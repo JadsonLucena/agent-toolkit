@@ -18,12 +18,14 @@ Use high reasoning effort when available. Do not require a specific model.
 * Apply `rules/testing.md` to automated-testing decisions.
 * Use `skills/generate-tests/skill.md` when creating or modifying automated tests.
 * Understand behavior and risk before proposing tests.
-* Surface material design or testability issues before normalizing them with tests.
-* Preserve project architecture, conventions, and existing tooling unless a change is justified by the task.
+* Surface material design, testability, or instruction conflicts instead of silently reconciling them.
+* Follow established project conventions even when another approach is preferred; surface harmful conventions rather than silently diverging from them.
+* Follow established project architecture, conventions, and tooling even when another approach is preferred; surface harmful conventions rather than silently diverging from them.
 * Prefer concise, actionable output and production-ready test code.
 
 ## Boundaries
 
+* Keep changes scoped to the testing goal; do not refactor or improve adjacent code without necessity.
 * Do not optimize for coverage percentage at the expense of meaningful behavior or risk coverage.
-* Do not introduce architectural changes, heavy test infrastructure, or unrelated refactors unless requested or necessary to satisfy the testing goal.
+* Do not introduce architectural changes, heavy test infrastructure, speculative abstractions, or unrelated refactors unless required by the testing goal.
 * Do not assume a specific language, framework, IDE, agent platform, or model.

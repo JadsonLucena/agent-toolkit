@@ -8,8 +8,10 @@ Generate complete, maintainable automated tests for new or modified behavior whi
 
 1. **Understand the context**
 
-   * Determine expected behavior, observable contract, scope, boundaries, and relevant project conventions.
-   * Infer the testing framework, assertion library, and mocking tools from the project context. If a material ambiguity remains, state the assumption before generating tests.
+   * Read the behavior under test, its public contract, immediate collaborators, and nearby test conventions before making changes.
+   * Determine expected behavior, scope, and boundaries.
+   * Identify and follow the project's existing testing framework, assertion library, mocking tools, and conventions.
+   * State material assumptions explicitly. If ambiguity can materially change the expected behavior, ask rather than guess.
 
 2. **Map behavior and risk**
 
@@ -24,6 +26,7 @@ Generate complete, maintainable automated tests for new or modified behavior whi
 
 4. **Select the test strategy**
 
+   * Define the success criteria the tests must prove.
    * Choose the lowest test level that provides sufficient confidence.
    * Define the required scenarios and whether specialized testing is relevant.
    * Select appropriate doubles and isolation boundaries.
@@ -50,5 +53,5 @@ Generate complete, maintainable automated tests for new or modified behavior whi
 * Start with a brief summary of the test strategy and material risks.
 * If a **Developer Alert** is required, present it before the tests.
 * Provide complete, copy-pasteable test code in standard Markdown code blocks.
-* Report failing tests, quality gates, or measurable regressions instead of declaring success.
+* Report failing, skipped, or unexecuted checks, measurable regressions, and material uncertainty; never imply successful validation when verification is incomplete.
 * Keep explanations concise; let test names and assertions describe the behavior.
