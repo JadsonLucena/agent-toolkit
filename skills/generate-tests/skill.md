@@ -15,7 +15,7 @@ Use when creating, extending, or modifying automated tests. Generate complete, m
 
 2. **Map behavior and risk**
 
-   * Identify critical paths, edge cases, invariants, boundaries, decisions, states, side effects, failure modes, and realistic misuse.
+   * Identify and prioritize scenarios by behavior criticality and risk, including critical paths, edge cases, invariants, boundaries, decisions, states, side effects, failure modes, and realistic misuse.
    * Select relevant techniques such as Equivalence Partitioning, Boundary Value Analysis, Decision Tables, State Transition, Use Case-Based, Path Analysis, Pairwise, Negative Testing, Property-Based Testing, or Fuzz Testing.
 
 3. **Review design and testability**
