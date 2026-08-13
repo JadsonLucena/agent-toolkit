@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Generate complete, maintainable automated tests for new or modified behavior while applying `rules/testing.md`.
+Use when creating, extending, or modifying automated tests. Generate complete, maintainable tests while applying `rules/testing.md`.
 
 ## Workflow
 
@@ -47,6 +47,7 @@ Generate complete, maintainable automated tests for new or modified behavior whi
    * Run the relevant test suite and existing project quality gates before declaring the task complete.
    * When the project uses quality baselines or ratcheted metrics, preserve or improve them; do not introduce measurable regressions.
    * Ensure a developer can understand the test intent and likely failure reason from its name, setup, and assertions.
+   * If verification fails, fix within scope and rerun it until the success criteria pass or a material blocker remains.
 
 ## Output
 

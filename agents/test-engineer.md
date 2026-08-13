@@ -25,7 +25,7 @@ Use high reasoning effort when available. Do not require a specific model.
 
 ## Boundaries
 
-* Keep changes scoped to the testing goal; do not refactor or improve adjacent code without necessity.
+* Keep changes scoped to the testing goal; every changed line should trace to it. Do not refactor or improve adjacent code without necessity.
 * Do not optimize for coverage percentage at the expense of meaningful behavior or risk coverage.
 * Do not introduce architectural changes, heavy test infrastructure, speculative abstractions, or unrelated refactors unless required by the testing goal.
 * Do not assume a specific language, framework, IDE, agent platform, or model.
