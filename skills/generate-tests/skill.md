@@ -10,7 +10,7 @@ Use when creating, extending, or modifying automated tests. Generate complete, m
 
    * Read the behavior under test, its public contract, immediate collaborators, and nearby test conventions before making changes.
    * Determine expected behavior, scope, and boundaries.
-   * Identify and follow the project's existing testing framework, assertion library, mocking tools, and conventions.
+   * Identify and follow the project's testing framework, assertion library, mocking tools, test commands, and conventions from repository evidence such as existing tests, configuration, manifests, and scripts.
    * State material assumptions explicitly. If ambiguity can materially change the expected behavior, ask rather than guess.
 
 2. **Map behavior and risk**
@@ -44,15 +44,17 @@ Use when creating, extending, or modifying automated tests. Generate complete, m
    * Confirm relevant success, failure, edge, boundary, state, side-effect, retry, replay, idempotency, and substitutability concerns were considered.
    * Confirm determinism, isolation, reproducibility, and CI suitability.
    * Confirm the tests avoid shallow assertions, over-mocking, brittle implementation checks, and unnecessary complexity.
-   * Run the relevant test suite and existing project quality gates before declaring the task complete.
+   * Run the narrowest relevant verification first, then the applicable project quality gates.
+   * Read verification evidence and diagnose failures before changing code.
    * When the project uses quality baselines or ratcheted metrics, preserve or improve them; do not introduce measurable regressions.
+   * Record the verification commands executed and their outcomes.
    * Ensure a developer can understand the test intent and likely failure reason from its name, setup, and assertions.
-   * If verification fails, fix within scope and rerun it until the success criteria pass or a material blocker remains.
+   * If verification fails, diagnose and fix the root cause within scope, then rerun the affected checks until the success criteria pass or further progress is blocked by unavailable verification, a material blocker, an out-of-scope fix, or unproductive repeated attempts.
 
 ## Output
 
 * Start with a brief summary of the test strategy and material risks.
 * If a **Developer Alert** is required, present it before the tests.
 * Provide complete, copy-pasteable test code in standard Markdown code blocks.
-* Report failing, skipped, or unexecuted checks, measurable regressions, and material uncertainty; never imply successful validation when verification is incomplete.
+* Report verification commands and outcomes, including failing, skipped, blocked, or unexecuted checks, measurable regressions, and material uncertainty; never imply successful validation when verification is incomplete.
 * Keep explanations concise; let test names and assertions describe the behavior.

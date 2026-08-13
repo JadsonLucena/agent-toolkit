@@ -120,3 +120,4 @@ Legacy, externally constrained, framework-controlled, or backward-compatible cod
 * Use snapshots or golden files only when they provide meaningful behavioral value.
 * Do not add tests that fail to reduce a meaningful, identifiable risk.
 * Do not create abstractions solely to remove harmless duplication.
+* Do not make verification pass by weakening meaningful assertions, removing relevant coverage, skipping tests, suppressing failures, or changing unrelated behavior. Address the root cause or report the blocker.
