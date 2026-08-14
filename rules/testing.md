@@ -81,7 +81,7 @@ Use quality metrics as diagnostic signals, not proof of correctness; follow proj
 
 ## Regression and Characterization
 
-* When fixing a defect, add a regression test that fails before the fix and passes after it whenever practical.
+* When fixing a defect, add a regression test that fails before the fix and passes after it whenever practical; confirm the pre-fix failure is caused by the defect, not test setup, configuration, or unrelated errors.
 * For legacy or externally constrained code that must be safely changed, consider characterization tests before refactoring.
 * Characterization tests capture current observable behavior; they do not legitimize poor design.
 * Document the purpose of a characterization test when it is not obvious.
@@ -101,6 +101,7 @@ Treat the following as signals for developer review before testing.
 ### Responsibility
 
 * A function, method, or class has multiple unrelated responsibilities, excessive branching, hidden side effects, or unclear boundaries that materially increase testing complexity.
+* Disproportionate test setup or pervasive mocking for a narrow behavior may indicate excessive coupling, too many responsibilities, or unclear boundaries.
 * Consider Divergent Change and Shotgun Surgery when they indicate poor responsibility boundaries.
 
 ### Predictability
