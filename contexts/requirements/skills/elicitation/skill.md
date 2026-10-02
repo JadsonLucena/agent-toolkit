@@ -24,11 +24,12 @@ stateDiagram-v2
 
     Clarify --> Investigate: clarification received
     Consolidate --> ValidateUnderstanding
+    ValidateUnderstanding --> Validation
 
     state Validation <<choice>>
-    ValidateUnderstanding --> Complete: needs and constraints are coherent
-    ValidateUnderstanding --> Investigate: contradiction or material gap
-    ValidateUnderstanding --> Clarify: stakeholder decision required
+    Validation --> Complete: needs and constraints are coherent
+    Validation --> Investigate: contradiction or material gap
+    Validation --> Clarify: stakeholder decision required
 
     Complete --> [*]
     Blocked --> [*]
