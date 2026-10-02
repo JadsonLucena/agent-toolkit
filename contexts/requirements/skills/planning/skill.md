@@ -8,8 +8,8 @@ Use to transform sufficiently defined requirements and other supported work sour
 
 * Rule: `contexts/requirements/rules/requirements.md`
 * Rule: `contexts/requirements/rules/planning.md`
-* Contract: `contracts/requirement-specification.md`
-* Contract: `contracts/backlog-item.md`
+* Contract: `contracts/requirements.md`
+* Contract: `contracts/work-item.md`
 
 ## State Model
 
@@ -48,4 +48,4 @@ stateDiagram-v2
 
 ## Output
 
-Produce `contracts/backlog-item.md`-compatible items with coherent intent, source traceability, acceptance evidence, dependencies, risks, assumptions, and readiness state. Do not invent priority, estimates, owners, iterations, or deadlines.
+Produce `contracts/work-item.md`-compatible items with coherent intent, source traceability, acceptance evidence, dependencies, risks, assumptions, and readiness state. Do not invent priority, estimates, owners, iterations, or deadlines.
