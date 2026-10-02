@@ -20,6 +20,7 @@
 * Keep coupled work together when separation would create an invalid, misleading, unverifiable, or operationally unsafe intermediate state.
 * Split work when independent intents, acceptance conditions, risks, dependencies, or delivery paths can be reasoned about separately.
 * Avoid premature decomposition beyond the level needed for the current planning horizon.
+* Technical or enabling tasks may exist when they represent necessary work, but they must trace to the outcome, requirement, constraint, dependency, or risk that justifies them.
 * Do not manufacture implementation tasks when the solution has not been selected and the task would encode an unsupported design decision.
 
 ## Acceptance and Readiness
@@ -28,6 +29,7 @@
 * Add planning-specific completion conditions only when they do not alter stakeholder intent.
 * Keep material unknowns, assumptions, dependencies, risks, and blockers visible.
 * Do not label an item ready when a material ambiguity prevents reliable implementation or verification.
+* Missing implementation detail is not automatically a blocker when source semantics are clear and design or implementation can legitimately decide the detail later.
 * Readiness is contextual; do not impose a universal Definition of Ready.
 
 ## Dependencies and Ordering
@@ -43,6 +45,14 @@
 * Refinement may improve clarity, decomposition, traceability, dependencies, risks, and acceptance evidence without changing underlying requirement semantics.
 * A semantic scope change requires requirements evidence or an explicit decision; it is not merely planning refinement.
 * Preserve history or rationale for material planning changes when the surrounding system supports it.
+
+## Planning Closure
+
+* Account for every material source requirement, defect, risk, decision, or obligation that entered the planning scope.
+* Identify source items with no planned realization and classify them explicitly when they are deferred, rejected, external, out of scope, or otherwise intentionally unplanned.
+* Identify work items with no evidenced source or purpose; do not retain orphan work merely because it already exists.
+* Check for duplicated scope, hidden scope expansion, inconsistent acceptance semantics, and unresolved dependency cycles before treating the plan as current.
+* A closed traceability loop does not require every source to become a work item, but every material omission must be explainable.
 
 ## Quality Guardrails
 

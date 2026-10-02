@@ -37,7 +37,7 @@ Contexts organize the four canonical artifact types by engineering responsibilit
 
 1. **Rules** — durable principles, constraints, invariants, and quality standards.
 2. **Skills** — reusable operational procedures and task state models.
-3. **Commands** — thin engineering-intent entry points that select a workflow.
+3. **Commands** — thin engineering-intent and authorization entry points that select a workflow without granting unrelated mutations.
 4. **Agents** — specialist scope, evidence discipline, orchestration, boundaries, and handoffs.
 
 See `ARCHITECTURE.md` for the responsibility matrix and dependency rules.
@@ -91,12 +91,15 @@ contexts/git/
 │   ├── gitflow.md
 │   ├── semantic-commit.md
 │   └── semantic-version.md
-├── skills/create-semantic-commits/skill.md
+├── skills/
+│   ├── create-semantic-commits/skill.md
+│   ├── determine-semantic-version/skill.md
+│   └── manage-branch-work/skill.md
 ├── commands/commit.md
 └── agents/git-engineer.md
 ```
 
-Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
+Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations. Branch/integration and semantic-version analysis are reusable skills even though they do not yet have public command entry points.
 
 ## Contracts
 

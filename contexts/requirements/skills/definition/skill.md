@@ -39,9 +39,20 @@ stateDiagram-v2
 4. Define acceptance criteria as observable evidence of satisfaction without prescribing an unnecessary test or implementation technique.
 5. Preserve source provenance and stable traceability identifiers when available.
 6. Check necessity, clarity, singularity, consistency, feasibility status, verifiability, completeness for the intended downstream use, and traceability.
-7. Surface contradictions and material ambiguity. Return stakeholder-intent questions to elicitation rather than resolving them by invention.
-8. Produce a specification only for semantics supported by evidence; keep unresolved material explicitly open.
+7. Check explicitly for duplicate requirements, hidden compound obligations, unsupported thresholds or precision, and solution leakage that is not backed by an explicit constraint or decision.
+8. Surface contradictions and material ambiguity. Return stakeholder-intent questions to elicitation rather than resolving them by invention.
+9. Produce a specification only for semantics supported by evidence; keep unresolved material explicitly open.
 
 ## Output
 
 Produce a `contracts/requirements.md`-compatible specification with requirements, acceptance criteria, business rules, constraints, assumptions, dependencies, traceability, and unresolved questions.
+
+## Stop Conditions
+
+Stop the affected definition decision and surface the issue when:
+
+* evidence supports multiple materially different requirement interpretations;
+* a required threshold, actor, policy, boundary, or acceptance semantic is unsupported;
+* source conflicts require stakeholder or developer authority to resolve;
+* continuing would require converting a design preference into stakeholder intent;
+* required evidence is unavailable and the affected requirement cannot be meaningfully defined without it.

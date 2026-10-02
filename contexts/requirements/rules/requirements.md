@@ -15,6 +15,7 @@
 * Distinguish directly stated needs from analyst-derived implications.
 * Treat existing software behavior, documentation, tickets, policies, regulations, contracts, interviews, and developer context as evidence with potentially different authority; do not silently resolve conflicts between them.
 * Surface conflicting evidence and identify what must be clarified or decided.
+* Newer evidence supersedes older evidence only when the supersession relationship is explicit; preserve enough provenance to explain what changed and why.
 * Never present an unsupported inference as a stakeholder-approved requirement.
 
 ## Ambiguity and Assumptions
@@ -56,6 +57,14 @@ Do not create false precision. Unknown values, thresholds, priorities, dates, ac
 * Do not prescribe a test level, framework, or implementation technique unless that is itself required.
 * A requirement may be valid before executable tests exist, but it must be possible to explain how its satisfaction could be evaluated.
 
+## Requirement Change and Impact
+
+* Treat a material change in stakeholder need, constraint, business rule, acceptance semantics, or governing evidence as a requirement change rather than a silent edit.
+* Preserve the superseded interpretation or enough history to explain the change when the surrounding system supports it.
+* Re-evaluate affected acceptance criteria, dependent requirements, planning items, design decisions, implementation references, and test evidence after a material requirement change.
+* Do not preserve an obsolete interpretation merely because downstream artifacts already depend on it.
+* Impact analysis should identify what remains valid independently and what requires revision, clarification, re-planning, or re-verification.
+
 ## Traceability
 
 * Preserve identity across transformations from source need to requirement, acceptance evidence, backlog item, implementation reference, and test evidence when those artifacts exist.
@@ -67,6 +76,10 @@ Do not create false precision. Unknown values, thresholds, priorities, dates, ac
 
 * Do not treat a backlog item, implementation detail, commit message, or test as the authoritative source of stakeholder intent when a requirement source exists.
 * Do not mark a requirement complete merely because a template is filled.
+* Do not equate elicitation notes with validated requirements.
+* Do not equate a user story with the complete requirement set when additional rules, constraints, quality attributes, states, or acceptance conditions exist.
+* Do not use priority as a substitute for semantic clarity.
+* Do not let formatting or template completeness hide unresolved semantic ambiguity.
 * Do not hide uncertainty behind generic wording such as "as appropriate", "user friendly", "fast", or "secure" when the missing criterion is material.
 * Do not combine independent obligations into one requirement when doing so harms verification, traceability, or change control.
 * Do not split a coherent requirement solely to satisfy an arbitrary format.

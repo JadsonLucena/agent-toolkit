@@ -36,7 +36,10 @@ contexts/
     │   ├── gitflow.md
     │   ├── semantic-commit.md
     │   └── semantic-version.md
-    ├── skills/create-semantic-commits/skill.md
+    ├── skills/
+    │   ├── create-semantic-commits/skill.md
+    │   ├── determine-semantic-version/skill.md
+    │   └── manage-branch-work/skill.md
     ├── commands/commit.md
     └── agents/git-engineer.md
 
@@ -52,7 +55,7 @@ contracts/
 |---|---|---|
 | Rule | Durable principles, constraints, invariants, safety and quality standards | Step-by-step workflow, invocation routing, specialist persona |
 | Skill | Reusable procedure, operational state, verification loop, task output | Global policy, user entry-point semantics, specialist identity |
-| Command | Explicit engineering intent, input selection, workflow entry point, expected result | Detailed policy or duplicated procedure |
+| Command | Explicit engineering intent, input selection, authorization boundary, workflow entry point, expected result | Detailed policy or duplicated procedure |
 | Agent | Specialist scope, evidence discipline, orchestration, boundaries, handoffs | Detailed reusable task procedure |
 | Contract | Neutral handoff semantics and schema meaning | Policy, workflow, orchestration, specialist behavior |
 
@@ -85,6 +88,8 @@ Contracts are supporting schemas, not a fifth canonical artifact type.
 | Git | `rules/semantic-commit.md` | Rule | Commit semantics, message structure, and atomicity invariants |
 | Git | `rules/semantic-version.md` | Rule | Semantic-version compatibility and increment invariants |
 | Git | `skills/create-semantic-commits/skill.md` | Skill | Atomic staging, verification, message derivation, commit creation, and post-check workflow |
+| Git | `skills/determine-semantic-version/skill.md` | Skill | Compatibility analysis, version-policy evaluation, and evidence-backed semantic-version recommendation |
+| Git | `skills/manage-branch-work/skill.md` | Skill | Branch, synchronization, integration, and worktree decision and verification workflow |
 | Git | `commands/commit.md` | Command | Start explicitly requested semantic commit creation |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
 | Cross-context | `contracts/requirements.md` | Contract | Neutral requirement-definition handoff semantics |
@@ -107,6 +112,7 @@ Additional rules:
 * Skills may depend on rules and contracts, but not on commands.
 * Agents may depend on rules, skills, and contracts, but not on commands.
 * Commands may select agents and skills and reference rules or contracts, but remain thin.
+* Commands define the authorization granted by invocation; authorization does not silently expand to adjacent mutations or downstream operations.
 * Contracts must not depend on a context implementation.
 * A context must not invoke another context's internal agent or skill merely to obtain data.
 * Cross-context integration should pass semantic evidence through contracts or explicit inputs.
@@ -120,6 +126,8 @@ Operational state machines belong in skills when they describe how a reusable ta
 Agents may contain a routing state model when it represents specialist-level orchestration rather than a reusable task procedure.
 
 Rules remain authoritative for constraints even when a state graph exists.
+
+Iterative or mutating skills should state explicit stop conditions when continued execution could otherwise require guessing, unsafe mutation, out-of-scope work, or unproductive retries.
 
 ## Ambiguity
 
@@ -147,8 +155,8 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 2. Requirements is split into Elicitor, Specifier, and Backlog Planner because discovery, formal semantics, and work decomposition have different evidence and failure modes.
 3. Testing consumes requirements-derived evidence optionally and never requires Requirements workflows.
 4. Git consumes planning intent only as optional evidence and never treats it as stronger than repository state.
-5. Detailed atomic commit execution moved from the Git Engineer into a skill.
-6. Detailed Gitflow, merge/rebase, worktree, composition, and version graphs are not retained in the agent. Their durable constraints remain in rules; new skills should be added only when a reusable operational workflow is needed.
+5. Detailed atomic commit execution lives in a dedicated skill.
+6. Reusable branch/integration/worktree and semantic-version decision procedures live in dedicated skills; they do not require first-class commands until a clear user-facing invocation intent exists.
 7. Contracts exist now because Requirements already hands semantics to Planning and Testing. They remain neutral schemas rather than a new artifact category.
 8. A generic `shared/` directory is intentionally avoided.
 
@@ -161,4 +169,4 @@ The following are intentionally not first-class commands yet:
 * merge/rebase orchestration;
 * repository-composition selection.
 
-Promote one to a skill or command only when there is a concrete reusable workflow and a clear invocation intent.
+Promote one to a command only when there is a clear user-facing invocation intent. Reusable internal procedures may remain skills without public command entry points.

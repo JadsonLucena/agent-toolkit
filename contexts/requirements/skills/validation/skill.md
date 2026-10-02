@@ -2,27 +2,66 @@
 
 ## Purpose
 
-Use as an independent quality gate for requirement definitions before downstream planning or implementation.
+Use as a separate quality gate for requirement definitions before downstream planning or implementation.
 
 ## Uses
 
 * Rule: `contexts/requirements/rules/requirements.md`
-* Contract: `contracts/requirement-specification.md`
+* Contract: `contracts/requirements.md`
+
+## Finding Taxonomy
+
+Classify each material finding by what was discovered:
+
+* `defect` — the specification contradicts supported evidence, its own semantics, or an applicable rule and can be corrected without inventing stakeholder intent;
+* `ambiguity` — multiple materially different interpretations remain plausible;
+* `gap` — information required for the intended downstream use is absent;
+* `conflict` — supported sources, requirements, rules, or decisions disagree;
+* `risk` — the specification remains usable but carries material uncertainty, dependency, feasibility concern, or consequence that must stay visible.
+
+Finding type is distinct from workflow status. Multiple findings may contribute to one overall readiness decision.
+
+## Workflow Status
+
+Classify the validation result separately from individual finding types:
+
+* `sufficient` — no material issue blocks the intended downstream use;
+* `needs-revision` — the specification can be corrected from existing evidence;
+* `needs-clarification` — stakeholder or developer input is required;
+* `blocked` — required evidence or validation capability is unavailable.
+
+When useful, report the target separately as `readiness_for`, such as stakeholder review, backlog planning, design, or implementation. Do not encode the target stage into the status itself.
 
 ## Workflow
 
-1. Identify the specification scope, intended downstream use, sources, and unresolved questions.
-2. Check each material requirement for evidence, clarity, consistency, verifiability, traceability, and sufficient completeness.
+1. Identify the specification scope, intended downstream use, sources, decisions, assumptions, conflicts, and unresolved questions.
+2. Check each material requirement for evidence, clarity, consistency, singularity, verifiability, traceability, and sufficient completeness.
 3. Check acceptance criteria for observable evidence and semantic alignment with their source requirement.
-4. Check business rules, constraints, assumptions, dependencies, states, invariants, and non-functional requirements for contradictions or unsupported precision.
-5. Distinguish specification defects from unresolved stakeholder intent.
-6. Classify the result as:
-   * `sufficient` — no material issue blocks the intended downstream use;
-   * `needs-revision` — the specification can be corrected from existing evidence;
-   * `needs-clarification` — stakeholder or developer input is required;
-   * `blocked` — required evidence is unavailable.
-7. Report findings with traceable references to the affected requirement or source. Do not rewrite stakeholder intent merely to make validation pass.
+4. Check business rules, constraints, assumptions, dependencies, states, invariants, and non-functional requirements for contradictions, unsupported precision, duplicate obligations, and solution leakage.
+5. Classify each material finding as `defect`, `ambiguity`, `gap`, `conflict`, or `risk`.
+6. Correct only defects that can be corrected from existing evidence without inventing stakeholder intent.
+7. Route semantic ambiguity, gaps, and unresolved conflicts to the appropriate stakeholder or developer authority.
+8. Revalidate affected relationships and traceability after corrections.
+9. Determine the overall workflow status independently from the finding type and report the actual readiness target.
+10. Do not convert unresolved findings into a pass merely to keep downstream work moving.
 
 ## Output
 
-Produce a concise validation report with status, material findings, affected identifiers, unresolved questions, and the evidence required to resolve them.
+Produce a concise validation report containing:
+
+* overall `status`;
+* optional `readiness_for`;
+* findings with type, affected identifiers, evidence, and material impact;
+* corrections performed from existing evidence;
+* unresolved questions or decisions;
+* evidence required to resolve remaining findings.
+
+## Stop Conditions
+
+Stop the affected validation decision and surface the issue when:
+
+* a material ambiguity, gap, or conflict requires authority not available to the validator;
+* required source evidence cannot be obtained or inspected;
+* validation would require inventing expected semantics;
+* repeated correction/revalidation cycles are not reducing the material findings;
+* a downstream-readiness conclusion cannot be supported by evidence.
