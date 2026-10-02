@@ -10,6 +10,8 @@ This command selects the Backlog Planner and the `refine` mode of the backlog-pl
 
 ## Uses
 
+* Rule: `contexts/requirements/rules/tailoring.md`
+
 * Agent: `contexts/requirements/agents/backlog-planner.md`
 * Skill: `contexts/requirements/skills/backlog-planning/skill.md`
 * Mode: `refine`
@@ -22,6 +24,7 @@ This command selects the Backlog Planner and the `refine` mode of the backlog-pl
 * Current requirements, decisions, and source evidence.
 * Existing tracker hierarchy, item taxonomy, or backlog conventions when available.
 * Intended planning horizon.
+* Optional use-case/journey context, examples, learning objectives, and critical guarantees when available.
 
 ## Output
 
