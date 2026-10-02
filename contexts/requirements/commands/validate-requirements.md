@@ -10,6 +10,8 @@ This command selects the Requirements Specifier and validation workflow. It auth
 
 ## Uses
 
+* Rule: `contexts/requirements/rules/tailoring.md`
+
 * Agent: `contexts/requirements/agents/requirements-specifier.md`
 * Skill: `contexts/requirements/skills/validation/skill.md`
 * Rule: `contexts/requirements/rules/requirements.md`
@@ -23,7 +25,7 @@ This command selects the Requirements Specifier and validation workflow. It auth
 
 ## Output
 
-Validation findings, affected identifiers, evidence, unresolved questions, and an evidence-backed readiness state.
+Rigor assessment when material, validation findings with type and severity, cross-artifact consistency findings, missing knowledge, evidence-backed revision recommendations, unresolved questions, and a readiness state.
 
 ## Boundary
 
