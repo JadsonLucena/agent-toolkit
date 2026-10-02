@@ -143,17 +143,41 @@ Test Evidence
 
 Downstream artifacts may summarize upstream semantics but must not silently change them.
 
+## Model Selection
+
+The toolkit does not require a specific AI provider or model.
+
+The execution environment should select an appropriate model and reasoning effort according to the task. Agents describe the capability they need; model configuration belongs to the platform adapter.
+
+```text
+Elicitation / planning → strong reasoning and decomposition
+Architecture           → high reasoning
+Implementation         → strong coding capability
+Testing                → high reasoning and adversarial analysis
+Git and release        → high reasoning over repository evidence
+Security               → high reasoning and specialized analysis
+Code review            → high reasoning and broad context
+Simple transformations → lightweight model when sufficient
+```
+
+## Context Management
+
+Long-running collaboration should preserve decisions, constraints, assumptions, unresolved issues, and relevant implementation context without forcing every agent to inherit the complete conversation history.
+
+Stable or repeatedly used project information may be cached when the execution platform supports it, but stale cached context must not override newer project state.
+
 ## Design Principles
 
-* **Vendor neutral**
-* **Context first**
-* **Single responsibility**
-* **Composable**
-* **Loosely coupled**
-* **Traceable**
-* **Evidence driven**
-* **Task oriented**
-* **Quality driven**
+* **Vendor neutral** — canonical definitions do not depend on a specific AI ecosystem.
+* **Context first** — artifacts are grouped by engineering responsibility.
+* **Single responsibility** — each concept has one authoritative owner.
+* **Composable** — contexts collaborate through explicit inputs and outputs.
+* **Loosely coupled** — cross-context evidence does not create workflow dependencies.
+* **Traceable** — material semantics preserve provenance across transformations.
+* **Evidence driven** — supported evidence precedes inference.
+* **Context aware** — preserve relevant context while minimizing unnecessary context.
+* **Task oriented** — commands express engineering intent rather than low-level tool aliases.
+* **Quality driven** — verification distinguishes evidence from assumptions and unverified conclusions.
 
 ## Roadmap
 
