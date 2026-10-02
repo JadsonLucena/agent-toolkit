@@ -33,12 +33,13 @@ stateDiagram-v2
     Decompose --> Trace
     Trace --> AnalyzeDependencies
     AnalyzeDependencies --> EvaluateReadiness
+    EvaluateReadiness --> Readiness
 
     state Readiness <<choice>>
-    EvaluateReadiness --> Ready: sufficient for planning horizon
-    EvaluateReadiness --> RevisePlan: decomposition or traceability issue
-    EvaluateReadiness --> NeedRequirementsClarification: semantic ambiguity
-    EvaluateReadiness --> Blocked: required source unavailable
+    Readiness --> Ready: sufficient for planning horizon
+    Readiness --> RevisePlan: decomposition or traceability issue
+    Readiness --> NeedRequirementsClarification: semantic ambiguity
+    Readiness --> Blocked: required source unavailable
 
     RevisePlan --> Decompose
     NeedRequirementsClarification --> InspectSources: clarified source received
