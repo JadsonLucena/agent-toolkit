@@ -8,11 +8,13 @@ This document defines the canonical structure and responsibility boundaries of A
 contexts/
 ├── requirements/
 │   ├── rules/
+│   │   ├── tailoring.md
 │   │   ├── requirements.md
 │   │   └── backlog.md
 │   ├── skills/
 │   │   ├── elicitation/skill.md
 │   │   ├── definition/skill.md
+│   │   ├── example-discovery/skill.md
 │   │   ├── validation/skill.md
 │   │   └── backlog-planning/skill.md
 │   ├── commands/
@@ -67,11 +69,13 @@ Contracts are supporting schemas, not a fifth canonical artifact type.
 
 | Context | Artifact | Type | Authoritative responsibility |
 |---|---|---|---|
-| Requirements | `rules/requirements.md` | Rule | Requirement evidence, ambiguity, quality, acceptance, change impact, and traceability invariants |
+| Requirements | `rules/tailoring.md` | Rule | Risk-proportional rigor, applicable-knowledge selection, governance, and anti-bureaucracy invariants |
+| Requirements | `rules/requirements.md` | Rule | Strategic framing, requirement semantics, evidence, ambiguity, quality, acceptance, change impact, and traceability invariants |
 | Requirements | `rules/backlog.md` | Rule | Backlog integrity, decomposition, readiness, dependency, tracker compatibility, refinement, and closure invariants |
 | Requirements | `skills/elicitation/skill.md` | Skill | Discover and consolidate supported stakeholder needs and unknowns |
-| Requirements | `skills/definition/skill.md` | Skill | Transform supported needs into verifiable requirement definitions |
-| Requirements | `skills/validation/skill.md` | Skill | Evaluate requirement-definition quality in a separate validation pass |
+| Requirements | `skills/definition/skill.md` | Skill | Transform supported needs into verifiable requirement definitions at the required rigor |
+| Requirements | `skills/example-discovery/skill.md` | Skill | Discover domain examples, counterexamples, boundaries, and questions before test automation |
+| Requirements | `skills/validation/skill.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
 | Requirements | `skills/backlog-planning/skill.md` | Skill | Build or refine traceable planning items while preserving source semantics |
 | Requirements | `commands/elicit-requirements.md` | Command | Start requirements discovery |
 | Requirements | `commands/specify-requirements.md` | Command | Start formal requirement definition |
@@ -134,6 +138,16 @@ Rules remain authoritative for constraints even when a state graph exists.
 
 Iterative or mutating skills should state explicit preconditions and stop conditions when continued execution could otherwise require guessing, unsafe mutation, out-of-scope work, or unproductive retries.
 
+A workflow may diagnose an out-of-scope defect without gaining authority to mutate the affected artifact. Mutation authority comes from the invoked command or separate explicit authorization.
+
+## Requirements Tailoring
+
+Requirements work follows the principle **just enough requirements, with sufficient rigor for the risk**.
+
+The Requirements context distinguishes `lightweight`, `standard`, and `high-assurance` rigor when classification is useful. Rigor changes the amount of evidence, validation, traceability, examples, review, and change discipline required; it does not create a mandatory document checklist.
+
+Knowledge concerns are conditional. Missing documentation is not equivalent to missing knowledge, and a concern is not `N/A` merely because its preferred artifact is absent.
+
 ## Ambiguity
 
 Use semantic states rather than numeric confidence:
@@ -175,15 +189,17 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 
 1. Physical organization is context-first; conceptual ownership remains Rule × Skill × Command × Agent.
 2. Requirements is split into Elicitor, Specifier, and Backlog Planner because discovery, formal semantics, and work decomposition have different evidence and failure modes.
-3. Elicitation and specification share `contracts/requirements.md` to preserve semantic continuity without creating a workflow-specific mega-contract.
-4. Backlog creation and refinement are two invocation modes of one backlog-planning capability.
-5. Testing consumes requirements-derived evidence optionally through `contracts/test-basis.md` and never requires Requirements workflows.
-6. Git consumes planning intent only as optional evidence and never treats it as stronger than repository state.
-7. Detailed atomic commit execution lives in a dedicated skill.
-8. Reusable branch/integration/worktree and semantic-version decision procedures live in dedicated skills.
-9. Semantic-version analysis has a public command because it has a clear user-facing intent and a non-mutating authorization boundary.
-10. Contracts exist because contexts exchange semantics. They remain neutral schemas rather than a new artifact category.
-11. A generic `shared/` directory is intentionally avoided.
+3. Requirements rigor is tailored to risk and uncertainty; the framework optimizes knowledge sufficiency rather than artifact count.
+4. Elicitation and specification share `contracts/requirements.md` to preserve semantic continuity without creating a workflow-specific mega-contract.
+5. Example discovery belongs to Requirements and may hand semantic evidence to Testing through `contracts/test-basis.md` without invoking Testing internals.
+6. Backlog creation and refinement are two invocation modes of one backlog-planning capability.
+7. Testing consumes requirements-derived evidence optionally through `contracts/test-basis.md` and never requires Requirements workflows.
+8. Git consumes planning intent only as optional evidence and never treats it as stronger than repository state.
+9. Detailed atomic commit execution lives in a dedicated skill.
+10. Reusable branch/integration/worktree and semantic-version decision procedures live in dedicated skills.
+11. Semantic-version analysis has a public command because it has a clear user-facing intent and a non-mutating authorization boundary.
+12. Contracts exist because contexts exchange semantics. They remain neutral schemas rather than a new artifact category.
+13. A generic `shared/` directory is intentionally avoided.
 
 ## Deferred Candidates
 
