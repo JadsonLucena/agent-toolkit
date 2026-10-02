@@ -69,11 +69,11 @@ Contracts are supporting schemas, not a fifth canonical artifact type.
 | Requirements | `rules/planning.md` | Rule | Planning integrity, decomposition, readiness, dependency, and refinement invariants |
 | Requirements | `skills/elicitation/skill.md` | Skill | Discover and consolidate supported stakeholder needs and unknowns |
 | Requirements | `skills/definition/skill.md` | Skill | Transform supported needs into verifiable requirement definitions |
-| Requirements | `skills/validation/skill.md` | Skill | Independently evaluate requirement-definition quality |
+| Requirements | `skills/validation/skill.md` | Skill | Evaluate requirement-definition quality in a separate validation pass |
 | Requirements | `skills/planning/skill.md` | Skill | Transform supported work sources into traceable planning items |
 | Requirements | `commands/elicit.md` | Command | Start requirements discovery |
 | Requirements | `commands/specify.md` | Command | Start formal requirement definition |
-| Requirements | `commands/audit.md` | Command | Start the independent requirement-quality gate |
+| Requirements | `commands/audit.md` | Command | Start the separate requirement-quality gate |
 | Requirements | `commands/items.md` | Command | Produce a structured backlog from supported sources |
 | Requirements | `commands/refinement.md` | Command | Refine existing planning items without changing source semantics |
 | Requirements | `agents/requirements-elicitor.md` | Agent | Own discovery scope, provenance, clarification, and elicitation handoff |
