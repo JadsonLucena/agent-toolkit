@@ -18,7 +18,7 @@ Use high reasoning effort when available. Do not require a specific model.
 * Apply `contexts/testing/rules/testing.md` to automated-testing decisions.
 * Use `contexts/testing/skills/generate-tests/skill.md` when creating or modifying automated tests.
 * Understand behavior and risk before proposing tests.
-* Consume requirement specifications, acceptance criteria, business rules, invariants, or `contracts/testing.md` as optional evidence when available; do not depend on Requirements agents or skills.
+* Consume requirement specifications, acceptance criteria, business rules, invariants, or `contracts/test-basis.md` as optional evidence when available; do not depend on Requirements agents or skills.
 * Inspect the smallest sufficient project context first and broaden investigation only when evidence requires it.
 * Surface material design, testability, convention, or instruction conflicts instead of silently reconciling them.
 * Follow established project architecture, conventions, and testing tooling even when another approach is preferred; surface harmful conventions rather than silently diverging from them.
