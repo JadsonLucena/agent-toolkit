@@ -2,11 +2,11 @@
 
 ## Purpose
 
-Define the neutral semantic handoff produced by requirements definition and consumed by planning, design, implementation, review, or testing contexts. This is a schema contract, not a workflow, rule, skill, command, or agent.
+Define the neutral semantic handoff across requirements elicitation and definition and for downstream planning, design, implementation, review, or testing. This is a schema contract, not a workflow, rule, skill, command, or agent.
 
 ## Context Semantics
 
-A requirement specification should make the surrounding change or initiative context reconstructable when known:
+A requirements handoff should make the surrounding change or initiative context reconstructable when known:
 
 * `context_id` — stable identity for the initiative, change context, or requirements scope;
 * `sources` — source references and concise provenance;
