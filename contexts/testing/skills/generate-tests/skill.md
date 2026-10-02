@@ -37,7 +37,7 @@ flowchart TD
 The workflow progressively establishes and refines:
 
 * Behavioral context, contract, scope, and boundaries.
-* Optional requirement specification, acceptance criteria, or `contracts/test-basis.md` evidence when supplied.
+* Optional requirement specification, acceptance criteria, or `contracts/testing.md` evidence when supplied.
 * Material assumptions and unresolved uncertainty.
 * Project testing tooling and conventions.
 * Risks, scenarios, and relevant test techniques.
@@ -98,7 +98,7 @@ The workflow progressively establishes and refines:
 1. **Understand the context**
 
    * Read the behavior under test, its public contract, immediate collaborators, and nearby test conventions before making changes.
-   * When requirement specifications, acceptance criteria, business rules, invariants, or a `contracts/test-basis.md` artifact are supplied, use them as additional behavioral evidence without requiring the Requirements context or invoking its internal skills.
+   * When requirement specifications, acceptance criteria, business rules, invariants, or a `contracts/testing.md` artifact are supplied, use them as additional behavioral evidence without requiring the Requirements context or invoking its internal skills.
    * Determine expected behavior, scope, and boundaries.
    * Reconcile supplied planning evidence with observable implementation and project evidence. Surface material conflicts instead of silently choosing one source.
    * State material assumptions explicitly. If ambiguity can materially change the expected behavior, ask rather than guess.
