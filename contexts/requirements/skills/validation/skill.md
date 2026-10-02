@@ -13,7 +13,7 @@ Use as a separate quality gate for requirement definitions before downstream pla
 
 Classify each material finding by what was discovered:
 
-* `defect` — the specification contradicts supported evidence, its own semantics, or an applicable rule and can be corrected without inventing stakeholder intent;
+* `defect` — the specification contradicts supported evidence, its own semantics, or an applicable rule and an evidence-backed correction can be described without inventing stakeholder intent;
 * `ambiguity` — multiple materially different interpretations remain plausible;
 * `gap` — information required for the intended downstream use is absent;
 * `conflict` — supported sources, requirements, rules, or decisions disagree;
@@ -26,7 +26,7 @@ Finding type is distinct from workflow status. Multiple findings may contribute 
 Classify the validation result separately from individual finding types:
 
 * `sufficient` — no material issue blocks the intended downstream use;
-* `needs-revision` — the specification can be corrected from existing evidence;
+* `needs-revision` — one or more evidence-backed revisions are required before the intended downstream use;
 * `needs-clarification` — stakeholder or developer input is required;
 * `blocked` — required evidence or validation capability is unavailable.
 
@@ -39,9 +39,9 @@ When useful, report the target separately as `readiness_for`, such as stakeholde
 3. Check acceptance criteria for observable evidence and semantic alignment with their source requirement.
 4. Check business rules, constraints, assumptions, dependencies, states, invariants, and non-functional requirements for contradictions, unsupported precision, duplicate obligations, and solution leakage.
 5. Classify each material finding as `defect`, `ambiguity`, `gap`, `conflict`, or `risk`.
-6. Correct only defects that can be corrected from existing evidence without inventing stakeholder intent.
+6. For each correctable defect, describe the evidence-backed revision without mutating the specification under this validation workflow.
 7. Route semantic ambiguity, gaps, and unresolved conflicts to the appropriate stakeholder or developer authority.
-8. Revalidate affected relationships and traceability after corrections.
+8. Identify relationships and traceability that would require revalidation if a proposed revision is later authorized and applied.
 9. Determine the overall workflow status independently from the finding type and report the actual readiness target.
 10. Do not convert unresolved findings into a pass merely to keep downstream work moving.
 
@@ -52,16 +52,21 @@ Produce a concise validation report containing:
 * overall `status`;
 * optional `readiness_for`;
 * findings with type, affected identifiers, evidence, and material impact;
-* corrections performed from existing evidence;
+* evidence-backed revision recommendations;
 * unresolved questions or decisions;
 * evidence required to resolve remaining findings.
 
+## Boundary
+
+Validation is read-only unless a separate command or explicit authorization permits modifying the specification. This skill may describe an evidence-backed revision but must not apply it silently.
+
 ## Stop Conditions
+
 
 Stop the affected validation decision and surface the issue when:
 
 * a material ambiguity, gap, or conflict requires authority not available to the validator;
 * required source evidence cannot be obtained or inspected;
 * validation would require inventing expected semantics;
-* repeated correction/revalidation cycles are not reducing the material findings;
+* repeated validation cycles are not reducing the material findings;
 * a downstream-readiness conclusion cannot be supported by evidence.
