@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Use when creating, extending, or modifying automated tests. Generate complete, maintainable tests while applying `rules/testing.md`.
+Use when creating, extending, or modifying automated tests. Generate complete, maintainable tests while applying `contexts/testing/rules/testing.md`.
 
 ## Operational Graph
 
@@ -73,7 +73,7 @@ The workflow progressively establishes and refines:
 
 **Requires:** success criteria and test strategy.
 
-**Produces:** complete, runnable tests consistent with the project and `rules/testing.md`.
+**Produces:** complete, runnable tests consistent with the project and `contexts/testing/rules/testing.md`.
 
 ### Verify
 
@@ -115,14 +115,14 @@ The workflow progressively establishes and refines:
 
 4. **Review design and testability**
 
-   * Evaluate the Design and Testability Smells in `rules/testing.md`.
+   * Evaluate the Design and Testability Smells in `contexts/testing/rules/testing.md`.
    * If a probable issue materially harms testability, maintainability, predictability, or architectural integrity, output a **Developer Alert** before generating the full test suite and explain the issue concisely.
    * Continue only when the issue can be handled safely within scope; otherwise report the blocker or required developer decision.
    * For legacy or constrained code, prefer characterization tests when needed to make change safe.
 
 5. **Generate the tests**
 
-   * Follow project conventions and `rules/testing.md`.
+   * Follow project conventions and `contexts/testing/rules/testing.md`.
    * Keep setup minimal and explicit.
    * Use realistic, non-sensitive data.
    * Generate complete, runnable tests.
