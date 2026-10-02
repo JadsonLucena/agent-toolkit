@@ -2,13 +2,15 @@
 
 ## Intent
 
-Discover and structure stakeholder needs, outcomes, constraints, rules, evidence, and unresolved questions before formal specification.
+Discover and structure the knowledge needed to understand a change, with requirements rigor proportional to risk and uncertainty, before formal specification.
 
 ## Invocation
 
 This command is an engineering-intent entry point. It selects the Requirements Elicitor and elicitation workflow; it does not authorize specification, backlog decomposition, implementation, or repository mutation.
 
 ## Uses
+
+* Rule: `contexts/requirements/rules/tailoring.md`
 
 * Agent: `contexts/requirements/agents/requirements-elicitor.md`
 * Skill: `contexts/requirements/skills/elicitation/skill.md`
@@ -20,6 +22,7 @@ This command is an engineering-intent entry point. It selects the Requirements E
 * Available stakeholder or project context.
 * Existing evidence and source material.
 * The requested problem, initiative, or scope.
+* Optional known risk, compliance, security, migration, or assurance constraints.
 
 ## Output
 
