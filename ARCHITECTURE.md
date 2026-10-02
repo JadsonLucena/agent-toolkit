@@ -9,18 +9,18 @@ contexts/
 ├── requirements/
 │   ├── rules/
 │   │   ├── requirements.md
-│   │   └── planning.md
+│   │   └── backlog.md
 │   ├── skills/
 │   │   ├── elicitation/skill.md
 │   │   ├── definition/skill.md
 │   │   ├── validation/skill.md
-│   │   └── planning/skill.md
+│   │   └── backlog-planning/skill.md
 │   ├── commands/
-│   │   ├── elicit.md
-│   │   ├── specify.md
-│   │   ├── audit.md
-│   │   ├── items.md
-│   │   └── refinement.md
+│   │   ├── elicit-requirements.md
+│   │   ├── specify-requirements.md
+│   │   ├── validate-requirements.md
+│   │   ├── build-backlog.md
+│   │   └── refine-backlog.md
 │   └── agents/
 │       ├── requirements-elicitor.md
 │       ├── requirements-specifier.md
@@ -28,7 +28,7 @@ contexts/
 ├── testing/
 │   ├── rules/testing.md
 │   ├── skills/generate-tests/skill.md
-│   ├── commands/test.md
+│   ├── commands/generate-tests.md
 │   └── agents/test-engineer.md
 └── git/
     ├── rules/
@@ -40,13 +40,15 @@ contexts/
     │   ├── create-semantic-commits/skill.md
     │   ├── determine-semantic-version/skill.md
     │   └── manage-branch-work/skill.md
-    ├── commands/commit.md
+    ├── commands/
+    │   ├── commit.md
+    │   └── determine-semantic-version.md
     └── agents/git-engineer.md
 
 contracts/
 ├── requirements.md
 ├── work-item.md
-└── testing.md
+└── test-basis.md
 ```
 
 ## Responsibility Model
@@ -65,23 +67,23 @@ Contracts are supporting schemas, not a fifth canonical artifact type.
 
 | Context | Artifact | Type | Authoritative responsibility |
 |---|---|---|---|
-| Requirements | `rules/requirements.md` | Rule | Requirement evidence, ambiguity, quality, acceptance, and traceability invariants |
-| Requirements | `rules/planning.md` | Rule | Planning integrity, decomposition, readiness, dependency, and refinement invariants |
+| Requirements | `rules/requirements.md` | Rule | Requirement evidence, ambiguity, quality, acceptance, change impact, and traceability invariants |
+| Requirements | `rules/backlog.md` | Rule | Backlog integrity, decomposition, readiness, dependency, tracker compatibility, refinement, and closure invariants |
 | Requirements | `skills/elicitation/skill.md` | Skill | Discover and consolidate supported stakeholder needs and unknowns |
 | Requirements | `skills/definition/skill.md` | Skill | Transform supported needs into verifiable requirement definitions |
 | Requirements | `skills/validation/skill.md` | Skill | Evaluate requirement-definition quality in a separate validation pass |
-| Requirements | `skills/planning/skill.md` | Skill | Transform supported work sources into traceable planning items |
-| Requirements | `commands/elicit.md` | Command | Start requirements discovery |
-| Requirements | `commands/specify.md` | Command | Start formal requirement definition |
-| Requirements | `commands/audit.md` | Command | Start the separate requirement-quality gate |
-| Requirements | `commands/items.md` | Command | Produce a structured backlog from supported sources |
-| Requirements | `commands/refinement.md` | Command | Refine existing planning items without changing source semantics |
+| Requirements | `skills/backlog-planning/skill.md` | Skill | Build or refine traceable planning items while preserving source semantics |
+| Requirements | `commands/elicit-requirements.md` | Command | Start requirements discovery |
+| Requirements | `commands/specify-requirements.md` | Command | Start formal requirement definition |
+| Requirements | `commands/validate-requirements.md` | Command | Start the separate requirement-quality gate |
+| Requirements | `commands/build-backlog.md` | Command | Build a structured backlog from supported sources |
+| Requirements | `commands/refine-backlog.md` | Command | Refine existing planning items without changing source semantics |
 | Requirements | `agents/requirements-elicitor.md` | Agent | Own discovery scope, provenance, clarification, and elicitation handoff |
 | Requirements | `agents/requirements-specifier.md` | Agent | Own formal requirement semantics, evidence discipline, and validation routing |
-| Requirements | `agents/backlog-planner.md` | Agent | Own planning decomposition, traceability, dependencies, and readiness boundaries |
+| Requirements | `agents/backlog-planner.md` | Agent | Own backlog decomposition, traceability, dependencies, tracker alignment, and readiness boundaries |
 | Testing | `rules/testing.md` | Rule | Automated-testing standards and quality invariants |
 | Testing | `skills/generate-tests/skill.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
-| Testing | `commands/test.md` | Command | Start automated-test creation or modification |
+| Testing | `commands/generate-tests.md` | Command | Start automated-test creation or modification |
 | Testing | `agents/test-engineer.md` | Agent | Own testing specialization, evidence discipline, and scope boundaries |
 | Git | `rules/git.md` | Rule | Repository-state, history, synchronization, worktree, composition, and remote safety |
 | Git | `rules/gitflow.md` | Rule | Gitflow applicability and branch-lifecycle invariants |
@@ -91,10 +93,11 @@ Contracts are supporting schemas, not a fifth canonical artifact type.
 | Git | `skills/determine-semantic-version/skill.md` | Skill | Compatibility analysis, version-policy evaluation, and evidence-backed semantic-version recommendation |
 | Git | `skills/manage-branch-work/skill.md` | Skill | Branch, synchronization, integration, and worktree decision and verification workflow |
 | Git | `commands/commit.md` | Command | Start explicitly requested semantic commit creation |
+| Git | `commands/determine-semantic-version.md` | Command | Start semantic-version analysis without release mutation |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
-| Cross-context | `contracts/requirements.md` | Contract | Neutral requirement-definition handoff semantics |
+| Cross-context | `contracts/requirements.md` | Contract | Neutral elicitation and requirement-definition handoff semantics |
 | Cross-context | `contracts/work-item.md` | Contract | Neutral planning-item handoff semantics |
-| Cross-context | `contracts/testing.md` | Contract | Optional behavioral evidence handoff for Testing |
+| Cross-context | `contracts/test-basis.md` | Contract | Optional behavioral evidence handoff for Testing |
 
 ## Dependency Direction
 
@@ -116,8 +119,10 @@ Additional rules:
 * Contracts must not depend on a context implementation.
 * A context must not invoke another context's internal agent or skill merely to obtain data.
 * Cross-context integration should pass semantic evidence through contracts or explicit inputs.
+* Cross-context agent or skill composition is allowed only when the invoked workflow explicitly spans those contexts. Data acquisition alone is not sufficient justification for cross-context orchestration.
 * Git and Testing must remain independently usable when Requirements artifacts are absent.
 * Requirements must remain independently usable when no repository exists.
+* Vendor adapters may depend on canonical artifacts; canonical artifacts never depend on a vendor adapter.
 
 ## State Models
 
@@ -127,7 +132,7 @@ Agents may contain a routing state model when it represents specialist-level orc
 
 Rules remain authoritative for constraints even when a state graph exists.
 
-Iterative or mutating skills should state explicit stop conditions when continued execution could otherwise require guessing, unsafe mutation, out-of-scope work, or unproductive retries.
+Iterative or mutating skills should state explicit preconditions and stop conditions when continued execution could otherwise require guessing, unsafe mutation, out-of-scope work, or unproductive retries.
 
 ## Ambiguity
 
@@ -145,28 +150,49 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 * Context names are stable engineering nouns: `requirements`, `testing`, `git`.
 * Rule filenames name the governed concern.
 * Skill directories name the reusable capability.
-* Command filenames are concise within their context; the context supplies the namespace.
+* Command names use a clear verb-object engineering intent and should remain understandable when surfaced outside their physical context. The context namespace may remove redundancy only when the remaining name stays unambiguous.
 * Agent filenames name the specialist role.
 * Contract filenames name the semantic handoff, not a workflow.
+
+## Command Shape
+
+Commands should use a consistent editorial shape:
+
+```text
+# <Command>
+
+## Intent
+## Invocation
+## Uses
+## Inputs
+## Output
+## Boundary
+```
+
+Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` defines what it does not authorize or what must be escalated.
 
 ## Accepted Decisions
 
 1. Physical organization is context-first; conceptual ownership remains Rule × Skill × Command × Agent.
 2. Requirements is split into Elicitor, Specifier, and Backlog Planner because discovery, formal semantics, and work decomposition have different evidence and failure modes.
-3. Testing consumes requirements-derived evidence optionally and never requires Requirements workflows.
-4. Git consumes planning intent only as optional evidence and never treats it as stronger than repository state.
-5. Detailed atomic commit execution lives in a dedicated skill.
-6. Reusable branch/integration/worktree and semantic-version decision procedures live in dedicated skills; they do not require first-class commands until a clear user-facing invocation intent exists.
-7. Contracts exist now because Requirements already hands semantics to Planning and Testing. They remain neutral schemas rather than a new artifact category.
-8. A generic `shared/` directory is intentionally avoided.
+3. Elicitation and specification share `contracts/requirements.md` to preserve semantic continuity without creating a workflow-specific mega-contract.
+4. Backlog creation and refinement are two invocation modes of one backlog-planning capability.
+5. Testing consumes requirements-derived evidence optionally through `contracts/test-basis.md` and never requires Requirements workflows.
+6. Git consumes planning intent only as optional evidence and never treats it as stronger than repository state.
+7. Detailed atomic commit execution lives in a dedicated skill.
+8. Reusable branch/integration/worktree and semantic-version decision procedures live in dedicated skills.
+9. Semantic-version analysis has a public command because it has a clear user-facing intent and a non-mutating authorization boundary.
+10. Contracts exist because contexts exchange semantics. They remain neutral schemas rather than a new artifact category.
+11. A generic `shared/` directory is intentionally avoided.
 
 ## Deferred Candidates
 
-The following are intentionally not first-class commands yet:
+The following do not currently require first-class commands:
 
-* semantic-version analysis;
 * parallel worktree preparation;
 * merge/rebase orchestration;
 * repository-composition selection.
 
 Promote one to a command only when there is a clear user-facing invocation intent. Reusable internal procedures may remain skills without public command entry points.
+
+See `MIGRATION.md` for structural renames and responsibility movement.
