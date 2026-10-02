@@ -6,7 +6,7 @@ Evaluate requirement quality and readiness for the requested downstream use.
 
 ## Invocation
 
-This command selects the Requirements Specifier and validation workflow. It authorizes evidence-backed validation and correction of specification defects that do not require inventing stakeholder intent.
+This command selects the Requirements Specifier and validation workflow. It authorizes analysis and evidence-backed revision recommendations only; it does not authorize modifying the specification.
 
 ## Uses
 
@@ -27,4 +27,4 @@ Validation findings, affected identifiers, evidence, unresolved questions, and a
 
 ## Boundary
 
-Material ambiguity, gaps, or conflicts requiring stakeholder or developer authority must be surfaced rather than silently resolved.
+Material ambiguity, gaps, or conflicts requiring stakeholder or developer authority must be surfaced rather than silently resolved. Applying a recommended revision requires separate explicit authorization.
