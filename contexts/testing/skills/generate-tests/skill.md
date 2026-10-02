@@ -38,10 +38,10 @@ flowchart TD
 The workflow progressively establishes and refines:
 
 * Behavioral context, contract, scope, and boundaries.
-* Optional requirement specification, acceptance criteria, or `contracts/test-basis.md` evidence when supplied.
+* Optional requirement specification, acceptance/fit criteria, business examples, counterexamples, boundaries, failure model, or `contracts/test-basis.md` evidence when supplied.
 * Material assumptions and unresolved uncertainty.
 * Project testing tooling and conventions.
-* Risks, scenarios, and relevant test techniques.
+* Risks, examples, counterexamples, scenario partitions, failure assumptions, and relevant test techniques.
 * Success criteria and test strategy.
 * Generated or modified tests.
 * Verification evidence and quality-gate outcomes.
@@ -99,7 +99,8 @@ The workflow progressively establishes and refines:
 1. **Understand the context**
 
    * Read the behavior under test, its public contract, immediate collaborators, and nearby test conventions before making changes.
-   * When requirement specifications, acceptance criteria, business rules, invariants, or a `contracts/test-basis.md` artifact are supplied, use them as additional behavioral evidence without requiring the Requirements context or invoking its internal skills.
+   * When requirement specifications, acceptance/fit criteria, business rules, invariants, examples, counterexamples, boundaries, quality/security obligations, or a `contracts/test-basis.md` artifact are supplied, use them as additional behavioral evidence without requiring the Requirements context or invoking its internal skills.
+   * Preserve business examples as business evidence. Do not rewrite them into UI, transport, persistence, or framework details unless those details are part of the required behavior.
    * Determine expected behavior, scope, and boundaries.
    * Reconcile supplied planning evidence with observable implementation and project evidence. Surface material conflicts instead of silently choosing one source.
    * State material assumptions explicitly. If ambiguity can materially change the expected behavior, ask rather than guess.
@@ -107,12 +108,13 @@ The workflow progressively establishes and refines:
 2. **Infer project context and map behavior and risk**
 
    * Identify and follow the project's testing framework, assertion library, mocking tools, test commands, and conventions from repository evidence such as existing tests, configuration, manifests, and scripts.
-   * Identify and prioritize scenarios by behavior criticality and risk, including critical paths, edge cases, invariants, boundaries, decisions, states, side effects, failure modes, and realistic misuse.
+   * Start from supplied rules/examples when available, then identify uncovered behavior by criticality and risk, including critical paths, counterexamples, edge cases, invariants, boundaries, decisions, states, side effects, failure modes, and realistic misuse.
+   * When a failure model is supplied or can be supported from project evidence, include relevant timeout, retry, partial-failure, duplicate/replay, dependency-outage, ordering, idempotency, or concurrency scenarios.
    * Select relevant techniques such as Equivalence Partitioning, Boundary Value Analysis, Decision Tables, State Transition, Use Case-Based, Path Analysis, Pairwise, Negative Testing, Property-Based Testing, or Fuzz Testing.
 
 3. **Define success and test strategy**
 
-   * Define the observable success criteria the tests must prove.
+   * Define the observable success criteria the tests must prove, preserving the distinction between business specification and the automation layer.
    * Choose the lowest test level that provides sufficient confidence.
    * Define the required scenarios and whether specialized testing is relevant.
    * Select appropriate doubles and isolation boundaries.
@@ -130,11 +132,13 @@ The workflow progressively establishes and refines:
    * Keep setup minimal and explicit.
    * Use realistic, non-sensitive data.
    * Generate complete, runnable tests.
+   * When the project uses BDD or Specification by Example, preserve domain-oriented examples and living-documentation value without assuming Gherkin is required.
 
 6. **Verify the result**
 
    * Confirm the tests protect intended contracts, rules, invariants, or outcomes.
-   * Confirm relevant success, failure, edge, boundary, state, side-effect, retry, replay, idempotency, and substitutability concerns were considered.
+   * Confirm relevant success, failure, counterexample, edge, boundary, state, side-effect, retry, replay, idempotency, and substitutability concerns were considered.
+   * When the change modifies previously verified behavior, run or identify the relevant regression checks rather than validating only the new slice.
    * Confirm determinism, isolation, reproducibility, and CI suitability.
    * Confirm the tests avoid shallow assertions, over-mocking, brittle implementation checks, and unnecessary complexity.
    * Run the narrowest relevant verification first, then the applicable project quality gates.
@@ -162,5 +166,5 @@ This skill may create or modify test artifacts. It may diagnose defects outside 
 * Start with a brief summary of the test strategy and material risks.
 * If a **Developer Alert** is required, present it before the tests.
 * Provide complete, copy-pasteable test code in standard Markdown code blocks.
-* Report verification commands and outcomes, including failing, skipped, blocked, or unexecuted checks, measurable regressions, and material uncertainty; never imply successful validation when verification is incomplete.
+* Report verification commands and outcomes, including failing, skipped, blocked, or unexecuted checks, regression evidence, measurable regressions, and material uncertainty; never imply successful validation when verification is incomplete.
 * Keep explanations concise; let test names and assertions describe the behavior.
