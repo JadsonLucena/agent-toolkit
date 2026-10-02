@@ -2,10 +2,11 @@
 
 ## Purpose
 
-Use to discover and structure stakeholder needs, goals, context, constraints, business rules, risks, conflicts, and unknowns before formal specification.
+Use to discover and structure the knowledge needed to understand a change before formal specification, applying only the rigor justified by its risk and uncertainty.
 
 ## Uses
 
+* Rule: `contexts/requirements/rules/tailoring.md`
 * Rule: `contexts/requirements/rules/requirements.md`
 * Contract: `contracts/requirements.md`
 
@@ -13,7 +14,8 @@ Use to discover and structure stakeholder needs, goals, context, constraints, bu
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Discover
+    [*] --> AssessContext
+    AssessContext --> Discover
     Discover --> Investigate
     Investigate --> EvaluateUnderstanding
 
@@ -27,7 +29,7 @@ stateDiagram-v2
     ValidateUnderstanding --> Validation
 
     state Validation <<choice>>
-    Validation --> Complete: needs and constraints are coherent
+    Validation --> Complete: knowledge sufficient for intended next decision
     Validation --> Investigate: contradiction or material gap
     Validation --> Clarify: stakeholder decision required
 
@@ -37,41 +39,74 @@ stateDiagram-v2
 
 ## Working State
 
-Maintain:
+Maintain only the concerns that are material to the context, including when relevant:
 
-* problem and operating context;
-* stakeholders and affected actors;
-* goals and desired outcomes;
-* observed needs and pain points;
-* business rules and external constraints;
-* assumptions and evidence provenance;
-* conflicts, risks, dependencies, and unknowns;
+* selected rigor: `lightweight`, `standard`, or `high-assurance`, with rationale;
+* applicable and explicitly non-applicable knowledge concerns;
+* need, business goals, desired outcomes, and success evidence;
+* current state, future state, and material change gaps;
+* work scope and product/software boundary;
+* stakeholders, affected actors, and relevant authority;
+* business events and business responses;
+* domain terms, facts, business rules, and external constraints;
+* candidate solutions or learning options when solution uncertainty matters;
+* transition needs for migration, rollout, compatibility, cutover, training, or decommissioning;
+* risks, dependencies, assumptions, unknowns, options, conflicts, and provenance;
 * open questions and decisions required.
 
 ## Workflow
 
-1. Establish the problem context, objective, scope boundary, available sources, and known stakeholders.
-2. Inspect supplied evidence before asking questions that the evidence already answers.
-3. Identify materially affected stakeholder perspectives or authoritative sources that are not represented and could change the resulting understanding.
-4. Discover goals, needs, actors, workflows, constraints, business rules, failure concerns, dependencies, exclusions, and success signals.
-5. Separate directly stated information from derived implications, assumptions, proposed solutions, and already-made decisions.
-6. Detect contradictions, overloaded terms, hidden decisions, and solution-first statements; recover the underlying need unless the proposed solution is itself an explicit constraint or decision.
-7. Investigate missing context that can materially alter semantics, scope, acceptance, or downstream work.
-8. Ask focused clarification questions only for material ambiguity; avoid interrogating low-impact uncertainty.
-9. Consolidate equivalent statements without erasing meaningful differences in source, actor, condition, priority, or authority.
-10. Validate the resulting understanding against the available evidence and represented stakeholder context.
-11. Stop with explicit unresolved questions when required evidence or a stakeholder decision is unavailable.
+1. **Assess context and required rigor.**
+   * Consider business/customer/financial impact, security, privacy, compliance, domain and technical complexity, integrations, teams, migration/legacy, reversibility, uncertainty, expected change frequency, and solution lifetime when relevant.
+   * Select `lightweight`, `standard`, or `high-assurance` only when a rigor label is useful, and record why.
+   * Determine which knowledge concerns are applicable; do not turn the framework into a mandatory artifact checklist.
+
+2. **Establish strategic framing.**
+   * Identify the underlying Need or opportunity without prematurely encoding a solution.
+   * Identify supported Business Goals and observable success evidence.
+   * Distinguish business success metrics from fit criteria, acceptance criteria, and test assertions.
+
+3. **Understand change and scope.**
+   * Capture relevant Current State, desired Future State, and material gaps.
+   * Distinguish Work Scope from Product Boundary when the change may involve people, process, policy, purchased products, manual operations, or partial automation.
+   * Ask, when material, why the problem needs software rather than assuming it does.
+   * Identify transition concerns separately from permanent product behavior.
+
+4. **Investigate business behavior and knowledge.**
+   * Inspect supplied evidence before asking questions that it already answers.
+   * Identify materially affected stakeholder perspectives or authoritative sources that are not represented.
+   * Discover goals, needs, actors, workflows, business events, rules, constraints, failures, dependencies, exclusions, and success signals.
+   * Preserve important domain terms and facts; distinguish true business rules from historical implementation limitations.
+
+5. **Separate evidence from interpretation.**
+   * Distinguish directly stated information, derived implications, assumptions, options, proposed solutions, and explicit decisions.
+   * Detect contradictions, overloaded terms, hidden decisions, and solution-first statements.
+   * When a proposed solution is not a supported constraint or decision, recover the underlying need and keep the proposal as an option.
+
+6. **Explore uncertainty proportionally.**
+   * For material unknowns, record the risk if unresolved and how the knowledge could be obtained.
+   * When solution uncertainty matters, preserve candidate alternatives and consider whether a prototype, experiment, probe, spike, or thin slice is the appropriate next learning step.
+   * Ask focused clarification questions only when ambiguity can materially change semantics, scope, acceptance, risk, or downstream work.
+
+7. **Consolidate and validate understanding.**
+   * Consolidate equivalent statements without erasing meaningful differences in source, actor, condition, authority, or rationale.
+   * Validate the resulting understanding against available evidence and represented stakeholder context.
+   * Check for both under-engineering and unnecessary analysis/documentation.
+   * Stop with explicit unresolved questions when required evidence or authority is unavailable.
 
 ## Output
 
-Produce an elicitation handoff conforming to the elicitation semantics in `contracts/requirements.md`, containing supported needs, goals, stakeholders, constraints, business rules, risks, assumptions, provenance, conflicts, and open questions. Do not silently convert unresolved intent into formal requirements or backlog items.
+Produce an elicitation handoff conforming to `contracts/requirements.md`. Include the selected rigor and applicable concerns when material, plus supported strategic framing, stakeholder/domain knowledge, constraints, risks, assumptions, options, conflicts, provenance, and open questions.
+
+Do not silently convert unresolved intent into formal requirements, architecture, backlog items, or software scope.
 
 ## Stop Conditions
 
-Stop the affected line of work and surface the issue when:
+Stop only the affected line of work and surface the issue when:
 
 * a materially required stakeholder perspective or authoritative source is unavailable;
 * conflicting evidence cannot be resolved within the authorized interaction;
 * continuing would require inventing material stakeholder intent;
+* product/software scope would have to be assumed without evidence;
 * the requested scope exceeds the available authority or evidence;
-* repeated clarification attempts are not producing new evidence or narrowing the ambiguity.
+* repeated clarification or discovery attempts are not producing useful learning.
