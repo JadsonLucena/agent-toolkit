@@ -28,7 +28,11 @@ A work item should make the following available when material and known:
 * dependencies and sequencing constraints;
 * risks and blockers;
 * explicit assumptions and unresolved questions;
-* readiness state for the intended planning horizon.
+* readiness state for the intended planning horizon;
+* parent goal, use-case, journey, requirement, or other semantic context when one exists;
+* slice intent and observable outcome when the item represents an incremental slice;
+* learning objective when the item intentionally exists to reduce uncertainty;
+* critical guarantees or invariants that the slice must preserve.
 
 Optional project-specific fields may include priority, estimate, owner, iteration, deadline, labels, or implementation notes only when supported by the surrounding process.
 
@@ -37,10 +41,14 @@ Optional project-specific fields may include priority, estimate, owner, iteratio
 * Work-item semantics must not silently expand or reinterpret source requirements.
 * Missing priority, estimate, owner, or schedule information remains unspecified.
 * One requirement may map to multiple items and one item may trace to multiple related requirements.
-* Technical or enabling work must retain an evidenced outcome, requirement, constraint, dependency, or risk that justifies it.
+* Technical or enabling work must retain an evidenced outcome, requirement, constraint, dependency, risk, or learning objective that justifies it.
+* A technical task should normally remain subordinate to a coherent slice or work item when it is only one implementation step of that outcome.
+* Incremental slicing must not remove critical financial, security, privacy, compliance, integrity, deduplication, or minimum-observability guarantees that are required from the first usable increment.
+* A use-case or actor goal should remain semantically whole even when delivery is split across slices.
 * Material semantic ambiguity must be returned to the requirements source rather than resolved by planning invention.
 * Source obligations with no work item must remain explicitly accounted for when they are deferred, rejected, external, out of scope, or intentionally unplanned.
 * Work items with no evidenced source or purpose are traceability findings, not automatically valid scope.
+* Candidates for deferment, trimming, experimentation, or removal must remain recommendations unless an authorized decision establishes their disposition.
 
 ## Portability
 
