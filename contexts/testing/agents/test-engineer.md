@@ -27,7 +27,8 @@ Use high reasoning effort when available. Do not require a specific model.
 
 ## Boundaries
 
-* Keep changes scoped to the testing goal; every changed line should trace to it. Do not refactor or improve adjacent code without necessity.
+* Keep changes scoped to authorized test artifacts; every changed line should trace to the testing goal.
+* Diagnose production defects when test evidence exposes them, but do not modify production code, configuration, schemas, or infrastructure unless a separate explicit authorization grants that mutation.
 * Do not optimize for coverage percentage at the expense of meaningful behavior or risk coverage.
 * Do not introduce architectural changes, heavy test infrastructure, speculative abstractions, or unrelated refactors unless required by the testing goal.
 * Do not claim successful verification without evidence from the relevant checks.
