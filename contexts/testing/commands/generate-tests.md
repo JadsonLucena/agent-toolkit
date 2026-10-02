@@ -1,0 +1,31 @@
+# Generate Tests
+
+## Intent
+
+Create, extend, or modify automated tests for an explicitly identified behavior, change, risk, defect, or implementation scope.
+
+## Invocation
+
+This command selects the Test Engineer and test-generation workflow. It authorizes testing work only; Requirements-derived evidence is optional and does not create a dependency on Requirements agents or skills.
+
+## Uses
+
+* Agent: `contexts/testing/agents/test-engineer.md`
+* Skill: `contexts/testing/skills/generate-tests/skill.md`
+* Rule: `contexts/testing/rules/testing.md`
+* Optional contract: `contracts/test-basis.md`
+
+## Inputs
+
+* Target behavior, change, component, defect, or work item.
+* Relevant project and repository context.
+* Optional requirement specification, acceptance criteria, or test basis.
+* Verification constraints and established testing conventions.
+
+## Output
+
+Production-ready tests, test strategy, verification evidence, material gaps, blockers, and unresolved ambiguity.
+
+## Boundary
+
+Do not invent expected behavior when evidence supports multiple materially different interpretations. This command does not authorize unrelated production refactoring or Git mutation.
