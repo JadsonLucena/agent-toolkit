@@ -9,6 +9,13 @@ Use when a task explicitly authorizes creating one or more commits. Convert an a
 * Rule: `contexts/git/rules/git.md`
 * Rule: `contexts/git/rules/semantic-commit.md`
 
+## Preconditions
+
+* Creating commits is explicitly authorized for a defined change scope.
+* The repository is inspectable.
+* No unresolved Git operation or conflict makes committing unsafe.
+* The authorized change set can be distinguished from unrelated work.
+
 ## Operational Graph
 
 ```mermaid
@@ -33,7 +40,7 @@ stateDiagram-v2
 
     state Verification <<choice>>
     VerifyUnit --> Verification
-    Verification --> ComposeMessage: passed
+    Verification --> ComposeMessage: passed or not required
     Verification --> DiagnoseFailure: failed
 
     state CanProgress <<choice>>
@@ -84,6 +91,12 @@ stateDiagram-v2
 13. Inspect the resulting commit and repository status.
 14. Repeat for remaining authorized logical units.
 15. Stop when repository state is ambiguous, required verification is unavailable, a material blocker remains, a necessary fix is outside scope, or repeated attempts are not producing meaningful progress.
+
+## Boundaries
+
+* Commit authorization does not authorize push, merge, rebase of shared history, tag, release, branch deletion, worktree mutation, or remote-ref mutation.
+* Do not bypass hooks, required checks, branch protections, signing requirements, or repository policy.
+* Do not amend or rewrite published history unless separately authorized and sufficiently verified.
 
 ## Output
 
