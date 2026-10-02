@@ -19,12 +19,12 @@ This command selects the Test Engineer and test-generation workflow. It authoriz
 
 * Target behavior, change, component, defect, or work item.
 * Relevant project and repository context.
-* Optional requirement specification, acceptance criteria, or test basis.
+* Optional requirement specification, acceptance/fit criteria, rules, examples, counterexamples, boundaries, failure model, or test basis.
 * Verification constraints and established testing conventions.
 
 ## Output
 
-Production-ready tests, test strategy, verification evidence, material gaps, blockers, and unresolved ambiguity.
+Production-ready tests, test strategy, traceability to supported behavior, regression/verification evidence, material gaps, blockers, and unresolved ambiguity.
 
 ## Boundary
 
