@@ -10,6 +10,8 @@ This command selects the Backlog Planner and the `build` mode of the backlog-pla
 
 ## Uses
 
+* Rule: `contexts/requirements/rules/tailoring.md`
+
 * Agent: `contexts/requirements/agents/backlog-planner.md`
 * Skill: `contexts/requirements/skills/backlog-planning/skill.md`
 * Mode: `build`
@@ -21,6 +23,7 @@ This command selects the Backlog Planner and the `build` mode of the backlog-pla
 * Requirement specifications and other explicit work sources.
 * Existing tracker hierarchy, item taxonomy, or backlog conventions when available.
 * Intended planning horizon.
+* Optional use-case/journey context, examples, learning objectives, and critical guarantees when available.
 
 ## Output
 
