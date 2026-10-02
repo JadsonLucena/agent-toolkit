@@ -7,6 +7,7 @@ Use to discover and structure stakeholder needs, goals, context, constraints, bu
 ## Uses
 
 * Rule: `contexts/requirements/rules/requirements.md`
+* Contract: `contracts/requirements.md`
 
 ## State Model
 
@@ -62,7 +63,7 @@ Maintain:
 
 ## Output
 
-Produce an elicitation record containing supported needs, goals, stakeholders, constraints, business rules, risks, assumptions, provenance, conflicts, and open questions. Do not silently convert unresolved intent into formal requirements or backlog items.
+Produce an elicitation handoff conforming to the elicitation semantics in `contracts/requirements.md`, containing supported needs, goals, stakeholders, constraints, business rules, risks, assumptions, provenance, conflicts, and open questions. Do not silently convert unresolved intent into formal requirements or backlog items.
 
 ## Stop Conditions
 
