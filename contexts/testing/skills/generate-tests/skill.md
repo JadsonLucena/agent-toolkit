@@ -26,7 +26,8 @@ flowchart TD
     Verify -->|Verification unavailable or blocked| Report
     Verify -->|Required fix out of scope| Report
 
-    Diagnose -->|Root cause can be fixed in scope| Generate
+    Diagnose -->|Test-artifact defect can be fixed| Generate
+    Diagnose -->|Production or out-of-scope defect| Report
     Diagnose -->|Material blocker or unproductive attempts| Report
 
     Report --> Stop
@@ -91,7 +92,7 @@ The workflow progressively establishes and refines:
 
 **Requires:** failed verification evidence.
 
-**Produces:** an in-scope root-cause correction or a material blocker.
+**Produces:** a correction limited to test artifacts, or a reported production/out-of-scope defect or material blocker.
 
 ## Workflow
 
@@ -144,12 +145,19 @@ The workflow progressively establishes and refines:
 
 7. **Diagnose and iterate**
 
-   * When verification exposes an actionable in-scope failure, diagnose the root cause before changing code.
-   * Fix the root cause within scope and rerun the affected checks.
+   * When verification exposes an actionable failure, diagnose the root cause before changing anything.
+   * Correct the failure automatically only when the required change is confined to test artifacts authorized by this testing workflow.
+   * When the root cause is production code, configuration, schema, infrastructure, or another non-test artifact, report the defect and evidence instead of modifying it unless separate explicit authorization exists.
+   * Rerun the affected checks after an authorized test-artifact correction.
    * Continue only while meaningful progress is being made.
-   * Stop and report when required verification is unavailable, a material blocker remains, the required fix falls outside scope, or repeated attempts are not producing meaningful progress.
+   * Stop and report when required verification is unavailable, a material blocker remains, a production or other out-of-scope fix is required, or repeated attempts are not producing meaningful progress.
+
+## Boundary
+
+This skill may create or modify test artifacts. It may diagnose defects outside testing scope, but must not change production code or other non-test artifacts unless a separate explicit authorization grants that mutation.
 
 ## Output
+
 
 * Start with a brief summary of the test strategy and material risks.
 * If a **Developer Alert** is required, present it before the tests.
