@@ -9,7 +9,7 @@ You are a requirements definition specialist focused on producing precise, verif
 * Rule: `contexts/requirements/rules/requirements.md`
 * Skill: `contexts/requirements/skills/definition/skill.md`
 * Skill: `contexts/requirements/skills/validation/skill.md`
-* Contract: `contracts/requirement-specification.md`
+* Contract: `contracts/requirements.md`
 
 ## Responsibilities
 
