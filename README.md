@@ -50,11 +50,13 @@ See `ARCHITECTURE.md` for the responsibility matrix, dependency rules, command s
 ```text
 contexts/requirements/
 ├── rules/
+│   ├── tailoring.md
 │   ├── requirements.md
 │   └── backlog.md
 ├── skills/
 │   ├── elicitation/skill.md
 │   ├── definition/skill.md
+│   ├── example-discovery/skill.md
 │   ├── validation/skill.md
 │   └── backlog-planning/skill.md
 ├── commands/
@@ -69,9 +71,11 @@ contexts/requirements/
     └── backlog-planner.md
 ```
 
-Requirements can operate from conversations, documents, interviews, tickets, existing-system evidence, policies, and other supported sources. A repository is not required.
+Requirements can operate from conversations, documents, interviews, tickets, existing-system evidence, policies, data, and other supported sources. A repository is not required.
 
-Elicitation and specification share `contracts/requirements.md` so source evidence, decisions, assumptions, conflicts, and traceability survive the transformation without coupling their workflows.
+Requirements work is tailored to risk and uncertainty using the principle **just enough requirements, with sufficient rigor for the risk**. The toolkit may use `lightweight`, `standard`, or `high-assurance` rigor when the distinction is useful; it does not require every known artifact or technique for every change.
+
+Elicitation and specification share `contracts/requirements.md` so Need/Goal context, source evidence, decisions, assumptions, conflicts, applicable concerns, and traceability survive the transformation without coupling their workflows. Example Discovery can refine rules and boundaries before automation and hand optional evidence to Testing through `contracts/test-basis.md`.
 
 ### Testing
 
@@ -162,18 +166,23 @@ Avoid numeric confidence scores that imply unsupported precision.
 Preserve identity across transformations when the corresponding artifacts exist:
 
 ```text
-Stakeholder Need
-      │
-      ▼
+Source / Rationale
+      ↓
+Need → Business Goal
+      ↓
+Rule / Constraint
+      ↓
 Requirement
-      ├────────────► Acceptance Criterion
-      ├────────────► Business Rule
+      ├────────────► Acceptance / Fit Evidence
+      ├────────────► Example / Counterexample
       ▼
-Work Item
+Slice / Work Item
       ▼
-Implementation
+Design / Implementation
       ▼
 Test Evidence
+      ▼
+Outcome Evidence
 ```
 
 Downstream artifacts may summarize upstream semantics but must not silently change them.
@@ -216,7 +225,7 @@ Stable or repeatedly used project information may be cached when the execution p
 
 ## Roadmap
 
-Next contexts should cover architecture and design, implementation, code review, and security without collapsing specialties.
+Next contexts should cover architecture and design, implementation, code review, security engineering, release evidence, and solution/outcome evaluation without collapsing specialties. Requirements may carry the drivers for those contexts, but it does not own their internal design or delivery procedures.
 
 Additional Git commands should be introduced only when a reusable procedure also has a clear user-facing invocation intent and authorization boundary.
 
