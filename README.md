@@ -1,17 +1,49 @@
 # Agent Toolkit
 
-A vendor-neutral toolkit for organizing **AI rules, skills, and specialized agents** for software engineering workflows.
+A vendor-neutral toolkit of **rules, skills, commands, and specialized agents** for the software development pipeline—from elicitation through code review—including cross-cutting concerns such as version control.
 
-The project provides a reusable foundation for coordinating AI agents by responsibility, knowledge domain, reasoning needs, and shared context—without coupling the source definitions to a specific IDE, provider, or model.
+Canonical definitions stay independent of any IDE, provider, or model. Platform-specific formats are adapters, not sources of truth.
 
 ## Purpose
 
-The toolkit is built around four principles:
+Cover the full development cycle with composable artifacts:
 
-1. **Specialized agents** for distinct software engineering responsibilities.
-2. **Reusable skills** that encapsulate knowledge and procedures shared across agents.
-3. **Task-aware model selection** so each activity can use an appropriate AI model and reasoning effort.
-4. **Context management** to reduce duplication, preserve relevant knowledge, and coordinate multiple agents efficiently.
+1. **Rules** — persistent standards that must be respected.
+2. **Skills** — reusable procedures for a specific kind of task.
+3. **Commands** — explicit entry points that start a workflow.
+4. **Agents** — specialized roles that apply the relevant rules, skills, and commands.
+
+Agents stay specialized. Cross-cutting concerns (for example Git, security, or conventions) are first-class, not hidden inside a general-purpose prompt.
+
+## Current inventory
+
+What this repository already defines:
+
+```text
+rules/
+├── testing.md
+├── git.md
+├── gitflow.md
+├── semantic-commit.md
+└── semantic-version.md
+
+skills/
+└── generate-tests/
+
+agents/
+├── test-engineer.md
+└── git-engineer.md
+```
+
+| Area | Status | Artifacts |
+|---|---|---|
+| Automated testing | Available | `rules/testing.md`, `skills/generate-tests/`, `agents/test-engineer.md` |
+| Git, history, and release semantics | Available | `rules/git.md`, `rules/gitflow.md`, `rules/semantic-commit.md`, `rules/semantic-version.md`, `agents/git-engineer.md` |
+| Commands | Not started | no `commands/` definitions yet |
+| Elicitation through implementation | Roadmap | no planner, architect, or implementation agent yet |
+| Code review | Roadmap | no reviewer agent or review skill yet |
+
+`gitflow.md` applies only when the repository uses Gitflow or the task explicitly requires it.
 
 ## Architecture
 
@@ -19,231 +51,177 @@ The toolkit is built around four principles:
 agent-toolkit/
 ├── rules/
 ├── skills/
+├── commands/    # planned
 ├── agents/
 └── README.md
 ```
 
 ### Rules
 
-Rules define persistent principles, constraints, quality standards, and expected behavior.
-
-They answer:
+Persistent principles, constraints, quality standards, and expected behavior.
 
 > **What standards must be respected?**
 
-Examples:
-
-```text
-rules/
-├── testing.md
-├── architecture.md
-├── security.md
-└── clean-code.md
-```
-
-Rules should remain concise, reusable, and independent of specific workflows or tools.
+Rules stay concise, reusable, and independent of a specific workflow or tool.
 
 ### Skills
 
-Skills encapsulate reusable knowledge and procedures for accomplishing a specific type of task.
-
-They answer:
+Reusable knowledge and procedures for one type of task.
 
 > **How should this task be performed?**
 
-Examples:
+Multiple agents may reuse the same skill when it matches their responsibility.
 
-```text
-skills/
-├── generate-tests/
-├── design-api/
-├── threat-modeling/
-├── performance-analysis/
-└── code-review/
-```
+### Commands
 
-Multiple agents may reuse the same skill whenever it is relevant to their responsibility.
+Named entry points that start a pipeline stage or a cross-cutting workflow.
+
+> **When should this workflow be invoked, and with what goal?**
+
+Commands compose agents, rules, and skills. They do not replace them. None are defined yet.
 
 ### Agents
 
-Agents represent specialized engineering roles and orchestrate the rules and skills required to accomplish their goals.
-
-They answer:
+Specialized engineering roles that orchestrate the rules, skills, and commands needed for a goal.
 
 > **Who should perform this task, and which capabilities should be applied?**
 
-Examples:
+Each agent has a clear scope and uses only the artifacts relevant to its specialty.
 
-```text
-agents/
-├── planner.md
-├── software-architect.md
-├── software-engineer.md
-├── test-engineer.md
-├── security-engineer.md
-└── code-reviewer.md
-```
-
-Each agent should have a clear scope and use only the rules and skills relevant to its specialty.
-
-## Agent Specialization
+## Development pipeline
 
 Prefer specialized agents over a single general-purpose agent.
 
-A software engineering workflow may involve agents responsible for:
-
-- **Plan** — requirements, decomposition, risks, dependencies, and execution strategy.
-- **Develop** — architecture, design, patterns, quality, security, performance, and implementation.
-- **Test** — test strategy, automated testing, edge cases, failure behavior, and quality validation.
-- **Review** — correctness, code quality, architecture, security, technical debt, performance, and maintainability.
-
-Agents may collaborate, but responsibilities should remain explicit to avoid duplicated work and conflicting decisions.
-
-## Model Selection
-
-The toolkit does not require a specific AI provider or model.
-
-The execution environment should select an appropriate model and reasoning effort according to the task.
-
-For example:
-
 ```text
-Planning             → strong reasoning and decomposition
-Architecture         → high reasoning
-Implementation       → strong coding capability
-Testing              → high reasoning and adversarial analysis
-Security             → high reasoning and specialized analysis
-Code Review          → high reasoning and broad context
-Simple transformations → lightweight model when sufficient
+Elicitation → Plan → Design → Implement → Test → Review
+                      │
+                      └── Cross-cutting: Git, security, conventions, …
 ```
 
-Model configuration belongs to the execution environment or platform adapter, while agents describe the capability they require.
+| Stage | Responsibility | Status |
+|---|---|---|
+| Elicitation | Problem, stakeholders, constraints, and desired outcomes | Roadmap |
+| Plan | Requirements, decomposition, risks, dependencies, and execution strategy | Roadmap |
+| Design | Architecture, boundaries, contracts, and trade-offs | Roadmap |
+| Implement | Application code within the agreed design and quality rules | Roadmap |
+| Test | Test strategy, automated tests, edge cases, and verification | Available |
+| Review | Correctness, quality, architecture, security, debt, and maintainability | Roadmap |
 
-This keeps the toolkit portable across different AI providers and future model generations.
+| Cross-cutting | Responsibility | Status |
+|---|---|---|
+| Git and release | Safe history, commits, branches, composition, versions, and publication | Available |
+| Security | Threats, authorization, secrets, and sensitive data | Roadmap |
+| Conventions | Shared coding, architecture, and documentation standards | Roadmap |
 
-## Context Management
+Agents may collaborate. Responsibilities stay explicit so work is not duplicated and decisions do not conflict.
 
-Efficient context management is a core concern when multiple agents collaborate.
-
-The toolkit should favor:
-
-### Conversation Compaction
-
-Periodically summarize or compact long-running conversations while preserving:
-
-- decisions;
-- constraints;
-- assumptions;
-- unresolved issues;
-- relevant implementation context.
-
-Historical detail that no longer affects the task should not consume active context unnecessarily.
-
-### Shared Context
-
-Agents working on the same task should share the relevant project and decision context instead of rebuilding it independently.
-
-Shared context may include:
-
-- requirements;
-- architectural decisions;
-- domain constraints;
-- implementation decisions;
-- discovered risks;
-- test strategy;
-- review findings.
-
-Each agent should consume only the subset relevant to its responsibility.
-
-### Context Caching
-
-Stable or repeatedly used information should be cached when the execution platform supports it.
-
-Examples include:
-
-- project conventions;
-- architecture documentation;
-- rules;
-- commonly used skills;
-- dependency information;
-- domain terminology.
-
-Caching should reduce repeated context processing without allowing stale information to override newer project state.
-
-## Execution Model
-
-A typical workflow may look like:
+A typical collaboration still flows left to right through the pipeline. Git is not a late stage: it applies whenever repository state, history, or release intent changes.
 
 ```text
 Request
    │
    ▼
-Planner
-   │
-   ├── requirements
-   ├── risks
-   └── execution plan
+Elicitation / Planner          (roadmap)
    │
    ▼
-Developer / Architect
+Designer / Implementer         (roadmap)
    │
-   ├── architecture rules
-   ├── design skills
-   ├── security skills
-   └── implementation
+   ├── Test Engineer           (available)
+   └── Git Engineer            (available, cross-cutting)
    │
    ▼
-Test Engineer
-   │
-   ├── testing rules
-   └── testing skills
-   │
-   ▼
-Reviewer
-   │
-   ├── correctness
-   ├── quality
-   ├── security
-   ├── technical debt
-   ├── performance
-   └── maintainability
+Reviewer                       (roadmap)
 ```
 
 Relevant context and decisions should flow between agents without forcing every agent to inherit the complete conversation history.
 
-## Design Principles
+## Roadmap
+
+The next definitions should fill the pipeline and the missing artifact type, without collapsing specialties into one agent.
+
+**Commands**
+
+- Entry points for elicitation, planning, implementation, testing, review, and Git operations.
+
+**Pipeline agents and supporting artifacts**
+
+- Elicitation and planning (requirements, decomposition, risks).
+- Architecture and design (including API and system-design skills).
+- Implementation (software engineer, plus quality rules such as architecture and clean code).
+- Code review (reviewer agent and review skill).
+
+**Additional cross-cutting concerns**
+
+- Security (rule, threat-modeling skill, security engineer).
+- Shared conventions that remain independent of a single pipeline stage.
+
+New artifacts should follow the same vendor-neutral Markdown shape as the existing testing and Git definitions.
+
+## Model selection
+
+The toolkit does not require a specific AI provider or model.
+
+The execution environment should select an appropriate model and reasoning effort according to the task. Agents describe the capability they need; model configuration belongs to the platform adapter.
+
+```text
+Elicitation / planning → strong reasoning and decomposition
+Architecture           → high reasoning
+Implementation         → strong coding capability
+Testing                → high reasoning and adversarial analysis
+Git and release        → high reasoning over repository evidence
+Security               → high reasoning and specialized analysis
+Code review            → high reasoning and broad context
+Simple transformations → lightweight model when sufficient
+```
+
+## Context management
+
+Efficient context management matters when multiple agents collaborate.
+
+### Conversation compaction
+
+Periodically summarize or compact long-running conversations while preserving decisions, constraints, assumptions, unresolved issues, and relevant implementation context.
+
+### Shared context
+
+Agents on the same task should share project and decision context instead of rebuilding it independently. Each agent consumes only the subset relevant to its responsibility.
+
+### Context caching
+
+Stable or repeatedly used information—conventions, architecture docs, rules, common skills, domain terms—should be cached when the platform supports it, without letting stale cache override newer project state.
+
+## Design principles
 
 - **Vendor neutral** — source definitions must not depend on a specific IDE, AI provider, or model.
-- **Single responsibility** — rules, skills, and agents must have clearly separated concerns.
-- **Composable** — agents combine only the rules and skills they need.
-- **Reusable** — knowledge should be defined once and shared across agents.
+- **Full pipeline** — artifacts should cover elicitation through review, plus cross-cutting concerns.
+- **Single responsibility** — rules, skills, commands, and agents must have clearly separated concerns.
+- **Composable** — agents combine only the artifacts they need.
+- **Reusable** — knowledge is defined once and shared.
 - **Context aware** — preserve relevant context while minimizing unnecessary tokens.
-- **Task oriented** — use specialized agents and appropriate models according to the work being performed.
+- **Task oriented** — use specialized agents and appropriate models for the work.
 - **Quality driven** — optimize for correctness, security, maintainability, performance, and meaningful engineering outcomes.
 
 ## Portability
 
 Canonical definitions are written in neutral Markdown.
 
-Platform-specific formats should be treated as adapters rather than sources of truth.
-
 ```text
-rules / skills / agents
-         │
-         ▼
-   Canonical Markdown
-         │
-   ┌─────┼─────────┐
-   ▼     ▼         ▼
- Cursor  Copilot  Claude
-   ▼     ▼         ▼
- Other AI platforms
+rules / skills / commands / agents
+              │
+              ▼
+      Canonical Markdown
+              │
+      ┌───────┼─────────┐
+      ▼       ▼         ▼
+   Cursor  Copilot   Claude
+      ▼       ▼         ▼
+      Other AI platforms
 ```
 
 This allows the toolkit to evolve independently from any individual AI ecosystem.
 
 ## Goal
 
-The goal is not to create a collection of prompts.
+The goal is not a collection of prompts.
 
-It is to build a **composable software engineering system for AI agents**, where responsibilities, knowledge, reasoning, and context are intentionally structured to produce consistent and high-quality engineering outcomes.
+It is a **composable software engineering system for AI agents**, covering the development pipeline and its cross-cutting concerns, where responsibilities, knowledge, reasoning, and context are structured to produce consistent engineering outcomes.
