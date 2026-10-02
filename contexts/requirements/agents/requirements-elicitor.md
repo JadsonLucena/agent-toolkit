@@ -12,6 +12,7 @@ Use high reasoning effort when available. Do not require a specific model.
 
 * Rule: `contexts/requirements/rules/requirements.md`
 * Skill: `contexts/requirements/skills/elicitation/skill.md`
+* Contract: `contracts/requirements.md`
 
 ## Responsibilities
 
