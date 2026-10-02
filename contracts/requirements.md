@@ -19,6 +19,24 @@ A requirement specification should make the surrounding change or initiative con
 
 Do not encode the downstream target into `status`, and do not use numeric confidence scores as a substitute for evidence.
 
+## Elicitation Evidence
+
+An elicitation handoff may include, when material and known:
+
+* problem or opportunity statement;
+* desired outcomes and success evidence;
+* stakeholders and affected actors;
+* scope boundaries and exclusions;
+* candidate requirements or expressed needs;
+* business rules and domain language;
+* functional needs and quality expectations;
+* constraints and externally imposed obligations;
+* dependencies and risks;
+* assumptions, conflicts, open questions, and decisions;
+* provenance for every material statement.
+
+Elicitation evidence remains distinct from approved specification. Candidate requirements, assumptions, and interpretations must not be promoted to accepted requirements merely because they appear in the handoff.
+
 ## Required Semantics
 
 A requirement specification must make the following available when material and known:
