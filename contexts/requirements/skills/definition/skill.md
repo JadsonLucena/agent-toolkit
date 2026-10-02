@@ -7,7 +7,7 @@ Use to transform sufficiently understood needs and evidence into precise, verifi
 ## Uses
 
 * Rule: `contexts/requirements/rules/requirements.md`
-* Contract: `contracts/requirement-specification.md`
+* Contract: `contracts/requirements.md`
 
 ## State Model
 
@@ -44,4 +44,4 @@ stateDiagram-v2
 
 ## Output
 
-Produce a `contracts/requirement-specification.md`-compatible specification with requirements, acceptance criteria, business rules, constraints, assumptions, dependencies, traceability, and unresolved questions.
+Produce a `contracts/requirements.md`-compatible specification with requirements, acceptance criteria, business rules, constraints, assumptions, dependencies, traceability, and unresolved questions.
