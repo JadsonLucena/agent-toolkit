@@ -9,7 +9,7 @@ Entry point for producing a structured backlog from sufficiently defined require
 * Agent: `contexts/requirements/agents/backlog-planner.md`
 * Skill: `contexts/requirements/skills/planning/skill.md`
 * Rule: `contexts/requirements/rules/planning.md`
-* Contract: `contracts/backlog-item.md`
+* Contract: `contracts/work-item.md`
 
 ## Inputs
 
