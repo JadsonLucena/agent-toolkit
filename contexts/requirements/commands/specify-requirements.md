@@ -2,13 +2,15 @@
 
 ## Intent
 
-Convert supported elicitation evidence into precise, traceable, verifiable requirement definitions.
+Convert supported elicitation evidence into precise, traceable, verifiable requirements at the rigor justified by the context.
 
 ## Invocation
 
 This command selects the Requirements Specifier and definition workflow. It does not authorize backlog decomposition, design, implementation, or unrelated downstream mutations.
 
 ## Uses
+
+* Rule: `contexts/requirements/rules/tailoring.md`
 
 * Agent: `contexts/requirements/agents/requirements-specifier.md`
 * Skill: `contexts/requirements/skills/definition/skill.md`
