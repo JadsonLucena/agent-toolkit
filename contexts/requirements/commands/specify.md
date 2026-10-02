@@ -9,7 +9,7 @@ Entry point for converting sufficiently understood needs into a precise, verifia
 * Agent: `contexts/requirements/agents/requirements-specifier.md`
 * Skill: `contexts/requirements/skills/definition/skill.md`
 * Rule: `contexts/requirements/rules/requirements.md`
-* Contract: `contracts/requirement-specification.md`
+* Contract: `contracts/requirements.md`
 
 ## Inputs
 
