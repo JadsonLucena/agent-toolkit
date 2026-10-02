@@ -43,15 +43,7 @@ stateDiagram-v2
     Verification --> ComposeMessage: passed or not required
     Verification --> DiagnoseFailure: failed
 
-    state CanProgress <<choice>>
-    DiagnoseFailure --> CanProgress
-    CanProgress --> FixInScope: root cause is in scope
-    CanProgress --> Blocked: verification unavailable
-    CanProgress --> Blocked: material blocker
-    CanProgress --> Blocked: fix outside scope
-    CanProgress --> Blocked: attempts unproductive
-
-    FixInScope --> StageUnit
+    DiagnoseFailure --> Blocked: verification failed
     ComposeMessage --> EvaluateCommitSemantics
 
     state CommitSemantics <<choice>>
@@ -84,16 +76,17 @@ stateDiagram-v2
 6. Stage exactly one logical unit, using path- or hunk-level staging when necessary.
 7. Inspect the complete staged diff.
 8. Correct staging when it contains independent intents, unrelated changes, or omits changes required for a coherent and verifiable unit.
-9. Run the narrowest relevant verification when practical and required by repository policy.
+9. Run the narrowest relevant verification when practical and required by repository policy. If verification fails, diagnose enough to report the failure, but do not modify the implementation or authorized change set under commit-only authorization.
 10. Derive type, scope, summary, body, breaking-change metadata, and references from the staged diff and verified context.
 11. Ask before committing when material commit semantics remain ambiguous.
 12. Create the commit only when the staged diff and message describe the same logical unit.
 13. Inspect the resulting commit and repository status.
 14. Repeat for remaining authorized logical units.
-15. Stop when repository state is ambiguous, required verification is unavailable, a material blocker remains, a necessary fix is outside scope, or repeated attempts are not producing meaningful progress.
+15. Stop when repository state is ambiguous, required verification is unavailable or fails, a material blocker remains, or continuing would require changing implementation semantics beyond staging/partitioning the already-authorized change set.
 
 ## Boundaries
 
+* Commit authorization permits staging and partitioning the already-authorized changes, but it does not authorize editing production or test implementation to make verification pass.
 * Commit authorization does not authorize push, merge, rebase of shared history, tag, release, branch deletion, worktree mutation, or remote-ref mutation.
 * Do not bypass hooks, required checks, branch protections, signing requirements, or repository policy.
 * Do not amend or rewrite published history unless separately authorized and sufficiently verified.
