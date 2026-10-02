@@ -14,7 +14,7 @@ Entry point for creating or modifying automated tests for a defined behavior or 
 
 * Behavior or implementation under test.
 * Optional target scope.
-* Optional requirement specification, acceptance criteria, or `contracts/test-basis.md`.
+* Optional requirement specification, acceptance criteria, or `contracts/testing.md`.
 * Project testing conventions and verification constraints.
 
 ## Result
