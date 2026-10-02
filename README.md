@@ -219,6 +219,7 @@ Stable or repeatedly used project information may be cached when the execution p
 * **Loosely coupled** — cross-context evidence does not create unnecessary workflow dependencies.
 * **Traceable** — material semantics preserve provenance across transformations.
 * **Evidence driven** — supported evidence precedes inference.
+* **Risk proportionate** — requirements rigor and representation scale with consequence, uncertainty, and the next decision rather than template completeness.
 * **Context aware** — preserve relevant context while minimizing unnecessary context.
 * **Task oriented** — commands express clear engineering intent.
 * **Quality driven** — verification distinguishes evidence from assumptions and unverified conclusions.
