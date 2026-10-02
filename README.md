@@ -26,10 +26,11 @@ agent-toolkit/
 │       └── agents/
 ├── contracts/
 ├── ARCHITECTURE.md
+├── MIGRATION.md
 └── README.md
 ```
 
-Contexts organize the four canonical artifact types by engineering responsibility. Cross-context collaboration uses explicit semantic evidence and contracts rather than dependencies on another context's internal skills or agents.
+Contexts organize the four canonical artifact types by engineering responsibility. Cross-context collaboration uses explicit semantic evidence and contracts rather than accidental dependencies on another context's internal skills or agents.
 
 `contracts/` contains neutral handoff schemas. Contracts are not a fifth artifact type and contain no workflow logic.
 
@@ -40,7 +41,7 @@ Contexts organize the four canonical artifact types by engineering responsibilit
 3. **Commands** — thin engineering-intent and authorization entry points that select a workflow without granting unrelated mutations.
 4. **Agents** — specialist scope, evidence discipline, orchestration, boundaries, and handoffs.
 
-See `ARCHITECTURE.md` for the responsibility matrix and dependency rules.
+See `ARCHITECTURE.md` for the responsibility matrix, dependency rules, command shape, and naming rules. See `MIGRATION.md` for structural renames and moved responsibilities.
 
 ## Current Contexts
 
@@ -50,18 +51,18 @@ See `ARCHITECTURE.md` for the responsibility matrix and dependency rules.
 contexts/requirements/
 ├── rules/
 │   ├── requirements.md
-│   └── planning.md
+│   └── backlog.md
 ├── skills/
 │   ├── elicitation/skill.md
 │   ├── definition/skill.md
 │   ├── validation/skill.md
-│   └── planning/skill.md
+│   └── backlog-planning/skill.md
 ├── commands/
-│   ├── elicit.md
-│   ├── specify.md
-│   ├── audit.md
-│   ├── items.md
-│   └── refinement.md
+│   ├── elicit-requirements.md
+│   ├── specify-requirements.md
+│   ├── validate-requirements.md
+│   ├── build-backlog.md
+│   └── refine-backlog.md
 └── agents/
     ├── requirements-elicitor.md
     ├── requirements-specifier.md
@@ -70,17 +71,19 @@ contexts/requirements/
 
 Requirements can operate from conversations, documents, interviews, tickets, existing-system evidence, policies, and other supported sources. A repository is not required.
 
+Elicitation and specification share `contracts/requirements.md` so source evidence, decisions, assumptions, conflicts, and traceability survive the transformation without coupling their workflows.
+
 ### Testing
 
 ```text
 contexts/testing/
 ├── rules/testing.md
 ├── skills/generate-tests/skill.md
-├── commands/test.md
+├── commands/generate-tests.md
 └── agents/test-engineer.md
 ```
 
-Testing remains autonomous. Requirements evidence may improve test design, but it is optional and Testing does not invoke Requirements skills or agents.
+Testing remains autonomous. Requirements evidence may improve test design through the optional `contracts/test-basis.md`, but Testing does not invoke Requirements skills or agents merely to obtain that evidence.
 
 ### Git
 
@@ -95,17 +98,38 @@ contexts/git/
 │   ├── create-semantic-commits/skill.md
 │   ├── determine-semantic-version/skill.md
 │   └── manage-branch-work/skill.md
-├── commands/commit.md
+├── commands/
+│   ├── commit.md
+│   └── determine-semantic-version.md
 └── agents/git-engineer.md
 ```
 
-Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations. Branch/integration and semantic-version analysis are reusable skills even though they do not yet have public command entry points.
+Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
 
 ## Contracts
 
-* `contracts/requirements.md` — requirement-definition semantics.
+* `contracts/requirements.md` — elicitation and requirement-definition semantics.
 * `contracts/work-item.md` — planning-item semantics.
-* `contracts/testing.md` — optional behavioral evidence for Testing.
+* `contracts/test-basis.md` — optional behavioral evidence for Testing.
+
+## Commands
+
+Commands express engineering intent rather than low-level tool aliases:
+
+```text
+/requirements/elicit-requirements
+/requirements/specify-requirements
+/requirements/validate-requirements
+/requirements/build-backlog
+/requirements/refine-backlog
+
+/testing/generate-tests
+
+/git/commit
+/git/determine-semantic-version
+```
+
+A command's invocation defines its authorization boundary. For example, determining a semantic version does not authorize version-file mutation, tagging, publishing, or release.
 
 ## Development Pipeline
 
@@ -115,7 +139,15 @@ Elicitation ↔ Specification ↔ Backlog / Plan → Design → Implement → Te
 Cross-cutting: Git, security, conventions, …
 ```
 
-The first three stages are iterative. A planning ambiguity may return to specification, and missing stakeholder intent may return to elicitation.
+The first three stages are iterative. A backlog ambiguity may return to specification, and missing stakeholder intent may return to elicitation.
+
+## Cross-Context Composition
+
+The default integration model is loose coupling by semantic contracts.
+
+A context must not invoke another context's internal agent or skill merely to obtain data. Explicit multi-context workflows may orchestrate multiple specialists when the workflow itself intentionally spans those responsibilities.
+
+Testing and Git remain independently usable when Requirements artifacts are absent.
 
 ## Ambiguity Policy
 
@@ -174,17 +206,19 @@ Stable or repeatedly used project information may be cached when the execution p
 * **Vendor neutral** — canonical definitions do not depend on a specific AI ecosystem.
 * **Context first** — artifacts are grouped by engineering responsibility.
 * **Single responsibility** — each concept has one authoritative owner.
-* **Composable** — contexts collaborate through explicit inputs and outputs.
-* **Loosely coupled** — cross-context evidence does not create workflow dependencies.
+* **Composable** — explicit workflows may coordinate multiple contexts without merging their responsibilities.
+* **Loosely coupled** — cross-context evidence does not create unnecessary workflow dependencies.
 * **Traceable** — material semantics preserve provenance across transformations.
 * **Evidence driven** — supported evidence precedes inference.
 * **Context aware** — preserve relevant context while minimizing unnecessary context.
-* **Task oriented** — commands express engineering intent rather than low-level tool aliases.
+* **Task oriented** — commands express clear engineering intent.
 * **Quality driven** — verification distinguishes evidence from assumptions and unverified conclusions.
 
 ## Roadmap
 
-Next contexts should cover architecture and design, implementation, code review, and security without collapsing specialties. Additional Git entry points should be added only when they represent reusable engineering intent.
+Next contexts should cover architecture and design, implementation, code review, and security without collapsing specialties.
+
+Additional Git commands should be introduced only when a reusable procedure also has a clear user-facing invocation intent and authorization boundary.
 
 ## Portability
 
