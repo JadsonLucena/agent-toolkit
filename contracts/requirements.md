@@ -66,6 +66,7 @@ A requirement specification must make the following available when material and 
 * business rules and invariants;
 * functional, quality, security, interface, data, operational, and transition constraints when relevant;
 * actors, triggers, preconditions, states, transitions, outcomes, guarantees, alternatives, exceptions, or failure behavior when they materially improve understanding;
+* stable scenario identities and scenario-to-requirement/rule/use-case relationships when scenarios are treated as first-class behavioral knowledge;
 * data semantics such as ownership, temporal meaning, integrity, lifecycle, lineage, or consumer guarantees when relevant;
 * quality context, metric/observable property, justified thresholds, failure assumptions, and trade-offs when relevant;
 * security actors, information, operations, purposes, delegations, obligations, and misuse concerns when relevant;
@@ -95,6 +96,7 @@ For material business rules, the handoff may preserve:
 * A material semantic change creates a requirements concern and must not be hidden as a downstream transformation.
 * When requirement semantics change, consumers should be able to identify downstream artifacts that require re-evaluation.
 * A proposed technical solution does not become a requirement unless evidence supports it as intent, constraint, or decision.
+* Stable scenario identifiers must survive downstream transformations when supplied; adapters and Testing must not replace semantic scenario identity with framework-specific test names.
 * The contract defines knowledge; it does not require every field or artifact for every context.
 
 ## Portability
