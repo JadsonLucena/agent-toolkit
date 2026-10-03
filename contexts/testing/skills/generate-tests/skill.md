@@ -4,6 +4,12 @@
 
 Use when creating, extending, or modifying automated tests. Generate complete, maintainable tests while applying `contexts/testing/rules/testing.md`.
 
+## Uses
+
+* Rule: `contexts/testing/rules/testing.md`
+* Optional input contract: `contracts/test-basis.md`
+* Output contract: `contracts/test-evidence.md`
+
 ## Operational Graph
 
 ```mermaid
@@ -38,14 +44,16 @@ flowchart TD
 The workflow progressively establishes and refines:
 
 * Behavioral context, contract, scope, and boundaries.
+* Optional portable Scenario Set with stable scenario identities.
 * Optional requirement specification, acceptance/fit criteria, business examples, counterexamples, boundaries, failure model, or `contracts/test-basis.md` evidence when supplied.
 * Material assumptions and unresolved uncertainty.
 * Project testing tooling and conventions.
 * Risks, examples, counterexamples, scenario partitions, failure assumptions, and relevant test techniques.
 * Success criteria and test strategy.
 * Generated or modified tests.
+* Scenario-to-automation coverage mapping when stable scenario identities exist.
 * Verification evidence and quality-gate outcomes.
-* Blockers, out-of-scope requirements, or unresolved failures.
+* Blockers, uncovered scenarios, orphan tests when relevant, out-of-scope requirements, or unresolved failures.
 
 ## Execution Contracts
 
@@ -57,13 +65,13 @@ The workflow progressively establishes and refines:
 
 **Requires:** understood context.
 
-**Produces:** project testing tooling, conventions, prioritized risks, scenarios, and relevant techniques.
+**Produces:** project testing tooling, conventions, prioritized risks, preserved/derived scenarios, coverage gaps, and relevant techniques.
 
 ### Define Success
 
 **Requires:** behavior, risks, and project context.
 
-**Produces:** observable success criteria, test level, required scenarios, doubles, and isolation boundaries.
+**Produces:** observable success criteria, test level, required scenarios, scenario coverage plan, doubles, and isolation boundaries.
 
 ### Review
 
@@ -81,7 +89,7 @@ The workflow progressively establishes and refines:
 
 **Requires:** generated or modified tests.
 
-**Produces:** verification evidence and one of:
+**Produces:** verification evidence, scenario coverage evidence when applicable, and one of:
 
 * success;
 * actionable in-scope failure;
@@ -100,6 +108,7 @@ The workflow progressively establishes and refines:
 
    * Read the behavior under test, its public contract, immediate collaborators, and nearby test conventions before making changes.
    * When requirement specifications, acceptance/fit criteria, business rules, invariants, examples, counterexamples, boundaries, quality/security obligations, or a `contracts/test-basis.md` artifact are supplied, use them as additional behavioral evidence without requiring the Requirements context or invoking its internal skills.
+   * When a Scenario Set is supplied, preserve every `scenario_id` exactly and treat it as semantic identity independent from test filenames, methods, classes, Gherkin titles, or test-management identifiers.
    * Preserve business examples as business evidence. Do not rewrite them into UI, transport, persistence, or framework details unless those details are part of the required behavior.
    * Determine expected behavior, scope, and boundaries.
    * Reconcile supplied planning evidence with observable implementation and project evidence. Surface material conflicts instead of silently choosing one source.
@@ -108,7 +117,9 @@ The workflow progressively establishes and refines:
 2. **Infer project context and map behavior and risk**
 
    * Identify and follow the project's testing framework, assertion library, mocking tools, test commands, and conventions from repository evidence such as existing tests, configuration, manifests, and scripts.
-   * Start from supplied rules/examples when available, then identify uncovered behavior by criticality and risk, including critical paths, counterexamples, edge cases, invariants, boundaries, decisions, states, side effects, failure modes, and realistic misuse.
+   * Start from the supplied Scenario Set, rules, and examples when available. Identify missing coverage without duplicating an equivalent existing scenario.
+   * When no Scenario Set exists, derive only the scenarios supported by available behavior evidence and project risk; do not invent expected behavior merely to fill a scenario catalog.
+   * Identify uncovered behavior by criticality and risk, including critical paths, counterexamples, edge cases, invariants, boundaries, decisions, states, side effects, failure modes, and realistic misuse.
    * When a failure model is supplied or can be supported from project evidence, include relevant timeout, retry, partial-failure, duplicate/replay, dependency-outage, ordering, idempotency, or concurrency scenarios.
    * Select relevant techniques such as Equivalence Partitioning, Boundary Value Analysis, Decision Tables, State Transition, Use Case-Based, Path Analysis, Pairwise, Negative Testing, Property-Based Testing, or Fuzz Testing.
 
@@ -117,6 +128,7 @@ The workflow progressively establishes and refines:
    * Define the observable success criteria the tests must prove, preserving the distinction between business specification and the automation layer.
    * Choose the lowest test level that provides sufficient confidence.
    * Define the required scenarios and whether specialized testing is relevant.
+   * Build a scenario coverage plan that distinguishes scenarios requiring automation, scenarios adequately verified by another supported mechanism, and scenarios blocked by missing evidence or capability.
    * Select appropriate doubles and isolation boundaries.
 
 4. **Review design and testability**
@@ -132,11 +144,12 @@ The workflow progressively establishes and refines:
    * Keep setup minimal and explicit.
    * Use realistic, non-sensitive data.
    * Generate complete, runnable tests.
+   * Preserve scenario-to-test relationships. Use project-native tags, annotations, metadata, test-management links, or stable code references when available; otherwise report the mapping in test evidence instead of forcing IDs into test names.
    * When the project uses BDD or Specification by Example, preserve domain-oriented examples and living-documentation value without assuming Gherkin is required.
 
 6. **Verify the result**
 
-   * Confirm the tests protect intended contracts, rules, invariants, or outcomes.
+   * Confirm the tests protect intended contracts, rules, invariants, scenarios, or outcomes.
    * Confirm relevant success, failure, counterexample, edge, boundary, state, side-effect, retry, replay, idempotency, and substitutability concerns were considered.
    * When the change modifies previously verified behavior, run or identify the relevant regression checks rather than validating only the new slice.
    * Confirm determinism, isolation, reproducibility, and CI suitability.
@@ -145,6 +158,8 @@ The workflow progressively establishes and refines:
    * Read verification evidence before deciding whether the work is complete or requires diagnosis.
    * When the project uses quality baselines or ratcheted metrics, preserve or improve them; do not introduce measurable regressions.
    * Record the verification commands executed and their outcomes.
+   * Produce `contracts/test-evidence.md`-compatible scenario coverage when stable scenario identities are available, preserving `scenario_id`, `automation_refs`, automation status, and verification status.
+   * Report uncovered or partially covered scenarios and tests that lack a supported behavioral source when traceability is required.
    * Ensure a developer can understand the test intent and likely failure reason from its name, setup, and assertions.
 
 7. **Diagnose and iterate**
@@ -167,4 +182,5 @@ This skill may create or modify test artifacts. It may diagnose defects outside 
 * If a **Developer Alert** is required, present it before the tests.
 * Provide complete, copy-pasteable test code in standard Markdown code blocks.
 * Report verification commands and outcomes, including failing, skipped, blocked, or unexecuted checks, regression evidence, measurable regressions, and material uncertainty; never imply successful validation when verification is incomplete.
+* When scenario identities exist, include `contracts/test-evidence.md`-compatible coverage showing which scenarios are automated, partially automated, uncovered, blocked, passed, failed, or not run.
 * Keep explanations concise; let test names and assertions describe the behavior.
