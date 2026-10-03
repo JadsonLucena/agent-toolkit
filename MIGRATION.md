@@ -54,7 +54,8 @@ The context-first migration was also hardened against later requirements-review 
 * `requirements/rules/tailoring.md` makes rigor proportional to risk and uncertainty instead of document count.
 * Elicitation now separates Need, Business Goal, success evidence, Current/Future State, Work Scope, Product Boundary, and candidate solutions when those concerns are material.
 * Requirements semantics now cover conditional data, quality, security, transition, scenario, rationale, and rule-governance concerns without making every concern mandatory.
-* `example-discovery/skill.md` owns domain examples, counterexamples, boundaries, and questions before test automation.
+* `example-discovery/skill.md` owns stable behavioral Scenario Sets plus domain examples, counterexamples, boundaries, and questions before test automation.
+* `contracts/test-basis.md` preserves portable scenario identity into Testing, while `contracts/test-evidence.md` records scenario-to-test coverage and verification without mutating upstream semantics.
 * Backlog planning now supports coherent vertical/use-case/journey slicing, explicit learning work, trim-the-tail candidates, and critical guarantees.
 * Validation is read-only and evaluates missing knowledge, cross-artifact consistency, severity, and risk-proportional readiness.
 * Test generation may diagnose production defects but may not modify production artifacts without separate authorization.
