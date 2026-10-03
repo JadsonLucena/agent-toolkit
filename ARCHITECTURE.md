@@ -50,7 +50,8 @@ contexts/
 contracts/
 ├── requirements.md
 ├── work-item.md
-└── test-basis.md
+├── test-basis.md
+└── test-evidence.md
 ```
 
 ## Responsibility Model
@@ -101,7 +102,8 @@ Contracts are supporting schemas, not a fifth canonical artifact type.
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
 | Cross-context | `contracts/requirements.md` | Contract | Neutral elicitation and requirement-definition handoff semantics |
 | Cross-context | `contracts/work-item.md` | Contract | Neutral planning-item handoff semantics |
-| Cross-context | `contracts/test-basis.md` | Contract | Optional behavioral evidence handoff for Testing |
+| Cross-context | `contracts/test-basis.md` | Contract | Optional portable Scenario Set and behavioral evidence handoff for Testing |
+| Cross-context | `contracts/test-evidence.md` | Contract | Scenario-to-automation coverage and verification evidence |
 
 ## Dependency Direction
 
@@ -127,6 +129,37 @@ Additional rules:
 * Git and Testing must remain independently usable when Requirements artifacts are absent.
 * Requirements must remain independently usable when no repository exists.
 * Vendor adapters may depend on canonical artifacts; canonical artifacts never depend on a vendor adapter.
+
+## Behavioral Scenario Traceability
+
+When scenarios are first-class behavioral knowledge, preserve semantic identity across contexts:
+
+```text
+Requirement / Rule / Use Case / Slice
+                │
+                ▼
+          Scenario Set
+                │
+        ┌───────┴────────┐
+        ▼                ▼
+     Examples       Counterexamples
+        │                │
+        └───────┬────────┘
+                ▼
+          Test Basis
+                │
+                ▼
+         Automated Tests
+                │
+                ▼
+          Test Evidence
+```
+
+`scenario_id` belongs to the semantic Scenario Set. It must not be replaced by a Gherkin title, test method, filename, test-management identifier, or other adapter-specific identity.
+
+`contracts/test-basis.md` carries the portable Scenario Set into Testing. `contracts/test-evidence.md` records scenario-to-automation and verification relationships without mutating upstream requirement semantics.
+
+Scenario, Example, and Automated Test are distinct concepts. The architecture permits one-to-many and many-to-one traceability where the relationship is explicit.
 
 ## State Models
 
@@ -191,15 +224,16 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 2. Requirements is split into Elicitor, Specifier, and Backlog Planner because discovery, formal semantics, and work decomposition have different evidence and failure modes.
 3. Requirements rigor is tailored to risk and uncertainty; the framework optimizes knowledge sufficiency rather than artifact count.
 4. Elicitation and specification share `contracts/requirements.md` to preserve semantic continuity without creating a workflow-specific mega-contract.
-5. Example discovery belongs to Requirements and may hand semantic evidence to Testing through `contracts/test-basis.md` without invoking Testing internals.
-6. Backlog creation and refinement are two invocation modes of one backlog-planning capability.
-7. Testing consumes requirements-derived evidence optionally through `contracts/test-basis.md` and never requires Requirements workflows.
-8. Git consumes planning intent only as optional evidence and never treats it as stronger than repository state.
-9. Detailed atomic commit execution lives in a dedicated skill.
-10. Reusable branch/integration/worktree and semantic-version decision procedures live in dedicated skills.
-11. Semantic-version analysis has a public command because it has a clear user-facing intent and a non-mutating authorization boundary.
-12. Contracts exist because contexts exchange semantics. They remain neutral schemas rather than a new artifact category.
-13. A generic `shared/` directory is intentionally avoided.
+5. Example discovery belongs to Requirements and may hand a portable Scenario Set and semantic evidence to Testing through `contracts/test-basis.md` without invoking Testing internals.
+6. Stable scenario identity is preserved across Requirements, planning, Testing, and adapter representations; execution coverage is reported separately through `contracts/test-evidence.md`.
+7. Backlog creation and refinement are two invocation modes of one backlog-planning capability.
+8. Testing consumes requirements-derived evidence optionally through `contracts/test-basis.md` and never requires Requirements workflows.
+9. Git consumes planning intent only as optional evidence and never treats it as stronger than repository state.
+10. Detailed atomic commit execution lives in a dedicated skill.
+11. Reusable branch/integration/worktree and semantic-version decision procedures live in dedicated skills.
+12. Semantic-version analysis has a public command because it has a clear user-facing intent and a non-mutating authorization boundary.
+13. Contracts exist because contexts exchange semantics. They remain neutral schemas rather than a new artifact category.
+14. A generic `shared/` directory is intentionally avoided.
 
 ## Deferred Candidates
 
