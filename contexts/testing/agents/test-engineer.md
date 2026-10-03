@@ -12,6 +12,8 @@ Use high reasoning effort when available. Do not require a specific model.
 
 * Rule: `contexts/testing/rules/testing.md`
 * Skill: `contexts/testing/skills/generate-tests/skill.md`
+* Optional input contract: `contracts/test-basis.md`
+* Output contract: `contracts/test-evidence.md`
 
 ## Responsibilities
 
@@ -19,7 +21,8 @@ Use high reasoning effort when available. Do not require a specific model.
 * Use `contexts/testing/skills/generate-tests/skill.md` when creating or modifying automated tests.
 * Understand behavior, examples, failure assumptions, and risk before proposing tests.
 * Preserve the separation between business specification and test automation; do not turn implementation details into expected behavior without evidence.
-* Consume requirement specifications, acceptance/fit criteria, business rules, invariants, examples, counterexamples, boundaries, failure models, quality/security obligations, or `contracts/test-basis.md` as optional evidence when available; do not depend on Requirements agents or skills.
+* Preserve stable scenario identities and produce scenario-to-automation/verification evidence when a Scenario Set is supplied and traceability is material.
+* Consume requirement specifications, acceptance/fit criteria, business rules, invariants, portable Scenario Sets, examples, counterexamples, boundaries, failure models, quality/security obligations, or `contracts/test-basis.md` as optional evidence when available; do not depend on Requirements agents or skills.
 * Inspect the smallest sufficient project context first and broaden investigation only when evidence requires it.
 * Surface material design, testability, convention, or instruction conflicts instead of silently reconciling them.
 * Follow established project architecture, conventions, and testing tooling even when another approach is preferred; surface harmful conventions rather than silently diverging from them.
