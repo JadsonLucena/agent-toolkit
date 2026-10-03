@@ -29,7 +29,8 @@ A work item should make the following available when material and known:
 * risks and blockers;
 * explicit assumptions and unresolved questions;
 * readiness state for the intended planning horizon;
-* parent goal, use-case, journey, requirement, or other semantic context when one exists;
+* parent goal, use-case, journey, requirement, scenario, or other semantic context when one exists;
+* `scenario_refs` when the work item realizes or changes explicitly modeled behavioral scenarios;
 * slice intent and observable outcome when the item represents an incremental slice;
 * learning objective when the item intentionally exists to reduce uncertainty;
 * critical guarantees or invariants that the slice must preserve.
@@ -45,6 +46,7 @@ Optional project-specific fields may include priority, estimate, owner, iteratio
 * A technical task should normally remain subordinate to a coherent slice or work item when it is only one implementation step of that outcome.
 * Incremental slicing must not remove critical financial, security, privacy, compliance, integrity, deduplication, or minimum-observability guarantees that are required from the first usable increment.
 * A use-case or actor goal should remain semantically whole even when delivery is split across slices.
+* Stable scenario identifiers referenced by planning items must be preserved rather than replaced with tracker-specific item identifiers.
 * Material semantic ambiguity must be returned to the requirements source rather than resolved by planning invention.
 * Source obligations with no work item must remain explicitly accounted for when they are deferred, rejected, external, out of scope, or intentionally unplanned.
 * Work items with no evidenced source or purpose are traceability findings, not automatically valid scope.
