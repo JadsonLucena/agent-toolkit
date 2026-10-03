@@ -9,6 +9,7 @@ Use to transform sufficiently understood needs and evidence into precise, verifi
 * Rule: `contexts/requirements/rules/tailoring.md`
 * Rule: `contexts/requirements/rules/requirements.md`
 * Contract: `contracts/requirements.md`
+* Optional handoff: `contracts/test-basis.md`
 
 ## State Model
 
@@ -49,16 +50,17 @@ stateDiagram-v2
    * transition requirements distinct from permanent solution requirements.
 6. Use requirement patterns only as prompts to investigate potentially relevant concerns; never copy a pattern into the specification without supporting evidence.
 7. Define acceptance criteria, fit criteria, or other observable evidence of satisfaction without prescribing an unnecessary test level or implementation technique.
-8. Use concrete examples or boundary cases when they improve shared understanding; keep business examples free of implementation noise unless that detail is itself required.
-9. Preserve source provenance, rationale, authority, and stable traceability identifiers when available.
-10. Check necessity, clarity, singularity, consistency, feasibility status, verifiability, completeness for the intended downstream use, and proportionality to the selected rigor.
-11. Check explicitly for duplicate requirements, orphan requirements, hidden compound obligations, unsupported thresholds or precision, contradictory rules, and solution leakage.
-12. Surface contradictions and material ambiguity. Return stakeholder-intent questions to elicitation rather than resolving them by invention.
-13. Produce a specification only for semantics supported by evidence; keep unresolved material explicitly open.
+8. When behavioral scenarios are material, preserve or establish stable scenario identities and their traceability to requirements, rules, use cases, and slices. Use `contexts/requirements/skills/example-discovery/skill.md` when scenarios/examples need dedicated exploration.
+9. Use concrete examples or boundary cases when they improve shared understanding; keep business examples free of implementation noise unless that detail is itself required.
+10. Preserve source provenance, rationale, authority, requirement identifiers, rule identifiers, and scenario identifiers when available.
+11. Check necessity, clarity, singularity, consistency, feasibility status, verifiability, completeness for the intended downstream use, and proportionality to the selected rigor.
+12. Check explicitly for duplicate requirements, orphan requirements, orphan scenarios, hidden compound obligations, unsupported thresholds or precision, contradictory rules, and solution leakage.
+13. Surface contradictions and material ambiguity. Return stakeholder-intent questions to elicitation rather than resolving them by invention.
+14. Produce a specification only for semantics supported by evidence; keep unresolved material explicitly open.
 
 ## Output
 
-Produce a `contracts/requirements.md`-compatible specification containing the applicable strategic traceability, requirements, rules, constraints, acceptance/fit evidence, assumptions, options, dependencies, conflicts, and unresolved questions.
+Produce a `contracts/requirements.md`-compatible specification containing the applicable strategic traceability, requirements, rules, constraints, acceptance/fit evidence, scenarios, assumptions, options, dependencies, conflicts, and unresolved questions. When a portable Scenario Set is useful for downstream behavioral verification, expose it through `contracts/test-basis.md` while preserving the same scenario identities.
 
 Do not create fields merely to satisfy a schema when the corresponding knowledge is not relevant.
 
