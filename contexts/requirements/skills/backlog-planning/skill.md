@@ -57,6 +57,11 @@ stateDiagram-v2
 5. Shape the smallest coherent delivery or learning slices that preserve source semantics:
    * prefer end-to-end, observable, verifiable, informative slices over layer-by-layer decomposition;
    * keep the goal whole while slicing delivery;
+   * when a Use Case exists, preserve its reference and identify the meaningful story, flow, or scenario realized by the slice when known;
+   * prefer the simplest useful use-case story first, then enough additional stories to make the intended release sufficient; do not assume all known stories belong in the current commitment;
+   * keep known behavioral space, committed release scope, and implemented behavior distinguishable;
+   * when a Story Map is useful, preserve narrative flow, backbone context, details/variations, and coherent release slices; do not confuse story-map User Tasks with Engineering Tasks;
+   * when User Stories are used, preserve Card/Conversation/Confirmation intent and use INVEST only as a diagnostic heuristic rather than a mandatory gate;
    * preserve relevant business rules, quality/security constraints, acceptance evidence, and critical guarantees;
    * when uncertainty is the primary risk, prefer explicit learning work over speculative implementation.
 6. Keep technical tasks subordinate to the outcome/slice they realize unless the task itself is independently meaningful work.
@@ -71,7 +76,7 @@ stateDiagram-v2
 
 ## Output
 
-Produce `contracts/work-item.md`-compatible items with coherent intent, source traceability, acceptance evidence, slice/learning context when applicable, dependencies, risks, assumptions, critical guarantees, and readiness state.
+Produce `contracts/work-item.md`-compatible items with coherent intent, source traceability, acceptance evidence, slice/learning context when applicable, use-case or journey context when known, dependencies, risks, assumptions, critical guarantees, and readiness state.
 
 Include closure findings and candidates for learning, trimming, deferment, or removal without silently deciding their disposition.
 

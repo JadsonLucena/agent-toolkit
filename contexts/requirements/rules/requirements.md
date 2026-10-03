@@ -59,7 +59,9 @@ Do not hide transition work inside permanent product behavior.
 
 * Keep important domain terms explicit and consistent; distinguish domain language from technical implementation vocabulary.
 * Capture material facts and relationships between domain concepts, including n-ary relationships when the domain requires them.
-* Treat business rules as declarative domain constraints that may govern multiple requirements, scenarios, work items, or tests.
+* Treat business rules as declarative business knowledge that may define concepts or structures, constrain behavior, establish eligibility or authorization, classify or derive information, define calculations, or govern decisions and actions across multiple requirements, scenarios, work items, or tests.
+* Keep **Business Rule**, **Domain Invariant**, **Functional Requirement**, **Process**, and **Implementation** conceptually distinct. A business rule may lead to an invariant, requirement, decision, or enforcement mechanism, but is not automatically any one of them.
+* Keep rule meaning separate from enforcement. The same rule may be enforced by domain logic, application policy, workflow, database constraints, external policy services, or another justified mechanism.
 * Do not bury authoritative business rules only inside code, SQL, use-case steps, stories, or acceptance criteria.
 * For critical rules, preserve governance information when known and useful: stable identity, statement, source, rationale, owner or authority, effective/expiration conditions, exceptions, dependencies, conflicts, and enforcement locations.
 * A rule's absence of an owner or authority is a governance finding when changing that rule requires business authorization.
@@ -155,11 +157,24 @@ Check security requirements for conflicts with each other and with required busi
 
 ## Requirement Patterns
 
-Patterns may be used as prompts to discover missing concerns, not as pre-written requirements.
+Patterns may be used as reusable requirements knowledge to improve elicitation, specification, and validation. They are investigation and specification guides, not pre-written requirements.
 
-When a recurring concern such as an inter-system interface appears, consider related questions such as authentication, authorization, availability, timeout, versioning, compatibility, logging, upgrade, documentation, and error handling only when relevant.
+When a pattern is applicable, preserve only the guidance that is useful to the current context, which may include:
 
-Do not create requirements solely because a pattern contains them.
+* the recurring problem or intent the pattern addresses;
+* applicability and non-applicability signals;
+* questions and knowledge that should be obtained;
+* expected requirement content or semantic dimensions;
+* templates or examples used only as guidance;
+* related or extra requirement concerns that are often worth checking;
+* development considerations that may affect feasibility or downstream design;
+* testing considerations that may affect verification.
+
+Check applicability before expanding related concerns. A pattern may point to other patterns without making those concerns mandatory. For example, an inter-system interface may lead to authentication, authorization, availability, response-time, throughput, compatibility, logging, upgrade, documentation, error-handling, or data-longevity questions only when the context supports them.
+
+Treat pattern relationships as a graph of candidate questions and concerns rather than a checklist. Do not create requirements solely because a pattern contains them.
+
+When the same requirements problem recurs across initiatives, it may become a candidate organizational pattern after review. Reuse should capture learned questions and omissions without duplicating live business rules or turning a domain-specific specification into a generic pattern prematurely.
 
 ## Rationale, Acceptance, and Validation
 

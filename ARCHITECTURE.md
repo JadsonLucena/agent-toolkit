@@ -18,6 +18,7 @@ contexts/
 │   │   ├── validation/skill.md
 │   │   └── backlog-planning/skill.md
 │   ├── commands/
+│   │   ├── shape-change.md
 │   │   ├── elicit-requirements.md
 │   │   ├── specify-requirements.md
 │   │   ├── validate-requirements.md
@@ -78,6 +79,7 @@ Contracts are supporting schemas, not a fifth canonical artifact type.
 | Requirements | `skills/example-discovery/skill.md` | Skill | Discover domain examples, counterexamples, boundaries, and questions before test automation |
 | Requirements | `skills/validation/skill.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
 | Requirements | `skills/backlog-planning/skill.md` | Skill | Build or refine traceable planning items while preserving source semantics |
+| Requirements | `commands/shape-change.md` | Command | Orchestrate the risk-proportional Requirements path from available evidence through validated planning without duplicating specialist workflows |
 | Requirements | `commands/elicit-requirements.md` | Command | Start requirements discovery |
 | Requirements | `commands/specify-requirements.md` | Command | Start formal requirement definition |
 | Requirements | `commands/validate-requirements.md` | Command | Start the separate requirement-quality gate |
@@ -234,6 +236,17 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 12. Semantic-version analysis has a public command because it has a clear user-facing intent and a non-mutating authorization boundary.
 13. Contracts exist because contexts exchange semantics. They remain neutral schemas rather than a new artifact category.
 14. A generic `shared/` directory is intentionally avoided.
+15. `/requirements/shape-change` is the optional composite Requirements entry point for feature, defect, migration, regulatory, operational, or other change contexts; it routes existing capabilities and does not create a second source of requirement semantics.
+
+## Framework Scope Roadmap
+
+This foundation intentionally does not absorb every discipline into Requirements.
+
+Future **Product Discovery** responsibility should own opportunity framing, user/customer discovery, current-work understanding, Impact Mapping, solution hypotheses, Valuable/Usable/Feasible evaluation, product prototypes/experiments, and validated learning. Requirements may preserve Need, Goals, constraints, candidate solutions, and evidence without becoming the owner of the full Product Discovery discipline.
+
+Future **Lean / Delivery Flow** responsibility should make small batches, WIP, queue time, handoffs, feedback delay, flow efficiency, team empowerment, built-in integrity, and whole-system optimization explicit when the delivery system needs those controls.
+
+Architecture/Design should later own design operationalization, DDD tactical design, architectural trade-offs, Use-Case Realization, and ADR workflows. Release Evidence and Solution/Outcome Evaluation should remain separate downstream responsibilities.
 
 ## Deferred Candidates
 

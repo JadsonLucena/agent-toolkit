@@ -77,6 +77,8 @@ Requirements work is tailored to risk and uncertainty using the principle **just
 
 Elicitation and specification share `contracts/requirements.md` so Need/Goal context, source evidence, decisions, assumptions, conflicts, applicable concerns, and traceability survive the transformation without coupling their workflows. Example Discovery can define stable Scenario Sets, refine rules/examples/boundaries before automation, and hand optional evidence to Testing through `contracts/test-basis.md`.
 
+`/requirements/shape-change` is an optional composite entry point that routes the existing elicitation, definition, read-only validation, and backlog-planning capabilities according to the evidence already available. It is neutral to feature, defect, migration, regulatory, and other change types, and it does not authorize design, implementation, testing, or Git mutation.
+
 ### Testing
 
 ```text
@@ -122,6 +124,7 @@ Git is cross-cutting but is not automatically invoked by other contexts. Plannin
 Commands express engineering intent rather than low-level tool aliases:
 
 ```text
+/requirements/shape-change
 /requirements/elicit-requirements
 /requirements/specify-requirements
 /requirements/validate-requirements
@@ -240,7 +243,9 @@ Stable or repeatedly used project information may be cached when the execution p
 
 ## Roadmap
 
-Next contexts should cover architecture and design, implementation, code review, security engineering, release evidence, and solution/outcome evaluation without collapsing specialties. Requirements may carry the drivers for those contexts, but it does not own their internal design or delivery procedures.
+Next contexts should cover Product Discovery, architecture and design, implementation, code review, security engineering, release evidence, solution/outcome evaluation, and Lean/delivery-flow concerns without collapsing specialties. Requirements may carry Needs, Goals, constraints, candidate solutions, uncertainty, quality/security drivers, and other semantic evidence, but it does not own those disciplines' internal procedures.
+
+Product Discovery should later own opportunity/user discovery, Impact Mapping, solution hypotheses, Valuable/Usable/Feasible evaluation, prototypes/experiments, and validated learning. Lean/delivery flow should later own explicit WIP, queue, batch-size, handoff, feedback-delay, flow-efficiency, built-in-integrity, and whole-system concerns when needed.
 
 Additional Git commands should be introduced only when a reusable procedure also has a clear user-facing invocation intent and authorization boundary.
 

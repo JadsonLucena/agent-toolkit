@@ -30,6 +30,8 @@ A work item should make the following available when material and known:
 * explicit assumptions and unresolved questions;
 * readiness state for the intended planning horizon;
 * parent goal, use-case, journey, requirement, scenario, or other semantic context when one exists;
+* `use_case_ref` and the meaningful flow/story/scenario realized by the item when Use-Case 2.0 semantics are available;
+* story-map or release-slice context when journey mapping is used;
 * `scenario_refs` when the work item realizes or changes explicitly modeled behavioral scenarios;
 * slice intent and observable outcome when the item represents an incremental slice;
 * learning objective when the item intentionally exists to reduce uncertainty;

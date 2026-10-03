@@ -34,10 +34,36 @@ Apply `contexts/requirements/rules/tailoring.md` when deciding how much decompos
 When use cases, journeys, or story maps exist:
 
 * preserve the actor/user goal and narrative context;
-* identify the flow or scenario covered by a slice;
+* identify the meaningful use-case story, flow, or scenario covered by a slice;
+* keep the known behavioral space distinct from the behavior committed to the current release and from behavior already implemented;
+* prefer the simplest useful story that can traverse the goal coherently, then add enough stories to make the release sufficient before pursuing the remaining tail;
+* do not require all known use-case stories to be fulfilled before a release can be useful;
 * avoid splitting a user goal into artificial CRUD or technical-layer stories merely to fit an iteration;
-* keep relevant business rules, quality/security constraints, and expected tests traceable to the slice;
-* use story mapping as an optional context-preserving technique, not a mandatory backlog format.
+* keep relevant business rules, quality/security constraints, acceptance evidence, and expected tests traceable to the slice.
+
+When Story Mapping is useful:
+
+* preserve the journey or narrative flow horizontally;
+* use a backbone to retain the larger activity/task context;
+* place details, alternatives, and smaller user tasks beneath the relevant backbone activity;
+* distinguish a **User Task** in the story map from an **Engineering Task** used to implement a slice;
+* shape release slices as coherent traversals of the experience rather than arbitrary collections of individually high-priority items.
+
+Story Mapping is an optional context-preserving technique, not a mandatory backlog format.
+
+## User Stories
+
+When User Stories are useful, treat them as lightweight units for conversation and planning rather than as complete requirement containers.
+
+Preserve the intent behind **Card, Conversation, Confirmation**:
+
+* the card or item is a reminder of the need;
+* conversation establishes shared understanding;
+* confirmation identifies observable evidence of satisfaction.
+
+Use INVEST only as a diagnostic heuristic: Independent enough, Negotiable, Valuable, Estimatable, Small, and Testable. Do not assign an INVEST score or turn it into a universal Definition of Ready.
+
+Do not force bugs, spikes, migrations, technical enablers, compliance work, operational work, or Use-Case Slices into a User Story template.
 
 ## Learning and Uncertainty
 

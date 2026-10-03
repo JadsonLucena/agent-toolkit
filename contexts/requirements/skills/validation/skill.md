@@ -69,7 +69,13 @@ Report the downstream target separately as `readiness_for`.
    * Check functional, data, quality, security, interface, operational, and transition semantics at the depth required by the selected rigor.
    * Check acceptance and fit evidence for observable behavior and justified precision.
 
-5. **Validate cross-artifact consistency when the corresponding artifacts exist.**
+5. **Validate the Use-Case set when Use Cases are a material representation.**
+   * Check whether relevant actors and actor goals are covered without requiring a Use Case for every requirement.
+   * Detect materially missing actor goals, duplicated goals, inconsistent goal levels, scope inconsistencies, artificial CRUD/technical mini Use Cases, and oversized Use Cases that combine distinct goals.
+   * Check whether meaningful alternatives or exceptions required for the intended downstream decision are represented.
+   * Apply this review only when Use Cases are actually part of the requirements model.
+
+6. **Validate cross-artifact consistency when the corresponding artifacts exist.**
    * Need/Goal ↔ Requirements.
    * Rules/Policies ↔ Requirements/Use Cases/Scenarios.
    * Requirements ↔ quality/security constraints.
@@ -80,17 +86,17 @@ Report the downstream target separately as `readiness_for`.
    * Success metrics ↔ production/outcome evidence.
    * Identify contradictions, drift, duplicated knowledge, and orphan relationships.
 
-6. **Validate uncertainty and solution decisions.**
+7. **Validate uncertainty and solution decisions.**
    * Surface implicit assumptions, unresolved unknowns, expiring options, unsupported thresholds, and hidden design decisions.
    * Distinguish a missing requirement from a legitimate downstream design choice.
    * Distinguish candidate solution evidence from accepted requirement semantics.
 
-7. **Classify findings.**
+8. **Classify findings.**
    * Assign finding type and severity.
    * Describe evidence, affected identifiers/relationships, material impact, and the smallest evidence-backed remediation.
    * For a correctable defect, describe the revision but do not mutate the specification.
 
-8. **Determine readiness.**
+9. **Determine readiness.**
    * Identify relationships that would require revalidation if a recommended revision is later authorized and applied.
    * Determine overall status for the actual `readiness_for` target.
    * Do not convert unresolved findings into a pass merely to keep work moving.

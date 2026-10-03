@@ -56,8 +56,10 @@ The context-first migration was also hardened against later requirements-review 
 * Requirements semantics now cover conditional data, quality, security, transition, scenario, rationale, and rule-governance concerns without making every concern mandatory.
 * `example-discovery/skill.md` owns stable behavioral Scenario Sets plus domain examples, counterexamples, boundaries, and questions before test automation.
 * `contracts/test-basis.md` preserves portable scenario identity into Testing, while `contracts/test-evidence.md` records scenario-to-test coverage and verification without mutating upstream semantics.
-* Backlog planning now supports coherent vertical/use-case/journey slicing, explicit learning work, trim-the-tail candidates, and critical guarantees.
-* Validation is read-only and evaluates missing knowledge, cross-artifact consistency, severity, and risk-proportional readiness.
+* Backlog planning now supports coherent vertical/use-case/journey slicing, explicit learning work, trim-the-tail candidates, critical guarantees, optional Story Mapping semantics, User Story diagnostics, and fuller Use-Case 2.0 progression from simplest useful to sufficient behavior.
+* Requirement Patterns now preserve applicability, investigation guidance, related concerns, downstream considerations, and organizational learning without becoming automatic requirements.
+* Validation is read-only and evaluates missing knowledge, cross-artifact consistency, Use-Case set quality when applicable, severity, and risk-proportional readiness.
+* `/requirements/shape-change` provides one neutral composite entry point over the existing Requirements capabilities without duplicating their procedures or expanding into design/implementation scope.
 * Test generation may diagnose production defects but may not modify production artifacts without separate authorization.
 * Commit verification may diagnose failures but may not edit the authorized implementation merely to make a commit pass.
 
