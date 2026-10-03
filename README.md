@@ -75,7 +75,7 @@ Requirements can operate from conversations, documents, interviews, tickets, exi
 
 Requirements work is tailored to risk and uncertainty using the principle **just enough requirements, with sufficient rigor for the risk**. The toolkit may use `lightweight`, `standard`, or `high-assurance` rigor when the distinction is useful; it does not require every known artifact or technique for every change.
 
-Elicitation and specification share `contracts/requirements.md` so Need/Goal context, source evidence, decisions, assumptions, conflicts, applicable concerns, and traceability survive the transformation without coupling their workflows. Example Discovery can refine rules and boundaries before automation and hand optional evidence to Testing through `contracts/test-basis.md`.
+Elicitation and specification share `contracts/requirements.md` so Need/Goal context, source evidence, decisions, assumptions, conflicts, applicable concerns, and traceability survive the transformation without coupling their workflows. Example Discovery can define stable Scenario Sets, refine rules/examples/boundaries before automation, and hand optional evidence to Testing through `contracts/test-basis.md`.
 
 ### Testing
 
@@ -87,7 +87,7 @@ contexts/testing/
 └── agents/test-engineer.md
 ```
 
-Testing remains autonomous. Requirements evidence may improve test design through the optional `contracts/test-basis.md`, but Testing does not invoke Requirements skills or agents merely to obtain that evidence.
+Testing remains autonomous. Requirements evidence may improve test design through the optional `contracts/test-basis.md`, but Testing does not invoke Requirements skills or agents merely to obtain that evidence. When stable scenarios are supplied, Testing preserves their identities and reports coverage/verification separately through `contracts/test-evidence.md`.
 
 ### Git
 
@@ -114,7 +114,8 @@ Git is cross-cutting but is not automatically invoked by other contexts. Plannin
 
 * `contracts/requirements.md` — elicitation and requirement-definition semantics.
 * `contracts/work-item.md` — planning-item semantics.
-* `contracts/test-basis.md` — optional behavioral evidence for Testing.
+* `contracts/test-basis.md` — optional portable Scenario Set and behavioral evidence for Testing.
+* `contracts/test-evidence.md` — scenario-to-automation coverage and verification evidence.
 
 ## Commands
 
@@ -172,13 +173,18 @@ Need → Business Goal
       ↓
 Rule / Constraint
       ↓
-Requirement
-      ├────────────► Acceptance / Fit Evidence
-      ├────────────► Example / Counterexample
+Requirement / Rule / Use Case
+      │
+      ▼
+Scenario Set
+      ├────────────► Example / Counterexample / Boundary
+      │
       ▼
 Slice / Work Item
       ▼
-Design / Implementation
+Test Basis
+      ▼
+Automated Tests
       ▼
 Test Evidence
       ▼
@@ -186,6 +192,14 @@ Outcome Evidence
 ```
 
 Downstream artifacts may summarize upstream semantics but must not silently change them.
+
+## BDD Portability
+
+The canonical model does not equate BDD with Gherkin.
+
+`contracts/test-basis.md` can carry stable scenarios, rules, examples, counterexamples, boundaries, assumptions, and expected outcomes independently from any automation syntax. Adapters may render that same Scenario Set as Gherkin/Cucumber, framework-native tests, test-case-management records, Markdown, JSON/YAML, or other representations.
+
+`contracts/test-evidence.md` keeps execution evidence separate from the business specification so a test framework can change without changing scenario identity.
 
 ## Model Selection
 
