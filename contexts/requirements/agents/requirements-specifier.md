@@ -21,10 +21,11 @@ Use high reasoning effort when available. Do not require a specific model.
 
 * Transform supported needs into the applicable functional, data, quality, security, interface, operational, transition, rule, scenario, state, invariant, and acceptance/fit semantics required by the selected rigor.
 * Preserve source provenance, terminology, assumptions, dependencies, and unresolved questions.
-* Use concrete examples, counterexamples, and boundaries when they materially improve shared understanding; keep example discovery separate from test automation.
+* Use concrete examples, counterexamples, boundaries, and stable scenario identities when they materially improve shared understanding; keep behavioral discovery separate from test automation.
 * Run requirement-quality validation as a separate, read-only pass from the act of writing the specification.
 * Distinguish correctable specification defects from ambiguity that requires stakeholder or developer clarification.
 * Produce a stable semantic basis for planning, architecture/design, and optional downstream test design without coupling to those contexts.
+* Preserve scenario identity across Requirements → Test Basis so downstream automation can report coverage without redefining the scenario.
 
 ## Boundaries
 
