@@ -1,163 +1,210 @@
 # Agent Toolkit
 
-A vendor-neutral toolkit of **rules, skills, commands, and specialized agents** for the software development pipeline—from elicitation through code review—including cross-cutting concerns such as version control.
+A vendor-neutral toolkit of **rules, skills, commands, and specialized agents** for the software development pipeline, organized by engineering context.
 
-Canonical definitions stay independent of any IDE, provider, or model. Platform-specific formats are adapters, not sources of truth.
-
-## Purpose
-
-Cover the full development cycle with composable artifacts:
-
-1. **Rules** — persistent standards that must be respected.
-2. **Skills** — reusable procedures for a specific kind of task.
-3. **Commands** — explicit entry points that start a workflow.
-4. **Agents** — specialized roles that apply the relevant rules, skills, and commands.
-
-Agents stay specialized. Cross-cutting concerns (for example Git, security, or conventions) are first-class, not hidden inside a general-purpose prompt.
-
-## Current inventory
-
-What this repository already defines:
-
-```text
-rules/
-├── testing.md
-├── git.md
-├── gitflow.md
-├── semantic-commit.md
-└── semantic-version.md
-
-skills/
-└── generate-tests/
-
-agents/
-├── test-engineer.md
-└── git-engineer.md
-```
-
-| Area | Status | Artifacts |
-|---|---|---|
-| Automated testing | Available | `rules/testing.md`, `skills/generate-tests/`, `agents/test-engineer.md` |
-| Git, history, and release semantics | Available | `rules/git.md`, `rules/gitflow.md`, `rules/semantic-commit.md`, `rules/semantic-version.md`, `agents/git-engineer.md` |
-| Commands | Not started | no `commands/` definitions yet |
-| Elicitation through implementation | Roadmap | no planner, architect, or implementation agent yet |
-| Code review | Roadmap | no reviewer agent or review skill yet |
-
-`gitflow.md` applies only when the repository uses Gitflow or the task explicitly requires it.
+Canonical definitions stay independent of any IDE, provider, model, issue tracker, or agent runtime. Platform-specific formats are adapters, not sources of truth.
 
 ## Architecture
 
 ```text
 agent-toolkit/
-├── rules/
-├── skills/
-├── commands/    # planned
-├── agents/
+├── contexts/
+│   ├── requirements/
+│   │   ├── rules/
+│   │   ├── skills/
+│   │   ├── commands/
+│   │   └── agents/
+│   ├── testing/
+│   │   ├── rules/
+│   │   ├── skills/
+│   │   ├── commands/
+│   │   └── agents/
+│   └── git/
+│       ├── rules/
+│       ├── skills/
+│       ├── commands/
+│       └── agents/
+├── contracts/
+├── ARCHITECTURE.md
+├── MIGRATION.md
 └── README.md
 ```
 
-### Rules
+Contexts organize the four canonical artifact types by engineering responsibility. Cross-context collaboration uses explicit semantic evidence and contracts rather than accidental dependencies on another context's internal skills or agents.
 
-Persistent principles, constraints, quality standards, and expected behavior.
+`contracts/` contains neutral handoff schemas. Contracts are not a fifth artifact type and contain no workflow logic.
 
-> **What standards must be respected?**
+## Artifact Responsibilities
 
-Rules stay concise, reusable, and independent of a specific workflow or tool.
+1. **Rules** — durable principles, constraints, invariants, and quality standards.
+2. **Skills** — reusable operational procedures and task state models.
+3. **Commands** — thin engineering-intent and authorization entry points that select a workflow without granting unrelated mutations.
+4. **Agents** — specialist scope, evidence discipline, orchestration, boundaries, and handoffs.
 
-### Skills
+See `ARCHITECTURE.md` for the responsibility matrix, dependency rules, command shape, and naming rules. See `MIGRATION.md` for structural renames and moved responsibilities.
 
-Reusable knowledge and procedures for one type of task.
+## Current Contexts
 
-> **How should this task be performed?**
-
-Multiple agents may reuse the same skill when it matches their responsibility.
-
-### Commands
-
-Named entry points that start a pipeline stage or a cross-cutting workflow.
-
-> **When should this workflow be invoked, and with what goal?**
-
-Commands compose agents, rules, and skills. They do not replace them. None are defined yet.
-
-### Agents
-
-Specialized engineering roles that orchestrate the rules, skills, and commands needed for a goal.
-
-> **Who should perform this task, and which capabilities should be applied?**
-
-Each agent has a clear scope and uses only the artifacts relevant to its specialty.
-
-## Development pipeline
-
-Prefer specialized agents over a single general-purpose agent.
+### Requirements
 
 ```text
-Elicitation → Plan → Design → Implement → Test → Review
-                      │
-                      └── Cross-cutting: Git, security, conventions, …
+contexts/requirements/
+├── rules/
+│   ├── tailoring.md
+│   ├── requirements.md
+│   └── backlog.md
+├── skills/
+│   ├── elicitation/skill.md
+│   ├── definition/skill.md
+│   ├── example-discovery/skill.md
+│   ├── validation/skill.md
+│   └── backlog-planning/skill.md
+├── commands/
+│   ├── elicit-requirements.md
+│   ├── specify-requirements.md
+│   ├── validate-requirements.md
+│   ├── build-backlog.md
+│   └── refine-backlog.md
+└── agents/
+    ├── requirements-elicitor.md
+    ├── requirements-specifier.md
+    └── backlog-planner.md
 ```
 
-| Stage | Responsibility | Status |
-|---|---|---|
-| Elicitation | Problem, stakeholders, constraints, and desired outcomes | Roadmap |
-| Plan | Requirements, decomposition, risks, dependencies, and execution strategy | Roadmap |
-| Design | Architecture, boundaries, contracts, and trade-offs | Roadmap |
-| Implement | Application code within the agreed design and quality rules | Roadmap |
-| Test | Test strategy, automated tests, edge cases, and verification | Available |
-| Review | Correctness, quality, architecture, security, debt, and maintainability | Roadmap |
+Requirements can operate from conversations, documents, interviews, tickets, existing-system evidence, policies, data, and other supported sources. A repository is not required.
 
-| Cross-cutting | Responsibility | Status |
-|---|---|---|
-| Git and release | Safe history, commits, branches, composition, versions, and publication | Available |
-| Security | Threats, authorization, secrets, and sensitive data | Roadmap |
-| Conventions | Shared coding, architecture, and documentation standards | Roadmap |
+Requirements work is tailored to risk and uncertainty using the principle **just enough requirements, with sufficient rigor for the risk**. The toolkit may use `lightweight`, `standard`, or `high-assurance` rigor when the distinction is useful; it does not require every known artifact or technique for every change.
 
-Agents may collaborate. Responsibilities stay explicit so work is not duplicated and decisions do not conflict.
+Elicitation and specification share `contracts/requirements.md` so Need/Goal context, source evidence, decisions, assumptions, conflicts, applicable concerns, and traceability survive the transformation without coupling their workflows. Example Discovery can define stable Scenario Sets, refine rules/examples/boundaries before automation, and hand optional evidence to Testing through `contracts/test-basis.md`.
 
-A typical collaboration still flows left to right through the pipeline. Git is not a late stage: it applies whenever repository state, history, or release intent changes.
+`/requirements/shape-change` is an optional composite entry point that routes the existing elicitation, definition, read-only validation, and backlog-planning capabilities according to the evidence already available. It is neutral to feature, defect, migration, regulatory, and other change types, and it does not authorize design, implementation, testing, or Git mutation.
+
+### Testing
 
 ```text
-Request
-   │
-   ▼
-Elicitation / Planner          (roadmap)
-   │
-   ▼
-Designer / Implementer         (roadmap)
-   │
-   ├── Test Engineer           (available)
-   └── Git Engineer            (available, cross-cutting)
-   │
-   ▼
-Reviewer                       (roadmap)
+contexts/testing/
+├── rules/testing.md
+├── skills/generate-tests/skill.md
+├── commands/generate-tests.md
+└── agents/test-engineer.md
 ```
 
-Relevant context and decisions should flow between agents without forcing every agent to inherit the complete conversation history.
+Testing remains autonomous. Requirements evidence may improve test design through the optional `contracts/test-basis.md`, but Testing does not invoke Requirements skills or agents merely to obtain that evidence. When stable scenarios are supplied, Testing preserves their identities and reports coverage/verification separately through `contracts/test-evidence.md`.
 
-## Roadmap
+### Git
 
-The next definitions should fill the pipeline and the missing artifact type, without collapsing specialties into one agent.
+```text
+contexts/git/
+├── rules/
+│   ├── git.md
+│   ├── gitflow.md
+│   ├── semantic-commit.md
+│   └── semantic-version.md
+├── skills/
+│   ├── create-semantic-commits/skill.md
+│   ├── determine-semantic-version/skill.md
+│   └── manage-branch-work/skill.md
+├── commands/
+│   ├── commit.md
+│   └── determine-semantic-version.md
+└── agents/git-engineer.md
+```
 
-**Commands**
+Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
 
-- Entry points for elicitation, planning, implementation, testing, review, and Git operations.
+## Contracts
 
-**Pipeline agents and supporting artifacts**
+* `contracts/requirements.md` — elicitation and requirement-definition semantics.
+* `contracts/work-item.md` — planning-item semantics.
+* `contracts/test-basis.md` — optional portable Scenario Set and behavioral evidence for Testing.
+* `contracts/test-evidence.md` — scenario-to-automation coverage and verification evidence.
 
-- Elicitation and planning (requirements, decomposition, risks).
-- Architecture and design (including API and system-design skills).
-- Implementation (software engineer, plus quality rules such as architecture and clean code).
-- Code review (reviewer agent and review skill).
+## Commands
 
-**Additional cross-cutting concerns**
+Commands express engineering intent rather than low-level tool aliases:
 
-- Security (rule, threat-modeling skill, security engineer).
-- Shared conventions that remain independent of a single pipeline stage.
+```text
+/requirements/shape-change
+/requirements/elicit-requirements
+/requirements/specify-requirements
+/requirements/validate-requirements
+/requirements/build-backlog
+/requirements/refine-backlog
 
-New artifacts should follow the same vendor-neutral Markdown shape as the existing testing and Git definitions.
+/testing/generate-tests
 
-## Model selection
+/git/commit
+/git/determine-semantic-version
+```
+
+A command's invocation defines its authorization boundary. For example, determining a semantic version does not authorize version-file mutation, tagging, publishing, or release.
+
+## Development Pipeline
+
+```text
+Elicitation ↔ Specification ↔ Backlog / Plan → Design → Implement → Test → Review
+
+Cross-cutting: Git, security, conventions, …
+```
+
+The first three stages are iterative. A backlog ambiguity may return to specification, and missing stakeholder intent may return to elicitation.
+
+## Cross-Context Composition
+
+The default integration model is loose coupling by semantic contracts.
+
+A context must not invoke another context's internal agent or skill merely to obtain data. Explicit multi-context workflows may orchestrate multiple specialists when the workflow itself intentionally spans those responsibilities.
+
+Testing and Git remain independently usable when Requirements artifacts are absent.
+
+## Ambiguity Policy
+
+* **Low-impact uncertainty** — state an explicit assumption and continue.
+* **Material ambiguity** — ask rather than guess.
+* **Blocking missing information** — stop only the affected decision.
+
+Avoid numeric confidence scores that imply unsupported precision.
+
+## Traceability
+
+Preserve identity across transformations when the corresponding artifacts exist:
+
+```text
+Source / Rationale
+      ↓
+Need → Business Goal
+      ↓
+Rule / Constraint
+      ↓
+Requirement / Rule / Use Case
+      │
+      ▼
+Scenario Set
+      ├────────────► Example / Counterexample / Boundary
+      │
+      ▼
+Slice / Work Item
+      ▼
+Test Basis
+      ▼
+Automated Tests
+      ▼
+Test Evidence
+      ▼
+Outcome Evidence
+```
+
+Downstream artifacts may summarize upstream semantics but must not silently change them.
+
+## BDD Portability
+
+The canonical model does not equate BDD with Gherkin.
+
+`contracts/test-basis.md` can carry stable scenarios, rules, examples, counterexamples, boundaries, assumptions, and expected outcomes independently from any automation syntax. Adapters may render that same Scenario Set as Gherkin/Cucumber, framework-native tests, test-case-management records, Markdown, JSON/YAML, or other representations.
+
+`contracts/test-evidence.md` keeps execution evidence separate from the business specification so a test framework can change without changing scenario identity.
+
+## Model Selection
 
 The toolkit does not require a specific AI provider or model.
 
@@ -174,54 +221,38 @@ Code review            → high reasoning and broad context
 Simple transformations → lightweight model when sufficient
 ```
 
-## Context management
+## Context Management
 
-Efficient context management matters when multiple agents collaborate.
+Long-running collaboration should preserve decisions, constraints, assumptions, unresolved issues, and relevant implementation context without forcing every agent to inherit the complete conversation history.
 
-### Conversation compaction
+Stable or repeatedly used project information may be cached when the execution platform supports it, but stale cached context must not override newer project state.
 
-Periodically summarize or compact long-running conversations while preserving decisions, constraints, assumptions, unresolved issues, and relevant implementation context.
+## Design Principles
 
-### Shared context
+* **Vendor neutral** — canonical definitions do not depend on a specific AI ecosystem.
+* **Context first** — artifacts are grouped by engineering responsibility.
+* **Single responsibility** — each concept has one authoritative owner.
+* **Composable** — explicit workflows may coordinate multiple contexts without merging their responsibilities.
+* **Loosely coupled** — cross-context evidence does not create unnecessary workflow dependencies.
+* **Traceable** — material semantics preserve provenance across transformations.
+* **Evidence driven** — supported evidence precedes inference.
+* **Risk proportionate** — requirements rigor and representation scale with consequence, uncertainty, and the next decision rather than template completeness.
+* **Context aware** — preserve relevant context while minimizing unnecessary context.
+* **Task oriented** — commands express clear engineering intent.
+* **Quality driven** — verification distinguishes evidence from assumptions and unverified conclusions.
 
-Agents on the same task should share project and decision context instead of rebuilding it independently. Each agent consumes only the subset relevant to its responsibility.
+## Roadmap
 
-### Context caching
+Next contexts should cover Product Discovery, architecture and design, implementation, code review, security engineering, release evidence, solution/outcome evaluation, and Lean/delivery-flow concerns without collapsing specialties. Requirements may carry Needs, Goals, constraints, candidate solutions, uncertainty, quality/security drivers, and other semantic evidence, but it does not own those disciplines' internal procedures.
 
-Stable or repeatedly used information—conventions, architecture docs, rules, common skills, domain terms—should be cached when the platform supports it, without letting stale cache override newer project state.
+Product Discovery should later own opportunity/user discovery, Impact Mapping, solution hypotheses, Valuable/Usable/Feasible evaluation, prototypes/experiments, and validated learning. Lean/delivery flow should later own explicit WIP, queue, batch-size, handoff, feedback-delay, flow-efficiency, built-in-integrity, and whole-system concerns when needed.
 
-## Design principles
-
-- **Vendor neutral** — source definitions must not depend on a specific IDE, AI provider, or model.
-- **Full pipeline** — artifacts should cover elicitation through review, plus cross-cutting concerns.
-- **Single responsibility** — rules, skills, commands, and agents must have clearly separated concerns.
-- **Composable** — agents combine only the artifacts they need.
-- **Reusable** — knowledge is defined once and shared.
-- **Context aware** — preserve relevant context while minimizing unnecessary tokens.
-- **Task oriented** — use specialized agents and appropriate models for the work.
-- **Quality driven** — optimize for correctness, security, maintainability, performance, and meaningful engineering outcomes.
+Additional Git commands should be introduced only when a reusable procedure also has a clear user-facing invocation intent and authorization boundary.
 
 ## Portability
 
-Canonical definitions are written in neutral Markdown.
-
-```text
-rules / skills / commands / agents
-              │
-              ▼
-      Canonical Markdown
-              │
-      ┌───────┼─────────┐
-      ▼       ▼         ▼
-   Cursor  Copilot   Claude
-      ▼       ▼         ▼
-      Other AI platforms
-```
-
-This allows the toolkit to evolve independently from any individual AI ecosystem.
+Canonical definitions are neutral Markdown. Adapters may transform them into provider-specific formats while preserving canonical semantics.
 
 ## Goal
 
-The goal is not a collection of prompts.
-
-It is a **composable software engineering system for AI agents**, covering the development pipeline and its cross-cutting concerns, where responsibilities, knowledge, reasoning, and context are structured to produce consistent engineering outcomes.
+The goal is not a collection of prompts. It is a **composable software engineering system for AI agents** where responsibility, evidence, workflow, boundaries, and context are structured to produce consistent engineering outcomes.
