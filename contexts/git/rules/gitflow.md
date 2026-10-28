@@ -6,8 +6,8 @@
 * Apply Gitflow only when the repository explicitly uses it or when a release-oriented model with equivalent branch roles is required.
 * Do not impose Gitflow on repositories using trunk-based development, GitHub Flow, or another established workflow.
 * Preserve repository-defined branch names, prefixes, merge policies, protections, and release practices when they differ from the conventional names below.
-* Apply `rules/git.md` to repository state, synchronization, history rewriting, remote operations, tags, signing, worktrees, and Git safety.
-* Apply `rules/semantic-version.md` to release, hotfix, and tag version identifiers when the project declares a versioning scheme.
+* Apply `contexts/git/rules/git.md` to repository state, synchronization, history rewriting, remote operations, tags, signing, worktrees, and Git safety.
+* Apply `contexts/git/rules/semantic-version.md` to release, hotfix, and tag version identifiers when the project declares a versioning scheme.
 
 ## Branch Roles
 

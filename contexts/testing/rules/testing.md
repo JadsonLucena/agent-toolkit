@@ -14,6 +14,21 @@
 * Add comments only for non-obvious business rules, formulas, magic values, or complex reasoning.
 * Focus on behavior and risk coverage, not coverage percentage alone.
 
+## Scenario Traceability
+
+When a portable Scenario Set or equivalent stable scenario identities are supplied:
+
+* preserve each upstream `scenario_id` exactly;
+* map automated tests to the scenarios they verify instead of replacing semantic scenario identity with test-framework naming;
+* keep Scenario, Example, and Automated Test as distinct concepts;
+* allow one scenario to map to multiple tests and one test to cover multiple related scenarios when the relationship is explicit;
+* identify scenarios with no automation, partial automation, blocked automation, or unexecuted verification when traceability is material;
+* identify automated tests with no supported behavior source when the project requires behavioral traceability;
+* record coverage and verification evidence through `contracts/test-evidence.md` rather than mutating the upstream Scenario Set;
+* do not require scenario IDs to appear in test names or source code when project conventions or tooling provide a better traceability mechanism.
+
+A Scenario Set is optional. When it does not exist, tests may trace directly to requirements, rules, defects, work items, contracts, or other supported behavior sources.
+
 ## Test Levels
 
 * Choose the lowest test level that provides sufficient confidence at a reasonable cost. Use the Testing Pyramid as a heuristic, not a mandatory distribution.
