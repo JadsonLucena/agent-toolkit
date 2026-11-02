@@ -204,3 +204,15 @@ Do not infer one state from another.
 ## Foundational Guidance
 
 These rules synthesize the project's PR policy with established guidance on code inspection, small batches, incremental delivery, use-case slicing, and modern code review. Repository-specific policy remains authoritative over generic heuristics when it preserves safety and integrity.
+
+Foundational references used to shape this rule include:
+
+* Michael Fagan (1976), *Design and Code Inspections to Reduce Errors in Program Development*.
+* Jason Cohen, Eric Brown, and Steven Teleki (2006), *Best Kept Secrets of Peer Code Review*.
+* Donald Reinertsen (2009), *The Principles of Product Development Flow*.
+* Jez Humble and David Farley (2010), *Continuous Delivery*.
+* Ivar Jacobson, Ian Spence, and Kurt Bittner, *Use-Case 2.0*.
+* Alberto Bacchelli and Christian Bird (2013), *Expectations, Outcomes, and Challenges of Modern Code Review*.
+* Google Engineering Practices, *Small CLs* and *Writing Good CL Descriptions*.
+
+These references inform reviewability and flow principles; the numeric size ranges in this rule remain heuristics for local calibration, not universal laws.
