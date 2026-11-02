@@ -33,6 +33,37 @@ When current-state knowledge matters, distinguish genuine business rules from ac
 * When solution uncertainty is material, preserve candidate options and the evidence needed to compare them rather than collapsing prematurely to one design.
 * A prototype, experiment, probe, or spike may be valid work when its purpose is to reduce a material uncertainty.
 
+## Change Boundary and Scope Drift
+
+When a specific change is being shaped, preserve a **Change Boundary** when it materially improves scope control and downstream traceability.
+
+A Change Boundary describes the current change, not the permanent product boundary. When known and relevant, it should identify:
+
+* the primary objective and expected observable change;
+* included behavior, rules, actors, data, qualities, transitions, or other obligations;
+* explicitly excluded scope;
+* explicitly deferred scope and the authority or decision supporting the deferral when material;
+* affected requirements, rules, use cases, scenarios, or other semantic sources;
+* critical guarantees that must hold for the bounded change to be valid or safe;
+* material dependencies and unresolved scope decisions;
+* the expected product/business state after this change, without implying that the larger initiative is complete.
+
+Keep these boundaries distinct:
+
+* **Work Scope** — the broader organizational or change work under consideration.
+* **Product Boundary** — what responsibility belongs to the product/software versus its environment.
+* **Change Boundary** — what this specific change currently intends to alter, preserve, exclude, or defer.
+
+The initial Change Boundary may evolve as evidence improves. Reconcile material discoveries rather than silently absorbing them:
+
+* evidence that clarifies or refines already included intent may be incorporated while preserving provenance;
+* evidence that materially expands or narrows the intended change requires an explicit scope decision;
+* a related but independently valuable need should remain a separate change candidate unless authority explicitly expands the current boundary;
+* a missing critical guarantee that is necessary for the bounded change must be added, resolved, or block the affected slice rather than being deferred merely to keep scope small;
+* unrelated discoveries must not become requirements of the current change merely because they were found during analysis.
+
+Preserve enough history or rationale to explain material boundary changes and their downstream impact.
+
 ## Business Events and Business Response
 
 When event completeness is useful:
@@ -86,6 +117,20 @@ Do not hide transition work inside permanent product behavior.
 * For material unknowns, record when useful: the unknown statement, risk if unresolved, how it can be learned, and any decision deadline.
 * For material options, record when useful: alternatives, evidence needed, option-expiration conditions, and the cost or consequence of committing now versus delaying.
 * Treat uncertainty as knowledge to manage, not as a defect to hide.
+
+## Representation and Local Conventions
+
+When a project, organization, regulation, or stakeholder process already defines a requirements template, schema, notation, document structure, or mandatory fields:
+
+* inspect and preserve the applicable local convention before introducing a generic representation;
+* treat the local structure as a presentation and integration constraint, not as the source of requirement semantics;
+* preserve required headings, identifiers, fields, and relationships when they do not conflict with semantic integrity;
+* do not populate unsupported fields merely to make the template appear complete;
+* do not omit material requirements knowledge merely because the local template has no dedicated field for it; use the closest supported representation or an explicit extension when permitted;
+* if multiple templates or schemas may apply and no reliable selection rule exists, surface the ambiguity rather than choosing arbitrarily;
+* use a generic or canonical fallback representation only when no applicable local convention exists or the user explicitly requests it.
+
+Template completeness is not requirements completeness, and requirements completeness does not require a particular template.
 
 ## Requirement Quality
 
@@ -187,6 +232,25 @@ When the same requirements problem recurs across initiatives, it may become a ca
 * Requirements validation asks whether the specified thing is the right thing for the supported need; do not equate requirements validation with software testing.
 * Validation evidence may come from stakeholder review, walkthrough, examples, prototypes, model review, inspection, checklists, or other supported evidence.
 
+## Completion-State Semantics
+
+Keep Requirements lifecycle and downstream delivery states distinct. A generic claim that a requirement or change is "complete" is insufficient when the intended state is material.
+
+When applicable, distinguish at least:
+
+* **elicitation sufficient** — enough supported stakeholder/domain knowledge exists for the intended next decision or for requirement definition;
+* **requirements specified** — the required semantics for the selected scope/rigor have been defined, including explicit unknowns;
+* **requirements validated** — a separate validation pass found the requirements sufficiently correct, coherent, traceable, and verifiable for its stated downstream target;
+* **planning ready** — validated requirements are sufficient for the intended planning horizon;
+* **work item ready** — a planning item is sufficiently shaped for its stated downstream use;
+* **slice implemented** — downstream implementation exists;
+* **slice accepted** — required acceptance evidence demonstrates the bounded behavior at the defined environment/level;
+* **outcome demonstrated** — evidence shows the intended business/product outcome, not merely delivery output.
+
+Requirements owns the semantics of its own stages but must not infer downstream states. An accepted requirement is not thereby implemented, and an implemented slice is not thereby accepted or successful in outcome terms.
+
+Use semantic `status` values such as `sufficient`, `needs-revision`, `needs-clarification`, and `blocked` together with an explicit `readiness_for` target when the target matters. Do not overload one status with multiple lifecycle meanings.
+
 ## Requirement Change and Impact
 
 * Treat a material change in stakeholder need, goal, constraint, business rule, acceptance semantics, or governing evidence as a requirement change rather than a silent edit.
@@ -227,6 +291,8 @@ Outcome Evidence
 
 * Do not treat a backlog item, implementation detail, commit message, or test as the authoritative source of stakeholder intent when a requirement source exists.
 * Do not mark a requirement complete merely because a template is filled.
+* Do not treat scope discovered during elicitation or specification as automatically approved scope for the current Change Boundary.
+* Do not use one completion state as evidence for another; for example, validated requirements do not imply implementation or acceptance.
 * Do not equate elicitation notes with validated requirements.
 * Do not equate a user story with the complete requirement set when additional rules, constraints, quality attributes, states, or acceptance conditions exist.
 * Do not use priority as a substitute for semantic clarity.
