@@ -75,9 +75,13 @@ Requirements can operate from conversations, documents, interviews, tickets, exi
 
 Requirements work is tailored to risk and uncertainty using the principle **just enough requirements, with sufficient rigor for the risk**. The toolkit may use `lightweight`, `standard`, or `high-assurance` rigor when the distinction is useful; it does not require every known artifact or technique for every change.
 
+When scope control is material, Requirements distinguishes **Work Scope**, **Product Boundary**, and a specific **Change Boundary**. The Change Boundary records what the current change intends to alter, preserve, exclude, or defer and is reconciled as new evidence appears. Discovery does not automatically authorize scope expansion.
+
+Requirements also favors the smallest coherent **knowledge batch** that safely supports the next material decision. Existing project templates/schemas are preserved as representation conventions when applicable, but template completeness is not requirements completeness. Lifecycle states such as elicitation sufficient, requirements specified, requirements validated, planning ready, implementation, acceptance, and demonstrated outcome remain distinct.
+
 Elicitation and specification share `contracts/requirements.md` so Need/Goal context, source evidence, decisions, assumptions, conflicts, applicable concerns, and traceability survive the transformation without coupling their workflows. Example Discovery can define stable Scenario Sets, refine rules/examples/boundaries before automation, and hand optional evidence to Testing through `contracts/test-basis.md`.
 
-`/requirements/shape-change` is an optional composite entry point that routes the existing elicitation, definition, read-only validation, and backlog-planning capabilities according to the evidence already available. It is neutral to feature, defect, migration, regulatory, and other change types, and it does not authorize design, implementation, testing, or Git mutation.
+`/requirements/shape-change` is an optional composite entry point that routes the existing elicitation, definition, read-only validation, and backlog-planning capabilities according to the evidence already available. It works toward the next material decision using the smallest coherent knowledge batch, preserves/reconciles the Change Boundary when present, and remains neutral to feature, defect, migration, regulatory, and other change types. It does not authorize design, implementation, testing, or Git mutation.
 
 ### Testing
 
@@ -173,6 +177,8 @@ Preserve identity across transformations when the corresponding artifacts exist:
 Source / Rationale
       ↓
 Need → Business Goal
+      ↓
+Change Boundary
       ↓
 Rule / Constraint
       ↓
