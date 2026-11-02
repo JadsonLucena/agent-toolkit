@@ -49,6 +49,22 @@ Use when failure could cause substantial financial loss, security or privacy har
 
 High Assurance should increase evidence, review, traceability, verification, and change discipline only where those controls reduce actual risk. Do not use it by default.
 
+## Knowledge Batch Size
+
+Requirements work should proceed in the smallest coherent knowledge batch that can safely support the next material decision.
+
+For each batch:
+
+* identify the next decision, handoff, or planning horizon that the knowledge must support;
+* gather and define only the knowledge needed to make that decision safely at the selected rigor;
+* keep semantically coupled rules, scenarios, constraints, and guarantees together when splitting them would create misleading or unsafe understanding;
+* defer distant detail that has no current decision value and is likely to change before use;
+* expand the batch when risk, dependency, irreversibility, compliance, security, financial integrity, or critical guarantees require earlier knowledge;
+* prefer learning work when uncertainty is more valuable to reduce than scope is to specify;
+* revisit the next batch after validation or a material decision rather than attempting to fully specify the entire future solution up front.
+
+Small batches reduce speculative requirements work, but batch size must not be optimized at the expense of semantic coherence or required assurance.
+
 ## Tailoring
 
 For the selected context:
@@ -59,7 +75,20 @@ For the selected context:
 * scale traceability, validation, examples, reviews, and verification to the risk;
 * surface both under-engineering and over-engineering;
 * prefer a smaller artifact set when it represents the same knowledge with less duplication;
+* prefer the smallest coherent knowledge batch that safely supports the next decision;
 * avoid ceremony that has no identifiable consumer or decision value.
+
+## Representation Conventions
+
+When an applicable local template, schema, notation, or documentation convention already exists:
+
+* preserve it when doing so does not compromise semantic integrity;
+* distinguish representation requirements from requirements meaning;
+* do not require a canonical artifact shape merely because the toolkit can produce one;
+* do not fill unsupported fields or invent semantics to satisfy a template;
+* surface material ambiguity when more than one local representation could apply and no selection rule is available.
+
+A local convention may change how requirements are represented; it must not silently change what the requirements mean.
 
 ## Governance
 
