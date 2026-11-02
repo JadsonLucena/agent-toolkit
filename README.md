@@ -99,18 +99,25 @@ contexts/git/
 │   ├── git.md
 │   ├── gitflow.md
 │   ├── semantic-commit.md
-│   └── semantic-version.md
+│   ├── semantic-version.md
+│   └── pull-request.md
 ├── skills/
 │   ├── create-semantic-commits/skill.md
 │   ├── determine-semantic-version/skill.md
-│   └── manage-branch-work/skill.md
+│   ├── manage-branch-work/skill.md
+│   └── manage-pull-request/skill.md
 ├── commands/
 │   ├── commit.md
-│   └── determine-semantic-version.md
+│   ├── determine-semantic-version.md
+│   ├── plan-pull-requests.md
+│   ├── prepare-pull-request.md
+│   └── create-pull-request.md
 └── agents/git-engineer.md
 ```
 
 Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
+
+Pull-request workflows preserve three distinct intents: planning review boundaries, preparing a truthful PR from the final diff, and explicitly creating the remote review request. PRs are bounded by coherent/verifiable integration units rather than line count alone; repository PR templates take precedence over the generic fallback; and PR creation never implies push, merge, auto-merge, release, or deployment authorization.
 
 ## Contracts
 
@@ -135,6 +142,9 @@ Commands express engineering intent rather than low-level tool aliases:
 
 /git/commit
 /git/determine-semantic-version
+/git/plan-pull-requests
+/git/prepare-pull-request
+/git/create-pull-request
 ```
 
 A command's invocation defines its authorization boundary. For example, determining a semantic version does not authorize version-file mutation, tagging, publishing, or release.
