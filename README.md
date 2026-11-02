@@ -118,7 +118,7 @@ Git is cross-cutting but is not automatically invoked by other contexts. Plannin
 
 ## Contracts
 
-* `contracts/requirements.md` — elicitation and requirement-definition semantics.
+* `contracts/requirements.md` — elicitation and requirement-definition semantics, including optional Change Boundary, scope-change, lifecycle, and representation-convention context.
 * `contracts/work-item.md` — planning-item semantics.
 * `contracts/test-basis.md` — optional portable Scenario Set and behavioral evidence for Testing.
 * `contracts/test-evidence.md` — scenario-to-automation coverage and verification evidence.
@@ -180,9 +180,7 @@ Need → Business Goal
       ↓
 Change Boundary
       ↓
-Rule / Constraint
-      ↓
-Requirement / Rule / Use Case
+Requirement / Rule / Constraint / Use Case
       │
       ▼
 Scenario Set
