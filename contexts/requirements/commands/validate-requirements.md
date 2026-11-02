@@ -22,10 +22,11 @@ This command selects the Requirements Specifier and validation workflow. It auth
 * Requirement specification.
 * Supporting evidence and decisions.
 * Intended readiness target.
+* Change Boundary and supporting scope decisions when one governs the specification.
 
 ## Output
 
-Rigor assessment when material, validation findings with type and severity, cross-artifact consistency findings, missing knowledge, evidence-backed revision recommendations, unresolved questions, and a readiness state.
+Rigor assessment when material, validation findings with type and severity, Change Boundary/scope-drift findings when applicable, cross-artifact consistency findings, missing knowledge, evidence-backed revision recommendations, unresolved questions, and a readiness state tied to an explicit downstream target.
 
 ## Boundary
 
