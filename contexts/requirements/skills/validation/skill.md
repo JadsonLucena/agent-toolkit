@@ -60,8 +60,8 @@ Report the downstream target separately as `readiness_for`.
    * Do not fail a concern merely because a preferred document type is absent.
 
 3. **Validate strategic framing when applicable.**
-   * Check Need, Business Goal, success evidence, Current/Future State, material gaps, Work Scope, Product Boundary, transition needs, and candidate-solution assumptions.
-   * Detect solution-first statements, output presented as outcome, and software scope assumed without support.
+   * Check Need, Business Goal, success evidence, Current/Future State, material gaps, Work Scope, Product Boundary, Change Boundary when present, transition needs, and candidate-solution assumptions.
+   * Detect solution-first statements, output presented as outcome, software scope assumed without support, and material scope drift that was silently absorbed rather than explicitly decided.
 
 4. **Validate requirements and business knowledge.**
    * Check each material requirement for evidence, necessity, rationale, scope, clarity, consistency, singularity, feasibility status, verifiability, traceability, and sufficient completeness.
@@ -80,11 +80,12 @@ Report the downstream target separately as `readiness_for`.
    * Rules/Policies ↔ Requirements/Use Cases/Scenarios.
    * Requirements ↔ quality/security constraints.
    * Requirements/Use Cases ↔ slices/work items.
+   * Change Boundary ↔ requirements/rules/scenarios/work items when a Change Boundary exists.
    * Rules/Requirements ↔ examples/test basis.
    * Requirements ↔ design/architecture references.
    * Requirements ↔ implementation/test evidence.
    * Success metrics ↔ production/outcome evidence.
-   * Identify contradictions, drift, duplicated knowledge, and orphan relationships.
+   * Identify contradictions, drift, duplicated knowledge, orphan relationships, and boundary expansions/narrowings that lack supporting scope decisions.
 
 7. **Validate uncertainty and solution decisions.**
    * Surface implicit assumptions, unresolved unknowns, expiring options, unsupported thresholds, and hidden design decisions.
@@ -99,8 +100,10 @@ Report the downstream target separately as `readiness_for`.
 9. **Determine readiness.**
    * Identify relationships that would require revalidation if a recommended revision is later authorized and applied.
    * Determine overall status for the actual `readiness_for` target.
+   * Keep lifecycle claims distinct: requirements validated for a target does not imply planning readiness, implementation, acceptance, deployment, release, or business outcome.
    * Do not convert unresolved findings into a pass merely to keep work moving.
    * Do not require unrelated knowledge merely because the framework knows how to model it.
+   * Check that local templates or schemas were used as representation constraints rather than as a substitute for semantic sufficiency.
 
 ## Output
 
@@ -110,7 +113,7 @@ Produce a concise validation report containing:
 * overall `status` and `readiness_for`;
 * applicable concerns evaluated;
 * findings with type, severity, affected identifiers, evidence, impact, and remediation;
-* cross-artifact contradictions, drift, duplication, and orphan relationships when present;
+* cross-artifact contradictions, drift, duplication, orphan relationships, and material Change Boundary mismatches when present;
 * missing **knowledge**, not merely missing documents;
 * premature solution decisions and implicit assumptions when present;
 * evidence-backed revision recommendations;
