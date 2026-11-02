@@ -35,7 +35,7 @@ Invocation does not authorize architecture selection, implementation, automated-
 * Existing Change Boundary, scope decisions, or applicable local requirements representation when present.
 * Optional known security, privacy, compliance, migration, financial, or assurance constraints.
 
-## Routing
+### Routing
 
 1. Inspect supplied evidence, identify the intended next material decision/handoff, and determine the earliest Requirements capability that is still necessary; do not repeat work merely because this command spans the full path. Work in the smallest coherent knowledge batch that can safely support that next decision.
 2. If material stakeholder intent, Need/Goal context, scope, Change Boundary, business knowledge, or uncertainty is not sufficiently understood, route through Requirements Elicitation.
