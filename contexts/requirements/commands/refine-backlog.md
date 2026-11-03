@@ -21,15 +21,15 @@ This command selects the Backlog Planner and the `refine` mode of the backlog-pl
 ## Inputs
 
 * Existing backlog.
-* Current requirements, decisions, and source evidence.
+* Current requirements, Change Boundary/scope decisions, decisions, and source evidence.
 * Existing tracker hierarchy, item taxonomy, or backlog conventions when available.
 * Intended planning horizon.
 * Optional use-case/journey context, examples, learning objectives, and critical guarantees when available.
 
 ## Output
 
-Refined work items plus surfaced traceability, dependency, ambiguity, closure, and readiness findings.
+Refined work items plus surfaced traceability, Change Boundary/scope-drift, dependency, ambiguity, closure, and readiness findings.
 
 ## Boundary
 
-A material semantic scope change is a requirements concern and must not be hidden as backlog refinement.
+A material semantic scope change or Change Boundary revision is a requirements concern and must not be hidden or approved as backlog refinement.

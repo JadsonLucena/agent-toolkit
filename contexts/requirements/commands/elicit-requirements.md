@@ -22,11 +22,13 @@ This command is an engineering-intent entry point. It selects the Requirements E
 * Available stakeholder or project context.
 * Existing evidence and source material.
 * The requested problem, initiative, or scope.
+* Existing Change Boundary or scope decisions when present.
+* Applicable local requirements template/schema/notation when known.
 * Optional known risk, compliance, security, migration, or assurance constraints.
 
 ## Output
 
-A requirements elicitation handoff conforming to the elicitation semantics in `contracts/requirements.md`.
+A requirements elicitation handoff conforming to `contracts/requirements.md`, including the Change Boundary, material scope discoveries, intended next-decision knowledge batch, lifecycle claim, and local representation convention when applicable.
 
 ## Boundary
 

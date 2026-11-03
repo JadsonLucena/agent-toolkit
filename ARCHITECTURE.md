@@ -185,6 +185,44 @@ Iterative or mutating skills should state explicit preconditions and stop condit
 
 A workflow may diagnose an out-of-scope defect without gaining authority to mutate the affected artifact. Mutation authority comes from the invoked command or separate explicit authorization.
 
+## Change Boundary and Knowledge Batches
+
+Requirements distinguishes three related boundaries:
+
+* **Work Scope** — the broader organizational/change work under consideration.
+* **Product Boundary** — what responsibility belongs to the product/software versus its environment.
+* **Change Boundary** — what a specific bounded change intends to alter, preserve, exclude, or defer.
+
+A Change Boundary may carry its objective, included/excluded/deferred semantics, affected requirements/rules/scenarios, critical guarantees, dependencies, unresolved scope decisions, and expected state after the bounded change.
+
+Scope discovered during elicitation, definition, or planning is not automatically approved scope. Material expansion or narrowing requires an explicit scope decision; related independent needs remain separate change candidates unless authority expands the boundary; missing critical guarantees must be resolved or block the affected slice.
+
+Requirements work should proceed in the smallest coherent **knowledge batch** that can safely support the next material decision or handoff. This is a requirements analogue of small-batch flow, not a request to fragment semantically coupled rules, scenarios, constraints, or guarantees.
+
+Lifecycle claims remain distinct:
+
+```text
+elicitation sufficient
+        ≠
+requirements specified
+        ≠
+requirements validated
+        ≠
+planning ready
+        ≠
+work item ready
+        ≠
+slice implemented
+        ≠
+slice accepted
+        ≠
+outcome demonstrated
+```
+
+Requirements may preserve downstream state references for traceability, but it must not infer those states without evidence.
+
+Local requirements templates, schemas, and notations are representation constraints. They may shape how knowledge is expressed, but they do not redefine canonical semantics or make template completion equivalent to requirements completeness.
+
 ## Requirements Tailoring
 
 Requirements work follows the principle **just enough requirements, with sufficient rigor for the risk**.
@@ -247,7 +285,8 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 13. Contracts exist because contexts exchange semantics. They remain neutral schemas rather than a new artifact category.
 14. A generic `shared/` directory is intentionally avoided.
 15. `/requirements/shape-change` is the optional composite Requirements entry point for feature, defect, migration, regulatory, operational, or other change contexts; it routes existing capabilities and does not create a second source of requirement semantics.
-16. Pull-request work is owned by Git as a review/integration concern: durable PR policy lives in `rules/pull-request.md`, reusable plan/prepare/create procedure lives in `skills/manage-pull-request/skill.md`, and separate commands preserve different authorization levels. Implementation remains outside Git.
+16. Requirements may establish a Change Boundary distinct from Work Scope and Product Boundary, reconcile material scope drift explicitly, work in next-decision-oriented knowledge batches, preserve local representation conventions without confusing them with semantics, and keep lifecycle/completion states distinct.
+17. Pull-request work is owned by Git as a review/integration concern: durable PR policy lives in `rules/pull-request.md`, reusable plan/prepare/create procedure lives in `skills/manage-pull-request/skill.md`, and separate commands preserve different authorization levels. Implementation remains outside Git.
 
 ## Framework Scope Roadmap
 

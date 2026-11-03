@@ -20,12 +20,12 @@ This command selects the Requirements Specifier and definition workflow. It does
 ## Inputs
 
 * Elicitation handoff or equivalent authoritative source material.
-* Existing requirement identifiers, decisions, assumptions, and constraints when present.
+* Existing requirement identifiers, Change Boundary/scope decisions, decisions, assumptions, constraints, and local representation convention when present.
 
 ## Output
 
-Requirement definitions conforming to `contracts/requirements.md`, including acceptance evidence, traceability, assumptions, conflicts, and unresolved questions.
+Requirement definitions conforming to `contracts/requirements.md`, including Change Boundary reconciliation when applicable, acceptance evidence, traceability, assumptions, conflicts, unresolved questions, and an explicit requirements-specified lifecycle claim.
 
 ## Boundary
 
-If material requirement semantics cannot be established from evidence, return the clarification need rather than inventing values, thresholds, actors, or behavior.
+If material requirement semantics or scope cannot be established from evidence, return the clarification/scope-decision need rather than inventing values, thresholds, actors, behavior, or boundary changes.

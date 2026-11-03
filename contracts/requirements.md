@@ -15,9 +15,10 @@ A requirements handoff should make the surrounding change or initiative context 
 * `open_questions` — unresolved questions whose answers may change semantics or scope;
 * `conflicts` — unresolved contradictions between sources, requirements, rules, or decisions;
 * `status` — semantic state such as `sufficient`, `needs-revision`, `needs-clarification`, or `blocked`;
-* `readiness_for` — optional downstream target for which the status was evaluated, such as backlog planning or design.
+* `readiness_for` — optional downstream target for which the status was evaluated, such as backlog planning or design;
+* `stage_claims` — optional explicit lifecycle claims such as elicitation sufficient, requirements specified, requirements validated, or planning ready, each with its evidence/target when material.
 
-Do not encode the downstream target into `status`, and do not use numeric confidence scores as a substitute for evidence.
+Do not encode the downstream target into `status`, and do not use numeric confidence scores as a substitute for evidence. A stage claim must not imply a later stage such as implementation, acceptance, deployment, release, or outcome achievement.
 
 ## Tailoring Semantics
 
@@ -42,6 +43,8 @@ An elicitation handoff may include, when material and known:
 * `change_gaps` — differences between current and future state that justify investigation or change;
 * `work_scope` — the broader work to understand or change;
 * `product_boundary` — the part, if any, assigned to software/product;
+* `change_boundary` — the current change's objective, included scope, excluded scope, explicitly deferred scope, affected semantics, critical guarantees, dependencies, unresolved scope decisions, and expected state after the bounded change when useful;
+* `scope_changes` — material discoveries that clarify, expand, narrow, or sit outside the current Change Boundary, together with the decision/evidence that governs their disposition when known;
 * `stakeholders` and affected actors;
 * `business_events` and expected business responses when useful for completeness;
 * `candidate_solutions` or learning options when solution uncertainty is material;
@@ -51,9 +54,26 @@ An elicitation handoff may include, when material and known:
 * constraints and externally imposed obligations;
 * dependencies and risks;
 * assumptions, options, conflicts, open questions, and decisions;
-* provenance for every material statement.
+* provenance for every material statement;
+* `representation_convention` — applicable project/organization template, schema, notation, or document convention when one governs the handoff, including unresolved template-selection ambiguity when material.
 
 Elicitation evidence remains distinct from approved specification. Candidate requirements, assumptions, options, and interpretations must not be promoted to accepted requirements merely because they appear in the handoff.
+
+## Change Boundary Semantics
+
+When a Change Boundary is represented, preserve enough information to distinguish:
+
+* primary objective and expected observable change;
+* included semantics;
+* excluded semantics;
+* explicitly deferred semantics and supporting authority/decision when material;
+* affected requirement/rule/use-case/scenario references when available;
+* critical guarantees that must not be lost by decomposition;
+* material dependencies and unresolved scope decisions;
+* expected state after the bounded change;
+* material boundary revisions and their provenance.
+
+The Change Boundary must remain distinct from Work Scope and Product Boundary. Discovery does not automatically authorize boundary expansion.
 
 ## Requirement Specification Semantics
 
@@ -97,6 +117,9 @@ For material business rules, the handoff may preserve:
 * When requirement semantics change, consumers should be able to identify downstream artifacts that require re-evaluation.
 * A proposed technical solution does not become a requirement unless evidence supports it as intent, constraint, or decision.
 * Stable scenario identifiers must survive downstream transformations when supplied; adapters and Testing must not replace semantic scenario identity with framework-specific test names.
+* Local templates or schemas may shape representation but must not replace or silently alter these semantics.
+* Template completion must not be interpreted as requirements completion.
+* A lifecycle stage such as requirements validated or planning ready must not be used as evidence that implementation, acceptance, release, deployment, or business outcome has occurred.
 * The contract defines knowledge; it does not require every field or artifact for every context.
 
 ## Portability

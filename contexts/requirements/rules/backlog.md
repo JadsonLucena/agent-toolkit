@@ -13,10 +13,10 @@ Apply `contexts/requirements/rules/tailoring.md` when deciding how much decompos
 
 ## Source Integrity and Traceability
 
-* Trace work items to the requirements, needs, goals, defects, risks, decisions, learning objectives, or other evidence that justify them.
+* Trace work items to the requirements, needs, goals, defects, risks, decisions, learning objectives, Change Boundary, or other evidence that justify them.
 * Preserve requirement identifiers, business rules, critical guarantees, and acceptance semantics when they exist.
 * Treat requirement and work-item identities as different: one requirement may map to multiple work items, and one coherent work item may satisfy multiple related requirements.
-* When a work item reveals unsupported behavior or materially changes source intent, return the issue for requirements clarification rather than silently expanding scope.
+* When a work item reveals unsupported behavior, materially changes source intent, or expands/narrows an explicit Change Boundary, return the issue for requirements clarification or an authorized scope decision rather than silently changing scope.
 * A task, test, architecture change, or implementation step with no evidenced parent outcome is a traceability finding.
 
 ## Decomposition and Vertical Slicing
@@ -84,6 +84,18 @@ Do not remove or defer guarantees that are required for a slice to be valid or s
 
 A smaller slice is not acceptable if it violates a guarantee that must hold from its first use.
 
+## Change-Boundary Integrity
+
+When planning is derived from an explicit Change Boundary:
+
+* preserve its objective, included/excluded/deferred scope, critical guarantees, and relevant source relationships;
+* trace work items to the Change Boundary when the relationship is material;
+* do not treat work discovered during decomposition as automatically approved scope;
+* classify material planning discoveries as clarification within the boundary, proposed boundary change, separate change candidate, or missing critical guarantee;
+* return proposed boundary changes to Requirements authority instead of deciding them as a planning convenience;
+* preserve explicitly deferred scope rather than silently reintroducing it through tasks;
+* do not use a smaller work item as justification for dropping a guarantee required by the bounded change.
+
 ## Acceptance and Readiness
 
 * Preserve relevant acceptance criteria, examples, fit criteria, and critical guarantees from source requirements.
@@ -92,6 +104,7 @@ A smaller slice is not acceptable if it violates a guarantee that must hold from
 * Do not label an item ready when a material ambiguity prevents reliable implementation or verification.
 * Missing implementation detail is not automatically a blocker when source semantics are clear and design or implementation can legitimately decide the detail later.
 * Readiness is contextual; do not impose a universal Definition of Ready.
+* Keep work-item readiness distinct from requirements validation, implementation completion, slice acceptance, deployment, release, and demonstrated business outcome.
 
 ## Dependencies and Ordering
 
@@ -129,4 +142,5 @@ A smaller slice is not acceptable if it violates a guarantee that must hold from
 * Do not equate small size with readiness, verticality, or value.
 * Do not duplicate the same obligation across multiple items without an explicit coordination reason.
 * Do not hide unresolved requirement questions inside implementation notes.
+* Do not hide a Change Boundary expansion inside backlog decomposition or refinement.
 * Do not impose a specific issue tracker, agile framework, story-map notation, or vendor schema.

@@ -45,7 +45,10 @@ Maintain only the concerns that are material to the context, including when rele
 * applicable and explicitly non-applicable knowledge concerns;
 * need, business goals, desired outcomes, and success evidence;
 * current state, future state, and material change gaps;
-* work scope and product/software boundary;
+* work scope, product/software boundary, and Change Boundary when useful;
+* intended next decision or handoff and the smallest coherent knowledge batch needed to support it;
+* material scope discoveries classified as clarification, boundary expansion/narrowing, separate change candidate, or missing critical guarantee;
+* applicable local requirements template/schema/notation when one exists;
 * stakeholders, affected actors, and relevant authority;
 * business events and business responses;
 * domain terms, facts, business rules, and external constraints;
@@ -60,6 +63,7 @@ Maintain only the concerns that are material to the context, including when rele
    * Consider business/customer/financial impact, security, privacy, compliance, domain and technical complexity, integrations, teams, migration/legacy, reversibility, uncertainty, expected change frequency, and solution lifetime when relevant.
    * Select `lightweight`, `standard`, or `high-assurance` only when a rigor label is useful, and record why.
    * Determine which knowledge concerns are applicable; do not turn the framework into a mandatory artifact checklist.
+   * Identify the intended next decision or handoff and limit discovery to the smallest coherent knowledge batch that can support it safely at the selected rigor.
 
 2. **Establish strategic framing.**
    * Identify the underlying Need or opportunity without prematurely encoding a solution.
@@ -69,6 +73,9 @@ Maintain only the concerns that are material to the context, including when rele
 3. **Understand change and scope.**
    * Capture relevant Current State, desired Future State, and material gaps.
    * Distinguish Work Scope from Product Boundary when the change may involve people, process, policy, purchased products, manual operations, or partial automation.
+   * Establish or preserve a Change Boundary when a specific change is being shaped: primary objective, included/excluded/deferred scope, affected semantics, critical guarantees, dependencies, unresolved scope decisions, and expected state after the bounded change when material.
+   * Keep Work Scope, Product Boundary, and Change Boundary distinct.
+   * Inspect applicable local requirements templates/schemas/notations and preserve them as representation constraints without treating their fields as stakeholder intent.
    * Ask, when material, why the problem needs software rather than assuming it does.
    * Identify transition concerns separately from permanent product behavior.
 
@@ -77,6 +84,7 @@ Maintain only the concerns that are material to the context, including when rele
    * Identify materially affected stakeholder perspectives or authoritative sources that are not represented.
    * Discover goals, needs, actors, workflows, business events, rules, constraints, failures, dependencies, exclusions, and success signals.
    * Preserve important domain terms and facts; distinguish true business rules from historical implementation limitations.
+   * Reconcile newly discovered scope against the Change Boundary: incorporate supported clarification, surface material expansion/narrowing for an explicit scope decision, keep independently valuable related needs as separate change candidates unless authorized otherwise, and do not defer a critical guarantee needed for the bounded change.
 
 5. **Separate evidence from interpretation.**
    * Distinguish directly stated information, derived implications, assumptions, options, proposed solutions, and explicit decisions.
@@ -92,11 +100,13 @@ Maintain only the concerns that are material to the context, including when rele
    * Consolidate equivalent statements without erasing meaningful differences in source, actor, condition, authority, or rationale.
    * Validate the resulting understanding against available evidence and represented stakeholder context.
    * Check for both under-engineering and unnecessary analysis/documentation.
+   * Confirm that the resulting knowledge still matches the current Change Boundary or that every material boundary revision is explicit and supported.
+   * Record the lifecycle claim as elicitation sufficient only for the stated next decision/handoff; do not imply specification, validation, planning readiness, implementation, or acceptance.
    * Stop with explicit unresolved questions when required evidence or authority is unavailable.
 
 ## Output
 
-Produce an elicitation handoff conforming to `contracts/requirements.md`. Include the selected rigor and applicable concerns when material, plus supported strategic framing, stakeholder/domain knowledge, constraints, risks, assumptions, options, conflicts, provenance, and open questions.
+Produce an elicitation handoff conforming to `contracts/requirements.md`. Include the selected rigor and applicable concerns when material, plus supported strategic framing, Change Boundary and material scope changes when used, stakeholder/domain knowledge, constraints, risks, assumptions, options, conflicts, provenance, local representation convention when applicable, and open questions.
 
 Do not silently convert unresolved intent into formal requirements, architecture, backlog items, or software scope.
 
@@ -109,4 +119,5 @@ Stop only the affected line of work and surface the issue when:
 * continuing would require inventing material stakeholder intent;
 * product/software scope would have to be assumed without evidence;
 * the requested scope exceeds the available authority or evidence;
+* a material Change Boundary expansion or narrowing requires authority that is not available;
 * repeated clarification or discovery attempts are not producing useful learning.

@@ -23,12 +23,12 @@ This command selects the Backlog Planner and the `build` mode of the backlog-pla
 * Requirement specifications and other explicit work sources.
 * Existing tracker hierarchy, item taxonomy, or backlog conventions when available.
 * Intended planning horizon.
-* Optional use-case/journey context, examples, learning objectives, and critical guarantees when available.
+* Optional Change Boundary, use-case/journey context, examples, learning objectives, and critical guarantees when available.
 
 ## Output
 
-Traceable work items with coherent intent, acceptance evidence, dependencies, risks, assumptions, blockers, readiness, and closure findings.
+Traceable work items with coherent intent, `change_boundary_ref` when applicable, acceptance evidence, dependencies, risks, assumptions, blockers, readiness, and closure findings.
 
 ## Boundary
 
-If decomposition would require inventing or changing source semantics, return the issue to requirements clarification rather than creating speculative scope.
+If decomposition would require inventing/changing source semantics or expanding/narrowing a Change Boundary, return the issue to requirements clarification or authorized scope decision rather than creating speculative scope.

@@ -28,8 +28,9 @@ A work item should make the following available when material and known:
 * dependencies and sequencing constraints;
 * risks and blockers;
 * explicit assumptions and unresolved questions;
-* readiness state for the intended planning horizon;
-* parent goal, use-case, journey, requirement, scenario, or other semantic context when one exists;
+* readiness state for the intended planning horizon, without implying implementation, acceptance, deployment, release, or outcome completion;
+* parent goal, use-case, journey, requirement, scenario, Change Boundary, or other semantic context when one exists;
+* `change_boundary_ref` when the item belongs to an explicitly modeled Change Boundary;
 * `use_case_ref` and the meaningful flow/story/scenario realized by the item when Use-Case 2.0 semantics are available;
 * story-map or release-slice context when journey mapping is used;
 * `scenario_refs` when the work item realizes or changes explicitly modeled behavioral scenarios;
@@ -41,7 +42,8 @@ Optional project-specific fields may include priority, estimate, owner, iteratio
 
 ## Integrity
 
-* Work-item semantics must not silently expand or reinterpret source requirements.
+* Work-item semantics must not silently expand or reinterpret source requirements or the governing Change Boundary.
+* A planning item discovered during decomposition is not automatically approved scope; material expansion beyond the Change Boundary requires an explicit requirements/scope decision.
 * Missing priority, estimate, owner, or schedule information remains unspecified.
 * One requirement may map to multiple items and one item may trace to multiple related requirements.
 * Technical or enabling work must retain an evidenced outcome, requirement, constraint, dependency, risk, or learning objective that justifies it.
