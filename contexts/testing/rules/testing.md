@@ -10,6 +10,7 @@
 * Keep relevant test data explicit and hide irrelevant defaults behind builders, factories, fixtures, or equivalent helpers.
 * Use domain-relevant test data without real credentials, secrets, tokens, or PII.
 * Test names must describe expected behavior, not implementation.
+* Treat the test suite as executable behavioral specification and review evidence: a reviewer should be able to understand the principal path and material alternative, exceptional, boundary, and failure behavior from test names, setup, actions, and assertions without reverse-engineering implementation details. Tests remain verification artifacts and do not replace authoritative requirements, rules, contracts, or scenarios.
 * Follow project conventions for language, naming, lint, formatting, and style. If none exist, prefer English.
 * Add comments only for non-obvious business rules, formulas, magic values, or complex reasoning.
 * Focus on behavior and risk coverage, not coverage percentage alone.
