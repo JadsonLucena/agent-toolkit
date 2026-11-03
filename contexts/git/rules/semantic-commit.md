@@ -77,8 +77,49 @@
 * Implementation and its directly related tests normally belong to the same commit when they jointly constitute one behavior change.
 * Atomicity is based on logical intent and dependency, not file boundaries, file count, or diff size.
 
+## Pre-Commit Verification
+
+Before creating each new commit, inspect the repository's established quality gates and effective pre-commit hook behavior.
+
+When the repository provides these checks:
+
+* **lint is mandatory** before commit creation;
+* **tests are mandatory** before commit creation;
+* **tests with coverage are mandatory only when coverage is already an established project capability or policy**.
+
+Treat coverage as established only when supported by repository evidence such as:
+
+* an explicit test-with-coverage script or command;
+* test-runner or coverage configuration that enables coverage or defines thresholds;
+* CI configuration that runs or enforces coverage;
+* project documentation or repository policy that requires coverage.
+
+The mere presence of a coverage-related dependency is not sufficient evidence that coverage is an established gate.
+
+If tests exist but coverage is not established:
+
+* run the repository's normal test command;
+* do not install a coverage tool, introduce coverage configuration, or invent a coverage threshold under commit-only authorization.
+
+Before running checks explicitly, inspect the effective pre-commit mechanism, including repository-managed hooks and Git hook-path configuration when material.
+
+A required check may be skipped as a separate explicit command only when the effective pre-commit hook is verified to execute that same check at an equivalent or stronger scope for the commit.
+
+* If the hook covers lint but not tests, run tests explicitly.
+* If the hook covers tests but not lint, run lint explicitly.
+* If coverage is established but the hook runs tests without coverage, run the coverage-enabled test command explicitly.
+* If hook coverage is partial, ambiguous, disabled, bypassed, or cannot be verified, run the missing check explicitly.
+* Do not skip a required check merely because a hook file or hook framework exists.
+
+Required available checks must pass before the commit is created.
+
+If an available required check fails, cannot run, or its result cannot be verified, block commit creation and report the failure or missing verification. Do not bypass the check merely to create the commit.
+
+Repository policy may require additional quality gates. Apply them in addition to these defaults.
+
 ## Quality Guardrails
 
 * Base the message on the actual staged changes or intended patch when available.
 * Verify that the staged diff represents exactly one coherent logical unit before committing, and split it when it does not.
 * Do not hide unrelated changes behind a broad or ambiguous commit message.
+* Do not create a commit without the required pre-commit verification evidence defined above.
