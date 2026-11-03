@@ -38,14 +38,19 @@ contexts/
     │   ├── git.md
     │   ├── gitflow.md
     │   ├── semantic-commit.md
-    │   └── semantic-version.md
+    │   ├── semantic-version.md
+    │   └── pull-request.md
     ├── skills/
     │   ├── create-semantic-commits/skill.md
     │   ├── determine-semantic-version/skill.md
-    │   └── manage-branch-work/skill.md
+    │   ├── manage-branch-work/skill.md
+    │   └── manage-pull-request/skill.md
     ├── commands/
     │   ├── commit.md
-    │   └── determine-semantic-version.md
+    │   ├── determine-semantic-version.md
+    │   ├── plan-pull-requests.md
+    │   ├── prepare-pull-request.md
+    │   └── create-pull-request.md
     └── agents/git-engineer.md
 
 contracts/
@@ -96,11 +101,16 @@ Contracts are supporting schemas, not a fifth canonical artifact type.
 | Git | `rules/gitflow.md` | Rule | Gitflow applicability and branch-lifecycle invariants |
 | Git | `rules/semantic-commit.md` | Rule | Commit semantics, message structure, and atomicity invariants |
 | Git | `rules/semantic-version.md` | Rule | Semantic-version compatibility and increment invariants |
+| Git | `rules/pull-request.md` | Rule | PR boundary, reviewability, decomposition, template, description, readiness, traceability, and remote-creation invariants |
 | Git | `skills/create-semantic-commits/skill.md` | Skill | Atomic staging, verification, message derivation, commit creation, and post-check workflow |
 | Git | `skills/determine-semantic-version/skill.md` | Skill | Compatibility analysis, version-policy evaluation, and evidence-backed semantic-version recommendation |
 | Git | `skills/manage-branch-work/skill.md` | Skill | Branch, synchronization, integration, and worktree decision and verification workflow |
+| Git | `skills/manage-pull-request/skill.md` | Skill | Plan, prepare, and explicitly create coherent pull requests with scoped authorization |
 | Git | `commands/commit.md` | Command | Start explicitly requested semantic commit creation |
 | Git | `commands/determine-semantic-version.md` | Command | Start semantic-version analysis without release mutation |
+| Git | `commands/plan-pull-requests.md` | Command | Plan coherent PR boundaries without repository mutation |
+| Git | `commands/prepare-pull-request.md` | Command | Inspect the final change and prepare a truthful PR without remote mutation |
+| Git | `commands/create-pull-request.md` | Command | Create a remote PR with explicit creation-only authorization |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
 | Cross-context | `contracts/requirements.md` | Contract | Neutral elicitation and requirement-definition handoff semantics |
 | Cross-context | `contracts/work-item.md` | Contract | Neutral planning-item handoff semantics |
@@ -276,6 +286,7 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 14. A generic `shared/` directory is intentionally avoided.
 15. `/requirements/shape-change` is the optional composite Requirements entry point for feature, defect, migration, regulatory, operational, or other change contexts; it routes existing capabilities and does not create a second source of requirement semantics.
 16. Requirements may establish a Change Boundary distinct from Work Scope and Product Boundary, reconcile material scope drift explicitly, work in next-decision-oriented knowledge batches, preserve local representation conventions without confusing them with semantics, and keep lifecycle/completion states distinct.
+17. Pull-request work is owned by Git as a review/integration concern: durable PR policy lives in `rules/pull-request.md`, reusable plan/prepare/create procedure lives in `skills/manage-pull-request/skill.md`, and separate commands preserve different authorization levels. Implementation remains outside Git.
 
 ## Framework Scope Roadmap
 
