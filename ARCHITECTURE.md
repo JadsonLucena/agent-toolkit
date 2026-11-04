@@ -72,6 +72,8 @@ contracts/
 
 Contracts are supporting schemas, not a fifth canonical artifact type.
 
+Rules may include an optional `## Foundational Guidance` section when established standards, specifications, books, papers, or engineering practices materially shaped the rule. The section documents conceptual provenance and interpretation; it must not contain reusable procedure or silently override repository, organization, stakeholder, or domain-specific policy. Include only material references, and do not add the section merely for structural symmetry.
+
 ## Artifact Matrix
 
 | Context | Artifact | Type | Authoritative responsibility |

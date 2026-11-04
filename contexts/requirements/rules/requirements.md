@@ -302,3 +302,19 @@ Outcome Evidence
 * Do not split a coherent requirement solely to satisfy an arbitrary format.
 * Do not impose Scrum, a specific ticketing system, a specific requirements notation, or a vendor-specific schema.
 * Do not require every artifact or technique in this rule for every change; apply only the knowledge concerns justified by `tailoring.md`.
+
+
+## Foundational Guidance
+
+These rules synthesize established requirements-engineering guidance on stakeholder needs, scope, evidence, requirement quality, scenarios, use cases, traceability, validation, and change management. Supported project evidence and authorized decisions remain authoritative for the semantics of a specific change.
+
+Foundational references used to shape this rule include:
+
+* ISO/IEC/IEEE 29148:2018, *Systems and software engineering — Life cycle processes — Requirements engineering*.
+* Klaus Pohl (2010), *Requirements Engineering: Fundamentals, Principles, and Techniques*.
+* Karl Wiegers and Joy Beatty (2013), *Software Requirements*, 3rd Edition.
+* Suzanne Robertson and James Robertson (2012), *Mastering the Requirements Process: Getting Requirements Right*, 3rd Edition.
+* Alistair Cockburn (2001), *Writing Effective Use Cases*.
+* Ivar Jacobson, Ian Spence, and Kurt Bittner (2011), *Use-Case 2.0: The Guide to Succeeding with Use Cases*.
+
+These references inform the rule's semantics and quality principles; they do not make every technique or artifact mandatory for every change.

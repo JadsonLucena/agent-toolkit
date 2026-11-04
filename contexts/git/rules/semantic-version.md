@@ -62,3 +62,15 @@
 * Identify the current version, public API, release policy, release intent, and relevant changes before proposing the next version.
 * Do not invent a version bump when the project does not require a release.
 * If the public-API impact, release intent, or required version increment cannot be determined with sufficient confidence, ask the developer or release owner rather than guessing a version.
+
+
+## Foundational Guidance
+
+These rules are grounded primarily in the Semantic Versioning specification and use Conventional Commits only as optional release-automation evidence when the repository adopts that convention.
+
+Foundational references used to shape this rule include:
+
+* Tom Preston-Werner, *Semantic Versioning 2.0.0*.
+* *Conventional Commits 1.0.0* for the optional mapping of `feat`, `fix`, and breaking-change metadata to release increments.
+
+Semantic Versioning applies to a declared public API. Commit metadata may assist version inference, but actual compatibility and the project's declared release contract remain decisive.

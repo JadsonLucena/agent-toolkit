@@ -168,3 +168,17 @@
 * Verify the resulting working tree, staged state, branch, history, tag, worktree, and remote state relevant to the operation before declaring success.
 * Do not infer that a branch is current, a push succeeded, a merge completed, a worktree is safe to remove, or a tag was published without evidence from the corresponding Git state.
 * Prefer recoverable failure over destructive success.
+
+
+## Foundational Guidance
+
+These rules synthesize Git's own reference semantics with established guidance on safe history manipulation, branching, integration, recoverability, and continuous integration. Git's documented behavior and the repository's explicit workflow remain authoritative over generic workflow advice.
+
+Foundational references used to shape this rule include:
+
+* The official Git reference documentation for revisions, branches, worktrees, merge, rebase, reset, reflog, push, tags, and hooks.
+* Scott Chacon and Ben Straub, *Pro Git*, 2nd Edition.
+* Martin Fowler, *Continuous Integration* and *Patterns for Managing Source Code Branches*.
+* Jez Humble and David Farley (2010), *Continuous Delivery*.
+
+These references inform safety and integration principles; they do not impose a universal branching or merge strategy.

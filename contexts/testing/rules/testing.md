@@ -138,3 +138,18 @@ Legacy, externally constrained, framework-controlled, or backward-compatible cod
 * Do not add tests that fail to reduce a meaningful, identifiable risk.
 * Do not create abstractions solely to remove harmless duplication.
 * Do not make verification pass by weakening meaningful assertions, removing relevant coverage, skipping tests, suppressing failures, or changing unrelated behavior. Address the root cause or report the blocker.
+
+
+## Foundational Guidance
+
+These rules synthesize established guidance on automated-test design, test-driven development, xUnit patterns, executable behavioral specification, and specification by example. Project risk, behavioral evidence, and local tooling remain authoritative for the appropriate test strategy.
+
+Foundational references used to shape this rule include:
+
+* Kent Beck (2002), *Test Driven Development: By Example*.
+* Gerard Meszaros (2007), *xUnit Test Patterns: Refactoring Test Code*.
+* Steve Freeman and Nat Pryce (2009), *Growing Object-Oriented Software, Guided by Tests*.
+* Gojko Adzic (2011), *Specification by Example*.
+* Mike Cohn (2009), *Succeeding with Agile: Software Development Using Scrum*.
+
+These references inform test structure, feedback, maintainability, behavior orientation, and test-level heuristics; they do not make TDD, BDD, Gherkin, a specific test pyramid distribution, or a particular framework mandatory.
