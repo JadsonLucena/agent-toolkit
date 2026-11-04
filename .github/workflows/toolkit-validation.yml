@@ -1,0 +1,19 @@
+name: Toolkit validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Structural architecture lint
+        run: python3 scripts/toolkit_lint.py
+      - name: Linter regression tests
+        run: python3 -m unittest discover -s tests -v

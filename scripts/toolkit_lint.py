@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+"""Structural fitness checks for Agent Toolkit canonical artifacts.
+
+No external dependencies. This checks observable structure, not semantic truth
+or the safety of a real agent runtime.
+"""
+from __future__ import annotations
+
+import argparse
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+PATH_REF = re.compile(r"\x60((?:contexts|contracts)/[A-Za-z0-9_./-]+\.md)\x60")
+MATRIX_ROW = re.compile(
+    r"^\|\s*(Requirements|Testing|Git|Cross-context)\s*\|\s*"
+    r"\x60([^\x60]+)\x60\s*\|\s*(Rule|Skill|Command|Agent|Contract)\s*\|",
+    re.MULTILINE,
+)
+MD_LINK = re.compile(r"\[[^\]]+\]\(([^)\s]+)\)")
+COMMAND_SECTIONS = ("Intent", "Invocation", "Uses", "Inputs", "Output", "Boundary")
+
+
+def classify(path: Path) -> tuple[str, str] | None:
+    parts = path.parts
+    if len(parts) == 2 and parts[0] == "contracts" and parts[1].endswith(".md"):
+        return "Contract", "Cross-context"
+    if len(parts) < 4 or parts[0] != "contexts":
+        return None
+    context = parts[1].capitalize()
+    if context not in ("Requirements", "Testing", "Git"):
+        return None
+    if len(parts) == 4 and parts[3].endswith(".md"):
+        kind = {"rules": "Rule", "agents": "Agent", "commands": "Command"}.get(parts[2])
+        return (kind, context) if kind else None
+    if len(parts) == 5 and parts[2] == "skills" and parts[4] == "skill.md":
+        return "Skill", context
+    return None
+
+
+def section(content: str, name: str) -> str:
+    match = re.search(
+        r"(?ms)^## " + re.escape(name) + r"[ \t]*\n(.*?)(?=^## |\Z)",
+        content,
+    )
+    return match.group(1) if match else ""
+
+
+def lint_toolkit(root: Path) -> list[str]:
+    root = root.resolve()
+    errors: list[str] = []
+    architecture = root / "ARCHITECTURE.md"
+    if not architecture.is_file():
+        return ["ARCHITECTURE.md: missing canonical artifact matrix"]
+
+    discovered: dict[str, tuple[str, str]] = {}
+    for folder in ("contexts", "contracts"):
+        base = root / folder
+        if not base.is_dir():
+            errors.append(f"{folder}/: missing canonical directory")
+            continue
+        for path in base.rglob("*.md"):
+            rel = path.relative_to(root)
+            kind = classify(rel)
+            if kind is None:
+                errors.append(f"{rel}: invalid canonical artifact location")
+            else:
+                discovered[rel.as_posix()] = kind
+
+    matrix: dict[str, tuple[str, str]] = {}
+    for context, relative, kind in MATRIX_ROW.findall(architecture.read_text(encoding="utf-8")):
+        full = relative if context == "Cross-context" else f"contexts/{context.lower()}/{relative}"
+        if full in matrix:
+            errors.append(f"ARCHITECTURE.md: duplicate canonical ownership of {full}")
+        matrix[full] = (kind, context)
+    for path, expected in discovered.items():
+        if path not in matrix:
+            errors.append(f"ARCHITECTURE.md: missing ownership entry for {path}")
+        elif matrix[path] != expected:
+            errors.append(f"ARCHITECTURE.md: incorrect owner/type for {path}")
+    for path in matrix.keys() - discovered.keys():
+        errors.append(f"ARCHITECTURE.md: ownership entry points to missing artifact {path}")
+
+    skill_graph: dict[str, set[str]] = {}
+    docs = [p for p in root.rglob("*.md") if ".git" not in p.parts]
+    for path in docs:
+        rel = path.relative_to(root).as_posix()
+        content = path.read_text(encoding="utf-8")
+        if not content.startswith("# "):
+            errors.append(f"{rel}: expected a level-one title")
+        for ref in PATH_REF.findall(content):
+            if ".." in Path(ref).parts or not (root / ref).is_file():
+                errors.append(f"{rel}: broken reference {ref}")
+        for link in MD_LINK.findall(content):
+            if link.startswith(("http://", "https://", "mailto:", "#")):
+                continue
+            destination = link.split("#", 1)[0]
+            if destination and not (path.parent / destination).exists():
+                errors.append(f"{rel}: broken Markdown link {link}")
+
+        info = discovered.get(rel)
+        if info is None:
+            continue
+        kind, context = info
+        headings = re.findall(r"(?m)^## (.+?)\s*$", content)
+        if kind == "Command":
+            positions = [headings.index(h) if h in headings else -1 for h in COMMAND_SECTIONS]
+            if any(i < 0 for i in positions) or positions != sorted(positions):
+                errors.append(f"{rel}: invalid command shape (expected ordered {COMMAND_SECTIONS})")
+            for required in ("Invocation", "Boundary"):
+                if not section(content, required).strip():
+                    errors.append(f"{rel}: empty or missing {required} boundary section")
+        elif kind == "Skill":
+            for required in ("Purpose", "Uses", "Workflow", "Output"):
+                if required not in headings or not section(content, required).strip():
+                    errors.append(f"{rel}: skill missing {required} section")
+
+        uses = section(content, "Uses")
+        for target in PATH_REF.findall(uses):
+            target_info = discovered.get(target)
+            if target_info is None:
+                continue
+            target_kind, target_context = target_info
+            allowed = {
+                "Rule": {"Rule"},
+                "Skill": {"Rule", "Skill", "Contract"},
+                "Agent": {"Rule", "Skill", "Contract"},
+                "Command": {"Rule", "Skill", "Agent", "Contract"},
+                "Contract": set(),
+            }
+            if target_kind not in allowed[kind]:
+                errors.append(f"{rel}: forbidden dependency {kind} -> {target_kind} ({target})")
+            if kind in ("Rule", "Skill") and target_kind in ("Rule", "Skill") and context != target_context:
+                errors.append(f"{rel}: cross-context internal dependency on {target}")
+            if kind == "Skill" and target_kind == "Skill":
+                skill_graph.setdefault(rel, set()).add(target)
+
+        # Lexical regression checks are deliberately narrow: not a security proof.
+        authority = (section(content, "Invocation") + section(content, "Boundary")).lower()
+        if rel == "contexts/git/commands/create-pull-request.md":
+            for word in ("push", "merg", "auto-merge", "releas"):
+                if word not in authority:
+                    errors.append(f"{rel}: missing PR authorization exclusion for {word}")
+            if "does not authorize" not in authority:
+                errors.append(f"{rel}: missing explicit non-authorization statement")
+        if rel == "contexts/git/commands/plan-pull-requests.md" and "read-only" not in authority:
+            errors.append(f"{rel}: planning must remain read-only")
+        if rel == "contexts/requirements/commands/validate-requirements.md" and (
+            "does not authorize modifying" not in authority
+        ):
+            errors.append(f"{rel}: validation must not authorize specification mutation")
+
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(node: str) -> None:
+        if node in visiting:
+            errors.append(f"{node}: cyclic Skill -> Skill dependency")
+            return
+        if node in visited:
+            return
+        visiting.add(node)
+        for child in sorted(skill_graph.get(node, ())):
+            visit(child)
+        visiting.remove(node)
+        visited.add(node)
+
+    for skill in sorted(skill_graph):
+        visit(skill)
+    return sorted(set(errors))
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=ROOT, help="toolkit repository root")
+    args = parser.parse_args()
+    errors = lint_toolkit(args.root)
+    for error in errors:
+        print("ERROR:", error)
+    print(f"Toolkit lint: {len(errors)} error(s)")
+    return 1 if errors else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
