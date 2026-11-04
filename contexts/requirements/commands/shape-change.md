@@ -46,7 +46,8 @@ Invocation does not authorize architecture selection, implementation, automated-
    * use `build` when no planning representation exists;
    * use `refine` when an existing backlog was supplied and only planning refinement is authorized.
 7. Preserve identifiers, provenance, Change Boundary, scope-change decisions, representation conventions, lifecycle claims, decisions, assumptions, unknowns, business rules, scenarios, critical guarantees, and unresolved issues across each handoff.
-8. Stop only the affected path when material evidence or authority is missing. Preserve independently valid knowledge rather than restarting the entire workflow.
+8. After each routed capability, re-evaluate the resulting Requirements state against the intended next decision or readiness target and select only the next necessary transition; do not pre-route later capabilities based only on predicted need.
+9. Stop only the affected path when material evidence or authority is missing. Preserve independently valid knowledge rather than restarting the entire workflow.
 
 ## Output
 
