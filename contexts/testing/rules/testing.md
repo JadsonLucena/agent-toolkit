@@ -2,11 +2,11 @@
 
 ## Core Principles
 
-* Apply FIRST when appropriate, while keeping tests clear, focused, deterministic, and maintainable.
+* Apply FIRST (Fast, Independent, Repeatable, Self-Validating, Timely) when appropriate, while keeping tests clear, focused, deterministic, and maintainable.
 * Test intent through observable behavior and stable boundaries. Assertions must protect the relevant contract, rule, invariant, or outcome rather than reproduce implementation details.
 * Keep each test focused on one behavior or scenario. Multiple assertions are acceptable when they validate facets of the same outcome.
 * For side effects, assert relevant effects that must occur and must not occur.
-* Prefer KISS and balance DRY with DAMP. Accept small duplication when it improves clarity.
+* Prefer KISS and balance DRY with DAMP (Descriptive and Meaningful Phrases). Accept small duplication when it improves clarity.
 * Keep relevant test data explicit and hide irrelevant defaults behind builders, factories, fixtures, or equivalent helpers.
 * Use domain-relevant test data without real credentials, secrets, tokens, or PII.
 * Test names must describe expected behavior, not implementation.
@@ -102,33 +102,15 @@ Use quality metrics as diagnostic signals, not proof of correctness; follow proj
 * Characterization tests capture current observable behavior; they do not legitimize poor design.
 * Document the purpose of a characterization test when it is not obvious.
 
-## Design and Testability Smells
+## Testability Signals
 
-Treat the following as signals for developer review before testing.
+Treat testability smells as diagnostic evidence, not universal production-design mandates:
 
-### Dependency and Construction
+* Construction, lifecycle ownership, or coupling may warrant review **when** they materially obstruct isolation, meaningful assertions, or controlled test setup. Recognize legitimate composition roots, aggregates, value objects, factories, builders, and framework constraints.
+* Disproportionate test setup, pervasive mocking for a narrow behavior, or hidden side effects may indicate responsibility or dependency boundaries that deserve review.
+* Inconsistent interfaces or complex control flow may increase testing cost or obscure expected behavior; assess observed consequences before suggesting a design change.
 
-* Domain or application code directly instantiates infrastructure or concrete low-level dependencies that should normally be inverted.
-* A class creates objects whose lifecycle or ownership does not naturally belong to it.
-* Object construction conflicts with the intended association, aggregation, composition, dependency, or architectural boundary.
-* Consider legitimate composition, aggregate ownership, Value Objects, factories, builders, composition roots, framework-managed construction, and other intentional creational patterns before flagging construction.
-* Flag inappropriate ownership, lifecycle, coupling, or dependency direction, not the use of `new` itself.
-
-### Responsibility
-
-* A function, method, or class has multiple unrelated responsibilities, excessive branching, hidden side effects, or unclear boundaries that materially increase testing complexity.
-* Disproportionate test setup or pervasive mocking for a narrow behavior may indicate excessive coupling, too many responsibilities, or unclear boundaries.
-* Consider Divergent Change and Shotgun Surgery when they indicate poor responsibility boundaries.
-
-### Predictability
-
-* Interfaces for similar use cases are unnecessarily inconsistent in naming, structure, semantics, or usage patterns, making them less predictable or intuitive.
-
-### Parameter Count
-
-* Follow the Clean Code heuristic: prefer 0–1 parameters; 2 is acceptable; avoid 3; more than 3 requires strong justification. Consider legitimate domain or technical constraints before recommending refactoring.
-
-Legacy, externally constrained, framework-controlled, or backward-compatible code may require characterization tests before redesign.
+Test-only authorization permits reporting these signals, not refactoring production architecture. Legacy, externally constrained, framework-controlled, or compatibility-sensitive code may need characterization tests before any separately authorized redesign.
 
 ## Quality Guardrails
 
