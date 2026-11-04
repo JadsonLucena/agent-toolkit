@@ -253,6 +253,20 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 * Agent filenames name the specialist role.
 * Contract filenames name the semantic handoff, not a workflow.
 
+## Skill Format and Portability
+
+Canonical Skills are **semantic artifacts**, stored at `contexts/<context>/skills/<capability>/skill.md`. This lowercase Markdown file is the source of truth; it is **not directly compliant** with the open [Agent Skills specification](https://agentskills.io/specification), which requires `SKILL.md` and YAML frontmatter containing `name` and `description`.
+
+Adapters may produce Agent Skills-compatible exports, subject to these invariants:
+
+* Export each canonical Skill as a capability directory with `SKILL.md` and valid required frontmatter; derive `name` from the capability identifier and `description` from the canonical purpose without inventing capabilities.
+* Preserve procedure, preconditions, stop conditions, policy dependencies, and authorization limits; translate canonical paths/references to reachable exported locations.
+* Keep exports generated or adapter-owned; never treat a generated `SKILL.md` as a second canonical source of truth.
+* Validate generated artifacts against the target format and runtime restrictions. Compatibility is an **adapter guarantee to verify**, not a property of `skill.md` files merely because their semantics align.
+* Platform-specific metadata (such as model or reasoning effort) belongs to the adapter/runtime, not to canonical Agent definitions.
+
+This decision favors semantic portability now; changing the canonical serialization itself requires a separate compatibility/migration decision.
+
 ## Command Shape
 
 Commands should use a consistent editorial shape:
