@@ -88,9 +88,12 @@ def lint_toolkit(root: Path) -> list[str]:
         content = path.read_text(encoding="utf-8")
         if not content.startswith("# "):
             errors.append(f"{rel}: expected a level-one title")
-        for ref in PATH_REF.findall(content):
-            if ".." in Path(ref).parts or not (root / ref).is_file():
-                errors.append(f"{rel}: broken reference {ref}")
+        # MIGRATION.md intentionally records superseded paths: they are history,
+        # not active artifact references.
+        if path.name != "MIGRATION.md":
+            for ref in PATH_REF.findall(content):
+                if ".." in Path(ref).parts or not (root / ref).is_file():
+                    errors.append(f"{rel}: broken reference {ref}")
         for link in MD_LINK.findall(content):
             if link.startswith(("http://", "https://", "mailto:", "#")):
                 continue
@@ -114,6 +117,10 @@ def lint_toolkit(root: Path) -> list[str]:
             for required in ("Purpose", "Uses", "Workflow", "Output"):
                 if required not in headings or not section(content, required).strip():
                     errors.append(f"{rel}: skill missing {required} section")
+            # Skills can invoke other Skills from their Workflow section too.
+            for target in PATH_REF.findall(content):
+                if target != rel and classify(Path(target)) == ("Skill", context):
+                    skill_graph.setdefault(rel, set()).add(target)
 
         uses = section(content, "Uses")
         for target in PATH_REF.findall(uses):
