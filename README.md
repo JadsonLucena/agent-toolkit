@@ -60,6 +60,7 @@ contexts/requirements/
 │   ├── validation/skill.md
 │   └── backlog-planning/skill.md
 ├── commands/
+│   ├── shape-change.md
 │   ├── elicit-requirements.md
 │   ├── specify-requirements.md
 │   ├── validate-requirements.md
@@ -156,12 +157,12 @@ A command's invocation defines its authorization boundary. For example, determin
 ## Development Pipeline
 
 ```text
-Elicitation ↔ Specification ↔ Backlog / Plan → Design → Implement → Test → Review
+Elicitation ↔ Specification ↔ Validation ↔ Backlog / Plan → Design → Implement → Test → Review
 
 Cross-cutting: Git, security, conventions, …
 ```
 
-The first three stages are iterative. A backlog ambiguity may return to specification, and missing stakeholder intent may return to elicitation.
+The Requirements stages are iterative. Validation is a separate, read-only gate: its findings return to the appropriate elicitation or specification owner before a planning-readiness claim. Backlog ambiguity can also return to earlier stages.
 
 ## Cross-Context Composition
 
