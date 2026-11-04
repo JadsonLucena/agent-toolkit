@@ -67,3 +67,16 @@
 * Do not introduce future-release feature work into an active release or hotfix branch.
 * Do not guess a branch role, base, or semantic name when multiple plausible interpretations remain; ask the developer when the ambiguity can materially change the Gitflow operation.
 * Do not treat Gitflow as a universal best practice; use it only when it fits the repository's release model.
+
+
+## Foundational Guidance
+
+These rules adapt the original Gitflow branching model while explicitly treating it as a context-dependent, release-oriented workflow rather than a universal default.
+
+Foundational references used to shape this rule include:
+
+* Vincent Driessen (2010), *A successful Git branching model*.
+* Vincent Driessen's 2020 reflection on that model, which recommends simpler workflows for continuously delivered software and retains Gitflow as a possible fit for explicitly versioned software or multiple supported versions.
+* Martin Fowler, *Patterns for Managing Source Code Branches* and *Continuous Integration*.
+
+The original branch roles inform this rule, but repository-specific lifecycle policy remains authoritative and simpler high-frequency integration models should not be replaced by Gitflow without a demonstrated need.
