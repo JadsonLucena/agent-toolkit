@@ -65,6 +65,12 @@ For each batch:
 
 Small batches reduce speculative requirements work, but batch size must not be optimized at the expense of semantic coherence or required assurance.
 
+Requirements work must use **incremental reconciliation**: after each meaningful step, re-evaluate the resulting knowledge state against the intended next decision or readiness target before selecting another step.
+
+Choose only the smallest coherent, safe, evidence-backed transition that reduces the material gap. Do not execute additional foreseeable downstream work merely because it is likely to be needed later.
+
+Combine multiple changes only when separating them would leave an incoherent, unsafe, misleading, or unverifiable intermediate state. Stop when the intended state is reached or when the next transition requires missing evidence, authority, or a downstream responsibility.
+
 ## Tailoring
 
 For the selected context:
