@@ -123,3 +123,16 @@ Repository policy may require additional quality gates. Apply them in addition t
 * Verify that the staged diff represents exactly one coherent logical unit before committing, and split it when it does not.
 * Do not hide unrelated changes behind a broad or ambiguous commit message.
 * Do not create a commit without the required pre-commit verification evidence defined above.
+
+
+## Foundational Guidance
+
+These rules synthesize established commit-message conventions with atomic-change and reviewability principles. Repository-specific commit policy remains authoritative; Conventional Commits is the fallback only when no stronger local convention applies.
+
+Foundational references used to shape this rule include:
+
+* *Conventional Commits 1.0.0*.
+* The Angular project's Git commit message conventions, particularly their type/scope and message-style guidance.
+* The official Git documentation for commit objects and trailer-compatible metadata.
+
+Conventional Commit types communicate declared intent; they do not override contradictory evidence from the actual change or its compatibility impact.
