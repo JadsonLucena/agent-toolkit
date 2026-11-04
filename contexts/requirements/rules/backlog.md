@@ -144,3 +144,18 @@ When planning is derived from an explicit Change Boundary:
 * Do not hide unresolved requirement questions inside implementation notes.
 * Do not hide a Change Boundary expansion inside backlog decomposition or refinement.
 * Do not impose a specific issue tracker, agile framework, story-map notation, or vendor schema.
+
+
+## Foundational Guidance
+
+These rules synthesize lightweight backlog representation, conversational user stories, journey-oriented planning, use-case slicing, and incremental delivery/learning. They treat planning techniques as context-sensitive heuristics rather than mandatory process mechanics.
+
+Foundational references used to shape this rule include:
+
+* Mike Cohn (2004), *User Stories Applied: For Agile Software Development*.
+* Jeff Patton (2014), *User Story Mapping: Discover the Whole Story, Build the Right Product*.
+* Ivar Jacobson, Ian Spence, and Kurt Bittner (2011), *Use-Case 2.0: The Guide to Succeeding with Use Cases*.
+* Bill Wake (2003), *INVEST in Good Stories, and SMART Tasks*.
+* Donald Reinertsen (2009), *The Principles of Product Development Flow*.
+
+User-story, INVEST, story-mapping, and slicing guidance remains diagnostic and optional unless the surrounding project explicitly adopts those practices.
