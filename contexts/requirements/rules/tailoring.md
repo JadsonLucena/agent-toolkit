@@ -114,3 +114,18 @@ When material, establish:
 * Do not use High Assurance as a synonym for more paperwork.
 * Do not lower rigor merely because implementation is urgent.
 * Do not preserve obsolete or redundant artifacts solely because a process template expects them.
+
+
+## Foundational Guidance
+
+These tailoring rules synthesize risk-proportional requirements engineering, iterative requirements work, adaptive formality, and small-batch flow. The governing objective remains sufficient knowledge for the next material decision, not maximal documentation.
+
+Foundational references used to shape this rule include:
+
+* ISO/IEC/IEEE 29148:2018, *Systems and software engineering — Life cycle processes — Requirements engineering*.
+* Klaus Pohl (2010), *Requirements Engineering: Fundamentals, Principles, and Techniques*.
+* Suzanne Robertson and James Robertson (2012), *Mastering the Requirements Process: Getting Requirements Right*, 3rd Edition.
+* Donald Reinertsen (2009), *The Principles of Product Development Flow*.
+* Jez Humble and David Farley (2010), *Continuous Delivery*.
+
+The flow-oriented references inform batch size, feedback, and incremental decision-making; they do not impose a delivery framework on Requirements.
