@@ -267,6 +267,8 @@ Additional Git commands should be introduced only when a reusable procedure also
 
 Canonical definitions are neutral Markdown. Adapters may transform them into provider-specific formats while preserving canonical semantics.
 
+Canonical Skills use lowercase `skill.md` without requiring Agent Skills frontmatter. They are **not directly Agent Skills-compatible**. An adapter may export compliant `SKILL.md` files with `name`/`description` metadata, reference rewriting, and format validation. The canonical source remains authoritative; see `ARCHITECTURE.md` for the compatibility contract.
+
 ## Goal
 
 The goal is not a collection of prompts. It is a **composable software engineering system for AI agents** where responsibility, evidence, workflow, boundaries, and context are structured to produce consistent engineering outcomes.
