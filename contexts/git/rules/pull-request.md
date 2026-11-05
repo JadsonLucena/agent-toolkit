@@ -8,6 +8,15 @@
 * Keep the system safe after every merge. An incomplete larger feature may be integrated only when the merged state does not break existing behavior, contracts, data integrity, buildability, or required guarantees.
 * When incomplete behavior must be merged, keep it inactive behind an appropriate safe mechanism such as a feature flag, disabled path, compatibility layer, or equivalent repository-approved strategy.
 
+## Slice Terminology
+
+These labels describe **scope and traceability**, not new canonical artifact types:
+
+* **Product Slice** — a coherent increment of user/product behavior or validated learning toward a product outcome. It can require multiple independently integrable PRs.
+* **Architectural Slice** — a bounded technical contribution (for example, a service, component, contract, or repository-local change) that enables or evolves a larger Product Slice. It has its own integration-safety and verification obligations but does not, by itself, prove product acceptance.
+
+Neither term overrides a Requirements Change Boundary, a project's established slice vocabulary, or the rule that each PR must stand as one coherent, verifiable review unit.
+
 ## PR Boundary
 
 Before preparing or creating a PR, establish a PR Boundary containing, when relevant:

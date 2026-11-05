@@ -60,6 +60,7 @@ contexts/requirements/
 │   ├── validation/skill.md
 │   └── backlog-planning/skill.md
 ├── commands/
+│   ├── shape-change.md
 │   ├── elicit-requirements.md
 │   ├── specify-requirements.md
 │   ├── validate-requirements.md
@@ -155,13 +156,34 @@ A command's invocation defines its authorization boundary. For example, determin
 
 ## Development Pipeline
 
+The intended delivery flow is **test-first**: supported behavior is specified before implementation, and executable tests can guide implementation incrementally when a TDD workflow is selected.
+
 ```text
-Elicitation ↔ Specification ↔ Backlog / Plan → Design → Implement → Test → Review
+Elicitation ↔ Specification ↔ Validation ↔ Backlog / Plan
+                 │                           │
+                 ▼                           ▼
+        Scenario Set / Test Basis     Initial Design
+                 └──────────┬────────────────┘
+                            ▼
+                       Test Design
+                            ▼
+                   RED → GREEN → REFACTOR
+                    ▲                   │
+                    └───────────────────┘
+                            │
+                            ▼
+                     Verification → Review
 
 Cross-cutting: Git, security, conventions, …
 ```
 
-The first three stages are iterative. A backlog ambiguity may return to specification, and missing stakeholder intent may return to elicitation.
+Requirements stages are iterative. Validation is a separate, read-only requirement-quality gate: its findings return to the appropriate elicitation or specification owner before a planning-readiness claim. Backlog ambiguity can also return to earlier stages. A Scenario Set and the portable `contracts/test-basis.md` can originate during specification, **before** backlog planning or detailed technical design, and evolve through approved clarification. The diagram shows the principal handoff, not a mandatory one-way order between all activities.
+
+**Test Basis is not an executable test suite.** Test Design selects and prioritizes behavior, risk, test levels, and test cases from supported evidence. With TDD, choose the next small behavior, write and execute a test that fails for the **expected reason** (RED), implement just enough production code to pass (GREEN), and refactor while keeping tests green (REFACTOR). Repeat per behavior; do not turn the entire test list into speculative executable tests before the first implementation feedback. Initial design provides only the interface/architecture decisions needed to begin and may evolve during TDD.
+
+Verification remains distinct from the TDD inner loop: it checks the integrated result against applicable acceptance criteria, scenario coverage, contracts, functional and non-functional requirements, and project quality gates. TDD does not replace integration, security, resilience, performance, or acceptance verification. A material discrepancy discovered in test design or execution must be returned to the appropriate requirement owner, not silently change expected behavior.
+
+The current `/testing/generate-tests` command authorizes **test-artifact changes only**; it does not authorize production implementation. A future TDD capability should be owned by the Implementation context and invoked with explicit scope for both test and production-code changes, reusing Testing's standards and portable test evidence without changing their canonical ownership. The diagram expresses the target workflow; it does not claim that a TDD skill or Implementation agent already exists. Projects not using TDD may use another authorized, risk-appropriate delivery workflow while preserving test traceability and verification.
 
 ## Cross-Context Composition
 
