@@ -8,6 +8,7 @@ Use to transform sufficiently understood needs and evidence into precise, verifi
 
 * Rule: `contexts/requirements/rules/tailoring.md`
 * Rule: `contexts/requirements/rules/requirements.md`
+* Skill (conditional): `contexts/requirements/skills/example-discovery/skill.md`
 * Contract: `contracts/requirements.md`
 * Optional handoff: `contracts/test-basis.md`
 

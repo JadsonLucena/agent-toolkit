@@ -37,6 +37,8 @@ Invocation does not authorize architecture selection, implementation, automated-
 
 ### Routing
 
+The steps below select existing capabilities at the invocation boundary. Each specialist agent retains ownership of dynamic orchestration and handoffs within its capability, and each skill retains its reusable procedure. The command does not reimplement either.
+
 1. Inspect supplied evidence, identify the intended next material decision/handoff, and determine the earliest Requirements capability that is still necessary; do not repeat work merely because this command spans the full path. Work in the smallest coherent knowledge batch that can safely support that next decision.
 2. If material stakeholder intent, Need/Goal context, scope, Change Boundary, business knowledge, or uncertainty is not sufficiently understood, route through Requirements Elicitation.
 3. When evidence is sufficient for formal semantics, route through Requirements Definition.
@@ -63,7 +65,7 @@ Do not manufacture empty intermediate artifacts merely to demonstrate that every
 
 ## Boundary
 
-This command composes existing Requirements capabilities; it does not redefine their semantics.
+This command routes existing Requirements capabilities at invocation level; it does not redefine their semantics or take ownership of agent-level orchestration.
 
 It must not:
 
