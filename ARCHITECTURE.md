@@ -99,7 +99,7 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Testing | `skills/generate-tests/skill.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
 | Testing | `commands/generate-tests.md` | Command | Start automated-test creation or modification |
 | Testing | `agents/test-engineer.md` | Agent | Own testing specialization, evidence discipline, and scope boundaries |
-| Git | `rules/git.md` | Rule | Repository-state, history, synchronization, worktree, composition, and remote safety |
+| Git | `rules/git.md` | Rule | Repository-state, history, synchronization, worktree, composition, remote safety, and commit-safety verification gates |
 | Git | `rules/gitflow.md` | Rule | Gitflow applicability and branch-lifecycle invariants |
 | Git | `rules/semantic-commit.md` | Rule | Commit semantics, message structure, and atomicity invariants |
 | Git | `rules/semantic-version.md` | Rule | Semantic-version compatibility and increment invariants |
