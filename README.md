@@ -277,6 +277,12 @@ Stable or repeatedly used project information may be cached when the execution p
 * **Task oriented** — commands express clear engineering intent.
 * **Quality driven** — verification distinguishes evidence from assumptions and unverified conclusions.
 
+## Toolkit Self-Validation
+
+Run `python3 scripts/toolkit_lint.py` and `python3 -m unittest discover -s tests -v`. GitHub Actions runs both on pull requests and pushes to `main`.
+
+The lint checks canonical artifact paths, matrix ownership, dependency direction, same-context Skill composition cycles, broken Markdown references, required Command/Skill sections, and selected authorization-boundary markers. These are **structural fitness checks**, not proof of semantic consistency or runtime authorization enforcement. Behavioral agent evals and adapter capability tests remain a separate follow-up.
+
 ## Roadmap
 
 Next contexts should cover Product Discovery, architecture and design, implementation, code review, security engineering, release evidence, solution/outcome evaluation, and Lean/delivery-flow concerns without collapsing specialties. Requirements may carry Needs, Goals, constraints, candidate solutions, uncertainty, quality/security drivers, and other semantic evidence, but it does not own those disciplines' internal procedures.

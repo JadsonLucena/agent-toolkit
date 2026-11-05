@@ -1,0 +1,87 @@
+"""Negative and positive regressions for structural architecture checks."""
+import shutil
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from toolkit_lint import lint_toolkit  # noqa: E402
+
+
+class ToolkitLintTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        shutil.copytree(ROOT / "contexts", self.root / "contexts")
+        shutil.copytree(ROOT / "contracts", self.root / "contracts")
+        for name in ("ARCHITECTURE.md", "README.md", "MIGRATION.md"):
+            shutil.copy2(ROOT / name, self.root / name)
+
+    def change(self, path, old, new):
+        target = self.root / path
+        text = target.read_text(encoding="utf-8")
+        self.assertIn(old, text)
+        target.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+    def assert_error(self, needle):
+        errors = lint_toolkit(self.root)
+        self.assertTrue(any(needle in error for error in errors), errors)
+
+    def test_current_canonical_repository_passes(self):
+        self.assertEqual([], lint_toolkit(self.root))
+
+    def test_broken_canonical_reference(self):
+        self.change(
+            "contexts/requirements/skills/definition/skill.md",
+            "contexts/requirements/skills/example-discovery/skill.md",
+            "contexts/requirements/skills/never-existed/skill.md",
+        )
+        self.assert_error("broken reference")
+
+    def test_skill_cannot_depend_on_command(self):
+        self.change(
+            "contexts/requirements/skills/definition/skill.md",
+            "## Uses\n",
+            "## Uses\n\n* Command: \x60contexts/requirements/commands/shape-change.md\x60\n",
+        )
+        self.assert_error("forbidden dependency Skill -> Command")
+
+    def test_missing_command_section(self):
+        self.change("contexts/git/commands/commit.md", "## Boundary\n", "## Scope\n")
+        self.assert_error("invalid command shape")
+
+    def test_duplicate_canonical_owner(self):
+        target = self.root / "ARCHITECTURE.md"
+        content = target.read_text(encoding="utf-8")
+        line = "| Git | \x60rules/git.md\x60 | Rule |"
+        match = next(row for row in content.splitlines() if row.startswith(line))
+        target.write_text(content + "\n" + match + "\n", encoding="utf-8")
+        self.assert_error("duplicate canonical ownership")
+
+    def test_read_only_boundary_regression(self):
+        self.change(
+            "contexts/git/commands/plan-pull-requests.md",
+            "read-only",
+            "non-mutating",
+        )
+        self.change(
+            "contexts/git/commands/plan-pull-requests.md",
+            "read-only",
+            "non-mutating",
+        )
+        self.assert_error("planning must remain read-only")
+
+    def test_cycle_between_skills(self):
+        self.change(
+            "contexts/requirements/skills/example-discovery/skill.md",
+            "## Uses\n",
+            "## Uses\n\n* Skill: \x60contexts/requirements/skills/definition/skill.md\x60\n",
+        )
+        self.assert_error("cyclic Skill -> Skill")
+
+
+if __name__ == "__main__":
+    unittest.main()
