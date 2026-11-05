@@ -62,15 +62,15 @@ contracts/
 
 ## Responsibility Model
 
-| Type | Owns | Must not own |
+| Artifact kind | Owns | Must not own |
 |---|---|---|
 | Rule | Durable principles, constraints, invariants, safety and quality standards | Step-by-step workflow, invocation routing, specialist persona |
 | Skill | Reusable procedure, operational state, verification loop, task output | Global policy, user entry-point semantics, specialist identity |
-| Command | Explicit engineering intent, input selection, authorization boundary, workflow entry point, expected result | Detailed policy or duplicated procedure |
-| Agent | Specialist scope, evidence discipline, orchestration, boundaries, handoffs | Detailed reusable task procedure |
+| Command | Explicit engineering intent, input selection, authorization policy, thin invocation-level routing, workflow entry point, expected result | Detailed policy or duplicated specialist procedure |
+| Agent | Specialist scope, evidence discipline, dynamic specialist orchestration, boundaries, handoffs | Detailed reusable task procedure |
 | Contract | Neutral handoff semantics and schema meaning | Policy, workflow, orchestration, specialist behavior |
 
-Contracts are supporting schemas, not a fifth canonical artifact type.
+Contracts are supporting artifact kinds outside the four canonical behavioral artifact types (Rule, Skill, Command, Agent). They carry neutral schemas rather than behavior.
 
 Rules may include an optional `## Foundational Guidance` section when established standards, specifications, books, papers, or engineering practices materially shaped the rule. The section documents conceptual provenance and interpretation; it must not contain reusable procedure or silently override repository, organization, stakeholder, or domain-specific policy. Include only material references, and do not add the section merely for structural symmetry.
 
@@ -86,7 +86,7 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Requirements | `skills/example-discovery/skill.md` | Skill | Discover domain examples, counterexamples, boundaries, and questions before test automation |
 | Requirements | `skills/validation/skill.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
 | Requirements | `skills/backlog-planning/skill.md` | Skill | Build or refine traceable planning items while preserving source semantics |
-| Requirements | `commands/shape-change.md` | Command | Orchestrate the risk-proportional Requirements path from available evidence through validated planning without duplicating specialist workflows |
+| Requirements | `commands/shape-change.md` | Command | Route the minimum necessary Requirements capabilities toward validated planning; specialist orchestration remains with agents |
 | Requirements | `commands/elicit-requirements.md` | Command | Start requirements discovery |
 | Requirements | `commands/specify-requirements.md` | Command | Start formal requirement definition |
 | Requirements | `commands/validate-requirements.md` | Command | Start the separate requirement-quality gate |
@@ -133,8 +133,10 @@ Additional rules:
 
 * Rules may reference other rules in the same context when one rule set refines another.
 * Skills may depend on rules and contracts, but not on commands.
+* A skill may invoke another skill in the same context when the nested capability is independently reusable, its procedure is not duplicated, and the dependency remains acyclic.
 * Agents may depend on rules, skills, and contracts, but not on commands.
-* Commands may select agents and skills and reference rules or contracts, but remain thin.
+* Commands may select agents and skills and reference rules or contracts, but remain thin. A composite command may route between existing capabilities to fulfill its invocation, but does not own their internal workflows.
+* Agents own dynamic specialist-level orchestration and handoffs; the command chooses the invoked capability, not the implementation of its procedure.
 * Commands define the authorization granted by invocation; authorization does not silently expand to adjacent mutations or downstream operations.
 * Contracts must not depend on a context implementation.
 * A context must not invoke another context's internal agent or skill merely to obtain data.
@@ -143,6 +145,20 @@ Additional rules:
 * Git and Testing must remain independently usable when Requirements artifacts are absent.
 * Requirements must remain independently usable when no repository exists.
 * Vendor adapters may depend on canonical artifacts; canonical artifacts never depend on a vendor adapter.
+
+## Authorization Policy and Runtime Enforcement
+
+A Command declares **canonical authorization policy** for an invocation. Its Markdown text does not, by itself, enforce a security boundary or prevent an agent from invoking a tool with broader permissions.
+
+Platform adapters and runtimes are responsible for enforcing the declared scope at the actual side-effect boundary, when the platform supports such controls:
+
+* Expose only the tools/capabilities required for the authorized operation, with scoped credentials and resource permissions where possible.
+* Apply tool-level policy checks and approvals **before** sensitive or irreversible actions; do not rely only on agent instructions or output checks.
+* Treat authority as operation-specific: creating a pull request does not authorize push, merge, auto-merge, release, or deployment.
+* Deny or pause out-of-scope operations rather than inferring authorization from an adjacent action.
+* Report which restrictions are technically enforced and which are only instruction-level policy. When enforcement is unavailable, do not represent Markdown instructions as a security control; use an external approval/control or withhold the sensitive capability.
+
+An adapter's inability to enforce a control never expands canonical authorization. Runtime enforcement is a deployment responsibility, not a new canonical artifact type.
 
 ## Behavioral Scenario Traceability
 
@@ -266,6 +282,10 @@ Adapters may produce Agent Skills-compatible exports, subject to these invariant
 * Platform-specific metadata (such as model or reasoning effort) belongs to the adapter/runtime, not to canonical Agent definitions.
 
 This decision favors semantic portability now; changing the canonical serialization itself requires a separate compatibility/migration decision.
+
+## Command Terminology
+
+A Toolkit **Command** is an explicit invocation artifact, not necessarily a mutating operation in Command–Query Separation (CQS), nor an implementation of the GoF Command pattern. A read-only invocation such as `/git/determine-semantic-version` is still a Toolkit Command.
 
 ## Command Shape
 
