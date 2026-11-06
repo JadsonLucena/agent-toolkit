@@ -8,7 +8,7 @@ Create a remote pull request for an already published change using a verified he
 
 Use only when remote pull-request creation is explicitly requested.
 
-Invocation authorizes creation of the remote PR object. The skill may perform the read-only preparation checks required to create it safely and truthfully.
+Invocation authorizes creation of the remote PR object only **after** current independent code review (PASS), applicable project tests, and lint have satisfied the pre-creation gate, including for draft PRs. The skill may perform the read-only preparation checks required to create it safely and truthfully; when review evidence is missing, an explicitly authorized multi-context orchestrator may obtain a separate read-only Review result before retrying. The Git workflow consumes the neutral contract and does not invoke Review internals.
 
 ## Uses
 
@@ -19,6 +19,7 @@ Invocation authorizes creation of the remote PR object. The skill may perform th
 * Rule: `contexts/git/rules/gitflow.md` when applicable
 * Optional contract: `contracts/work-item.md`
 * Optional contract: `contracts/test-basis.md`
+* Required review handoff contract: `contracts/review-evidence.md`
 * Optional contract: `contracts/test-evidence.md`
 
 ## Inputs
@@ -27,6 +28,7 @@ Invocation authorizes creation of the remote PR object. The skill may perform th
 * Intended base branch.
 * Prepared title/description when available, otherwise sufficient evidence to prepare them.
 * Optional PR Boundary and traceability references.
+* Independent review evidence for the intended revision, and actual test/lint results or documented genuine non-applicability; these may be collected during authorized read-only preflight.
 * Optional explicit draft/ready intent when repository policy does not determine it.
 
 ## Output
@@ -37,6 +39,7 @@ A verified remote PR result containing:
 * repository and verified head/base;
 * title and description used;
 * draft/ready state;
+* independent review verdict, identity/coverage, and applicable test/lint evidence;
 * preparation and verification summary;
 * relevant limitations, dependencies, and follow-up work.
 
@@ -48,4 +51,4 @@ This command authorizes only remote PR creation plus the read-only checks needed
 
 It does not authorize pushing unpublished commits, creating commits, rewriting history, changing the implementation, assigning reviewers, applying labels or milestones, enabling auto-merge, merging, closing an existing PR, deleting branches, releasing, or deploying unless those operations are separately and explicitly authorized.
 
-If the head branch is not published, required checks make the PR unsafe/misleading, the base is materially ambiguous, or preparation is `blocked`, do not create the PR.
+Do not create the PR when independent review is missing, not PASS, stale or incomplete; applicable tests/lint are missing, failed or stale; the head branch is unpublished; the base is materially ambiguous; preparation is `blocked`; or any required verification makes creation unsafe or misleading.

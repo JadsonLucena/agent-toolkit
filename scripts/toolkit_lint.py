@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PATH_REF = re.compile(r"\x60((?:contexts|contracts)/[A-Za-z0-9_./-]+\.md)\x60")
 MATRIX_ROW = re.compile(
-    r"^\|\s*(Requirements|Testing|Git|Cross-context)\s*\|\s*"
+    r"^\|\s*(Requirements|Testing|Review|Git|Cross-context)\s*\|\s*"
     r"\x60([^\x60]+)\x60\s*\|\s*(Rule|Skill|Command|Agent|Contract)\s*\|",
     re.MULTILINE,
 )
@@ -28,7 +28,7 @@ def classify(path: Path) -> tuple[str, str] | None:
     if len(parts) < 4 or parts[0] != "contexts":
         return None
     context = parts[1].capitalize()
-    if context not in ("Requirements", "Testing", "Git"):
+    if context not in ("Requirements", "Testing", "Review", "Git"):
         return None
     if len(parts) == 4 and parts[3].endswith(".md"):
         kind = {"rules": "Rule", "agents": "Agent", "commands": "Command"}.get(parts[2])
@@ -150,6 +150,15 @@ def lint_toolkit(root: Path) -> list[str]:
                     errors.append(f"{rel}: missing PR authorization exclusion for {word}")
             if "does not authorize" not in authority:
                 errors.append(f"{rel}: missing explicit non-authorization statement")
+        if rel == "contexts/git/commands/create-pull-request.md":
+            for token in ("independent code review (pass)", "project tests", "and lint have satisfied"):
+                if token not in authority:
+                    errors.append(f"{rel}: missing pre-PR quality gate for {token}")
+        if rel == "contexts/review/commands/review-code.md":
+            if "read-only" not in section(content, "Invocation").lower() or "read-only" not in section(content, "Boundary").lower():
+                errors.append(f"{rel}: review invocation must remain read-only")
+            if "does not authorize" not in authority:
+                errors.append(f"{rel}: review command must forbid out-of-scope mutations")
         if rel == "contexts/git/commands/plan-pull-requests.md" and "read-only" not in authority:
             errors.append(f"{rel}: planning must remain read-only")
         if rel == "contexts/requirements/commands/validate-requirements.md" and (

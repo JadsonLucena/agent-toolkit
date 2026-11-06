@@ -74,6 +74,42 @@ class ToolkitLintTests(unittest.TestCase):
         )
         self.assert_error("planning must remain read-only")
 
+    def test_review_context_is_canonical(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        self.assertTrue((self.root / "contexts/review/agents/code-reviewer.md").is_file())
+
+    def test_review_command_cannot_become_mutating(self):
+        self.change(
+            "contexts/review/commands/review-code.md",
+            "Invocation authorizes read-only inspection",
+            "Invocation authorizes inspection",
+        )
+        self.assert_error("review invocation must remain read-only")
+
+    def test_pr_creation_requires_independent_review(self):
+        self.change(
+            "contexts/git/commands/create-pull-request.md",
+            "independent code review (PASS)",
+            "optional analysis",
+        )
+        self.assert_error("missing pre-PR quality gate")
+
+    def test_pr_creation_requires_lint(self):
+        self.change(
+            "contexts/git/commands/create-pull-request.md",
+            "and lint have satisfied",
+            "have satisfied",
+        )
+        self.assert_error("missing pre-PR quality gate")
+
+    def test_review_contract_cannot_be_removed_from_architecture(self):
+        self.change(
+            "ARCHITECTURE.md",
+            "| Cross-context | `contracts/review-evidence.md` | Contract |",
+            "| Removed | `contracts/review-evidence.md` | Contract |",
+        )
+        self.assert_error("missing ownership entry for contracts/review-evidence.md")
+
     def test_cycle_between_skills(self):
         self.change(
             "contexts/requirements/skills/example-discovery/skill.md",
