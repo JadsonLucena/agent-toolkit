@@ -102,6 +102,38 @@ class ToolkitLintTests(unittest.TestCase):
         )
         self.assert_error("missing pre-PR quality gate")
 
+    def test_shared_gate_policy_is_required(self):
+        self.change(
+            "contexts/git/rules/git.md",
+            "## Shared Quality-Gate Discovery and Evidence",
+            "## Unshared Checks",
+        )
+        self.assert_error("missing shared quality-gate policy")
+
+    def test_precommit_must_reference_shared_policy(self):
+        self.change(
+            "contexts/git/skills/create-semantic-commits/skill.md",
+            "shared quality-gate discovery and evidence policy",
+            "local ad-hoc verification",
+        )
+        self.assert_error("pre-commit must reuse shared quality-gate policy")
+
+    def test_prepr_hook_discovery_cannot_be_removed(self):
+        self.change(
+            "contexts/git/skills/manage-pull-request/skill.md",
+            "effective pre-commit/pre-push hooks",
+            "some checks",
+        )
+        self.assert_error("missing pre-PR check discovery or execution")
+
+    def test_prepr_must_execute_missing_checks(self):
+        self.change(
+            "contexts/git/commands/create-pull-request.md",
+            "execute missing non-destructive checks",
+            "skip missing checks",
+        )
+        self.assert_error("missing pre-PR explicit check fallback")
+
     def test_review_contract_cannot_be_removed_from_architecture(self):
         self.change(
             "ARCHITECTURE.md",

@@ -159,6 +159,25 @@ def lint_toolkit(root: Path) -> list[str]:
                 errors.append(f"{rel}: review invocation must remain read-only")
             if "does not authorize" not in authority:
                 errors.append(f"{rel}: review command must forbid out-of-scope mutations")
+        # Narrow policy-drift guards, not proof that a runtime actually runs checks.
+        if rel == "contexts/git/rules/git.md":
+            for heading in ("Shared Quality-Gate Discovery and Evidence", "Pre-Commit Verification", "Pre-Pull-Request Verification"):
+                if not section(content, heading).strip():
+                    errors.append(f"{rel}: missing shared quality-gate policy: {heading}")
+            for phrase in ("effective automation", "execute missing checks", "coverage is conditional"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing quality-gate invariant: {phrase}")
+        if rel == "contexts/git/skills/create-semantic-commits/skill.md":
+            if "shared quality-gate discovery and evidence policy" not in content.lower():
+                errors.append(f"{rel}: pre-commit must reuse shared quality-gate policy")
+        if rel == "contexts/git/skills/manage-pull-request/skill.md":
+            for phrase in ("shared quality-gate discovery and evidence", "effective pre-commit/pre-push hooks", "execute missing non-destructive project checks"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing pre-PR check discovery or execution: {phrase}")
+        if rel == "contexts/git/commands/create-pull-request.md":
+            for phrase in ("effective pre-commit/pre-push hooks", "execute missing non-destructive checks", "after pr creation does not satisfy"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing pre-PR explicit check fallback: {phrase}")
         if rel == "contexts/git/commands/plan-pull-requests.md" and "read-only" not in authority:
             errors.append(f"{rel}: planning must remain read-only")
         if rel == "contexts/requirements/commands/validate-requirements.md" and (

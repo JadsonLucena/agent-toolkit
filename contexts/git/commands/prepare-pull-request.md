@@ -8,7 +8,7 @@ Inspect an implemented change and prepare a truthful, reviewable pull request ti
 
 Use when a branch or diff is intended for review and needs to be reconciled with its objective, repository conventions, PR template, tests/evidence, and reviewability constraints.
 
-Invocation authorizes read-only repository inspection and non-destructive project verification when available, including reconciliation of independent code-review, tests, and lint evidence. It does not authorize remote PR creation or modification. Preparation may report missing evidence, but no remote PR may be created until all applicable pre-creation checks pass.
+Invocation authorizes read-only repository inspection and non-destructive project verification when available, including discovery of effective hooks/CI, execution of missing authorized lint/tests and established coverage checks, and reconciliation of independent code-review evidence. It does not authorize remote PR creation or modification. Preparation may report missing evidence, but no remote PR may be created until all applicable pre-creation checks pass.
 
 ## Uses
 
@@ -29,7 +29,7 @@ Invocation authorizes read-only repository inspection and non-destructive projec
 * Optional PR Boundary or prior PR plan.
 * Optional requirement, rule, use case, scenario, work item, defect, or slice references.
 * Optional independent code-review evidence and identity/coverage for the intended change.
-* Optional test/verification evidence.
+* Optional completed test/verification evidence, effective hook and CI information, and corresponding code revision/scope.
 
 ## Output
 
@@ -42,6 +42,7 @@ A PR preparation result containing:
 * proposed PR title;
 * complete PR description based on the final diff;
 * observed independent Code Review status/coverage/identity and applicable tests/lint evidence;
+* effective hooks/CI evidence, required checks discovered, and explicitly executed missing checks;
 * observed tests/checks and their results;
 * unexecuted, failed, or blocked verification;
 * material impacts, risks, dependencies, and remaining work.

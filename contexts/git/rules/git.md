@@ -161,45 +161,34 @@
 * Abort or stop an in-progress merge, rebase, or cherry-pick when continuing would require guessing at intended history or behavior.
 * Do not bypass hooks, branch protections, required checks, signing requirements, or review policies merely to complete an operation.
 
+## Shared Quality-Gate Discovery and Evidence
+
+Apply these invariants to both commit creation and pull-request preparation/creation, with the **target and timing of each operation** determining which evidence is valid.
+
+* **Discover required checks:** identify repository-defined lint, test, and any other required commands from scripts, test configuration, documentation, policy, and CI. Tests and lint are mandatory when the repository provides them; do not quietly waive repository-wide checks because a change seems trivial.
+* **Coverage is conditional:** require coverage-enabled tests only when coverage is an established project capability or policy, evidenced by an explicit coverage command, runner configuration, CI enforcement, or documentation. A dependency alone is not proof. Otherwise use normal tests; do not install coverage tooling, create thresholds, or rewrite project policy under Git-only authorization.
+* **Inspect effective automation:** determine the actual Git hook path (including `core.hooksPath` and repository hook managers when applicable), relevant pre-commit/pre-push hooks, and any CI or other automated check. Determine whether each mechanism is enabled, actually triggered for the intended operation, and covers the required command and scope. A configured hook, an unexecuted workflow, or a successful step with an unrelated scope is not evidence that the check passed.
+* **Validate each reusable result:** the check must have completed successfully and be corroborated by its log/status or equivalent reliable source; record check identity, command/source, covered content and scope, relevant configuration, code revision or snapshot, and observed outcome. Reuse only if the checked content matches the **exact target being gated** at equivalent or stronger scope. A prior check on an individual staged commit does not necessarily cover the full PR diff. Subsequent changes that can invalidate evidence require rechecking.
+* **Execute missing checks:** do not run an equivalent check twice when current valid evidence exists. Otherwise run the project's established non-destructive lint, test, and (when established) coverage commands explicitly **before** the operation, if the invocation and runtime authorize their execution. If checks have only partial hook coverage, run just the missing checks. Do not weaken commands, skip tests, or install tooling to manufacture a pass.
+* **Fail closed on required uncertainty:** a failed, bypassed, not-run, unavailable, stale, or uncorroborated required check is not a pass. If an authorized check cannot be executed or the observed result cannot be trusted, stop the affected commit/PR creation decision and report the blocker. Genuine non-applicability requires a repository-grounded justification, not a convenience exception.
+* **State evidence precisely:** record per-check `passed`, `failed`, `not-run`, `blocked`, `stale`, or justified `not-applicable` status and whether it came from the effective hook, CI, or explicit execution. Markdown instructions are policy, not runtime enforcement.
+
 ## Pre-Commit Verification
 
-Before creating each new commit, inspect the repository's established quality gates and effective pre-commit hook behavior.
+Apply **Shared Quality-Gate Discovery and Evidence** to each staged atomic commit. Inspect the *effective pre-commit path* and determine which checks it actually executes for that staged content. An explicit pre-run may be omitted only when the effective hook will enforce an equivalent or stronger check on that same staged unit and its execution/result can be verified during commit creation. An untriggered hook is not yet a passed check; if its execution cannot be observed, run the missing check explicitly before committing.
 
-When the repository provides these checks:
+If the hook covers lint but not tests, run tests explicitly; if it covers tests but not lint, run lint explicitly. If project coverage is established but the hook does not verify it, use the established coverage-enabled test command. Reevaluate checks when staged content, the relevant configuration, or hook behavior changes.
 
-* **lint is mandatory** before commit creation;
-* **tests are mandatory** before commit creation;
-* **tests with coverage are mandatory only when coverage is already an established project capability or policy**.
+All applicable checks must pass before the commit is accepted as verified: either through successful explicit preflight runs or successfully observed hook execution during commit creation. Failure or missing evidence blocks or invalidates the commit workflow without authorizing production/test changes.
 
-Treat coverage as established only when supported by repository evidence such as:
+## Pre-Pull-Request Verification
 
-* an explicit test-with-coverage script or command;
-* test-runner or coverage configuration that enables coverage or defines thresholds;
-* CI configuration that runs or enforces coverage;
-* project documentation or repository policy that requires coverage.
+Apply **Shared Quality-Gate Discovery and Evidence** to the *final intended PR head/base and complete change scope*, in addition to the independent code-review requirement in `contexts/git/rules/pull-request.md`.
 
-The mere presence of a coverage-related dependency is not sufficient evidence that coverage is an established gate.
-
-If tests exist but coverage is not established:
-
-* run the repository's normal test command;
-* do not install a coverage tool, introduce coverage configuration, or invent a coverage threshold under commit-only authorization.
-
-Before running checks explicitly, inspect the effective pre-commit mechanism, including repository-managed hooks and Git hook-path configuration when material.
-
-A required check may be skipped as a separate explicit command only when the effective pre-commit hook is verified to execute that same check at an equivalent or stronger scope for the commit.
-
-* If the hook covers lint but not tests, run tests explicitly.
-* If the hook covers tests but not lint, run lint explicitly.
-* If coverage is established but the hook runs tests without coverage, run the coverage-enabled test command explicitly.
-* If hook coverage is partial, ambiguous, disabled, bypassed, or cannot be verified, run the missing check explicitly.
-* Do not skip a required check merely because a hook file or hook framework exists.
-
-Required available checks must pass before the commit is created.
-
-If an available required check fails, cannot run, or its result cannot be verified, block commit creation and report the failure or missing verification. Do not bypass the check merely to create the commit.
-
-Repository policy may require additional quality gates. Apply them in addition to these defaults.
+* Evaluate evidence from effective pre-commit/pre-push hooks, explicit commands, and **already completed** CI runs. Reuse their results only when equivalent in scope and valid for the final PR revision. Merely pushing a branch, configuring CI, or assuming a hook fired does not demonstrate success.
+* A CI workflow triggered **only by opening a PR** runs after creation and **cannot** satisfy a pre-creation gate. Execute missing checks before creation or use other completed, scope-equivalent evidence (for example, a successful push CI result for the same head).
+* Recheck that head/base and relevant code/configuration still match the verified inputs immediately before creating the remote PR. Missing or invalid evidence blocks creation, including for draft PRs; preparing a local PR description remains read-only and may report incomplete results.
+* Code Review is a separate required gate: a valid test/lint/hook/CI run cannot replace a matching independent review `PASS`, nor vice versa.
 
 ## Quality Guardrails
 

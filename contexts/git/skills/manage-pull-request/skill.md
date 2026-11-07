@@ -42,7 +42,8 @@ Maintain, when relevant:
 * final diff and commit evidence when implemented;
 * review-relevant size and complexity signals;
 * applicable PR template and contribution instructions;
-* verification evidence (tests, lint, independent code-review verdict, review target identity and coverage) and known gaps;
+* per-check quality-gate inventory, effective hooks/CI, code identity, observed evidence and missing explicit executions (tests, lint, coverage when established);
+* independent code-review verdict, review target identity and coverage, and known gaps;
 * title and description;
 * readiness: `ready`, `draft`, or `blocked`;
 * remote PR identity and verified state after creation.
@@ -141,7 +142,12 @@ Use after implementation exists or when a branch/diff is ready to be inspected f
    * review-relevant size and complexity.
 5. If decomposition would materially improve reviewability, propose the specific split and its boundaries. Do not mechanically split a coherent change solely to satisfy a line threshold.
 6. Verify applicable scenarios, rules, acceptance criteria, invariants, and guarantees from available evidence.
-7. Execute or inspect non-destructive, applicable project tests and lint when the invoked command authorizes it and the environment supports it; record exact results or justified non-applicability.
+7. Apply **Shared Quality-Gate Discovery and Evidence** from `contexts/git/rules/git.md` to the full intended PR diff:
+   * discover repository-defined lint, tests, established coverage and other required checks;
+   * inspect effective pre-commit/pre-push hooks and any completed CI checks, confirming what **actually ran** and which revision/scope they checked;
+   * reuse only successful evidence equivalent to the full intended head/base; do not assume per-commit hooks or post-PR-triggered CI cover the complete PR;
+   * execute missing non-destructive project checks explicitly when available and authorized, using coverage-enabled tests only when coverage is established;
+   * record evidence origins, results, freshness, missing checks, and genuine non-applicability. Missing or failed required checks prevent a `ready` verdict.
 8. Obtain independent pre-PR review evidence via `contracts/review-evidence.md` when provided. If absent, request the separate read-only Review capability through an explicitly authorized orchestrator; do not invoke Review's internal agents/skills solely to fetch data. For local preparation, record missing, blocked or stale review explicitly; do not describe the result as fully ready.
 9. Record only observed results. Keep failures, skipped checks, blocked checks, and unavailable verification explicit.
 10. Search for the repository's applicable PR template and contribution instructions.
@@ -175,7 +181,7 @@ Use only when remote PR creation is explicitly authorized.
    * whether an equivalent open PR already exists.
 3. If the head branch is not published, do not push it unless push is separately authorized.
 4. If an equivalent PR already exists, report/reuse it rather than creating a duplicate.
-5. Revalidate the pre-creation quality gate against the final remote head/base: independent Code Review must have `PASS`, complete required coverage, and no unresolved blockers; applicable tests and lint must have current successful evidence (or documented genuine non-applicability). If evidence is missing, stale, failed or incomplete, do not create **any** remote PR, including a draft. When a runtime explicitly orchestrates cross-context work, it may obtain new read-only review evidence and retry this check without importing Review internals into Git.
+5. Reapply **Shared Quality-Gate Discovery and Evidence** to the final remote head/base and whole PR scope. Inspect the effective hooks, explicitly executed checks, and already completed CI evidence; validate successful test/lint and established coverage checks, executing any missing non-destructive checks before creation when authorized. Do **not** count a workflow triggered only after PR creation. Require independent Code Review `PASS`, complete required coverage, and no unresolved blockers for the exact target. If any mandatory evidence is missing, stale, failed or incomplete, do not create **any** remote PR, including a draft. When a runtime explicitly orchestrates cross-context work, it may obtain new read-only review evidence and retry this check without importing Review internals into Git.
 6. Do not create a PR whose preparation state is `blocked`.
 7. Create the PR as draft when preparation indicates `draft`, unless explicit repository/user direction requires another state and doing so remains truthful.
 8. Create a ready-for-review PR only when preparation indicates `ready`.
@@ -238,7 +244,7 @@ Produce:
 * verified head/base;
 * verified draft/ready state;
 * title and description used;
-* preparation/verification summary including pre-creation independent review, tests and lint;
+* preparation/verification summary including evidence origins, exact revision/scope, pre-creation independent review, tests, lint and established coverage;
 * any remaining limitations or follow-up work.
 
 ## Boundaries

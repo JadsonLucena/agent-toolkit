@@ -8,7 +8,7 @@ Create a remote pull request for an already published change using a verified he
 
 Use only when remote pull-request creation is explicitly requested.
 
-Invocation authorizes creation of the remote PR object only **after** current independent code review (PASS), applicable project tests, and lint have satisfied the pre-creation gate, including for draft PRs. The skill may perform the read-only preparation checks required to create it safely and truthfully; when review evidence is missing, an explicitly authorized multi-context orchestrator may obtain a separate read-only Review result before retrying. The Git workflow consumes the neutral contract and does not invoke Review internals.
+Invocation authorizes creation of the remote PR object only **after** current independent code review (PASS), applicable project tests, and lint have satisfied the pre-creation gate, including for draft PRs. The skill must discover repository-defined lint/tests and established coverage checks, inspect effective pre-commit/pre-push hooks and completed CI evidence, reuse only results valid for the intended revision and full scope, and execute missing non-destructive checks when authorized before creation. A workflow triggered only after PR creation does not satisfy this gate. The skill may perform the read-only preparation checks required to create it safely and truthfully; when review evidence is missing, an explicitly authorized multi-context orchestrator may obtain a separate read-only Review result before retrying. The Git workflow consumes the neutral contract and does not invoke Review internals.
 
 ## Uses
 
@@ -28,7 +28,7 @@ Invocation authorizes creation of the remote PR object only **after** current in
 * Intended base branch.
 * Prepared title/description when available, otherwise sufficient evidence to prepare them.
 * Optional PR Boundary and traceability references.
-* Independent review evidence for the intended revision, and actual test/lint results or documented genuine non-applicability; these may be collected during authorized read-only preflight.
+* Independent review evidence for the intended revision, plus actual test/lint and established coverage results (or documented genuine non-applicability) with execution source and revision/scope; missing checks must be executed when authorized during preflight.
 * Optional explicit draft/ready intent when repository policy does not determine it.
 
 ## Output
