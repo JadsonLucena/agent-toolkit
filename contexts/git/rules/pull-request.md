@@ -96,6 +96,15 @@ A PR can be technically prepared while not ready for final review. Use a draft/r
 
 Ready for review does not mean ready for production.
 
+## Pre-Creation Quality Gate
+
+* **Before creating any remote pull request, including a draft**, apply the shared check-discovery, hook/CI-evidence and missing-check execution policy from `contexts/git/rules/git.md`. Require independent code-review evidence with `PASS` under `contracts/review-evidence.md`, plus passing project tests and lint where applicable (coverage-enabled tests only when established). These are distinct checks; review cannot substitute for test/lint execution, and green test/lint results cannot substitute for review.
+* Required evidence must correspond to the final intended head/base and review scope. A hook or CI configuration alone, a partial pre-commit result, or a workflow that will run only after PR publication cannot satisfy the pre-creation gate. Reuse only successful, completed evidence of equivalent or stronger scope; run missing checks explicitly. Any code change that invalidates review or check evidence requires fresh verification before creation.
+* If an applicable test or lint check cannot run, fails, is skipped without an authorized applicable policy, or has stale/uncorroborated results, block PR creation. If a check is genuinely not applicable, state a specific reason instead of inventing a pass. Independent review itself is required even for R0/documentation-only changes, with proportionate depth.
+* If review evidence is absent, request or perform the **separate read-only Review capability** through an explicitly authorized multi-context orchestration, and consume its neutral contract. Git must not duplicate Review internals or require OCR or any vendor adapter. If review cannot be completed, remote creation is blocked.
+* A `draft` preparation state may still be produced before these checks complete; preparing a description is not remote creation. Draft PR publication is not an escape hatch for the pre-creation gates.
+* A reviewer-only Markdown instruction is not an enforcement mechanism. Where policy requires a hard block, enforce the checks through a configured runtime, preflight wrapper or CI/branch protection; never claim enforcement from the presence of this rule alone.
+
 ## Template Precedence
 
 Before writing a PR description, inspect applicable repository and organization instructions, including when present:
@@ -176,7 +185,8 @@ When no applicable repository template exists, use only the sections that are re
 ## Validation
 
 - Acceptance criteria / scenarios covered:
-- Tests / checks executed and observed result:
+- Tests / lint checks executed and observed result:
+- Independent code review: verdict, head/base, coverage, findings or remaining blockers:
 - Not executed / limitations:
 
 ## Impact and risks
@@ -202,6 +212,7 @@ Do not infer one state from another.
 
 ## Remote Creation Safety
 
+* Before remote PR creation, revalidate the independent review PASS and applicable tests/lint for the final intended revision, including for draft PRs.
 * Creating a PR requires explicit authorization to create the remote review object.
 * Preparing or drafting a PR does not authorize remote PR creation.
 * PR creation does not authorize pushing unpublished commits, rewriting history, assigning reviewers, adding labels, enabling auto-merge, merging, closing, deleting branches, releasing, or deploying unless separately authorized.

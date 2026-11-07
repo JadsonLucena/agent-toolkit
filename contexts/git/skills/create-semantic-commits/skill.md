@@ -79,26 +79,16 @@ stateDiagram-v2
 6. Stage exactly one logical unit, using path- or hunk-level staging when necessary.
 7. Inspect the complete staged diff.
 8. Correct staging when it contains independent intents, unrelated changes, or omits changes required for a coherent and verifiable unit.
-9. Discover the repository's established pre-commit quality gates before creating the commit:
-   * identify the repository-defined lint command when one exists;
-   * identify the repository-defined test command when one exists;
-   * determine whether coverage is an established capability or policy from scripts, test/coverage configuration, CI, or project documentation; do not infer this from a dependency alone;
-   * identify any additional repository-required quality gates.
-10. Inspect the effective pre-commit mechanism, including Git hook-path configuration and repository-managed hook tooling when material, and determine which required checks it actually executes.
-11. Calculate the missing explicit checks per quality gate:
-   * do not rerun a check separately when the effective hook is verified to execute the same check at an equivalent or stronger scope;
-   * run lint explicitly when available and not equivalently covered by the hook;
-   * run tests explicitly when available and not equivalently covered by the hook;
-   * when coverage is established, use the established coverage-enabled test command unless the hook already performs equivalent coverage verification;
-   * when coverage is not established, run normal tests and do not introduce coverage tooling/configuration under commit-only authorization.
-12. Run every missing required check before commit creation. Do not skip lint or tests merely because the staged change appears low risk or documentation-only when those checks are repository-wide commit gates.
-13. If a required available check fails, cannot run, or cannot be verified, diagnose enough to report the failure and block commit creation. Do not modify production/test implementation or weaken the gate under commit-only authorization.
-14. Derive type, scope, summary, body, breaking-change metadata, and references from the staged diff and verified context.
-15. Ask before committing when material commit semantics remain ambiguous.
-16. Create the commit only when the staged diff and message describe the same logical unit and all required pre-commit checks are passed or equivalently verified through the effective hook.
-17. Inspect the resulting commit and repository status.
-18. Repeat for remaining authorized logical units. Re-evaluate checks when repository state, staged content, or hook behavior materially changes.
-19. Stop when repository state is ambiguous, required verification is unavailable or fails, a material blocker remains, or continuing would require changing implementation semantics beyond staging/partitioning the already-authorized change set.
+9. Apply the shared quality-gate discovery and evidence policy from `contexts/git/rules/git.md` to the staged unit: discover project lint, test, established coverage and other required checks, without assuming a hook or configured command ran.
+10. Inspect the effective pre-commit hook path and repository-managed tooling; identify checks the hook will enforce on commit at equivalent or stronger scope. A hook that has not yet fired is not completed verification; confirm its execution and result during commit creation.
+11. Reconcile valid existing results and reliably enforceable commit-time hooks against required checks. Run missing lint, tests, and established coverage-enabled tests explicitly when authorized; avoid duplicate runs only where equivalent checks will demonstrably be enforced and their outcomes verified.
+12. If any required check fails, cannot run, is stale or cannot be verified, diagnose and block commit creation. Do not change production/test implementation or weaken a gate under commit-only authorization.
+13. Derive type, scope, summary, body, breaking-change metadata, and references from the staged diff and verified context.
+14. Ask before committing when material commit semantics remain ambiguous.
+15. Create the commit only when the staged diff and message describe the same logical unit and all required checks either passed in preflight or will be enforced by the effective hook during commit creation; verify hook results before claiming success.
+16. Inspect the resulting commit and repository status.
+17. Repeat for remaining authorized logical units. Re-evaluate checks when repository state, staged content, or hook behavior materially changes.
+18. Stop when repository state is ambiguous, required verification is unavailable or fails, a material blocker remains, or continuing would require changing implementation semantics beyond staging/partitioning the already-authorized change set.
 
 ## Boundaries
 
@@ -106,7 +96,7 @@ stateDiagram-v2
 * Commit authorization does not authorize push, merge, rebase of shared history, tag, release, branch deletion, worktree mutation, or remote-ref mutation.
 * Do not bypass hooks, required checks, branch protections, signing requirements, or repository policy.
 * Do not install/configure coverage tooling, create coverage thresholds, or change test policy merely to satisfy commit verification unless separately authorized.
-* Hook presence alone is not verification evidence; only checks proven to run through the effective pre-commit path may replace explicit execution.
+* Hook presence alone is not verification evidence; follow the shared evidence-scope and freshness policy in `contexts/git/rules/git.md`.
 * Do not amend or rewrite published history unless separately authorized and sufficiently verified.
 
 ## Output

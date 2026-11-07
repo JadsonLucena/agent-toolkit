@@ -19,6 +19,11 @@ agent-toolkit/
 │   │   ├── skills/
 │   │   ├── commands/
 │   │   └── agents/
+│   ├── review/
+│   │   ├── rules/
+│   │   ├── skills/
+│   │   ├── commands/
+│   │   └── agents/
 │   └── git/
 │       ├── rules/
 │       ├── skills/
@@ -96,6 +101,35 @@ contexts/testing/
 
 Testing remains autonomous. Requirements evidence may improve test design through the optional `contracts/test-basis.md`, but Testing does not invoke Requirements skills or agents merely to obtain that evidence. When stable scenarios are supplied, Testing preserves their identities and reports coverage/verification separately through `contracts/test-evidence.md`.
 
+### Review
+
+```text
+contexts/review/
+├── rules/code-review.md
+├── skills/
+│   ├── review-change/skill.md
+│   ├── coordinate-review-team/skill.md
+│   └── verify-findings/skill.md
+├── commands/review-code.md
+└── agents/
+    ├── code-reviewer.md
+    ├── specification-reviewer.md
+    ├── correctness-reviewer.md
+    ├── security-reviewer.md
+    ├── reliability-reviewer.md
+    ├── testing-reviewer.md
+    ├── architecture-reviewer.md
+    └── finding-verifier.md
+```
+
+The Code Reviewer performs a full, independent, read-only, risk-proportionate review of Git changes. It inspects the actual diff, relevant context, requirements when supplied, tests, affected consumers, security, reliability, architecture, and integration risks. Evidence and coverage are preserved through `contracts/review-evidence.md`.
+
+Review is **native and provider-neutral**: OCR or other installed review helpers may accelerate discovery but are optional. No installation, network provider, or adapter is required for a complete native review.
+
+**Collaborative Agent Teams:** the `code-reviewer` is the **Code Review Lead**. For R2/R3 changes, it preferentially activates a small set of relevant specialists when the platform supports independent agents and **actual peer-to-peer messaging**. Specialists share evidence, ask targeted questions and challenge conclusions; a distinct finding-verifier independently attempts falsification before the lead issues the sole verdict. R0/R1 changes normally run solo. On platforms without messaging, the lead relays questions between specialist passes or reviews natively. The record distinguishes `team-live`, `team-relayed`, and `native-solo`; mere subagent parallelism is not a collaborative Agent Team.
+
+The toolkit defines the roles and `contexts/review/skills/coordinate-review-team/skill.md` messaging workflow, **not a concrete provider's agent-spawning API**. Live team coordination requires a platform adapter/runtime that supports it, while native review remains fully functional without one. Independent review cannot be established by simply renaming the implementation author's role.
+
 ### Git
 
 ```text
@@ -122,14 +156,23 @@ contexts/git/
 
 Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
 
-Pull-request workflows preserve three distinct intents: planning review boundaries, preparing a truthful PR from the final diff, and explicitly creating the remote review request. PRs are bounded by coherent/verifiable integration units rather than line count alone; repository PR templates take precedence over the generic fallback; and PR creation never implies push, merge, auto-merge, release, or deployment authorization.
+Pull-request workflows preserve three distinct intents: planning review boundaries, preparing a truthful PR from the final diff, and explicitly creating the remote review request. **Before any remote PR is created (including draft PRs), an independent code review must PASS for the current change, and applicable project tests and lint must pass as separate prerequisites.** Missing or stale required evidence blocks creation; non-applicability must be justified. The Git context consumes review evidence but does not own Code Review.
+
+The pre-PR gate reuses Git's shared quality-gate policy with pre-commit: discover repository checks and effective hooks, validate completed hook/CI evidence against the final head/base and full change scope, and explicitly execute missing authorized checks before PR creation. A workflow that runs only **after** PR creation does not satisfy the pre-creation gate. Coverage-enabled tests are required only when coverage is already established by the project. PRs are bounded by coherent/verifiable integration units rather than line count alone; repository PR templates take precedence over the generic fallback; and PR creation never implies push, merge, auto-merge, release, or deployment authorization.
 
 ## Contracts
 
 * `contracts/requirements.md` — elicitation and requirement-definition semantics, including optional Change Boundary, scope-change, lifecycle, and representation-convention context.
 * `contracts/work-item.md` — planning-item semantics.
 * `contracts/test-basis.md` — optional portable Scenario Set and behavioral evidence for Testing.
+* `contracts/review-evidence.md` — review target, file coverage, verified findings, risk and pre-PR review status.
 * `contracts/test-evidence.md` — scenario-to-automation coverage and verification evidence.
+
+## Optional Provider Adapters
+
+Vendor-specific adapters are runtime-facing helpers, not canonical contexts. The Alibaba OpenCodeReview integration lives in `adapters/ocr/` (see its [README](adapters/ocr/README.md)) and provides structured `delegate preview` / `delegate rule` output when OCR is already installed. It does **not** run or approve a code review.
+
+Run it against a target repository with `python3 /path/to/agent-toolkit/adapters/ocr/delegate.py --repo . --from main --to HEAD`. The host agent must still independently review the complete Git change inventory, including files OCR excludes. Missing or failing OCR never blocks native code review and never satisfies the pre-PR Code Review gate by itself.
 
 ## Commands
 
@@ -144,6 +187,8 @@ Commands express engineering intent rather than low-level tool aliases:
 /requirements/refine-backlog
 
 /testing/generate-tests
+
+/review/review-code
 
 /git/commit
 /git/determine-semantic-version
@@ -172,7 +217,7 @@ Elicitation ↔ Specification ↔ Validation ↔ Backlog / Plan
                     └───────────────────┘
                             │
                             ▼
-                     Verification → Review
+                     Verification → Independent Review → PR gate
 
 Cross-cutting: Git, security, conventions, …
 ```
@@ -285,7 +330,7 @@ The lint checks canonical artifact paths, matrix ownership, dependency direction
 
 ## Roadmap
 
-Next contexts should cover Product Discovery, architecture and design, implementation, code review, security engineering, release evidence, solution/outcome evaluation, and Lean/delivery-flow concerns without collapsing specialties. Requirements may carry Needs, Goals, constraints, candidate solutions, uncertainty, quality/security drivers, and other semantic evidence, but it does not own those disciplines' internal procedures.
+Next contexts should cover Product Discovery, architecture and design, implementation, security engineering, release evidence, solution/outcome evaluation, and Lean/delivery-flow concerns without collapsing specialties. Requirements may carry Needs, Goals, constraints, candidate solutions, uncertainty, quality/security drivers, and other semantic evidence, but it does not own those disciplines' internal procedures.
 
 Product Discovery should later own opportunity/user discovery, Impact Mapping, solution hypotheses, Valuable/Usable/Feasible evaluation, prototypes/experiments, and validated learning. Lean/delivery flow should later own explicit WIP, queue, batch-size, handoff, feedback-delay, flow-efficiency, built-in-integrity, and whole-system concerns when needed.
 

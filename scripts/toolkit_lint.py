@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PATH_REF = re.compile(r"\x60((?:contexts|contracts)/[A-Za-z0-9_./-]+\.md)\x60")
 MATRIX_ROW = re.compile(
-    r"^\|\s*(Requirements|Testing|Git|Cross-context)\s*\|\s*"
+    r"^\|\s*(Requirements|Testing|Review|Git|Cross-context)\s*\|\s*"
     r"\x60([^\x60]+)\x60\s*\|\s*(Rule|Skill|Command|Agent|Contract)\s*\|",
     re.MULTILINE,
 )
@@ -28,7 +28,7 @@ def classify(path: Path) -> tuple[str, str] | None:
     if len(parts) < 4 or parts[0] != "contexts":
         return None
     context = parts[1].capitalize()
-    if context not in ("Requirements", "Testing", "Git"):
+    if context not in ("Requirements", "Testing", "Review", "Git"):
         return None
     if len(parts) == 4 and parts[3].endswith(".md"):
         kind = {"rules": "Rule", "agents": "Agent", "commands": "Command"}.get(parts[2])
@@ -150,6 +150,50 @@ def lint_toolkit(root: Path) -> list[str]:
                     errors.append(f"{rel}: missing PR authorization exclusion for {word}")
             if "does not authorize" not in authority:
                 errors.append(f"{rel}: missing explicit non-authorization statement")
+        if rel == "contexts/git/commands/create-pull-request.md":
+            for token in ("independent code review (pass)", "project tests", "and lint have satisfied"):
+                if token not in authority:
+                    errors.append(f"{rel}: missing pre-PR quality gate for {token}")
+        if rel == "contexts/review/agents/code-reviewer.md":
+            for phrase in ("coordinate-review-team/skill.md", "peer-to-peer messages", "review lead"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing team-lead coordination: {phrase}")
+        if rel == "contexts/review/skills/review-change/skill.md":
+            if "coordinate-review-team/skill.md" not in section(content, "Uses"):
+                errors.append(f"{rel}: missing collaborative review skill composition")
+        if rel == "contexts/review/skills/coordinate-review-team/skill.md":
+            if not section(content, "Collaboration Protocol").strip():
+                errors.append(f"{rel}: missing team collaboration protocol")
+            for phrase in ("peer-to-peer", "team-relayed", "native-solo", "challenge", "one `pass`"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing team collaboration or fallback: {phrase}")
+        if rel == "contexts/review/commands/review-code.md":
+            if (
+                "invocation authorizes read-only inspection" not in section(content, "Invocation").lower()
+                or "read-only" not in section(content, "Boundary").lower()
+            ):
+                errors.append(f"{rel}: review invocation must remain read-only")
+            if "does not authorize" not in authority:
+                errors.append(f"{rel}: review command must forbid out-of-scope mutations")
+        # Narrow policy-drift guards, not proof that a runtime actually runs checks.
+        if rel == "contexts/git/rules/git.md":
+            for heading in ("Shared Quality-Gate Discovery and Evidence", "Pre-Commit Verification", "Pre-Pull-Request Verification"):
+                if not section(content, heading).strip():
+                    errors.append(f"{rel}: missing shared quality-gate policy: {heading}")
+            for phrase in ("effective automation", "execute missing checks", "coverage is conditional"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing quality-gate invariant: {phrase}")
+        if rel == "contexts/git/skills/create-semantic-commits/skill.md":
+            if "shared quality-gate discovery and evidence policy" not in content.lower():
+                errors.append(f"{rel}: pre-commit must reuse shared quality-gate policy")
+        if rel == "contexts/git/skills/manage-pull-request/skill.md":
+            for phrase in ("shared quality-gate discovery and evidence", "effective pre-commit/pre-push hooks", "execute missing non-destructive project checks"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing pre-PR check discovery or execution: {phrase}")
+        if rel == "contexts/git/commands/create-pull-request.md":
+            for phrase in ("effective pre-commit/pre-push hooks", "execute missing non-destructive checks", "after pr creation does not satisfy"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing pre-PR explicit check fallback: {phrase}")
         if rel == "contexts/git/commands/plan-pull-requests.md" and "read-only" not in authority:
             errors.append(f"{rel}: planning must remain read-only")
         if rel == "contexts/requirements/commands/validate-requirements.md" and (

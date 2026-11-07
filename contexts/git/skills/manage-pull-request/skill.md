@@ -17,6 +17,7 @@ This skill supports three modes:
 * Rule: `contexts/git/rules/gitflow.md` when applicable
 * Optional contract: `contracts/work-item.md`
 * Optional contract: `contracts/test-basis.md`
+* Optional input contract: `contracts/review-evidence.md`
 * Optional contract: `contracts/test-evidence.md`
 
 ## Working State
@@ -41,7 +42,8 @@ Maintain, when relevant:
 * final diff and commit evidence when implemented;
 * review-relevant size and complexity signals;
 * applicable PR template and contribution instructions;
-* verification evidence and known gaps;
+* per-check quality-gate inventory, effective hooks/CI, code identity, observed evidence and missing explicit executions (tests, lint, coverage when established);
+* independent code-review verdict, review target identity and coverage, and known gaps;
 * title and description;
 * readiness: `ready`, `draft`, or `blocked`;
 * remote PR identity and verified state after creation.
@@ -140,24 +142,30 @@ Use after implementation exists or when a branch/diff is ready to be inspected f
    * review-relevant size and complexity.
 5. If decomposition would materially improve reviewability, propose the specific split and its boundaries. Do not mechanically split a coherent change solely to satisfy a line threshold.
 6. Verify applicable scenarios, rules, acceptance criteria, invariants, and guarantees from available evidence.
-7. Execute non-destructive, project-defined verification when the invoked command authorizes it and the environment supports it.
-8. Record only observed results. Keep failures, skipped checks, blocked checks, and unavailable verification explicit.
-9. Search for the repository's applicable PR template and contribution instructions.
-10. If one applicable template exists, preserve its structure. If multiple templates are materially ambiguous, stop the affected preparation decision rather than choosing arbitrarily.
-11. If no applicable template exists, use the fallback structure from `contexts/git/rules/pull-request.md`.
-12. Derive the title from the actual principal change and repository convention.
-13. Write the description from the final diff and evidence:
+7. Apply **Shared Quality-Gate Discovery and Evidence** from `contexts/git/rules/git.md` to the full intended PR diff:
+   * discover repository-defined lint, tests, established coverage and other required checks;
+   * inspect effective pre-commit/pre-push hooks and any completed CI checks, confirming what **actually ran** and which revision/scope they checked;
+   * reuse only successful evidence equivalent to the full intended head/base; do not assume per-commit hooks or post-PR-triggered CI cover the complete PR;
+   * execute missing non-destructive project checks explicitly when available and authorized, using coverage-enabled tests only when coverage is established;
+   * record evidence origins, results, freshness, missing checks, and genuine non-applicability. Missing or failed required checks prevent a `ready` verdict.
+8. Obtain independent pre-PR review evidence via `contracts/review-evidence.md` when provided. If absent, request the separate read-only Review capability through an explicitly authorized orchestrator; do not invoke Review's internal agents/skills solely to fetch data. For local preparation, record missing, blocked or stale review explicitly; do not describe the result as fully ready.
+9. Record only observed results. Keep failures, skipped checks, blocked checks, and unavailable verification explicit.
+10. Search for the repository's applicable PR template and contribution instructions.
+11. If one applicable template exists, preserve its structure. If multiple templates are materially ambiguous, stop the affected preparation decision rather than choosing arbitrarily.
+12. If no applicable template exists, use the fallback structure from `contexts/git/rules/pull-request.md`.
+13. Derive the title from the actual principal change and repository convention.
+14. Write the description from the final diff and evidence:
     * why;
     * what;
     * validation;
     * impact;
     * traceability/slice contribution;
     * remaining work.
-14. Determine readiness:
-    * **ready** — the PR is coherent, safe to integrate, and sufficiently evidenced for review under repository policy;
-    * **draft** — the PR can exist for collaboration but known work/evidence remains before final review;
+15. Determine readiness:
+    * **ready** — the PR is coherent, safe to integrate, and sufficiently evidenced for review under repository policy, including independent review PASS and applicable tests/lint;
+    * **draft** — preparation remains incomplete for final review; remote publication still requires all mandatory pre-creation checks;
     * **blocked** — creating/presenting the PR would be unsafe, materially misleading, or incompatible with repository policy.
-15. Recheck that PR readiness is not being used as evidence that the larger task, Product Slice, story, deployment, or release is complete.
+16. Recheck that PR readiness is not being used as evidence that the larger task, Product Slice, story, deployment, or release is complete.
 
 ### 4. Create Mode
 
@@ -173,17 +181,18 @@ Use only when remote PR creation is explicitly authorized.
    * whether an equivalent open PR already exists.
 3. If the head branch is not published, do not push it unless push is separately authorized.
 4. If an equivalent PR already exists, report/reuse it rather than creating a duplicate.
-5. Do not create a PR whose preparation state is `blocked`.
-6. Create the PR as draft when preparation indicates `draft`, unless explicit repository/user direction requires another state and doing so remains truthful.
-7. Create a ready-for-review PR only when preparation indicates `ready`.
-8. Do not infer reviewers, labels, milestones, auto-merge, merge method, or release actions from PR creation alone.
-9. After creation, fetch/inspect the remote PR and verify:
+5. Reapply **Shared Quality-Gate Discovery and Evidence** to the final remote head/base and whole PR scope. Inspect the effective hooks, explicitly executed checks, and already completed CI evidence; validate successful test/lint and established coverage checks, executing any missing non-destructive checks before creation when authorized. Do **not** count a workflow triggered only after PR creation. Require independent Code Review `PASS`, complete required coverage, and no unresolved blockers for the exact target. If any mandatory evidence is missing, stale, failed or incomplete, do not create **any** remote PR, including a draft. When a runtime explicitly orchestrates cross-context work, it may obtain new read-only review evidence and retry this check without importing Review internals into Git.
+6. Do not create a PR whose preparation state is `blocked`.
+7. Create the PR as draft when preparation indicates `draft`, unless explicit repository/user direction requires another state and doing so remains truthful.
+8. Create a ready-for-review PR only when preparation indicates `ready`.
+9. Do not infer reviewers, labels, milestones, auto-merge, merge method, or release actions from PR creation alone.
+10. After creation, fetch/inspect the remote PR and verify:
    * repository;
    * PR identity;
    * head/base;
    * title;
    * draft/ready state.
-10. Report the remote PR state without claiming merge, deployment, release, or task completion.
+11. Report the remote PR state without claiming merge, deployment, release, or task completion.
 
 ## Decomposition Signals
 
@@ -224,7 +233,7 @@ Produce:
 * applicable template source or fallback decision;
 * proposed title;
 * complete PR description;
-* observed verification evidence and limitations;
+* observed tests, lint, independent review verdict/coverage/identity, and limitations;
 * material risks, dependencies, and remaining work.
 
 ### Create mode
@@ -235,7 +244,7 @@ Produce:
 * verified head/base;
 * verified draft/ready state;
 * title and description used;
-* preparation/verification summary;
+* preparation/verification summary including evidence origins, exact revision/scope, pre-creation independent review, tests, lint and established coverage;
 * any remaining limitations or follow-up work.
 
 ## Boundaries
@@ -245,6 +254,7 @@ Produce:
 * Creating authorizes only creation of the remote PR object described by the command. It does not authorize push, history rewrite, reviewer assignment, labels, milestones, auto-merge, merge, branch deletion, release, or deployment unless separately authorized.
 * This skill may diagnose scope, test, implementation, or architecture defects, but diagnosis does not authorize changing those artifacts.
 * Do not alter the final diff merely to make the PR description look coherent unless a separate implementation authorization exists.
+* Remote PR creation must not bypass independent code review, applicable tests or lint merely because the target is a draft. Absence of a specific review engine (including OCR) is not a justification to skip native review.
 * Do not claim verification, readiness, publication, merge, release, or deployment states without corresponding evidence.
 
 ## Stop Conditions
@@ -256,6 +266,7 @@ Stop only the affected decision and report the blocker when:
 * multiple PR templates are plausible and no selection rule exists;
 * the diff cannot be reconciled with one coherent objective;
 * integration would expose incomplete behavior without required safety guarantees;
+* current independent review PASS, applicable test, or lint evidence is missing, stale, failed, or incomplete when remote creation is requested;
 * critical verification required by repository policy is unavailable or failing;
 * source intent is materially ambiguous and changes the PR boundary;
 * secrets or sensitive data would be exposed;
