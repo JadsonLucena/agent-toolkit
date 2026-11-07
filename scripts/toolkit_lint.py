@@ -168,7 +168,10 @@ def lint_toolkit(root: Path) -> list[str]:
                 if phrase not in content.lower():
                     errors.append(f"{rel}: missing team collaboration or fallback: {phrase}")
         if rel == "contexts/review/commands/review-code.md":
-            if "read-only" not in section(content, "Invocation").lower() or "read-only" not in section(content, "Boundary").lower():
+            if (
+                "invocation authorizes read-only inspection" not in section(content, "Invocation").lower()
+                or "read-only" not in section(content, "Boundary").lower()
+            ):
                 errors.append(f"{rel}: review invocation must remain read-only")
             if "does not authorize" not in authority:
                 errors.append(f"{rel}: review command must forbid out-of-scope mutations")
