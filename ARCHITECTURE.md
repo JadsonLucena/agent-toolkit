@@ -68,6 +68,12 @@ contracts/
 └── review-evidence.md
 ```
 
+## Optional Vendor Adapters
+
+`adapters/` contains noncanonical provider/runtime-specific integrations. For example, `adapters/ocr/` bridges Alibaba OpenCodeReview's **delegation-mode** file/rule discovery into structured supplemental data for Review. It is excluded from the canonical artifact matrix: adapters may consume canonical semantics, while canonical rules, skills, agents, commands and contracts must remain fully operable without them.
+
+An adapter must not claim review coverage, bypass verification, publish remote changes, install dependencies or mutate project artifacts merely because the helper exists. OCR's excluded/unaccounted paths remain in the independent review's Git inventory. Adapter failures trigger native fallback when Git context is still inspectable.
+
 ## Responsibility Model
 
 | Artifact kind | Owns | Must not own |

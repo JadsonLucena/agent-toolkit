@@ -155,6 +155,12 @@ The pre-PR gate reuses Git's shared quality-gate policy with pre-commit: discove
 * `contracts/review-evidence.md` — review target, file coverage, verified findings, risk and pre-PR review status.
 * `contracts/test-evidence.md` — scenario-to-automation coverage and verification evidence.
 
+## Optional Provider Adapters
+
+Vendor-specific adapters are runtime-facing helpers, not canonical contexts. The Alibaba OpenCodeReview integration lives in `adapters/ocr/` (see its [README](adapters/ocr/README.md)) and provides structured `delegate preview` / `delegate rule` output when OCR is already installed. It does **not** run or approve a code review.
+
+Run it against a target repository with `python3 /path/to/agent-toolkit/adapters/ocr/delegate.py --repo . --from main --to HEAD`. The host agent must still independently review the complete Git change inventory, including files OCR excludes. Missing or failing OCR never blocks native code review and never satisfies the pre-PR Code Review gate by itself.
+
 ## Commands
 
 Commands express engineering intent rather than low-level tool aliases:
