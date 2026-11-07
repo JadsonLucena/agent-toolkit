@@ -17,6 +17,9 @@ class ToolkitLintTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         shutil.copytree(ROOT / "contexts", self.root / "contexts")
         shutil.copytree(ROOT / "contracts", self.root / "contracts")
+        if (ROOT / "adapters").is_dir():
+            shutil.copytree(ROOT / "adapters", self.root / "adapters",
+                            ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         for name in ("ARCHITECTURE.md", "README.md", "MIGRATION.md"):
             shutil.copy2(ROOT / name, self.root / name)
 
@@ -32,6 +35,10 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_current_canonical_repository_passes(self):
         self.assertEqual([], lint_toolkit(self.root))
+
+    def test_missing_optional_adapter_documentation_is_reported(self):
+        (self.root / "adapters" / "ocr" / "README.md").unlink()
+        self.assert_error("broken Markdown link adapters/ocr/README.md")
 
     def test_broken_canonical_reference(self):
         self.change(
