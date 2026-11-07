@@ -6,7 +6,7 @@ Perform an independent, risk-proportionate and evidence-based review of a change
 
 ## Invocation
 
-Use to review a specified PR, branch diff, commit/range, file set, or current workspace changes. Invocation authorizes read-only inspection and non-destructive verification only where allowed by the runtime. It does not authorize remediation or PR publication.
+Use to review a specified PR, branch diff, commit/range, file set, or current workspace changes. Invocation authorizes read-only inspection and non-destructive verification only where allowed by the runtime, including risk-selected collaboration between read-only review agents if the platform supports isolation and peer messaging. It does not authorize remediation or PR publication.
 
 ## Uses
 
@@ -20,11 +20,11 @@ Use to review a specified PR, branch diff, commit/range, file set, or current wo
 
 * Explicit target or identified current workspace change, and intended comparison base when known.
 * Optional change objective, Change Boundary, requirements, scenarios, work item, ADRs, PR claims, test evidence, risk constraints or project review instructions.
-* Available repository inspection/verification capabilities; optional existing OCR or other helpers.
+* Available repository inspection/verification capabilities, optional existing OCR or other helpers, and optional agent-team messaging capabilities or explicit preference for collaborative review.
 
 ## Output
 
-A `PASS`, `FAIL`, or `INCOMPLETE` review report with reviewed base/head identity, file coverage, risk profile, verified and outstanding findings, check evidence, stale/unavailable checks, and remediation or investigation needs. A report from native review is valid without OCR.
+A `PASS`, `FAIL`, or `INCOMPLETE` review report with reviewed base/head identity, file coverage, risk profile, verified and outstanding findings, check evidence, stale/unavailable checks, actual team mode and collaboration evidence when used, and remediation or investigation needs. A report from native review is valid without OCR.
 
 ## Boundary
 

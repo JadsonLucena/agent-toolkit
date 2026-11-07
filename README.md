@@ -108,14 +108,27 @@ contexts/review/
 ├── rules/code-review.md
 ├── skills/
 │   ├── review-change/skill.md
+│   ├── coordinate-review-team/skill.md
 │   └── verify-findings/skill.md
 ├── commands/review-code.md
-└── agents/code-reviewer.md
+└── agents/
+    ├── code-reviewer.md
+    ├── specification-reviewer.md
+    ├── correctness-reviewer.md
+    ├── security-reviewer.md
+    ├── reliability-reviewer.md
+    ├── testing-reviewer.md
+    ├── architecture-reviewer.md
+    └── finding-verifier.md
 ```
 
 The Code Reviewer performs a full, independent, read-only, risk-proportionate review of Git changes. It inspects the actual diff, relevant context, requirements when supplied, tests, affected consumers, security, reliability, architecture, and integration risks. Evidence and coverage are preserved through `contracts/review-evidence.md`.
 
 Review is **native and provider-neutral**: OCR or other installed review helpers may accelerate discovery but are optional. No installation, network provider, or adapter is required for a complete native review.
+
+**Collaborative Agent Teams:** the `code-reviewer` is the **Code Review Lead**. For R2/R3 changes, it preferentially activates a small set of relevant specialists when the platform supports independent agents and **actual peer-to-peer messaging**. Specialists share evidence, ask targeted questions and challenge conclusions; a distinct finding-verifier independently attempts falsification before the lead issues the sole verdict. R0/R1 changes normally run solo. On platforms without messaging, the lead relays questions between specialist passes or reviews natively. The record distinguishes `team-live`, `team-relayed`, and `native-solo`; mere subagent parallelism is not a collaborative Agent Team.
+
+The toolkit defines the roles and `contexts/review/skills/coordinate-review-team/skill.md` messaging workflow, **not a concrete provider's agent-spawning API**. Live team coordination requires a platform adapter/runtime that supports it, while native review remains fully functional without one. Independent review cannot be established by simply renaming the implementation author's role.
 
 ### Git
 

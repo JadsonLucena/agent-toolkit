@@ -12,9 +12,22 @@ A review result should carry:
 * `context_id` and `source_refs` — optional change/slice/requirement/decision traceability without redefining source semantics;
 * `repository` and `target` — actual repository and commit/branch/workspace subject;
 * `base_sha` and `head_sha` — resolved full commit identities for a committed comparison; workspace reviews additionally declare a working-tree fingerprint or note that a stable identity could not be established;
-* `reviewer` — native review capability and any optional auxiliary tools used; tool usage is metadata, not a validity requirement;
+* `reviewer` — independent native reviewer/lead identity and any optional auxiliary tools or specialist agents used; tool/team usage is metadata, not a validity requirement;
 * `risk_profile` — R0/R1/R2/R3 or equivalent contextual classification with reasons;
 * `reviewed_at` — observation time where reliable, and `limitations`.
+
+## Optional Collaborative Team Evidence
+
+For team-based reviews, add a compact, provider-neutral collaboration record without requiring Agent Teams for valid solo reviews:
+
+* `execution_mode` — `native-solo`, `team-relayed` or `team-live`; `team-live` requires observed runtime-supported communication, not merely parallel subagent tasks;
+* `team_members` — activated roles, scoped assignments and actual participants/isolated sessions when available, including the lead and verifier if present;
+* `coordination` — relevant reviewer capability, messaging transport type, concurrency/relaying limitations, and why team mode was selected or skipped;
+* `peer_threads` — material evidence exchange: `thread_id`, `message_id`, origin/recipient, `kind`, target identity, claim, bounded code location, evidence references, question/challenge, response/resolution and open state;
+* `independent_verification` — whether verification used a distinct isolated agent or a native reviewer second pass; the label must match observed behavior;
+* `unresolved_collaboration` — interrupted specialists, unanswered high-impact challenges, source contradictions and coverage gaps.
+
+Do not serialize all agent chat transcripts or expose secrets. A team vote, helper success, or delegated file selection cannot produce `PASS` without direct coverage and verified evidence. Team results must match the same reviewed head/base; unavailable communication may fall back to native review without invalidating completed evidence.
 
 ## Coverage
 

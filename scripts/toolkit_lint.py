@@ -154,6 +154,19 @@ def lint_toolkit(root: Path) -> list[str]:
             for token in ("independent code review (pass)", "project tests", "and lint have satisfied"):
                 if token not in authority:
                     errors.append(f"{rel}: missing pre-PR quality gate for {token}")
+        if rel == "contexts/review/agents/code-reviewer.md":
+            for phrase in ("coordinate-review-team/skill.md", "peer-to-peer messages", "review lead"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing team-lead coordination: {phrase}")
+        if rel == "contexts/review/skills/review-change/skill.md":
+            if "coordinate-review-team/skill.md" not in section(content, "Uses"):
+                errors.append(f"{rel}: missing collaborative review skill composition")
+        if rel == "contexts/review/skills/coordinate-review-team/skill.md":
+            if not section(content, "Collaboration Protocol").strip():
+                errors.append(f"{rel}: missing team collaboration protocol")
+            for phrase in ("peer-to-peer", "team-relayed", "native-solo", "challenge", "one `pass`"):
+                if phrase not in content.lower():
+                    errors.append(f"{rel}: missing team collaboration or fallback: {phrase}")
         if rel == "contexts/review/commands/review-code.md":
             if "read-only" not in section(content, "Invocation").lower() or "read-only" not in section(content, "Boundary").lower():
                 errors.append(f"{rel}: review invocation must remain read-only")

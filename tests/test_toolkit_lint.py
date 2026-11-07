@@ -141,6 +141,40 @@ class ToolkitLintTests(unittest.TestCase):
         )
         self.assert_error("missing pre-PR explicit check fallback")
 
+    def test_review_team_lead_cannot_drop_coordination(self):
+        self.change(
+            "contexts/review/agents/code-reviewer.md",
+            "coordinate-review-team/skill.md",
+            "omitted-coordination.md",
+        )
+        self.assert_error("missing team-lead coordination")
+
+    def test_review_workflow_cannot_drop_collaboration_skill(self):
+        self.change(
+            "contexts/review/skills/review-change/skill.md",
+            "coordinate-review-team/skill.md",
+            "not-a-team-skill.md",
+        )
+        self.assert_error("missing collaborative review skill composition")
+
+    def test_team_messaging_and_fallback_are_required(self):
+        self.change(
+            "contexts/review/skills/coordinate-review-team/skill.md",
+            "## Collaboration Protocol",
+            "## Absent Protocol",
+        )
+        self.assert_error("missing team collaboration protocol")
+
+    def test_team_specialists_are_canonical(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        specialist_paths = (
+            "specification-reviewer", "correctness-reviewer", "security-reviewer",
+            "reliability-reviewer", "testing-reviewer", "architecture-reviewer",
+            "finding-verifier",
+        )
+        for name in specialist_paths:
+            self.assertTrue((self.root / "contexts" / "review" / "agents" / f"{name}.md").is_file())
+
     def test_review_contract_cannot_be_removed_from_architecture(self):
         self.change(
             "ARCHITECTURE.md",

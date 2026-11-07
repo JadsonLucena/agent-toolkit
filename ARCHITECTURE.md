@@ -37,9 +37,18 @@ contexts/
 │   ├── rules/code-review.md
 │   ├── skills/
 │   │   ├── review-change/skill.md
+│   │   ├── coordinate-review-team/skill.md
 │   │   └── verify-findings/skill.md
 │   ├── commands/review-code.md
-│   └── agents/code-reviewer.md
+│   └── agents/
+│       ├── code-reviewer.md
+│       ├── specification-reviewer.md
+│       ├── correctness-reviewer.md
+│       ├── security-reviewer.md
+│       ├── reliability-reviewer.md
+│       ├── testing-reviewer.md
+│       ├── architecture-reviewer.md
+│       └── finding-verifier.md
 └── git/
     ├── rules/
     │   ├── git.md
@@ -71,6 +80,8 @@ contracts/
 ## Optional Vendor Adapters
 
 `adapters/` contains noncanonical provider/runtime-specific integrations. For example, `adapters/ocr/` bridges Alibaba OpenCodeReview's **delegation-mode** file/rule discovery into structured supplemental data for Review. It is excluded from the canonical artifact matrix: adapters may consume canonical semantics, while canonical rules, skills, agents, commands and contracts must remain fully operable without them.
+
+Agent Teams runtime integration is optional as well. The Review context defines team roles and a provider-neutral messaging workflow; **actual peer-to-peer delivery, isolated agent spawning, and progress tracking require an approved runtime capable of those actions**. No Markdown file or OCR adapter creates runtime messaging by itself. Where unsupported, the lead uses relayed or native-solo review and reports the actual execution mode.
 
 An adapter must not claim review coverage, bypass verification, publish remote changes, install dependencies or mutate project artifacts merely because the helper exists. OCR's excluded/unaccounted paths remain in the independent review's Git inventory. Adapter failures trigger native fallback when Git context is still inspectable.
 
@@ -115,9 +126,17 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Testing | `agents/test-engineer.md` | Agent | Own testing specialization, evidence discipline, and scope boundaries |
 | Review | `rules/code-review.md` | Rule | Independent, risk-proportionate, evidence-driven code-review policy |
 | Review | `skills/review-change/skill.md` | Skill | Native review of a complete diff with context, coverage, risk, optional helpers, and evidence |
+| Review | `skills/coordinate-review-team/skill.md` | Skill | Risk-based Agent Team coordination, peer messaging, challenge routing, verification and native fallback |
 | Review | `skills/verify-findings/skill.md` | Skill | Falsification, verification, deduplication, and triage of candidate findings |
 | Review | `commands/review-code.md` | Command | Start read-only independent review of a bounded code change |
-| Review | `agents/code-reviewer.md` | Agent | Own review specialization, native fallback, verified findings, and evidence handoff |
+| Review | `agents/code-reviewer.md` | Agent | Lead independent reviews, select specialists, coordinate team exchanges and issue one evidence-backed verdict |
+| Review | `agents/specification-reviewer.md` | Agent | Investigate specification and contract compliance |
+| Review | `agents/correctness-reviewer.md` | Agent | Investigate behavioral correctness and regressions |
+| Review | `agents/security-reviewer.md` | Agent | Investigate security and privacy boundaries |
+| Review | `agents/reliability-reviewer.md` | Agent | Investigate data integrity, concurrency and resilience |
+| Review | `agents/testing-reviewer.md` | Agent | Investigate assertion and test/CI evidence adequacy |
+| Review | `agents/architecture-reviewer.md` | Agent | Investigate architecture, compatibility and operational constraints |
+| Review | `agents/finding-verifier.md` | Agent | Independently falsify candidate findings and challenge peer conclusions |
 | Git | `rules/git.md` | Rule | Repository-state, history, synchronization, worktree, composition, remote safety, and commit-safety verification gates |
 | Git | `rules/gitflow.md` | Rule | Gitflow applicability and branch-lifecycle invariants |
 | Git | `rules/semantic-commit.md` | Rule | Commit semantics, message structure, and atomicity invariants |
@@ -346,6 +365,7 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 
 18. Code Review is a separate, read-only context. It operates natively without required providers/adapters; OCR and similar helpers are optional. Requirements, Testing, and Git retain their own authority.
 19. Independent review, applicable tests, and lint are distinct pre-creation prerequisites for PRs. Git consumes `contracts/review-evidence.md` without depending on Review's internal procedures. Enforcing this policy requires runtime/CI controls; Markdown alone cannot block unauthorized remote creation.
+20. Review uses an optional risk-driven Agent Team, with the Code Review Lead coordinating specialist-to-specialist evidence exchange and independent falsification. R2/R3 favor relevant collaborative specialists where runtime support exists; native-solo and lead-relayed fallback remain valid. Provider-specific team orchestration is a runtime responsibility, not a requirement for canonical review.
 
 ## Framework Scope Roadmap
 
