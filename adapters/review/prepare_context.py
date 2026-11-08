@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ocr"))
-from delegate import adapter as ocr_adapter, AdapterError  # noqa: E402
+from delegate import adapter as ocr_adapter, git_inventory, AdapterError  # noqa: E402
 
 
 def prepare_context(
@@ -23,11 +23,30 @@ def prepare_context(
 ) -> dict[str, Any]:
     # Delegation mode never calls a provider LLM. OCR is allowed only by the
     # host policy; without approval use the same Git-native inventory path.
-    helper = ocr_adapter(
-        repo=repo, from_ref=base, to_ref=head, commit_ref=commit,
-        ocr_bin="ocr" if allow_ocr else "__agent_toolkit_ocr_disabled__",
-        timeout=timeout,
-    )
+    if allow_ocr:
+        helper = ocr_adapter(
+            repo=repo, from_ref=base, to_ref=head, commit_ref=commit,
+            ocr_bin="ocr", timeout=timeout,
+        )
+    else:
+        # Do not look up or execute any OCR executable when explicitly disabled.
+        if timeout < 1 or timeout > 120 or (commit is not None and not commit):
+            raise ValueError("invalid timeout or empty commit ref")
+        if bool(base) != bool(head) or (commit is not None and (base or head)):
+            raise ValueError("supply either --commit or both --from and --to")
+        repo = repo.resolve()
+        inventory = git_inventory(
+            repo=repo, timeout=timeout, from_ref=base, to_ref=head,
+            commit_ref=commit,
+        )
+        helper = {
+            "status": "disabled", "target": inventory["target"],
+            "mode": inventory["mode"], "git_changed_files": inventory["changed_files"],
+            "native_review_required_files": inventory["changed_files"],
+            "ocr_reviewable_files": [], "ocr_excluded_files": [],
+            "ocr_rule_groups": [], "ocr_unaccounted_files": [],
+            "diagnostics": [],
+        }
     return {
         "kind": "review-context", "schema_version": "1",
         "target": helper["target"], "mode": helper["mode"],

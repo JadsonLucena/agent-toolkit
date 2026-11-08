@@ -38,7 +38,8 @@ class PeerBus:
     ) -> dict[str, Any]:
         if sender not in self.roles or recipient not in self.roles or sender == recipient:
             raise TeamError("unknown or invalid peer")
-        if kind not in KINDS or not subject.strip() or not isinstance(evidence_refs, list):
+        if (kind not in KINDS or not isinstance(subject, str)
+                or not subject.strip() or not isinstance(evidence_refs, list)):
             raise TeamError("invalid peer message")
         if target_head_sha is not None and target_head_sha != self.head_sha:
             raise TeamError("stale review target")
