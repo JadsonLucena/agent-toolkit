@@ -174,6 +174,12 @@ Vendor-specific adapters are runtime-facing helpers, not canonical contexts. The
 
 Run it against a target repository with `python3 /path/to/agent-toolkit/adapters/ocr/delegate.py --repo . --from main --to HEAD`. The host agent must still independently review the complete Git change inventory, including files OCR excludes. Missing or failing OCR never blocks native code review and never satisfies the pre-PR Code Review gate by itself.
 
+Executable runtime integration examples (not additional canonical owners):
+
+* [Review context bootstrap](adapters/review/README.md) — automatically probes authorized installed OCR and preserves native Git scope; no AI review or verdict is emitted.
+* [Agent Team peer-message transport](adapters/teams/README.md) — testable cross-specialist question/challenge/response delivery for host-supplied agent handlers; in-process handlers do **not** qualify as isolated `team-live` model agents.
+* [Guarded GitHub PR creation](adapters/github/README.md) — runnable pre-creation validation of independent review evidence, final head/base and actual required tests/lint; with explicit `--create`, invokes `gh pr create` only after successful verification. This cannot prevent another client from bypassing the wrapper.
+
 ## Commands
 
 Commands express engineering intent rather than low-level tool aliases:

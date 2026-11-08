@@ -81,32 +81,40 @@ def git_inventory(*, repo: Path, timeout: int, from_ref: str | None, to_ref: str
     if commit_ref:
         mode = "commit"
         commit = git_commit(commit_ref, repo, timeout)
-        raw = git(["diff-tree", "--root", "--no-commit-id", "--name-only", "-r", "-z", commit], cwd=repo, timeout=timeout)
+        # diff-tree without -m/-c omits merge commit changes. Review changes
+        # introduced relative to the first parent (standard PR merge semantics).
+        parents = git(["rev-list", "--parents", "-n", "1", commit], cwd=repo, timeout=timeout).decode("ascii").split()
+        if not parents or parents[0] != commit:
+            raise AdapterError("could not resolve commit parents")
+        if len(parents) > 1:
+            raw = git([
+                "diff", "--no-ext-diff", "--no-textconv", "--no-renames",
+                "--name-only", "-z", parents[1], commit,
+            ], cwd=repo, timeout=timeout)
+        else:
+            raw = git([
+                "diff-tree", "--root", "--no-renames", "--no-commit-id",
+                "--name-only", "-r", "-z", commit,
+            ], cwd=repo, timeout=timeout)
         target["head_sha"] = commit
+        target["first_parent_sha"] = parents[1] if len(parents) > 1 else None
+        target["merge_commit"] = len(parents) > 2
     elif from_ref and to_ref:
         mode = "range"
         base = git_commit(from_ref, repo, timeout)
         tip = git_commit(to_ref, repo, timeout)
         merge_base = git(["merge-base", base, tip], cwd=repo, timeout=timeout).decode().strip()
         target = {"head_sha": tip, "base_sha": base, "merge_base_sha": merge_base}
-        raw = git(["diff", "--no-ext-diff", "--no-textconv", "--name-only", "-z", merge_base, tip], cwd=repo, timeout=timeout)
+        raw = git(["diff", "--no-ext-diff", "--no-textconv", "--no-renames", "--name-only", "-z", merge_base, tip], cwd=repo, timeout=timeout)
     else:
-        raw = git(["status", "--porcelain=v1", "--untracked-files=all", "-z"], cwd=repo, timeout=timeout)
-    if mode != "workspace":
-        names = [x.decode("utf-8", errors="surrogateescape") for x in raw.split(b"\x00") if x]
-    else:
-        chunks = [x for x in raw.split(b"\x00") if x]
-        names = []
-        i = 0
-        while i < len(chunks):
-            item = chunks[i]
-            if len(item) < 4 or item[2:3] != b" ":
-                raise AdapterError("unrecognized Git status output")
-            names.append(item[3:].decode("utf-8", errors="surrogateescape"))
-            # In porcelain v1 -z, renames/copies supply a second, original path.
-            if b"R" in item[:2] or b"C" in item[:2]:
-                i += 1
-            i += 1
+        # Compare the worktree to HEAD, including the index. Disable rename
+        # detection so both old and new paths are present in the native scope.
+        raw = git([
+            "diff", "--no-ext-diff", "--no-textconv", "--no-renames",
+            "--name-only", "-z", "HEAD",
+        ], cwd=repo, timeout=timeout)
+        raw += git(["ls-files", "--others", "--exclude-standard", "-z"], cwd=repo, timeout=timeout)
+    names = [x.decode("utf-8", errors="surrogateescape") for x in raw.split(b"\x00") if x]
     target["workspace_unpinned"] = mode == "workspace"
     return {"mode": mode, "target": target, "changed_files": sorted(set(names))}
 

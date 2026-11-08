@@ -1,0 +1,6 @@
+{
+  "checks": {
+    "lint": ["python3", "scripts/toolkit_lint.py"],
+    "tests": ["python3", "-m", "unittest", "discover", "-s", "tests", "-v"]
+  }
+}

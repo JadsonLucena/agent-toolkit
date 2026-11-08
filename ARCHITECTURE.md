@@ -83,6 +83,8 @@ contracts/
 
 Agent Teams runtime integration is optional as well. The Review context defines team roles and a provider-neutral messaging workflow; **actual peer-to-peer delivery, isolated agent spawning, and progress tracking require an approved runtime capable of those actions**. No Markdown file or OCR adapter creates runtime messaging by itself. Where unsupported, the lead uses relayed or native-solo review and reports the actual execution mode.
 
+`adapters/review/prepare_context.py` is an executable Review bootstrap: it automatically detects approved OCR and emits the full native Git inventory. `adapters/teams/peer_bus.py` implements bounded in-process peer messages for host-supplied role handlers, not independent model spawning or a `team-live` review. `adapters/github/guarded_pr.py` is an explicitly invoked GitHub CLI preflight-and-create adapter that validates independent review evidence and runs configured checks before any mutation through that entrypoint. No wrapper can prevent bypass through unrelated GitHub clients without separate platform authorization enforcement.
+
 An adapter must not claim review coverage, bypass verification, publish remote changes, install dependencies or mutate project artifacts merely because the helper exists. OCR's excluded/unaccounted paths remain in the independent review's Git inventory. Adapter failures trigger native fallback when Git context is still inspectable.
 
 ## Responsibility Model

@@ -116,6 +116,41 @@ class OcrAdapterTests(unittest.TestCase):
         self.assertEqual(self.head, got["target"]["head_sha"])
         self.assertEqual(["src/app.py", "tests/test_app.py"], got["native_review_required_files"])
 
+    def test_merge_commit_first_parent_inventory(self):
+        original_branch = run_git(self.repo, "symbolic-ref", "--short", "HEAD")
+        run_git(self.repo, "checkout", "-q", "-b", "side", self.base)
+        (self.repo / "side.py").write_text("side = True\n")
+        run_git(self.repo, "add", ".")
+        run_git(self.repo, "commit", "-q", "-m", "side feature")
+        run_git(self.repo, "checkout", "-q", original_branch)
+        run_git(self.repo, "merge", "-q", "--no-ff", "side", "-m", "merge feature")
+        merged = run_git(self.repo, "rev-parse", "HEAD")
+        got = adapter(repo=self.repo, ocr_bin="intentionally-missing-ocr", commit_ref=merged)
+        self.assertTrue(got["target"]["merge_commit"])
+        self.assertEqual(self.head, got["target"]["first_parent_sha"])
+        self.assertEqual(["side.py"], got["native_review_required_files"])
+
+    def test_root_commit_inventory(self):
+        got = adapter(repo=self.repo, ocr_bin="intentionally-missing-ocr", commit_ref=self.base)
+        self.assertIsNone(got["target"]["first_parent_sha"])
+        self.assertEqual(["src/app.py", "tests/test_app.py"], got["native_review_required_files"])
+
+    def test_rename_in_commit_and_range_includes_both_paths(self):
+        run_git(self.repo, "mv", "src/app.py", "src/renamed.py")
+        run_git(self.repo, "commit", "-q", "-m", "rename app")
+        rename_head = run_git(self.repo, "rev-parse", "HEAD")
+        for mode in ("commit", "range"):
+            if mode == "commit":
+                got = adapter(repo=self.repo, ocr_bin="intentionally-missing-ocr", commit_ref=rename_head)
+            else:
+                got = adapter(repo=self.repo, ocr_bin="intentionally-missing-ocr", from_ref=self.head, to_ref=rename_head)
+            self.assertEqual(["src/app.py", "src/renamed.py"], got["native_review_required_files"])
+
+    def test_rename_in_workspace_includes_both_paths(self):
+        run_git(self.repo, "mv", "src/app.py", "src/renamed.py")
+        got = adapter(repo=self.repo, ocr_bin="intentionally-missing-ocr")
+        self.assertEqual(["src/app.py", "src/renamed.py"], got["native_review_required_files"])
+
     def test_workspace_without_ocr_includes_untracked(self):
         (self.repo / "new.py").write_text("print('new')\n")
         (self.repo / "src" / "app.py").write_text("uncommitted = True\n")

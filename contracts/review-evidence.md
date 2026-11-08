@@ -71,6 +71,19 @@ Record deterministic checks separately:
 
 `PASS` means the required review was actually performed on this target, the applicable coverage and evidence are sufficient, and no review blockers remain. `FAIL` means verified blockers remain. `INCOMPLETE` means a required decision cannot be supported because scope, evidence, or material questions are unresolved. No-finding and tool exit-code success are not synonymous with `PASS`.
 
+## Optional Executable Preflight Representation
+
+A runtime that enforces Git's pre-PR gate may serialize the neutral review semantics as a JSON object (without making JSON an additional canonical contract). The GitHub reference adapter `adapters/github/guarded_pr.py` consumes the following *profile*:
+
+* `target: {base_sha, head_sha}` — full resolved Git commit identities for the reviewed PR diff;
+* `review_status: PASS`, `coverage_status: complete`, `reviewer` — actual separately executed reviewer/session identity;
+* `reviewer_independent: true` — explicit runtime-attested independence from the implementation session;
+* `changed_files` and `reviewed_files` — arrays of paths or `{path, ...}` objects; the adapter independently compares them with the exact Git diff;
+* `unreviewed_files`, `blocking_findings`, and `unresolved_questions` — empty arrays for a clean pre-creation gate;
+* `limitations` — if present, must be resolved according to applicable policy, not silently ignored.
+
+The machine representation is an **attestation, not a cryptographic proof of review**. A caller must establish evidence provenance and independent reviewer identity using its trusted runtime/approval process; fabricated JSON cannot make an otherwise self-reviewed change independently reviewed. The GitHub adapter runs project-required checks, revalidates head/base and remote publication, and only invokes `gh pr create` when expressly authorized. It does not govern PR creation outside that adapter.
+
 ## Pre-Pull-Request Consumption
 
 Git's pull-request owner may treat the review evidence as satisfying the **code-review prerequisite** only when:
