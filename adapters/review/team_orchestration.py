@@ -1,8 +1,8 @@
 """Provider-neutral, risk-sized Review Task coordination.
 
-A hosting IDE supplies REAL isolated Task calls, resume calls, and (where
-supported) a trusted direct-message audit feed. This module does not spawn
-models by itself and never manufactures an independent PASS.
+A host adapter supplies actual isolated task execution, continuations
+and, where available, a trusted direct-message audit. This reference code
+does not spawn models itself or manufacture an independent PASS.
 """
 from __future__ import annotations
 

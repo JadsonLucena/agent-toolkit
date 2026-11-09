@@ -14,7 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "adapters" / "review"))
 import run_review  # noqa: E402
 from prepare_context import prepare_context  # noqa: E402
-from team_orchestration import freeze, TeamPlanningError  # noqa: E402
+from team_orchestration import (
+    freeze, TeamPlanningError, _validate_finding, _validate_verified_finding,
+)  # noqa: E402
 
 
 def git(repo: Path, *args: str) -> str:
@@ -170,9 +172,32 @@ class PortableReviewTests(unittest.TestCase):
         )
         self.assertFalse(context["optional_helpers"]["ocr"]["rule_groups"][0]["binding"])
 
+    def test_specialist_finding_must_be_self_contained(self):
+        finding = {
+            "finding_id": "F1", "location": "service.py:1",
+            "claim": "See previous message", "trigger": "charge",
+            "evidence": "service.py:1", "consequence": "duplicate",
+            "severity": "high", "confidence": "high",
+        }
+        with self.assertRaisesRegex(TeamPlanningError, "self-contained"):
+            _validate_finding(finding, {"service.py"})
+
+    def test_verifier_must_independently_cite_source(self):
+        with self.assertRaisesRegex(TeamPlanningError, "self-contained"):
+            _validate_verified_finding({
+                "finding_id": "F1", "verification_status": "confirmed",
+                "location": "service.py:1",
+                "source_evidence": "See previous message",
+            }, {"F1"})
+
     def test_human_output_language_propagates(self):
         context = prepare_context(self.repo, allow_ocr=False, output_language="pt-BR")
         self.assertEqual("pt-BR", context["output_language"])
+        plan = freeze(
+            context, self.repo, risk_profile="R3", concerns=["security"],
+            task_available=True, isolated_tasks=True,
+        )
+        self.assertEqual("pt-BR", plan["output_language"])
 
 
 if __name__ == "__main__":

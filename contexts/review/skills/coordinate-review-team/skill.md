@@ -161,8 +161,9 @@ and `n_justification` (concerns, selected/omitted roles and N).
 implementation whose host-supplied `TaskRuntime` protocol requires an actual
 isolated Task batch, resume and optional direct-message audit. It never
 spawns an AI model itself; `run_review.py` freezes the plan for that host.
-Configuration in Cursor/another agent runtime must implement the Task adapter
-to perform the actual parallel sessions.
+Each host integrates the abstract task-batch, continuation and optional
+peer-audit capabilities through an adapter; no vendor-specific API or
+execution environment is required by the canonical workflow.
 
 ## Boundaries
 
