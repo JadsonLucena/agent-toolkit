@@ -22,6 +22,8 @@ CONCERN_ROLES = {
     "testing": "testing-reviewer",
     "architecture": "architecture-reviewer",
 }
+CONCERN_ALIASES = {"specification": "contract", "spec": "contract", "arch": "architecture"}
+CONCERN_CHOICES = frozenset(CONCERN_ROLES) | frozenset(CONCERN_ALIASES)
 BOUNDS = {"R0": (0, 0), "R1": (0, 1), "R2": (2, 4), "R3": (3, 5)}
 REQUEST_KINDS = {"question", "challenge", "escalation"}
 SUPPORTED_KINDS = REQUEST_KINDS | {"observation", "response", "resolution"}
@@ -54,10 +56,13 @@ def freeze(
     """Freeze target and assign bounded lenses BEFORE any Task call."""
     if risk_profile not in BOUNDS:
         raise TeamPlanningError("risk_profile must be R0, R1, R2 or R3")
-    if not isinstance(concerns, list) or any(c not in CONCERN_ROLES for c in concerns):
-        raise TeamPlanningError("concerns must use six known semantic names")
+    accepted = ", ".join(sorted(CONCERN_ROLES))
+    if not isinstance(concerns, list) or any(c not in CONCERN_CHOICES for c in concerns):
+        raise TeamPlanningError(f"Unknown concern; valid canonical concerns: {accepted}; aliases: spec, specification, arch")
+    raw_concerns = list(concerns)
+    concerns = [CONCERN_ALIASES.get(c, c) for c in concerns]
     if len(set(concerns)) != len(concerns):
-        raise TeamPlanningError("duplicate concerns cannot justify extra specialists")
+        raise TeamPlanningError("duplicate normalized concerns cannot justify extra specialists")
     if not isinstance(context.get("changed_files"), list) or not context["changed_files"]:
         raise TeamPlanningError("complete non-empty Git change inventory required")
     if not isinstance(context.get("target"), dict) or not isinstance(context.get("scope"), dict):
@@ -69,6 +74,7 @@ def freeze(
         fresh = git_inventory(
             repo=repo.resolve(), timeout=30, from_ref=scope.get("base_ref"),
             to_ref=scope.get("head_ref"), commit_ref=scope.get("commit_ref"),
+            base_branch=scope.get("base_branch"),
         )
     except (GitScopeError, OSError) as exc:
         raise TeamPlanningError("cannot freeze current Git target") from exc
@@ -78,8 +84,11 @@ def freeze(
         raise TeamPlanningError("workspace fingerprint missing")
     minimum, maximum = BOUNDS[risk_profile]
     selected = concerns[:maximum] if risk_profile != "R0" else []
-    if risk_profile in ("R2", "R3") and task_available and isolated_tasks and len(selected) < minimum:
-        raise TeamPlanningError(f"{risk_profile} needs {minimum}-{maximum} distinct concerns, not one all-purpose Task")
+    if risk_profile == "R2" and task_available and isolated_tasks and len(selected) < minimum:
+        raise TeamPlanningError(f"R2 needs {minimum}-{maximum} distinct concerns, not one all-purpose Task")
+    if risk_profile == "R3" and task_available and isolated_tasks and not selected:
+        raise TeamPlanningError("R3 requires at least one genuine distinct concern")
+    below_ideal = risk_profile == "R3" and 0 < len(selected) < minimum
     if risk_profile == "R1" and not concerns:
         selected = []
     # R0/R1 without a distinct concern are deliberate native-solo choices.
@@ -110,10 +119,16 @@ def freeze(
         },
         "execution_mode": mode,
         "lead_implemented_change": bool(lead_implemented_change),
+        "output_language": context.get("output_language"),
         "verifier_required": risk_profile == "R3",
         "n_justification": {
-            "distinct_concerns": list(concerns),
+            "distinct_concerns": list(concerns), "input_concerns": raw_concerns,
             "selected": len(selected), "minimum": minimum, "maximum": maximum,
+            "below_ideal_range": below_ideal,
+            "below_ideal_reason": (
+                "R3 has fewer distinct concerns than the usual range; use all real lenses and isolated verifier"
+                if below_ideal else None
+            ),
             "lead_counts_as_lens": False,
         },
     }
@@ -147,15 +162,55 @@ def _agent_prompt(role: str) -> str:
 
 
 def _assignment(plan: dict[str, Any], role: str, *, purpose: str, findings: Any = None) -> dict[str, Any]:
+    template = (Path(__file__).resolve().parents[2] /
+                "contexts/review/templates/specialist-dispatch.md").read_text(encoding="utf-8")
     return {
         "role": role, "agent_file": f"contexts/review/agents/{role}.md",
+        "dispatch_template": template,
+        "evidence_contract": "contracts/review-specialist-evidence.md",
         "agent_prompt": _agent_prompt(role), "purpose": purpose,
         "review_id": plan["review_id"], "repository": plan["repository"],
         "target": dict(plan["target"]), "risk_profile": plan["risk_profile"],
+        "output_language": plan.get("output_language"),
         "changed_files": list(plan["changed_files"]),
         "read_only": True, "findings_to_falsify": findings,
-        "instructions": "Inspect actual source and return candidate findings, covered files and uncertainty. No verdict.",
+        "instructions": (
+            "Inspect source independently. First pass must not include lead hypotheses. "
+            "Return self-contained findings with file:line, verified head, inspected files and questions. "
+            "Never refer to a previous message. No PASS/FAIL."
+        ),
     }
+
+
+def _validate_finding(finding: Any, inventory: set[str]) -> None:
+    if not isinstance(finding, dict):
+        raise TeamPlanningError("candidate finding must be a JSON object")
+    for field in ("finding_id", "location", "claim", "trigger", "evidence",
+                  "consequence", "severity", "confidence"):
+        if not isinstance(finding.get(field), str) or not finding[field].strip():
+            raise TeamPlanningError(f"candidate finding missing {field}")
+    if finding["severity"] not in {"critical", "high", "medium", "low"}:
+        raise TeamPlanningError("candidate finding severity invalid")
+    if finding["confidence"] not in {"high", "medium", "low"}:
+        raise TeamPlanningError("candidate finding confidence invalid")
+    if not any(finding["location"].startswith(path + ":") for path in inventory):
+        raise TeamPlanningError("candidate finding location must identify changed file:line")
+    for field in ("claim", "evidence", "consequence"):
+        if any(marker in finding[field].lower() for marker in ("previous message", "above message")):
+            raise TeamPlanningError("candidate findings must be self-contained")
+
+
+def _validate_verified_finding(item: Any, candidates: set[str]) -> None:
+    if not isinstance(item, dict) or item.get("finding_id") not in candidates:
+        raise TeamPlanningError("verifier returned unknown candidate")
+    if item.get("verification_status") not in {"confirmed", "supported", "unverified", "refuted"}:
+        raise TeamPlanningError("verifier must independently classify finding")
+    if not isinstance(item.get("location"), str) or ":" not in item["location"]:
+        raise TeamPlanningError("verifier missing source location")
+    if not isinstance(item.get("source_evidence"), str) or not item["source_evidence"].strip():
+        raise TeamPlanningError("verifier lacks independent source evidence")
+    if "previous message" in item["source_evidence"].lower():
+        raise TeamPlanningError("verifier result must be self-contained")
 
 
 def _validate_first_pass(replies: list[dict[str, Any]], plan: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -169,6 +224,8 @@ def _validate_first_pass(replies: list[dict[str, Any]], plan: dict[str, Any]) ->
         if not isinstance(reply, dict):
             raise TeamPlanningError("invalid Task response")
         _check_target(reply, plan)
+        if reply.get("verified_head_sha") != plan["target"]["head_sha"]:
+            raise TeamPlanningError("specialist did not confirm frozen head SHA")
         role = reply.get("role")
         task_id = reply.get("task_id")
         if role not in roles or role in grouped or not isinstance(task_id, str) or not task_id or task_id in seen_ids:
@@ -179,6 +236,11 @@ def _validate_first_pass(replies: list[dict[str, Any]], plan: dict[str, Any]) ->
                 raise TeamPlanningError(f"specialist omitted {field} array")
         if len(reply["relay_requests"]) > MAX_RELAY_REQUESTS:
             raise TeamPlanningError("too many peer requests")
+        for finding in reply["candidate_findings"]:
+            _validate_finding(finding, inventory)
+        for item in reply["uncertainties"]:
+            if not isinstance(item, str) or not item.strip():
+                raise TeamPlanningError("specialist uncertainties must be self-contained text")
         grouped[role] = reply
         seen_ids.add(task_id)
     return grouped
@@ -383,9 +445,19 @@ async def execute(
                     or verifier.get("verification_method") != "source-inspection"
                     or not isinstance(verifier.get("inspected_files"), list)
                     or not verifier.get("inspected_files")
-                    or not isinstance(verifier.get("verified_findings"), list)):
+                    or not isinstance(verifier.get("verified_findings"), list)
+                    or verifier.get("verified_head_sha") != plan["target"]["head_sha"]):
                 raise TeamPlanningError("verifier was not independently isolated or source-based")
             _paths(verifier["inspected_files"], set(plan["changed_files"]))
+            candidates = [f for item in grouped.values() for f in item["candidate_findings"]]
+            candidate_ids = {f["finding_id"] for f in candidates}
+            verified = verifier["verified_findings"]
+            if len(candidate_ids) != len(candidates) or len(verified) != len(candidate_ids):
+                raise TeamPlanningError("verifier did not inspect every distinct candidate")
+            for item in verified:
+                _validate_verified_finding(item, candidate_ids)
+            if {item["finding_id"] for item in verified} != candidate_ids:
+                raise TeamPlanningError("verifier omitted/duplicated candidate")
             verification = {"mode": "isolated-agent", "independent": True,
                             "task_id": verifier["task_id"], "inspected_files": verifier["inspected_files"]}
     return {
@@ -432,7 +504,8 @@ def finalize(
         scope = context["scope"]
         fresh = git_inventory(repo=repo.resolve(), timeout=30,
                               from_ref=scope.get("base_ref"), to_ref=scope.get("head_ref"),
-                              commit_ref=scope.get("commit_ref"))
+                              commit_ref=scope.get("commit_ref"),
+                              base_branch=scope.get("base_branch"))
         same = fresh["target"] == context["target"] and fresh["changed_files"] == context["changed_files"]
     except (GitScopeError, OSError):
         same = False
@@ -476,7 +549,7 @@ def finalize(
                 },
             }
     if verified_blockers:
-        verdict = "FAIL" if not reasons else "INCOMPLETE"
+        verdict = "FAIL"  # verified blockers dominate; preserve unresolved reasons
     else:
         verdict = "INCOMPLETE" if reasons else "PASS"
     return {

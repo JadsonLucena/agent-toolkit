@@ -43,6 +43,7 @@ class FakeTaskHost:
                 "task_id": task_id, "role": role, "review_id": request["review_id"],
                 "repository": request["repository"], "target": target,
                 "reviewed_files": list(request["changed_files"]),
+                "verified_head_sha": request["target"]["head_sha"],
                 "candidate_findings": [], "uncertainties": [], "relay_requests": [],
             }
             if self.requests and role == "correctness-reviewer":
@@ -157,9 +158,11 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(team.TeamPlanningError, "2-4 distinct concerns"):
             self.plan("R2", ["correctness"])
 
-    async def test_r3_insufficient_concerns_is_rejected_before_any_task(self):
-        with self.assertRaisesRegex(team.TeamPlanningError, "3-5 distinct concerns"):
-            self.plan("R3", ["security", "correctness"])
+    async def test_r3_two_real_concerns_are_allowed_with_verifier(self):
+        plan = self.plan("R3", ["security", "correctness"])
+        self.assertEqual(2, len(plan["selected_roles"]))
+        self.assertTrue(plan["n_justification"]["below_ideal_range"])
+        self.assertTrue(plan["verifier_required"])
 
     async def test_no_tasks_falls_back_to_real_native_solo(self):
         plan = self.plan(tasks=False)
@@ -210,7 +213,10 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
             answers = await original(requests)
             if requests[0]["role"] != "finding-verifier":
                 answers[0]["candidate_findings"] = [
-                    {"finding_id": "low-1", "severity": "low", "blocking": False},
+                    {"finding_id": "low-1", "severity": "low", "confidence": "medium",
+                     "location": "payments.py:1", "claim": "Sample low-impact concern",
+                     "trigger": "test", "evidence": "payments.py:1",
+                     "consequence": "none", "blocking": False},
                 ]
             return answers
 

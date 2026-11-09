@@ -164,11 +164,11 @@ class ReviewDispatchTests(unittest.TestCase):
     def test_r3_task_without_concerns_blocks_before_reviewer(self):
         code, out = self.call(
             "--no-ocr", "--risk-profile", "R3", "--task-capable",
-            "--isolated-subagents", "--concern", "security",
+            "--isolated-subagents",
         )
         self.assertEqual(2, code)
         self.assertEqual("INCOMPLETE", out["review_status"])
-        self.assertIn("3-5 distinct concerns", out["reason"])
+        self.assertIn("at least one genuine", out["reason"])
         self.assertFalse(self.capture.exists())
 
     def test_task_requires_frozen_risk_before_review(self):

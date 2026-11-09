@@ -91,31 +91,35 @@ def git_commit(ref: str, repo: Path, timeout: int) -> str:
     return git(["rev-parse", "--verify", "--end-of-options", f"{safe_ref(ref)}^{{commit}}"], cwd=repo, timeout=timeout).decode().strip()
 
 
-def git_inventory(*, repo: Path, timeout: int, from_ref: str | None, to_ref: str | None, commit_ref: str | None) -> dict[str, Any]:
+def git_inventory(
+    *, repo: Path, timeout: int, from_ref: str | None, to_ref: str | None,
+    commit_ref: str | None, base_branch: str | None = None,
+) -> dict[str, Any]:
+    """Git-native change inventory with explicit, read-only base selection."""
     root = Path(git(["rev-parse", "--show-toplevel"], cwd=repo, timeout=timeout).decode().strip()).resolve()
     if root != repo.resolve():
         raise GitScopeError("--repo must name the Git worktree root")
+    if base_branch and (from_ref or to_ref or commit_ref):
+        raise GitScopeError("base_branch is mutually exclusive with range/commit refs")
     head = git_commit("HEAD", repo, timeout)
     mode = "workspace"
+    warnings: list[str] = []
     target: dict[str, Any] = {"head_sha": head, "base_sha": None, "merge_base_sha": None}
+    if base_branch:
+        safe_ref(base_branch)
+        from_ref, to_ref = base_branch, "HEAD"
     if commit_ref:
         mode = "commit"
         commit = git_commit(commit_ref, repo, timeout)
-        # diff-tree without -m/-c omits merge commit changes. Review changes
-        # introduced relative to the first parent (standard PR merge semantics).
         parents = git(["rev-list", "--parents", "-n", "1", commit], cwd=repo, timeout=timeout).decode("ascii").split()
         if not parents or parents[0] != commit:
             raise GitScopeError("could not resolve commit parents")
         if len(parents) > 1:
-            raw = git([
-                "diff", "--no-ext-diff", "--no-textconv", "--no-renames",
-                "--name-only", "-z", parents[1], commit,
-            ], cwd=repo, timeout=timeout)
+            raw = git(["diff", "--no-ext-diff", "--no-textconv", "--no-renames",
+                       "--name-only", "-z", parents[1], commit], cwd=repo, timeout=timeout)
         else:
-            raw = git([
-                "diff-tree", "--root", "--no-renames", "--no-commit-id",
-                "--name-only", "-r", "-z", commit,
-            ], cwd=repo, timeout=timeout)
+            raw = git(["diff-tree", "--root", "--no-renames", "--no-commit-id",
+                       "--name-only", "-r", "-z", commit], cwd=repo, timeout=timeout)
         target["head_sha"] = commit
         target["first_parent_sha"] = parents[1] if len(parents) > 1 else None
         target["merge_commit"] = len(parents) > 2
@@ -125,19 +129,29 @@ def git_inventory(*, repo: Path, timeout: int, from_ref: str | None, to_ref: str
         tip = git_commit(to_ref, repo, timeout)
         merge_base = git(["merge-base", base, tip], cwd=repo, timeout=timeout).decode().strip()
         target = {"head_sha": tip, "base_sha": base, "merge_base_sha": merge_base}
-        raw = git(["diff", "--no-ext-diff", "--no-textconv", "--no-renames", "--name-only", "-z", merge_base, tip], cwd=repo, timeout=timeout)
+        if base_branch:
+            target["base_branch_ref"] = base_branch
+            target["base_branch_resolved_sha"] = base
+            # Never fetch or inspect the network: compare cached local refs only.
+            if not base_branch.startswith(("origin/", "refs/remotes/")):
+                branch = base_branch[len("refs/heads/"):] if base_branch.startswith("refs/heads/") else base_branch
+                try:
+                    cached = git_commit("refs/remotes/origin/" + branch, repo, timeout)
+                except GitScopeError:
+                    cached = None
+                if cached and cached != base:
+                    warnings.append(
+                        f"Local {base_branch} differs from cached origin/{branch}; "
+                        f"consider --base-branch origin/{branch}. No fetch was performed."
+                    )
+        raw = git(["diff", "--no-ext-diff", "--no-textconv", "--no-renames",
+                   "--name-only", "-z", merge_base, tip], cwd=repo, timeout=timeout)
     else:
-        # Compare the worktree to HEAD, including the index. Disable rename
-        # detection so both old and new paths are present in the native scope.
-        raw = git([
-            "diff", "--no-ext-diff", "--no-textconv", "--no-renames",
-            "--name-only", "-z", "HEAD",
-        ], cwd=repo, timeout=timeout)
+        raw = git(["diff", "--no-ext-diff", "--no-textconv", "--no-renames",
+                   "--name-only", "-z", "HEAD"], cwd=repo, timeout=timeout)
         raw += git(["ls-files", "--others", "--exclude-standard", "-z"], cwd=repo, timeout=timeout)
-    names = [x.decode("utf-8", errors="surrogateescape") for x in raw.split(b"\x00") if x]
+    names = [x.decode("utf-8", "surrogateescape") for x in raw.split(b"\x00") if x]
     target["workspace_unpinned"] = mode == "workspace"
     if mode == "workspace":
         target["workspace_fingerprint_sha256"] = workspace_fingerprint(repo, timeout)
-    return {"mode": mode, "target": target, "changed_files": sorted(set(names))}
-
-
+    return {"mode": mode, "target": target, "changed_files": sorted(set(names)), "warnings": warnings}
