@@ -39,3 +39,7 @@ First-pass specialists receive no unverified Lead hypotheses; the verifier
 independently inspects each candidate and records its source-based disposition.
 Machine field names remain English; human prose follows the project/user
 language or the explicitly provided `output_language`.
+
+## Investigation Reference
+
+Discover repository-owned, versioned conventions and honor their evidence/severity policy in `contexts/review/rules/code-review.md`; no architectural pattern is mandatory without a declared source or demonstrated fault.

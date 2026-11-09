@@ -95,3 +95,33 @@ No vendor-specific adapter files are introduced by this migration.
 * OCR-excluded paths remain required natively and system OCR rules are generic,
   nonbinding hints. Project-specific OCR rule injection was **not** added
   without an independently verified adapter capability.
+
+## 2026-11 — Advisory / Gate Profiles and Review Calibration (P13–P22)
+
+* **Profile semantics:** `review_profile=advisory|gate` is frozen with the
+  review context. Without attested independent execution, default to advisory.
+  The `review_status` enum remains PASS/FAIL/INCOMPLETE; advisory PASS is
+  labeled `PASS (advisory)` for humans and **never** satisfies a pre-PR gate.
+* **Pre-PR breaking change (intentional fail-closed):** older signed review
+  JSON missing `review_profile` is rejected. Independent signers must
+  explicitly include `"review_profile": "gate"` in the exact SSHSIG-signed
+  bytes; no reviewer flag or signature can promote advisory evidence.
+  No change to the SSHSIG namespace, trust policy or key custody.
+* **Finding fields (additive/backward-compatible):** optional
+  `likelihood=high|medium|low`, `origin=introduced|pre-existing|amplified-pre-existing`,
+  `lead_confirmed` on confirmed blockers, and `external_evidence[]`
+  (repository, pinned SHA, files, claim_supported). An amplified existing
+  risk needs evidence of increased exposure and a fix/decision-needed choice.
+  Lower-impact unresolved questions may declare `material:false`.
+* **Review depth:** calibrated impact/likelihood/confidence, R3 triggers
+  and eight falsification heuristics live in the canonical
+  `contexts/review/rules/code-review.md` and
+  `contexts/review/rules/high-risk-patterns.md`. They are not automatic
+  blockers. Requirement conflicts without valid supersession are
+  `decision-needed`; other-repository claims require pinned context.
+* **Host neutrality:** profile propagation and evidence checks are available
+  in the optional Python adapter; runtime-specific tasks, models and
+  project conventions are not new canonical format requirements.
+  Choosing whether project conventions (SOLID, DDD, Clean Architecture)
+  should be mandatory remains a **team policy proposal**, not enabled by
+  this toolkit migration.

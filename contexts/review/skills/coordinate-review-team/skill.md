@@ -29,6 +29,13 @@ verifier** must receive the same identity and read-only boundary.
 For a workspace review, hash HEAD, index, tracked changes and untracked file
 content and recheck at the end. A moving target makes evidence `INCOMPLETE`.
 
+## Review Profile
+
+Review team sizing and transport remain independent of the declared review
+profile. Follow `contexts/review/rules/code-review.md` for advisory vs gate
+independence, requirement authority, finding calibration and stop conditions;
+this skill alone owns team-sizing and relay policy.
+
 ## Team Activation
 
 Use one isolated subagent per distinct concern, with the actual corresponding

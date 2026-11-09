@@ -117,3 +117,29 @@ requirement for a specific product API. A host with isolated agents uses its
 own task creation, resume or new bounded follow-up and (if available)
 direct-delivery audit. Observability is required for `team-live`; otherwise
 use honest `team-relayed` provenance.
+
+## Advisory and Gate Profiles
+
+`review_profile` is a canonical semantic property, not a provider feature.
+The reference CLI accepts `--review-profile advisory|gate` (default:
+`advisory`). Both the two-phase and subprocess adapters use the same
+validator. Full source inspection, complete coverage and finding verification
+remain mandatory in either profile.
+
+```bash
+python3 adapters/review/run_review.py --repo . --no-ocr \
+  --review-profile advisory --prepare-only --out /tmp/review-context.json
+# An authorized host reviews and supplies /tmp/review-evidence.json.
+python3 adapters/review/run_review.py --repo . \
+  --validate-evidence /tmp/review-evidence.json \
+  --context /tmp/review-context.json
+```
+
+The machine field remains `review_status=PASS`, presented to humans as
+`PASS (advisory)`. Advisory results do not prove reviewer independence
+and cannot be signed as PR gate evidence. For a gate attempt, prepare
+with `--review-profile gate` and supply separately independent reviewer
+evidence; the Git adapter requires signed `review_profile=gate`.
+New optional finding fields are calibrated by `contexts/review/rules/code-review.md`;
+the high-risk pattern prompts in `contexts/review/rules/high-risk-patterns.md`
+do not themselves prove a defect.

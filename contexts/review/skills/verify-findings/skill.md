@@ -29,6 +29,16 @@ Preserve each raw candidate's identity and originating specialist(s), peer chall
 
 A normalized, traceable finding set under `contracts/review-evidence.md`, including raw-finding mappings, rejected reasons, unresolved concerns, and whether further verification is required.
 
+## Source and External-Context Verification
+
+Apply the single policy in `contexts/review/rules/code-review.md` for
+pinned `external-context` evidence, `amplified-pre-existing` risk, conflicting
+requirement sources, source inspection and the Lead's independent confirmation
+of blocking candidates. Use `contexts/review/rules/high-risk-patterns.md`
+only as falsification prompts, never automatic blocking criteria. Specialist
+and verifier outputs must be self-contained and anchored to inspected source;
+unavailable referenced messages are not evidence.
+
 ## Boundaries
 
 * Independent, read-only analysis; do not change code or tests, accept risk for a stakeholder, publish PR comments, or determine Git readiness.

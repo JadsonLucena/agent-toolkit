@@ -59,6 +59,7 @@ semantics of \`contracts/review-evidence.md\`. The signed profile includes:
 \`\`\`json
 {
   "repository": "org/repo",
+  "review_profile": "gate",
   "review_status": "PASS",
   "coverage_status": "complete",
   "reviewer": "reviewer@example.com",
@@ -142,3 +143,15 @@ It will fail closed if any required trust anchor or verification is unavailable.
 generates temporary SSH signing keys, tests signed/forged/stale evidence and
 protected check-policy failures, and simulates \`gh pr create\` plus subsequent
 \`gh api\` verification. No real PR is created by the tests.
+
+## Gate Profile Integrity
+
+The protected pre-PR validator accepts only SSHSIG-signed evidence explicitly
+declaring `review_profile: gate`. Signed `advisory` results, missing legacy
+profiles and independent-looking flags cannot bypass the gate. The profile
+is part of the **exact signed JSON bytes**; no adapter may retroactively
+promote an advisory finding. An advisory PASS may be useful in an IDE,
+but has no PR-creation authority. Explicitly nonmaterial questions with
+`material:false` may remain without granting false certainty about
+material unresolved issues. The signer and protected runtime remain
+responsible for actual reviewer independence.

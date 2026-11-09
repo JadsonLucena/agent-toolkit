@@ -39,3 +39,7 @@ First-pass specialists receive no unverified Lead hypotheses; the verifier
 independently inspects each candidate and records its source-based disposition.
 Machine field names remain English; human prose follows the project/user
 language or the explicitly provided `output_language`.
+
+## Investigation Reference
+
+Use `contexts/review/rules/high-risk-patterns.md` to select falsification probes for changed behavior, guards and external effects. The checklist is a heuristic, not automatic fault evidence.

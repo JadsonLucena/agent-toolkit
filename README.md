@@ -122,11 +122,11 @@ contexts/review/
     └── finding-verifier.md
 ```
 
-The Code Reviewer performs a full, independent, read-only, risk-proportionate review of Git changes. It inspects the actual diff, relevant context, requirements when supplied, tests, affected consumers, security, reliability, architecture, and integration risks. Evidence and coverage are preserved through `contracts/review-evidence.md`.
+The Code Reviewer performs a full, read-only, risk-proportionate review of Git changes in either `advisory` or independently executed `gate` profile. It inspects the actual diff, relevant context, requirements when supplied, tests, affected consumers, security, reliability, architecture, and integration risks. Evidence and coverage are preserved through `contracts/review-evidence.md`.
 
 Review is **native and provider-neutral**: OCR or other installed review helpers may accelerate discovery but are optional. No installation, network provider, or adapter is required for a complete native review.
 
-**Collaborative Agent Teams:** the `code-reviewer` is the **Code Review Lead**. For R2/R3 changes, it preferentially activates a small set of relevant specialists when the platform supports independent agents and **actual peer-to-peer messaging**. Specialists share evidence, ask targeted questions and challenge conclusions; a distinct finding-verifier independently attempts falsification before the lead issues the sole verdict. R0/R1 changes normally run solo. On platforms without messaging, the lead relays questions between specialist passes or reviews natively. The record distinguishes `team-live`, `team-relayed`, and `native-solo`; parallel isolated specialists alone are not evidence of collaboration; `team-relayed` is a collaborative team with actual Lead-mediated exchange, and `team-live` requires host-observed direct peer delivery.
+**Collaborative Agent Teams:** the `code-reviewer` is the **Code Review Lead**. For R2/R3 changes, it selects relevant isolated specialists when the runtime supports them; direct peer messaging is not required for a genuine Lead-relayed team. Specialists share evidence, ask targeted questions and challenge conclusions; a distinct finding-verifier independently attempts falsification before the lead issues the sole verdict. R0/R1 changes normally run solo. On platforms without messaging, the lead relays questions between specialist passes or reviews natively. The record distinguishes `team-live`, `team-relayed`, and `native-solo`; parallel isolated specialists alone are not evidence of collaboration; `team-relayed` is a collaborative team with actual Lead-mediated exchange, and `team-live` requires host-observed direct peer delivery.
 
 The toolkit defines the roles and `contexts/review/skills/coordinate-review-team/skill.md` messaging workflow, **not a concrete provider's agent-spawning API**. Live team coordination requires a platform adapter/runtime that supports it, while native review remains fully functional without one. Independent review cannot be established by simply renaming the implementation author's role.
 
@@ -156,7 +156,7 @@ contexts/git/
 
 Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
 
-Pull-request workflows preserve three distinct intents: planning review boundaries, preparing a truthful PR from the final diff, and explicitly creating the remote review request. **Before any remote PR is created (including draft PRs), an independent code review must PASS for the current change, and applicable project tests and lint must pass as separate prerequisites.** Missing or stale required evidence blocks creation; non-applicability must be justified. The Git context consumes review evidence but does not own Code Review.
+Pull-request workflows preserve three distinct intents: planning review boundaries, preparing a truthful PR from the final diff, and explicitly creating the remote review request. **Before any remote PR is created (including draft PRs), an explicitly signed, independently attested `review_profile=gate` review must PASS for the current change, and applicable project tests and lint must pass separately.** An advisory PASS never qualifies. Missing or stale required evidence blocks creation; non-applicability must be justified. The Git context consumes review evidence but does not own Code Review.
 
 The pre-PR gate reuses Git's shared quality-gate policy with pre-commit: discover repository checks and effective hooks, validate completed hook/CI evidence against the final head/base and full change scope, and explicitly execute missing authorized checks before PR creation. A workflow that runs only **after** PR creation does not satisfy the pre-creation gate. Coverage-enabled tests are required only when coverage is already established by the project. PRs are bounded by coherent/verifiable integration units rather than line count alone; repository PR templates take precedence over the generic fallback; and PR creation never implies push, merge, auto-merge, release, or deployment authorization.
 
@@ -176,8 +176,8 @@ Run it against a target repository with `python3 /path/to/agent-toolkit/adapters
 
 Executable runtime integration examples (not additional canonical owners):
 
-* [Review command runtime entrypoint](adapters/review/README.md) — `adapters/review/run_review.py` **always calls** `prepare_context.py` before dispatching an approved native reviewer: OCR-first by default, native-only on missing/unsupported OCR, or explicitly native-only with `--no-ocr` (no OCR adapter import). The bootstrap alone cannot issue a review verdict.
-* [Risk-sized Team orchestration and peer transport](adapters/teams/README.md) — reference `adapters/review/team_orchestration.py` freezes Git identity/fingerprint and R0–R3 risk before Task creation, selects N=0/0–1/2–4/3–5 relevant specialist lenses, relays messages via Task+resume unless peer delivery is genuinely observed, and requires source-based verification. `peer_bus.py` remains in-process only, not an isolated Agent Team.
+* [Portable Review runtime adapter](adapters/review/README.md) — `run_review.py` supports two-phase host-native and subprocess flows; both freeze context before investigation and share evidence validation. OCR remains optional; an adapter is not a canonical dependency.
+* [Risk-sized Team orchestration and peer transport](adapters/teams/README.md) — the reference `adapters/review/team_orchestration.py` implements the neutral team policy defined in `contexts/review/skills/coordinate-review-team/skill.md`. Direct messaging, host Tasks and in-process queues are distinct capabilities, never sources of review policy.
 * [Guarded GitHub PR creation](adapters/github/README.md) — validates a **detached SSH-signed independent review** against reviewer keys and check commands supplied by a deployment-protected policy, verifies the exact remote head/base and executes required checks before an explicitly authorized `gh pr create`. The newly created PR is queried and verified (including head/base SHA, title and Draft state). This cannot prevent a separate GitHub client from bypassing the wrapper; key custody and policy selection belong to the trusted runtime.
 
 ## Commands
@@ -374,3 +374,25 @@ The canonical mode/N policy belongs to
 policy to `contexts/review/rules/code-review.md`. An R3 diff with 1–2 real
 concerns is valid and still requires the source-inspecting isolated verifier
 when isolated agents are available.
+
+## Review Profiles, Calibrated Findings and Project Conventions
+
+Choose `advisory` for daily IDE or self-review when independent reviewer
+identity cannot be attested. It can return **PASS (advisory)** after full
+coverage and source verification but never unlocks PR creation. Choose
+`gate` for separately independent, signed pre-PR evidence. Machine status
+remains `PASS | FAIL | INCOMPLETE`. The Git gate accepts **only** explicitly
+signed `review_profile=gate` evidence under its protected SSHSIG policy.
+
+The normative calibration and project convention mechanisms live in
+[`contexts/review/rules/code-review.md`](contexts/review/rules/code-review.md):
+reachable severity (`critical/high/medium/low`), independent
+`likelihood` (`high/medium/low`), confidence, exposure-sensitive priority,
+requirement conflicts, pinned external evidence, and
+`introduced/pre-existing/amplified-pre-existing` origin. The eight
+counterexample-driven investigations in
+[`high-risk-patterns.md`](contexts/review/rules/high-risk-patterns.md)
+are **heuristics, not automatic blockers**. No SOLID/DDD/Clean Architecture
+rule is imposed without a project-owned, versioned convention or demonstrated
+critical defect. Host/IDE-specific conventions are adapters or optional
+repository evidence, never canonical toolkit defaults.

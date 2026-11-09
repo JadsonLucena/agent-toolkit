@@ -2,7 +2,7 @@
 
 ## Intent
 
-Perform an independent, risk-proportionate and evidence-based review of a change, producing a portable verdict and actionable findings for development or PR preparation.
+Perform an evidence-based review in the requested `advisory` or independently enforced `gate` profile, producing portable findings and a single verdict without authorizing PR creation.
 
 ## Invocation
 
@@ -20,7 +20,7 @@ Use to review a specified PR, branch diff, commit/range, file set, or current wo
 
 ## Inputs
 
-* Explicit target or identified current workspace change, and intended comparison base when known.
+* Explicit target or identified current workspace change, intended comparison base when known, and `review_profile: advisory | gate`. Choose `advisory` by default when independent execution cannot be attested; only explicit `gate` evidence can satisfy the Git pre-PR prerequisite. The Python reference CLI exposes `--review-profile`; any host can implement equivalent semantics.
 * Optional change objective, Change Boundary, requirements, scenarios, work item, ADRs, PR claims, test evidence, risk constraints or project review instructions.
 * Determine actual runtime capabilities according to `contexts/review/skills/coordinate-review-team/skill.md`. Reference CLI accepts `--risk-profile`, repeated `--concern` (`contract|correctness|security|reliability|testing|architecture`), `--task-capable`, `--isolated-subagents`, `--direct-peer-supported`, `--lead-implemented-change`, `--base-branch` and `--output-language`. Aliases: `spec|specification` → `contract`, `arch` → `architecture`.
 * Optional helper opt-out `--no-ocr` (or equivalent host-native setting) follows the mandatory behavior in `contexts/review/rules/code-review.md`.
@@ -29,7 +29,7 @@ Use to review a specified PR, branch diff, commit/range, file set, or current wo
 
 ## Output
 
-A `PASS`, `FAIL`, or `INCOMPLETE` report with frozen repo/base/head or workspace fingerprint, full file coverage, risk, actual `execution_mode`, `team_members` role/reason/Task IDs, `coordination` transport, bounded `peer_threads`, `independent_verification`, `n_justification`, verified findings, checks and unresolved questions.
+A `PASS`, `FAIL`, or `INCOMPLETE` machine verdict labeled by `review_profile` (for example `PASS (advisory)` in the human report), with the frozen target, complete scope, calibrated findings, observed checks and collaboration evidence. Format follows `contracts/review-evidence.md` and `contexts/review/templates/human-review-report.md`; checklist heuristics are never automatic blockers.
 
 ## Boundary
 

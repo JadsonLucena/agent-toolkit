@@ -81,9 +81,9 @@ contracts/
 
 `adapters/` contains noncanonical provider/runtime-specific integrations. For example, `adapters/ocr/` bridges Alibaba OpenCodeReview's **delegation-mode** file/rule discovery into structured supplemental data for Review. It is excluded from the canonical artifact matrix: adapters may consume canonical semantics, while canonical rules, skills, agents, commands and contracts must remain fully operable without them.
 
-Agent Teams runtime integration is optional as well. The Review context defines team roles and a provider-neutral messaging workflow; **actual peer-to-peer delivery, isolated agent spawning, and progress tracking require an approved runtime capable of those actions**. No Markdown file or OCR adapter creates runtime messaging by itself. Where unsupported, the lead uses relayed or native-solo review and reports the actual execution mode.
+Agent Teams runtime integration is optional as well. The Review context defines team roles and a provider-neutral messaging workflow; **actual peer-to-peer delivery, isolated agent spawning, and progress tracking require a runtime adapter capable of those actions**. No Markdown file or OCR adapter creates runtime messaging by itself. Where unsupported, the lead uses relayed or native-solo review and reports the actual execution mode.
 
-`adapters/review/run_review.py` is the reference entrypoint for canonical `/review/review-code`: it calls `prepare_context.py` **before** the approved reviewer, verifies Git head/diff or workspace fingerprint afterward, and freezes R0–R3 risk/concerns before any advertised Task spawn. Preparation prioritizes OCR >=1.9.0 when allowed and preserves neutral inventory in `adapters/review/git_scope.py`; `--no-ocr` never imports OCR. `adapters/review/team_orchestration.py` is the provider-neutral Task protocol: N=0/0–1/2–4/3–5 for R0/R1/R2/R3, with source-verifying isolated finding-verifier at R3; isolated Tasks without observed direct exchange are `team-relayed`, not `team-live`. A host must actually bind its Task API to the protocol: Markdown alone never spawns or isolates agents. `adapters/teams/peer_bus.py` implements bounded in-process peer messages with explicit request/response/resolution tracking for host-supplied role handlers, not independent model spawning or a `team-live` review. `adapters/github/guarded_pr.py` is an explicitly invoked GitHub CLI preflight-and-create adapter: it verifies SSH-signed review evidence from a key approved by an **external protected policy**, executes the policy's required checks, and verifies the created remote PR after mutation. The trusted runtime must protect signer keys, policies and their selection. No wrapper can prevent bypass through unrelated GitHub clients without separate platform authorization enforcement.
+`adapters/review/run_review.py` is the reference entrypoint for canonical `/review/review-code`: it calls `prepare_context.py` **before** the approved reviewer, verifies Git head/diff or workspace fingerprint afterward, and freezes R0–R3 risk/concerns before any advertised Task spawn. Preparation prioritizes OCR >=1.9.0 when allowed and preserves neutral inventory in `adapters/review/git_scope.py`; `--no-ocr` never imports OCR. `adapters/review/team_orchestration.py` is the provider-neutral Task protocol: risk-proportionate N from the canonical coordinate-review-team skill, including small critical diffs with fewer genuine concerns; isolated Tasks without observed direct exchange are `team-relayed`, not `team-live`. A host must actually bind its Task API to the protocol: Markdown alone never spawns or isolates agents. `adapters/teams/peer_bus.py` implements bounded in-process peer messages with explicit request/response/resolution tracking for host-supplied role handlers, not independent model spawning or a `team-live` review. `adapters/github/guarded_pr.py` is an explicitly invoked GitHub CLI preflight-and-create adapter: it verifies SSH-signed review evidence from a key approved by an **external protected policy**, executes the policy's required checks, and verifies the created remote PR after mutation. The trusted runtime must protect signer keys, policies and their selection. No wrapper can prevent bypass through unrelated GitHub clients without separate platform authorization enforcement.
 
 An adapter must not claim review coverage, bypass verification, publish remote changes, install dependencies or mutate project artifacts merely because the helper exists. OCR's excluded/unaccounted paths remain in the independent review's Git inventory. Adapter failures trigger native fallback when Git context is still inspectable.
 
@@ -126,7 +126,8 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Testing | `skills/generate-tests/skill.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
 | Testing | `commands/generate-tests.md` | Command | Start automated-test creation or modification |
 | Testing | `agents/test-engineer.md` | Agent | Own testing specialization, evidence discipline, and scope boundaries |
-| Review | `rules/code-review.md` | Rule | Independent, risk-proportionate, evidence-driven code-review policy |
+| Review | `rules/code-review.md` | Rule | Advisory/gate profiles, calibrated findings and evidence-driven Review policy |
+| Review | `rules/high-risk-patterns.md` | Rule | Eight source-grounded risk counterexamples used as investigation heuristics |
 | Review | `skills/review-change/skill.md` | Skill | Native review of a complete diff with context, coverage, risk, optional helpers, and evidence |
 | Review | `skills/coordinate-review-team/skill.md` | Skill | Risk-based Agent Team coordination, peer messaging, challenge routing, verification and native fallback |
 | Review | `skills/verify-findings/skill.md` | Skill | Falsification, verification, deduplication, and triage of candidate findings |
@@ -408,3 +409,21 @@ Canonical concerns: `contract`, `correctness`, `security`, `reliability`,
 `testing`, `architecture`. The CLI accepts aliases `spec`,
 `specification` and `arch`. `--base-branch` resolves local/cached
 refs without fetch; `--output-language` selects human report prose.
+
+## Advisory and Gate Review Semantics
+
+Canonical `contexts/review/rules/code-review.md` owns the two review
+profiles and calibrated finding policy. `advisory` can support complete
+read-only local reviews without independent session attestation; it must be
+visibly labeled and **cannot** satisfy remote PR preflight. `gate` additionally
+requires independently executed review and protected, externally verified
+SSHSIG evidence. The Git adapter rejects missing/legacy/advisory profile
+regardless of a PASS, signer or local success.
+
+`contracts/review-evidence.md` defines portable `review_profile`, optional
+`likelihood`, `origin`, `lead_confirmed`, and pinned
+`external_evidence[]`. Source-based falsification prompts live **only** in
+`contexts/review/rules/high-risk-patterns.md`, referenced by specialist
+agents rather than copied into their prompts. Repository-owned, versioned
+conventions can be discovered from existing project documentation; no
+specific IDE format, tracker, provider, model or execution engine is required.

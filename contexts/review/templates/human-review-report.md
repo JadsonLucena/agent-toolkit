@@ -1,13 +1,18 @@
-# Review Result: {{PASS|FAIL|INCOMPLETE}}
+# Review Result: {{PASS|FAIL|INCOMPLETE}} ({{advisory|gate}})
+
+The machine `review_status` remains one of PASS/FAIL/INCOMPLETE. Show
+`PASS (advisory)` to users for non-gating reviews; it never grants PR readiness.
 
 ## Blocking findings
 
-Confirmed blockers with file:line, trigger, evidence, consequence and action.
+Confirmed, Lead-inspected blockers with file:line, reachable trigger, evidence,
+consequence, likelihood, origin and recommended action. Include lead confirmation.
 If none, write "None confirmed".
 
 ## Nonblocking findings
 
-Material nonblocking findings and disposition.
+Material nonblocking findings with impact, likelihood, confidence, origin,
+exposure and disposition; list decision-needed requirement conflicts.
 
 ## Refuted candidates
 
@@ -15,7 +20,8 @@ Candidate IDs and source-supported falsification.
 
 ## Checks and coverage
 
-Check, revision, observed result, file inventory and any unreviewed paths.
+Check, revision, observed result/not-run reason, file inventory, unreviewed
+paths and any pinned external-context evidence.
 
 ## Execution metadata
 

@@ -39,3 +39,7 @@ First-pass specialists receive no unverified Lead hypotheses; the verifier
 independently inspects each candidate and records its source-based disposition.
 Machine field names remain English; human prose follows the project/user
 language or the explicitly provided `output_language`.
+
+## Investigation Reference
+
+Use the counterexamples in `contexts/review/rules/high-risk-patterns.md` for transactions, deadlines, locks, state and idempotency. Pin and qualify any external-context mitigation under `contexts/review/rules/code-review.md`.
