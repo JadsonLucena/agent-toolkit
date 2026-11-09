@@ -283,7 +283,21 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual("INCOMPLETE", incomplete["review_status"])
 
+    async def test_advisory_lead_can_report_complete_advisory_pass(self):
+        plan = self.plan(implementer=True)
+        self.assertEqual("advisory", plan["review_profile"])
+        result = await team.execute(plan, self.host())
+        final = team.finalize(
+            result, self.ctx, self.repo,
+            lead_reviewed_files=list(self.ctx["changed_files"]),
+            lead_independent=False, verified_blockers=[], unresolved_material=[],
+        )
+        self.assertEqual("PASS", final["review_status"])
+        self.assertEqual("advisory", final["review_profile"])
+        self.assertFalse(final["reviewer_independent"])
+
     async def test_implementer_lead_never_passes_even_with_isolated_team(self):
+        self.ctx["review_profile"] = "gate"
         plan = self.plan(implementer=True)
         result = await team.execute(plan, self.host())
         proof = team.finalize(

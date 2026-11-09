@@ -84,6 +84,106 @@ class PortableReviewTests(unittest.TestCase):
         self.assertEqual(0, code, result)
         self.assertEqual("PASS", result["review_status"])
 
+    def test_default_review_profile_is_advisory_without_attested_independence(self):
+        context = self.prepare()
+        self.assertEqual("advisory", context["review_profile"])
+        evidence = self.valid_evidence(context)
+        code, result = self.validate(evidence)
+        self.assertEqual(0, code, result)
+        self.assertEqual("advisory", result["review_evidence"]["review_profile"])
+        self.assertEqual("PASS (advisory)", result["review_label"])
+        self.assertFalse(result["pre_pr_review_independence_verified"])
+
+    def test_explicit_gate_profile_requires_independent_reviewer(self):
+        context = self.prepare("--review-profile", "gate")
+        evidence = self.valid_evidence(context)
+        evidence["review_profile"] = "gate"
+        code, blocked = self.validate(evidence)
+        self.assertEqual(2, code, blocked)
+        self.assertIn("independence", blocked["reason"])
+        evidence["reviewer_independent"] = True
+        code, passed = self.validate(evidence)
+        self.assertEqual(0, code, passed)
+        self.assertEqual("gate", passed["review_evidence"]["review_profile"])
+
+    def test_profile_mismatch_is_not_upgradeable(self):
+        context = self.prepare()
+        evidence = self.valid_evidence(context)
+        evidence["review_profile"] = "gate"
+        code, blocked = self.validate(evidence)
+        self.assertEqual(2, code, blocked)
+        self.assertIn("profile", blocked["reason"])
+
+    def test_optional_likelihood_and_origin_metadata_are_compatible(self):
+        context = self.prepare()
+        evidence = self.valid_evidence(context)
+        finding = {
+            "id": "f1", "likelihood": "medium", "origin": "amplified-pre-existing",
+            "amplification_reason": "New externally reachable endpoint",
+            "disposition": "decision-needed",
+        }
+        evidence["findings"] = [finding]
+        evidence["external_evidence"] = [{
+            "repository": "some/other-service", "sha": self.head,
+            "files": ["service.py"], "claim_supported": "idempotency"
+        }]
+        code, result = self.validate(evidence)
+        self.assertEqual(0, code, result)
+        self.assertEqual("medium", result["review_evidence"]["findings"][0]["likelihood"])
+        evidence["findings"][0]["likelihood"] = "certain"
+        code, result = self.validate(evidence)
+        self.assertEqual(2, code, result)
+        self.assertIn("likelihood", result["reason"])
+
+    def test_amplified_existing_risk_cannot_auto_defer(self):
+        context = self.prepare()
+        evidence = self.valid_evidence(context)
+        evidence["findings"] = [{
+            "id": "f1", "origin": "amplified-pre-existing",
+            "amplification_reason": "New high-value operation", "disposition": "defer",
+        }]
+        code, result = self.validate(evidence)
+        self.assertEqual(2, code, result)
+        self.assertIn("amplified", result["reason"])
+
+    def test_fail_requires_lead_confirmation_of_blocker(self):
+        context = self.prepare()
+        evidence = self.valid_evidence(context)
+        evidence.update(review_status="FAIL", blocking_findings=[
+            {"id": "f1", "verification_status": "confirmed", "lead_confirmed": False}
+        ])
+        code, result = self.validate(evidence)
+        self.assertEqual(2, code, result)
+        self.assertIn("lead_confirmed", result["reason"])
+        evidence["blocking_findings"][0]["lead_confirmed"] = True
+        code, result = self.validate(evidence)
+        self.assertEqual(1, code, result)
+        self.assertEqual("FAIL", result["review_status"])
+
+    def test_nonmaterial_question_does_not_turn_clean_pass_incomplete(self):
+        context = self.prepare()
+        evidence = self.valid_evidence(context)
+        evidence["unresolved_questions"] = [
+            {"question": "Preferred spelling in internal docs?", "material": False}
+        ]
+        code, result = self.validate(evidence)
+        self.assertEqual(0, code, result)
+        evidence["unresolved_questions"].append("Unknown critical authorization behavior")
+        code, result = self.validate(evidence)
+        self.assertEqual(2, code, result)
+        self.assertIn("complete", result["reason"])
+
+    def test_external_context_evidence_requires_a_pinned_revision(self):
+        context = self.prepare()
+        evidence = self.valid_evidence(context)
+        evidence["external_evidence"] = [{
+            "repository": "other", "sha": "HEAD",
+            "files": ["service.py"], "claim_supported": "fallback"
+        }]
+        code, result = self.validate(evidence)
+        self.assertEqual(2, code, result)
+        self.assertIn("external_evidence", result["reason"])
+
     def test_two_phase_wrong_head_is_blocked(self):
         context = self.prepare()
         evidence = self.valid_evidence(context)
@@ -148,7 +248,7 @@ class PortableReviewTests(unittest.TestCase):
         evidence = self.valid_evidence(context)
         evidence.update(
             review_status="FAIL",
-            blocking_findings=[{"finding_id": "F1", "verification_status": "confirmed"}],
+            blocking_findings=[{"finding_id": "F1", "verification_status": "confirmed", "lead_confirmed": True}],
             unresolved_questions=["Unverified external state"],
         )
         code, result = self.validate(evidence)

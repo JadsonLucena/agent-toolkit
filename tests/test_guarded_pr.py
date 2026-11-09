@@ -81,7 +81,7 @@ class GuardedPRTests(unittest.TestCase):
 
     def write_evidence(self, *, sign=True, **changes):
         value = {
-            "repository": "org/repo", "review_status": "PASS",
+            "repository": "org/repo", "review_profile": "gate", "review_status": "PASS",
             "coverage_status": "complete", "reviewer": self.reviewer,
             "reviewer_independent": True,
             "target": {"base_sha": self.base, "head_sha": self.head},
@@ -116,6 +116,23 @@ class GuardedPRTests(unittest.TestCase):
         self.assertTrue(result["signed_review_verified"])
         self.assertEqual({"lint", "tests"}, set(result["checks_passed"]))
         self.assertEqual(self.review_paths, result["changed_files"])
+
+    def test_signed_advisory_pass_never_satisfies_pre_pr_gate(self):
+        self.write_evidence(review_profile="advisory")
+        with self.assertRaisesRegex(gate.GateError, "gate"):
+            self.preflight()
+
+    def test_legacy_missing_profile_never_satisfies_pre_pr_gate(self):
+        self.write_evidence(review_profile=None)
+        with self.assertRaisesRegex(gate.GateError, "gate"):
+            self.preflight()
+
+    def test_nonmaterial_questions_with_explicit_material_false_are_not_gate_blockers(self):
+        self.write_evidence(unresolved_questions=[{
+            "question": "Noncritical naming preference", "material": False,
+        }])
+        outcome = self.preflight()
+        self.assertEqual(self.head, outcome["head_sha"])
 
     def test_forged_pass_without_signature_is_blocked(self):
         self.write_evidence(review_status="FAIL", sign=True)
