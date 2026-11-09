@@ -189,6 +189,22 @@ class ToolkitLintTests(unittest.TestCase):
         )
         self.assert_error("missing team collaboration protocol")
 
+    def test_review_team_requires_r3_proportional_n(self):
+        self.change(
+            "contexts/review/skills/coordinate-review-team/skill.md",
+            "R3 | 3–5 relevant roles",
+            "R3 | unlimited roles",
+        )
+        self.assert_error("missing team collaboration, proportional N or relay policy")
+
+    def test_review_team_requires_task_resume(self):
+        self.change(
+            "contexts/review/skills/coordinate-review-team/skill.md",
+            "`Task+resume`",
+            "`arbitrary sequential review`",
+        )
+        self.assert_error("missing team collaboration, proportional N or relay policy")
+
     def test_team_specialists_are_canonical(self):
         self.assertEqual([], lint_toolkit(self.root))
         specialist_paths = (

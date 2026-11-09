@@ -4,6 +4,9 @@ No OCR imports, OCR process discovery, or provider invocation exist here.
 """
 from __future__ import annotations
 
+import hashlib
+import os
+import stat
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -28,6 +31,54 @@ def git(args: list[str], *, cwd: Path, timeout: int) -> bytes:
     if len(result.stdout) > MAX_OUTPUT_BYTES or len(result.stderr) > MAX_OUTPUT_BYTES:
         raise GitScopeError("Git inventory output exceeded size limit")
     return result.stdout
+
+
+def workspace_fingerprint(repo: Path, timeout: int) -> str:
+    """Hash HEAD, index, tracked worktree diff, and untracked bytes read-only.
+
+    A workspace without a fingerprint cannot be a stable review target.
+    No Git writes (including write-tree), OCR imports or symlink traversal.
+    """
+    digest = hashlib.sha256()
+    for label, args in (
+        (b"head", ["rev-parse", "--verify", "HEAD"]),
+        (b"index", ["ls-files", "--stage", "-z"]),
+        (b"status", ["status", "--porcelain=v1", "-z", "--untracked-files=all"]),
+        (b"tracked", ["diff", "--no-ext-diff", "--no-textconv", "--binary", "HEAD"]),
+    ):
+        data = git(args, cwd=repo, timeout=timeout)
+        digest.update(label + b"\x00" + len(data).to_bytes(8, "big") + data)
+    untracked = sorted(x for x in git(
+        ["ls-files", "--others", "--exclude-standard", "-z"],
+        cwd=repo, timeout=timeout,
+    ).split(b"\x00") if x)
+    for raw in untracked:
+        relative = os.fsdecode(raw)
+        item = repo / relative
+        try:
+            mode = item.lstat().st_mode
+            if stat.S_ISLNK(mode):
+                payload = os.fsencode(os.readlink(item))
+                tag = b"symlink"
+            elif stat.S_ISREG(mode):
+                # O_NOFOLLOW prevents replacing an untracked file with a
+                # symlink to content outside the approved repository.
+                fd = os.open(item, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+                try:
+                    with os.fdopen(fd, "rb") as stream:
+                        h = hashlib.sha256()
+                        while chunk := stream.read(1024 * 1024):
+                            h.update(chunk)
+                        payload = h.digest()
+                except BaseException:
+                    raise
+                tag = b"regular-sha256"
+            else:
+                raise GitScopeError("unsupported untracked workspace object")
+        except OSError as exc:
+            raise GitScopeError(f"cannot fingerprint untracked file: {type(exc).__name__}") from exc
+        digest.update(b"untracked\x00" + raw + b"\x00" + tag + b"\x00" + payload)
+    return digest.hexdigest()
 
 
 def safe_ref(ref: str) -> str:
@@ -85,6 +136,8 @@ def git_inventory(*, repo: Path, timeout: int, from_ref: str | None, to_ref: str
         raw += git(["ls-files", "--others", "--exclude-standard", "-z"], cwd=repo, timeout=timeout)
     names = [x.decode("utf-8", errors="surrogateescape") for x in raw.split(b"\x00") if x]
     target["workspace_unpinned"] = mode == "workspace"
+    if mode == "workspace":
+        target["workspace_fingerprint_sha256"] = workspace_fingerprint(repo, timeout)
     return {"mode": mode, "target": target, "changed_files": sorted(set(names))}
 
 

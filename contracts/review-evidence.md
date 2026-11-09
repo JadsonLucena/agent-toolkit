@@ -20,12 +20,18 @@ A review result should carry:
 
 For team-based reviews, add a compact, provider-neutral collaboration record without requiring Agent Teams for valid solo reviews:
 
-* `execution_mode` — `native-solo`, `team-relayed` or `team-live`; `team-live` requires observed runtime-supported communication, not merely parallel subagent tasks;
+* `execution_mode` — `native-solo`, `team-relayed`, or `team-live`. A live designation requires **host-observed direct question/challenge + response delivery between isolated subagent IDs**; a capability flag, shared queue, lead relay or Cursor Task siblings do not suffice;
 * `team_members` — activated roles, scoped assignments and actual participants/isolated sessions when available, including the lead and verifier if present;
 * `coordination` — relevant reviewer capability, messaging transport type, concurrency/relaying limitations, and why team mode was selected or skipped;
 * `peer_threads` — material evidence exchange: `thread_id`, `message_id`, origin/recipient, `kind`, target identity, claim, bounded code location, evidence references, question/challenge, response/resolution and open state;
-* `independent_verification` — whether verification used a distinct isolated agent or a native reviewer second pass; the label must match observed behavior;
+* `independent_verification` — `{mode: isolated-agent, task_id, inspected_files}` for actual isolated source inspection, or `{mode: native-second-pass, independent: false, source_evidence}` for an observed native falsification pass; do not invent isolation;
 * `unresolved_collaboration` — interrupted specialists, unanswered high-impact challenges, source contradictions and coverage gaps.
+
+* `risk_profile` — R0–R3 fixed with repo, base/head or workspace fingerprint, complete Git changed-file inventory and separable concerns **before Task spawn**;
+* `team_members` — first-pass role, reason and actual Task ID, with lead excluded from N;
+* `n_justification` — concerns, N bound, activated/omitted roles and individual rationale;
+* `coordination` — host-observed direct exchange vs Task+resume/narrow Task relay vs none;
+* `peer_threads` — bounded evidence-linked questions, challenges, responses and resolutions, without full chats;
 
 Do not serialize all agent chat transcripts or expose secrets. A team vote, helper success, or delegated file selection cannot produce `PASS` without direct coverage and verified evidence. Team results must match the same reviewed head/base; unavailable communication may fall back to native review without invalidating completed evidence.
 

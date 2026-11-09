@@ -137,6 +137,76 @@ class ReviewDispatchTests(unittest.TestCase):
         self.assertEqual("native-fallback", result["review_evidence"]["review_preparation"]["mode"])
         self.assertTrue(self.capture.is_file())
 
+    def test_r3_team_plan_is_frozen_before_host_reviewer(self):
+        self.reviewer.write_text(
+            "import json, os, sys\n"
+            "from pathlib import Path\n"
+            "ctx=json.load(sys.stdin)\n"
+            "Path(os.environ['CAPTURE_CONTEXT_PATH']).write_text(json.dumps(ctx))\n"
+            "print(json.dumps({'review_status':'INCOMPLETE','target':ctx['target'],"
+            "'changed_files':ctx['changed_files'],'reviewed_files':[],"
+            "'unreviewed_files':ctx['changed_files'],'risk_profile':'R3',"
+            "'review_id':ctx['team_plan']['review_id']}))\n"
+        )
+        code, result = self.call(
+            "--no-ocr", "--risk-profile", "R3", "--task-capable",
+            "--isolated-subagents", "--concern", "correctness",
+            "--concern", "reliability", "--concern", "security",
+        )
+        self.assertEqual(1, code, result)
+        captured = json.loads(self.capture.read_text())
+        plan = captured["team_plan"]
+        self.assertEqual("R3", plan["risk_profile"])
+        self.assertEqual(3, len(plan["selected_roles"]))
+        self.assertEqual("team-relayed", plan["execution_mode"])
+        self.assertEqual(captured["target"], plan["target"])
+
+    def test_r3_task_without_concerns_blocks_before_reviewer(self):
+        code, out = self.call(
+            "--no-ocr", "--risk-profile", "R3", "--task-capable",
+            "--isolated-subagents", "--concern", "security",
+        )
+        self.assertEqual(2, code)
+        self.assertEqual("INCOMPLETE", out["review_status"])
+        self.assertIn("3-5 distinct concerns", out["reason"])
+        self.assertFalse(self.capture.exists())
+
+    def test_task_requires_frozen_risk_before_review(self):
+        code, out = self.call("--no-ocr", "--task-capable")
+        self.assertEqual(2, code)
+        self.assertIn("risk_profile must be classified", out["reason"])
+        self.assertFalse(self.capture.exists())
+
+    def test_r3_team_cannot_claim_pass_without_task_ids(self):
+        code, out = self.call(
+            "--no-ocr", "--risk-profile", "R3", "--task-capable",
+            "--isolated-subagents", "--concern", "correctness",
+            "--concern", "reliability", "--concern", "security",
+        )
+        self.assertEqual(2, code)
+        self.assertIn("frozen team or risk identity", out["reason"])
+
+    def test_workspace_mutation_during_review_invalidates_pass(self):
+        self.reviewer.write_text(
+            "import json, sys\n"
+            "from pathlib import Path\n"
+            "ctx=json.load(sys.stdin)\n"
+            "Path('new-untracked.txt').write_text('changed while reviewing')\n"
+            "print(json.dumps({'review_status':'PASS','coverage_status':'complete',"
+            "'target':ctx['target'],'changed_files':ctx['changed_files'],"
+            "'reviewed_files':ctx['changed_files'],'unreviewed_files':[],"
+            "'blocking_findings':[],'unresolved_questions':[]}))\n"
+        )
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = runner.main([
+                "--repo", str(self.repo), "--no-ocr", "--", sys.executable, str(self.reviewer),
+            ])
+        self.assertEqual(2, code)
+        result = json.loads(out.getvalue())
+        self.assertEqual("INCOMPLETE", result["review_status"])
+        self.assertIn("fingerprint changed during review", result["reason"])
+
     def test_missing_reviewer_command_does_not_claim_pass(self):
         with self.assertRaisesRegex(runner.ReviewInvocationError, "approved host reviewer"):
             runner.dispatch({"changed_files": [], "target": {}}, repo=self.repo, reviewer_command=[])

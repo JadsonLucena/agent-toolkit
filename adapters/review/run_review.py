@@ -15,7 +15,8 @@ from pathlib import Path
 from typing import Any
 
 from prepare_context import prepare_context
-from git_scope import GitScopeError
+from git_scope import GitScopeError, git_inventory
+from team_orchestration import TeamPlanningError, freeze
 
 MAX_RESULT_BYTES = 4 * 1024 * 1024
 
@@ -36,14 +37,27 @@ def review_paths(items: Any, name: str) -> set[str]:
     return result
 
 
+def assert_target_fresh(context: dict[str, Any], repo: Path) -> None:
+    scope = context.get("scope")
+    if not isinstance(scope, dict):
+        raise ReviewInvocationError("unfrozen review scope")
+    current = git_inventory(
+        repo=repo.resolve(), timeout=30, from_ref=scope.get("base_ref"),
+        to_ref=scope.get("head_ref"), commit_ref=scope.get("commit_ref"),
+    )
+    if current["target"] != context["target"] or current["changed_files"] != context["changed_files"]:
+        raise ReviewInvocationError("Git target or workspace fingerprint changed during review")
+
+
 def dispatch(
     context: dict[str, Any], *, repo: Path, reviewer_command: list[str],
     timeout: int = 300,
 ) -> dict[str, Any]:
     if not reviewer_command or not reviewer_command[0] or timeout < 1 or timeout > 3600:
         raise ReviewInvocationError("approved host reviewer command and bounded timeout are required")
-    # Preparation already happened: the host reviewer cannot be invoked before
-    # the full Git scope and optional OCR rule delegation are known.
+    # Preparation and, where requested, risk/team planning happen before any
+    # host reviewer may spawn subagents.
+    assert_target_fresh(context, repo)
     request = json.dumps(context, ensure_ascii=False).encode("utf-8")
     try:
         result = subprocess.run(
@@ -79,6 +93,45 @@ def dispatch(
         if (evidence.get("coverage_status") != "complete" or not expected <= reviewed
                 or not_reviewed or evidence.get("blocking_findings") or evidence.get("unresolved_questions")):
             raise ReviewInvocationError("reviewer claimed PASS without complete native review evidence")
+    plan = context.get("team_plan")
+    if plan is not None:
+        if evidence.get("review_id") != plan["review_id"] or evidence.get("risk_profile") != plan["risk_profile"]:
+            raise ReviewInvocationError("reviewer omitted frozen team or risk identity")
+        if verdict == "PASS":
+            if plan["lead_implemented_change"] or evidence.get("reviewer_independent") is not True:
+                raise ReviewInvocationError("implementer/self-review cannot claim independent PASS")
+            if plan["execution_mode"] == "team-relayed":
+                members = evidence.get("team_members")
+                if (not isinstance(members, list)
+                        or {m.get("role") for m in members if isinstance(m, dict)}
+                        != set(plan["selected_roles"])
+                        or not all(isinstance(m, dict) and m.get("task_id") for m in members)):
+                    raise ReviewInvocationError("missing isolated specialist Task evidence")
+                observed_mode = evidence.get("execution_mode")
+                if observed_mode not in ("team-relayed", "team-live"):
+                    raise ReviewInvocationError("subagents available but reviewer claimed native-solo")
+                coordination = evidence.get("coordination")
+                if not isinstance(coordination, dict):
+                    raise ReviewInvocationError("missing real collaboration transport evidence")
+                if observed_mode == "team-live":
+                    if not coordination.get("real_peer_delivery_observed") or not evidence.get("peer_threads"):
+                        raise ReviewInvocationError("team-live without observed direct peer delivery")
+                else:
+                    if coordination.get("transport") not in ("Task+resume", "Task (no relay needed)"):
+                        raise ReviewInvocationError("team-relayed without Task+resume provenance")
+            elif evidence.get("execution_mode") != "native-solo":
+                raise ReviewInvocationError("reviewer fabricated team without runtime capability")
+            if plan["risk_profile"] == "R3":
+                verification = evidence.get("independent_verification")
+                if not isinstance(verification, dict):
+                    raise ReviewInvocationError("R3 lacks independent verification evidence")
+                if plan["execution_mode"] == "team-relayed":
+                    if verification.get("mode") != "isolated-agent" or not verification.get("task_id"):
+                        raise ReviewInvocationError("R3 with Task requires isolated finding-verifier")
+                elif verification.get("mode") != "native-second-pass" or not verification.get("source_evidence"):
+                    raise ReviewInvocationError("R3 native fallback requires source-based second pass")
+    # Review evidence is valid only for the same source snapshot at completion.
+    assert_target_fresh(context, repo)
     # Never trust a reviewer to rewrite helper execution history.
     evidence["optional_helpers"] = context["optional_helpers"]
     evidence["review_preparation"] = {
@@ -105,6 +158,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-ocr", action="store_true")
     ap.add_argument("--timeout", type=int, default=300)
     ap.add_argument("--ocr-timeout", type=int, default=30)
+    ap.add_argument("--risk-profile", choices=("R0", "R1", "R2", "R3"))
+    ap.add_argument("--concern", action="append", default=[])
+    ap.add_argument("--task-capable", action="store_true")
+    ap.add_argument("--isolated-subagents", action="store_true")
+    ap.add_argument("--direct-peer-supported", action="store_true")
+    ap.add_argument("--lead-implemented-change", action="store_true")
     ap.add_argument("reviewer_command", nargs=argparse.REMAINDER,
                     help="-- <approved-host-reviewer-executable> [args...]")
     args = ap.parse_args(argv)
@@ -117,8 +176,18 @@ def main(argv: list[str] | None = None) -> int:
             args.repo, base=args.base, head=args.head, commit=args.commit,
             allow_ocr=not args.no_ocr, timeout=args.ocr_timeout,
         )
+        if args.task_capable and not args.risk_profile:
+            raise TeamPlanningError("risk_profile must be classified before Task spawn")
+        if args.risk_profile is not None:
+            context["team_plan"] = freeze(
+                context, args.repo, risk_profile=args.risk_profile,
+                concerns=args.concern, task_available=args.task_capable,
+                isolated_tasks=args.isolated_subagents or args.task_capable,
+                direct_peer_supported=args.direct_peer_supported,
+                lead_implemented_change=args.lead_implemented_change,
+            )
         result = dispatch(context, repo=args.repo, reviewer_command=command, timeout=args.timeout)
-    except (GitScopeError, ReviewInvocationError, ValueError, OSError) as exc:
+    except (GitScopeError, TeamPlanningError, ReviewInvocationError, ValueError, OSError) as exc:
         print(json.dumps({
             "kind": "review-invocation", "review_status": "INCOMPLETE",
             "reason": str(exc), "pre_pr_review_independence_verified": False,

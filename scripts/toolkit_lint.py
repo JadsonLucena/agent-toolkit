@@ -164,9 +164,11 @@ def lint_toolkit(root: Path) -> list[str]:
         if rel == "contexts/review/skills/coordinate-review-team/skill.md":
             if not section(content, "Collaboration Protocol").strip():
                 errors.append(f"{rel}: missing team collaboration protocol")
-            for phrase in ("peer-to-peer", "team-relayed", "native-solo", "challenge", "one `pass`"):
+            for phrase in ("peer-to-peer", "team-relayed", "native-solo", "challenge", "one `pass`",
+                           "r2", "2–4", "r3", "3–5", "task", "task+resume",
+                           "before any spawn", "n_justification", "finding-verifier"):
                 if phrase not in content.lower():
-                    errors.append(f"{rel}: missing team collaboration or fallback: {phrase}")
+                    errors.append(f"{rel}: missing team collaboration, proportional N or relay policy: {phrase}")
         if rel == "contexts/review/commands/review-code.md":
             if (
                 "invocation authorizes read-only inspection" not in section(content, "Invocation").lower()

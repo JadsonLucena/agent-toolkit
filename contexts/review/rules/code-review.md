@@ -8,14 +8,14 @@
 * Evidence precedes assertions. Do not claim tests passed, checks succeeded, requirements were met, or a change is safe without relevant evidence bound to the examined state.
 * Judge concrete reachable consequences, not checklist compliance. A code smell, metric, pattern preference, or undocumented speculative future use is not by itself a defect.
 * Balance completeness with cost. Review depth is risk-proportionate; do not require every specialist or test technique for every change.
-* Prefer a **collaborative Agent Team** for material R2/R3 cross-domain reviews when the runtime supports agent isolation, direct peer messaging and bounded parallel tasks. R0/R1 normally use a solo reviewer. The same native investigation and evidence standards hold when team support is unavailable.
+* Prefer a **risk-sized Agent Team** for R2/R3 when isolated Task/subagents exist, even when siblings cannot send direct messages. Prefer `team-live` only with host-observed direct peer-to-peer challenge/response; otherwise `team-relayed` through the lead. Use `native-solo` only if subagents are unavailable or R0/R1 has no separable concern. Never replace a 2–5-person review with one all-purpose R2/R3 Task merely because direct messaging is absent.
 * Only an independently executed reviewer can satisfy the independence requirement; assigning another role to the implementation author's same session does not make a review independent. A verifier must reexamine evidence rather than accept other agents' consensus.
 * Keep review findings, verification evidence, risk decisions, and the Git PR readiness decision separate. Review produces `contracts/review-evidence.md`; Git owns remote PR creation.
 * Repository-specific rules and enforceable project conventions take precedence over generic preferences when they preserve critical safety guarantees. A narrower local rule must not silently remove security, data-integrity, or evidence obligations.
 
 ## Scope, Coverage, and Risk
 
-* Establish the exact review target: base/head SHA or explicit working-tree snapshot. Record any uncommitted or unavailable state.
+* **Before any Task spawn:** freeze repository identity, exact base/head or workspace fingerprint (HEAD, index, tracked diff, untracked content), full Git file inventory, R0–R3 risk profile and distinct concerns. Give every specialist and verifier identical target identity and recheck freshness before the final decision.
 * Inventory the full changed-file set before excluding or grouping files. Record per-file disposition: `reviewed`, `excluded` with reason, `not-reviewed`, or `blocked`. Do not calculate coverage using only a silently filtered denominator.
 * Review all reviewable changed files and relevant dependent code. For large diffs, partition or escalate rather than silently skip.
 * Classify risk using observable impacts, with R0 (non-behavioral), R1 (local), R2 (cross-boundary or material operational impact), and R3 (critical safety, security, privacy, compliance, financial/data integrity) as optional profiles. Small diffs can be R3.
@@ -24,8 +24,8 @@
 
 ## Team Collaboration Integrity
 
-* The Code Review Lead owns risk-driven team composition, the immutable change identity, complete changed-file inventory, bounded assignments and the single final verdict. Specialists own only scoped investigative claims and may challenge each other; they may not individually approve the review.
-* Permit parallel independent lenses and **targeted peer-to-peer dialogue** through the approved runtime. Exchange bounded questions, evidence, counterexamples and requests for verification, not unfiltered full transcripts. When direct messaging is unsupported, relay questions through the lead or review sequentially; report the actual execution mode truthfully.
+* The Code Review Lead owns risk-based selection and one final verdict; the lead is **not a specialist lens**. First pass: R0=0 specialists, R1=0–1 (one only for a distinct concern), R2=2–4, R3=3–5. Choose one isolated Task per distinct concern from specification, correctness, security, reliability, testing and architecture; never spawn all six plus verifier as a default. R3 always requests an isolated `finding-verifier` if Task is available; R2 requests one for material findings; R1 for blocker candidates. Unjustified N or missing distinct concerns is a planning gap, not permission to pad or shrink the team.
+* **Parallel first pass:** dispatch all selected specialist Tasks in the same host turn with immutable identity and canonical agent prompts. **Relayed second pass:** when direct messaging is not observed (including Cursor Task siblings), the lead forwards structured questions/challenges via resume on the same subagent ID, or a new narrow Task with actual ID. The third pass is source-inspecting falsification by an isolated verifier or transparently labeled `native-second-pass`. Preserve real transport, source evidence, unresolved threads and non-consensus decisions.
 * Preserve authorship and provenance for each material observation, challenge, answer and unresolved conflict. Peer agreement is not proof; a specialist's finding must be source-verified and material disagreement cannot be voted away.
 * A failed team mechanism does not block an otherwise complete independent native review, but a lost mandatory file, stale target, unaddressed high-impact challenge or unverifiable evidence makes the result INCOMPLETE.
 

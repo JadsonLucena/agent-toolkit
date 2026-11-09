@@ -32,6 +32,50 @@ python3 /path/to/agent-toolkit/adapters/review/run_review.py \
 
 The bridge uses OCR's **delegation** capabilities (file selection and rule resolution), **not a separate OCR LLM Code Review**. A host reviewer remains responsible for the entire native analysis, even of OCR-excluded test files, and supplies the final `PASS`, `FAIL`, or `INCOMPLETE`. An executable returning OCR hints cannot count as reviewed evidence.
 
+## Team planning and isolated Task adapter
+
+Before **any** Task spawn, the Code Review Lead classifies risk and supplies
+separable concerns. The runner freezes the Git target including a SHA-256
+workspace fingerprint when reviewing uncommitted changes.
+
+Example for an R3 payment/authorization change with Cursor-like isolated Tasks:
+
+```bash
+python3 /path/to/agent-toolkit/adapters/review/run_review.py \
+  --repo . --from main --to HEAD \
+  --risk-profile R3 \
+  --concern correctness --concern reliability --concern security \
+  --task-capable \
+  -- /path/to/host-reviewer-with-task-api
+```
+
+`--task-capable` asserts that the runtime supplies *isolated* subagents. Do
+not set it for in-process function calls or ordinary subprocesses; doing so
+does not create real subagents. In Cursor, each selected specialist is a
+separate `Task` within one first-pass turn; the Code Review Lead relays
+question/challenge to the same subagent via `resume`, or creates a new
+narrow Task if resume is not supported. No direct sibling messaging is
+implied. With isolated Tasks but no host-observed direct exchange, the
+execution mode is `team-relayed`. `team-live` is permitted only when an
+approved runtime audit proves direct peer request AND response delivery.
+
+The host's authorized reviewer process imports
+`adapters/review/team_orchestration.py` and implements the `TaskRuntime`
+protocol: `task_batch(requests)`, `resume(task_id, message)`, and optional
+`direct_message_audit(review_id)`. The module freezes the plan **before**
+the first batch, validates common target and distinct task IDs, enforces
+R0=0, R1=0–1, R2=2–4, R3=3–5 specialists plus conditional/mandatory
+isolated verifier, relays bounded evidence threads, and returns only
+candidate evidence until the lead reconciles every file.
+
+`run_review.py` forwards the frozen `team_plan` to the reviewer and
+checks team/risk identity and the minimum evidence for a claimed `PASS`.
+The runner **cannot itself invoke Cursor's internal Task API**: the approved
+host must supply this protocol. Without that binding, a `--task-capable`
+claim is invalid and must not be used. Implementation authors must use a
+separately independent review lead/session; isolated lenses do not erase
+the lead's authorship.
+
 ## Reviewer contract
 
 The host reviewer receives a single `review-context` JSON object on stdin with `target`, `changed_files`, `review_required_files`, and `optional_helpers.ocr`. It writes an object conforming to `contracts/review-evidence.md` on stdout, including `review_status`, `target`, `changed_files`, `reviewed_files` and `unreviewed_files`.

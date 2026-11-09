@@ -56,6 +56,8 @@ def prepare_context(
         }
     return {
         "kind": "review-context", "schema_version": "1",
+        "repository": str(repo.resolve()),
+        "scope": {"base_ref": base, "head_ref": head, "commit_ref": commit},
         "target": helper["target"], "mode": helper["mode"],
         "changed_files": helper["git_changed_files"],
         "review_required_files": helper["native_review_required_files"],

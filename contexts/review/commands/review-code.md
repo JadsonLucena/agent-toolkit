@@ -22,14 +22,14 @@ Use to review a specified PR, branch diff, commit/range, file set, or current wo
 
 * Explicit target or identified current workspace change, and intended comparison base when known.
 * Optional change objective, Change Boundary, requirements, scenarios, work item, ADRs, PR claims, test evidence, risk constraints or project review instructions.
-* Available repository inspection/verification capabilities, optional existing OCR or other helpers, and optional agent-team messaging capabilities or explicit preference for collaborative review.
+* Available repository inspection, OCR and actual Task/subagent capabilities. The lead must classify R0–R3 risk and separable concerns before any spawn. The executable planner accepts `--risk-profile`, repeated `--concern`, `--task-capable`, `--isolated-subagents`, `--direct-peer-supported` and `--lead-implemented-change`. In Cursor Task without observed direct messaging the default is `team-relayed`, not native-solo.
 * Optional flag `--no-ocr` propagated **unchanged** to the runtime runner. When present, use only neutral Git inventory and native review: never import the OCR adapter, check `ocr --version`, call `ocr delegate`, or require OCR. Record `optional_helpers.ocr.status=disabled`.
 
 **Default ordering (without `--no-ocr`):** run the preparation bootstrap **before reviewing code**; check OCR availability and version (>= 1.9.0), resolve OCR file selection/rules when available, and then perform the complete native review using the original Git inventory and supplemental OCR context. OCR errors or absence trigger native-only fallback. OCR delegation is a deterministic helper, not a separately executed LLM review or source of a verdict. The invocation must never report successful review based only on `prepare_context.py` output.
 
 ## Output
 
-A `PASS`, `FAIL`, or `INCOMPLETE` review report with reviewed base/head identity, file coverage, risk profile, verified and outstanding findings, check evidence, stale/unavailable checks, actual team mode and collaboration evidence when used, and remediation or investigation needs. A report from native review is valid without OCR.
+A `PASS`, `FAIL`, or `INCOMPLETE` report with frozen repo/base/head or workspace fingerprint, full file coverage, risk, actual `execution_mode`, `team_members` role/reason/Task IDs, `coordination` transport, bounded `peer_threads`, `independent_verification`, `n_justification`, verified findings, checks and unresolved questions.
 
 ## Boundary
 

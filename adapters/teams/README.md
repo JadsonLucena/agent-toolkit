@@ -58,3 +58,19 @@ collection and authorization controls).
 
 \`tests/test_team_transport.py\` covers genuine in-process exchanges and
 failure paths. It does **not** assert a live provider/model integration.
+
+
+## Risk-sized Task orchestration versus the message bus
+
+The in-process `peer_bus.py` is a deterministic **transport test double**,
+not isolated subagents. For production-grade collaboration, the reference
+orchestrator lives in [`adapters/review/team_orchestration.py`](../review/team_orchestration.py).
+It accepts host-created **isolated** `Task` identities and launches all
+first-pass roles as one `task_batch`, enforcing R2=2–4 and R3=3–5 relevant
+lenses, followed by an isolated `finding-verifier` for R3.
+
+If a provider such as Cursor exposes Task/resume but no direct peer messages,
+use `team-relayed` and record each lead-forwarded challenge and response.
+Only a provider's direct-delivery audit may establish `team-live`.
+An Agent Team's votes never create a review `PASS` without an independent
+lead's complete file coverage and source verification.
