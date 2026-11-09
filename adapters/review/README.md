@@ -8,8 +8,7 @@ python3 /path/to/agent-toolkit/adapters/review/prepare_context.py \
   --repo . --from main --to HEAD
 \`\`\`
 
-It **automatically detects** an already-installed OCR executable and, when
-available, runs the *LLM-free* delegation commands. The returned JSON includes
+It **automatically detects** an already-installed OCR executable, verifies version >= 1.9.0, and, when compatible, runs the *LLM-free* delegation commands. The returned JSON includes
 Git's full independent file inventory, OCR-selected and OCR-excluded files,
 and optional resolved rules.
 

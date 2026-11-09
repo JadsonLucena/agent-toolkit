@@ -65,7 +65,9 @@ class PeerBus:
         if response_to and not previous:
             raise TeamError("response_to references unknown message")
 
-        thread = self.threads.get(thread_id or (previous and previous["thread_id"]))
+        if previous and thread_id is None:
+            thread_id = previous["thread_id"]
+        thread = self.threads.get(thread_id)
         if kind in OPEN_REQUESTS:
             if thread_id is not None or response_to is not None:
                 raise TeamError("new review requests must open their own thread")

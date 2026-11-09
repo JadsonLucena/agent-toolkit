@@ -82,7 +82,7 @@ A runtime that enforces Git's pre-PR gate may serialize the neutral review seman
 * `unreviewed_files`, `blocking_findings`, and `unresolved_questions` — empty arrays for a clean pre-creation gate;
 * `limitations` — if present, must be resolved according to applicable policy, not silently ignored.
 
-The machine representation is an **attestation, not a cryptographic proof of review**. A caller must establish evidence provenance and independent reviewer identity using its trusted runtime/approval process; fabricated JSON cannot make an otherwise self-reviewed change independently reviewed. The GitHub adapter runs project-required checks, revalidates head/base and remote publication, and only invokes `gh pr create` when expressly authorized. It does not govern PR creation outside that adapter.
+The GitHub adapter requires an SSHSIG **detached signature over the exact JSON evidence bytes** with namespace `agent-toolkit-code-review`. An externally protected trust policy defines approved reviewer public keys, identities and all mandatory test/lint commands. A signature authenticates key possession and evidence integrity; human/session independence also requires protected key custody, reviewer authorization and a trusted runtime (an author's arbitrary self-attestation is insufficient). The adapter refuses unsigned/tampered evidence or untrusted check substitution, validates head/base and required checks, and verifies the resulting GitHub PR after an explicit `--create`. It does not govern operations outside that adapter; other hosting providers may implement the same semantics without SSHSIG.
 
 ## Pre-Pull-Request Consumption
 
