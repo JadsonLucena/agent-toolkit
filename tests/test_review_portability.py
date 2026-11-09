@@ -191,7 +191,10 @@ class PortableReviewTests(unittest.TestCase):
             }, {"F1"})
 
     def test_human_output_language_propagates(self):
-        context = prepare_context(self.repo, allow_ocr=False, output_language="pt-BR")
+        context = prepare_context(
+            self.repo, base=self.base, head=self.head,
+            allow_ocr=False, output_language="pt-BR",
+        )
         self.assertEqual("pt-BR", context["output_language"])
         plan = freeze(
             context, self.repo, risk_profile="R3", concerns=["security"],
