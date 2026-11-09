@@ -283,6 +283,55 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual("INCOMPLETE", incomplete["review_status"])
 
+    async def test_blocker_requires_lead_source_confirmation_before_fail(self):
+        plan = self.plan()
+        result = await team.execute(plan, self.host())
+        evidence = {
+            "finding_id": "F1", "verification_status": "confirmed",
+            "location": "payments.py:1", "lead_confirmed": False,
+        }
+        incomplete = team.finalize(
+            result, self.ctx, self.repo,
+            lead_reviewed_files=list(self.ctx["changed_files"]),
+            lead_independent=True, verified_blockers=[evidence], unresolved_material=[],
+        )
+        self.assertEqual("INCOMPLETE", incomplete["review_status"])
+        self.assertIn("lead-confirmed", str(incomplete["unresolved_questions"]))
+        evidence["lead_confirmed"] = True
+        failed = team.finalize(
+            result, self.ctx, self.repo,
+            lead_reviewed_files=list(self.ctx["changed_files"]),
+            lead_independent=True, verified_blockers=[evidence], unresolved_material=[],
+        )
+        self.assertEqual("FAIL", failed["review_status"])
+
+    async def test_explicit_nonmaterial_questions_do_not_prevent_advisory_pass(self):
+        plan = self.plan()
+        result = await team.execute(plan, self.host())
+        clean = team.finalize(
+            result, self.ctx, self.repo,
+            lead_reviewed_files=list(self.ctx["changed_files"]),
+            lead_independent=True, verified_blockers=[],
+            unresolved_material=[{"question": "Optional display wording", "material": False}],
+        )
+        self.assertEqual("PASS", clean["review_status"])
+        self.assertEqual(1, len(clean["unresolved_questions"]))
+
+    async def test_likelihood_metadata_is_optional_but_invalid_values_rejected(self):
+        valid = {
+            "finding_id": "F1", "location": "payments.py:1",
+            "claim": "Concurrent commit", "trigger": "retry",
+            "evidence": "payments.py:1", "consequence": "duplicate",
+            "severity": "high", "confidence": "medium",
+            "likelihood": "low", "origin": "amplified-pre-existing",
+            "amplification_reason": "New financial operation",
+            "disposition": "decision-needed",
+        }
+        team._validate_finding(valid, {"payments.py"})
+        valid["likelihood"] = "guaranteed"
+        with self.assertRaisesRegex(team.TeamPlanningError, "likelihood"):
+            team._validate_finding(valid, {"payments.py"})
+
     async def test_advisory_lead_can_report_complete_advisory_pass(self):
         plan = self.plan(implementer=True)
         self.assertEqual("advisory", plan["review_profile"])
