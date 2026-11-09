@@ -42,7 +42,8 @@ class OcrAdapterTests(unittest.TestCase):
         self.bin = self.root / "bin"
         self.bin.mkdir()
 
-    def fake_ocr(self, *, invalid_json=False, unsupported=False, malicious=False, skip_test=False):
+    def fake_ocr(self, *, invalid_json=False, unsupported=False, malicious=False,
+                 skip_test=False, version='1.9.0', corrupt_repository=False):
         script = self.bin / "ocr"
         preview = {
             "schema_version": "1", "mode": "range", "repository": str(self.repo), "from": self.base, "to": self.head,
@@ -52,10 +53,15 @@ class OcrAdapterTests(unittest.TestCase):
         }
         if malicious:
             preview["reviewable_files"][0]["path"] = "../escape.py"
+        if corrupt_repository:
+            preview["repository"] = str(self.repo) + "\x00unexpected"
         body = [
             "#!/usr/bin/env python3",
             "import json, sys",
             "args = sys.argv[1:]",
+            "if args == ['--version']:",
+            "    print('open-code-review " + version + " linux/amd64')",
+            "    sys.exit(0)",
             "if '--format' in args and " + repr(unsupported) + ":",
             "    sys.stderr.write('unknown flag: --format')",
             "    sys.exit(1)",
@@ -86,6 +92,7 @@ class OcrAdapterTests(unittest.TestCase):
         self.assertEqual(["tests/test_app.py"], [f["path"] for f in got["ocr_excluded_files"]])
         self.assertEqual([], got["ocr_unaccounted_files"])
         self.assertEqual(["src/app.py"], got["ocr_rule_groups"][0]["files"])
+        self.assertEqual("1.9.0", got["ocr_version"])
 
     def test_ocr_does_not_account_for_a_file(self):
         got = adapter(repo=self.repo, ocr_bin=self.fake_ocr(skip_test=True), from_ref=self.base, to_ref=self.head)
@@ -97,6 +104,27 @@ class OcrAdapterTests(unittest.TestCase):
         got = adapter(repo=self.repo, ocr_bin=self.fake_ocr(unsupported=True), from_ref=self.base, to_ref=self.head)
         self.assertEqual("unsupported", got["status"])
         self.assertEqual(2, len(got["native_review_required_files"]))
+        self.assertFalse(got["review_performed"])
+
+    def test_old_ocr_version_falls_back_before_delegation(self):
+        got = adapter(repo=self.repo, ocr_bin=self.fake_ocr(version="1.8.9"),
+                      from_ref=self.base, to_ref=self.head)
+        self.assertEqual("unsupported", got["status"])
+        self.assertEqual(2, len(got["native_review_required_files"]))
+        self.assertIsNone(got["ocr_version"])
+        self.assertFalse(got["review_performed"])
+
+    def test_unparseable_ocr_version_falls_back(self):
+        got = adapter(repo=self.repo, ocr_bin=self.fake_ocr(version="unknown"),
+                      from_ref=self.base, to_ref=self.head)
+        self.assertEqual("unsupported", got["status"])
+        self.assertEqual(2, len(got["native_review_required_files"]))
+
+    def test_malformed_ocr_repository_path_falls_back(self):
+        got = adapter(repo=self.repo, ocr_bin=self.fake_ocr(corrupt_repository=True),
+                      from_ref=self.base, to_ref=self.head)
+        self.assertEqual("failed", got["status"])
+        self.assertEqual(["src/app.py", "tests/test_app.py"], got["native_review_required_files"])
         self.assertFalse(got["review_performed"])
 
     def test_invalid_json_never_becomes_valid_review(self):

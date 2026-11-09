@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -18,6 +19,7 @@ from typing import Any
 MAX_OUTPUT_BYTES = 8 * 1024 * 1024
 BATCH_SIZE = 40
 SUPPORTED_SCHEMA = "1"
+MIN_OCR_VERSION = (1, 9, 0)
 
 
 class AdapterError(Exception):
@@ -59,6 +61,21 @@ def decode_json(result: subprocess.CompletedProcess[bytes], command: str) -> dic
     if not isinstance(parsed, dict) or parsed.get("schema_version") != SUPPORTED_SCHEMA:
         raise AdapterError(f"ocr {command} has unsupported JSON schema version")
     return parsed
+
+
+def check_ocr_version(output: bytes) -> str:
+    """Accept only explicit semver from Alibaba OCR's documented version output."""
+    try:
+        value = output.decode("utf-8").strip()
+    except UnicodeDecodeError as exc:
+        raise AdapterError("unreadable OCR version; requires OCR >= 1.9.0") from exc
+    match = re.search(r"(?:open-code-review|ocr)\s+v?(\d+)\.(\d+)(?:\.(\d+))?(?=[-+\s]|$)", value, re.I)
+    if not match:
+        raise AdapterError("unknown OCR version format; requires OCR >= 1.9.0")
+    parts = tuple(int(v or 0) for v in match.groups())
+    if parts < MIN_OCR_VERSION:
+        raise AdapterError(f"OCR {'.'.join(map(str, parts))} is unsupported; requires OCR >= 1.9.0")
+    return ".".join(map(str, parts))
 
 
 def safe_ref(ref: str) -> str:
@@ -127,7 +144,14 @@ def valid_path(path: Any) -> bool:
 
 
 def parse_preview(data: dict[str, Any], *, mode: str, target: dict[str, Any], repo: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    if not isinstance(data.get("repository"), str) or not data["repository"] or Path(data["repository"]).resolve() != repo.resolve():
+    repository = data.get("repository")
+    if not isinstance(repository, str) or not repository or "\x00" in repository:
+        raise AdapterError("ocr preview contains an invalid repository path")
+    try:
+        resolved = Path(repository).resolve()
+    except (OSError, RuntimeError, ValueError) as exc:
+        raise AdapterError("ocr preview contains an invalid repository path") from exc
+    if resolved != repo.resolve():
         raise AdapterError("ocr preview repository does not match the inspected Git worktree")
     if data.get("mode") != mode:
         raise AdapterError("ocr preview mode does not match Git target")
@@ -182,7 +206,7 @@ def adapter(*, repo: Path, ocr_bin: str = "ocr", from_ref: str | None = None,
         "native_review_required_files": inventory["changed_files"],
         "ocr_reviewable_files": [], "ocr_excluded_files": [], "ocr_rule_groups": [],
         "ocr_unaccounted_files": inventory["changed_files"], "ocr_unknown_files": [],
-        "ocr_rule_gaps": [], "diagnostics": [],
+        "ocr_rule_gaps": [], "ocr_version": None, "diagnostics": [],
         "review_performed": False, "review_verdict": None,
     }
     executable = shutil.which(ocr_bin)
@@ -195,6 +219,10 @@ def adapter(*, repo: Path, ocr_bin: str = "ocr", from_ref: str | None = None,
     elif mode == "commit":
         argv += ["--commit", target["head_sha"]]
     try:
+        version_result = invoke([executable, "--version"], cwd=repo, timeout=timeout)
+        if version_result.returncode:
+            raise AdapterError("OCR version check failed; requires OCR >= 1.9.0")
+        result["ocr_version"] = check_ocr_version(version_result.stdout)
         preview = decode_json(invoke(argv, cwd=repo, timeout=timeout), "delegate preview")
         reviewable, excluded = parse_preview(preview, mode=mode, target=target, repo=repo)
         allowed = set(inventory["changed_files"])

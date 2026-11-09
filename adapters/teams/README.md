@@ -1,12 +1,25 @@
 # Optional Agent Team Messaging Transport
 
-\`peer_bus.py\` provides a small **provider-neutral, in-process** message
-transport for the Review Team protocol defined in
-\`contexts/review/skills/coordinate-review-team/skill.md\`.
+\`adapters/teams/peer_bus.py\` supplies a bounded, provider-neutral,
+**in-process** transport for host-provided Review specialist handlers. It
+implements the collaboration envelope of
+\`contexts/review/skills/coordinate-review-team/skill.md\`:
 
-It delivers real, bounded messages between role handlers and records the
-challenge/response evidence thread. Handlers are supplied by the hosting
-platform. Example:
+* \`review_id\`, immutable \`target_head_sha\` / \`target_base_sha\`,
+  \`message_id\`, \`thread_id\`, \`sender_role\` / \`recipient_role\`;
+* \`kind\`, \`subject\`, \`evidence_refs\`, \`requested_action\`,
+  \`response_to\` and message delivery status;
+* **open → responded → resolved** thread lifecycle for questions, challenges
+  and escalations.
+
+Each question/challenge/escalation starts a new thread with an actionable
+request; the intended peer responds with evidence and the original requester
+**explicitly resolves** the response. Unknown IDs, mismatched participants,
+stale identities, inappropriate resolutions or unresolved threads are
+rejected. Completion cannot be reported while material questions remain open
+or merely answered but unacknowledged.
+
+Example:
 
 \`\`\`python
 import asyncio
@@ -14,33 +27,34 @@ from peer_bus import PeerBus
 
 async def correctness(bus, role):
     await bus.send(role, "reliability", "challenge",
-                   "Can retries charge twice?", ["billing.py:32"])
+                   "Can retries charge twice?", ["billing.py:32"],
+                   requested_action="Inspect idempotency")
     answer = await bus.receive(role)
+    await bus.send(role, "reliability", "resolution",
+                   "Verified against the evidence", ["payments.py:18"],
+                   response_to=answer["message_id"])
     return answer["subject"]
 
 async def reliability(bus, role):
     question = await bus.receive(role)
     await bus.send(role, "correctness", "response",
                    "Idempotency guard is absent", ["payments.py:18"],
-                   thread_id=question["thread_id"],
                    response_to=question["message_id"])
+    await bus.receive(role)
 
-bus = PeerBus({"correctness", "reliability"}, "head-sha", "base-sha")
+bus = PeerBus({"correctness", "reliability"}, "head-sha", "base-sha",
+              review_id="review-123")
 result = asyncio.run(bus.run({
     "correctness": correctness, "reliability": reliability,
 }))
 \`\`\`
 
-The transport enforces role membership, immutable head identity, allowed
-message kinds, bounded messages and completion deadlines. It does not execute
-an AI model, create isolated agent sessions, run code review, approve findings,
-or publish PRs. It labels its execution \`team-relayed\`, **never \`team-live\`**,
-because in-process coroutine handlers do not establish independently isolated
-agents. A real Cursor/Claude/custom runtime must supply isolated agent
-handlers and prove peer message delivery before claiming \`team-live\`.
+Only the Code Review Lead can consolidate verified findings into a review
+verdict. Handler coroutines **are not isolated model agents**. This bridge
+truthfully reports \`team-relayed\`, \`review_performed=false\` and
+\`review_verdict=null\`; a separate real Agent Teams runtime is needed for
+\`team-live\` (independent sessions, actual peer-to-peer delivery, evidence
+collection and authorization controls).
 
-The lead retains the full review scope and performs verification under the
-neutral contract. Peer agreement is not a substitute for source evidence.
-Without any parallel execution, the canonical native-solo path remains
-available. See \`tests/test_team_transport.py\` for real exchanges with
-deterministic fake agent handlers and failure-path tests.
+\`tests/test_team_transport.py\` covers genuine in-process exchanges and
+failure paths. It does **not** assert a live provider/model integration.

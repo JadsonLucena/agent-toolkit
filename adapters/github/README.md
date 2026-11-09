@@ -1,21 +1,39 @@
 # Guarded GitHub PR Creation
 
-This optional GitHub runtime adapter applies the neutral Git rules and
-\`contracts/review-evidence.md\` **before** invoking \`gh pr create\`.
-The canonical rules do **not** import this adapter. Creation remains a
-separate, explicitly authorized operation.
+\`adapters/github/guarded_pr.py\` is an optional **GitHub-specific, executable
+pre-creation gate** for the portable Review → Git evidence contract.
 
-## Usage
+The adapter verifies an **SSH-signed review attestation** from an authorized
+reviewer and executes all checks specified in a **deployment-protected policy**.
+Only after success, and only with explicit \`--create\`, does it invoke
+\`gh pr create\`. It then queries the created PR through \`gh api\` and checks
+the returned repository, base/head refs **and SHAs**, title, and Draft state.
+A mismatch returns \`created_unverified\` with the remote URL and a nonzero exit
+code; it never claims success based only on the creation command's stdout.
 
-The reviewed feature branch must be published and checked out locally, the
-worktree must be clean, and evidence/configuration paths should be outside
-the repository unless they are committed. An authenticated GitHub CLI is
-needed **only** when using \`--create\`.
+## Trust model and setup
 
-Create a JSON configuration of repository-established checks, for example:
+An invoking **trusted runtime/operator** must own the following, outside the
+target repository and outside the implementation author's control:
+
+1. An SSH private signing key **held only by an authorized independent reviewer
+   or independent review service**, not the developer who authored the change.
+2. A protected OpenSSH allowed-signers file with that reviewer's public key.
+3. A protected trust policy listing the authorized review identities, exact
+   remote URL, GitHub repository identity and **complete required check argv**.
+4. A fixed, protected invocation of this gate. Do not allow untrusted authors
+   to supply substitute \`--trust-policy\` paths or override required check
+   configuration.
+
+Example protected trust policy (outside the checked-out repository):
 
 \`\`\`json
 {
+  "schema_version": 1,
+  "github_repository": "org/repo",
+  "remote_url": "git@github.com:org/repo.git",
+  "allowed_signers_file": "/protected/review-allowed-signers",
+  "reviewers": ["reviewer@example.com"],
   "checks": {
     "lint": ["python3", "scripts/toolkit_lint.py"],
     "tests": ["python3", "-m", "unittest", "discover", "-s", "tests", "-v"]
@@ -23,82 +41,104 @@ Create a JSON configuration of repository-established checks, for example:
 }
 \`\`\`
 
-Add \`coverage\` or other required checks when the repository establishes them.
-Pass the manifest through \`--checks-file\`. Commands use argument vectors
-without a shell; never embed shell pipelines.
+Add established coverage and other mandated checks to \`checks\`. The optional
+committed \`.github/toolkit-pr-checks.json\` is **not an authority**: when it
+exists, this wrapper additionally rejects differences from the protected
+check list. The protected policy, not a user-supplied manifest, selects the
+actual commands run.
 
-Supply independent Review evidence in a machine-readable representation
-compatible with the neutral contract:
+An SSH allowed-signers file contains a principal and a public key per line:
+
+\`\`\`text
+reviewer@example.com ssh-ed25519 <PUBLIC_KEY> comment
+\`\`\`
+
+The authorized independent reviewer produces a portable JSON file with the
+semantics of \`contracts/review-evidence.md\`. The signed profile includes:
 
 \`\`\`json
 {
+  "repository": "org/repo",
   "review_status": "PASS",
   "coverage_status": "complete",
-  "reviewer": "independent-review-session-id",
+  "reviewer": "reviewer@example.com",
   "reviewer_independent": true,
   "target": {
-    "base_sha": "<full base SHA>",
-    "head_sha": "<full feature-head SHA>"
+    "base_sha": "<full-base-SHA>",
+    "head_sha": "<full-head-SHA>"
   },
-  "changed_files": [{"path": "example.py"}],
-  "reviewed_files": [{"path": "example.py"}],
+  "changed_files": [{"path": "src/app.py"}],
+  "reviewed_files": [{"path": "src/app.py"}],
   "unreviewed_files": [],
   "blocking_findings": [],
   "unresolved_questions": []
 }
 \`\`\`
 
-This is an **attestation**, not a cryptographically verified approval. Its
-origin must be independently trusted and checked by the invoking runtime;
-a fabricated JSON file cannot establish an independent review. The wrapper
-requires an affirmative independence flag, PASS, complete coverage, exact
-head/base and changed-file equality, and no unresolved blockers.
+After completing the **actual independent review**, the authorized signer
+signs the **exact JSON bytes** (the private key must not be committed, copied
+to the implementation workspace, or handed to the code author):
 
 \`\`\`bash
-# Validate without remote mutation:
-python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
-  --repo . --base main --head feature/example \
-  --evidence /tmp/review-evidence.json \
-  --checks-file /tmp/project-checks.json
+ssh-keygen -Y sign -f /protected/reviewer_key \
+  -n agent-toolkit-code-review /protected/review-evidence.json
+# produces /protected/review-evidence.json.sig
+\`\`\`
 
-# Explicitly authorize creation after the same gate:
+The wrapper uses \`ssh-keygen -Y verify\` with a dedicated signature namespace.
+It refuses unsigned/tampered evidence, unknown signers, missing complete file
+coverage, unresolved review blockers, self-review by matching Git author
+email, stale base/head, dirty worktrees, unpublished branches, mismatched
+check commands and any failed mandatory check.
+
+**The SSH signature authenticates the signing key, not human independence by
+itself.** Trusted reviewer provisioning, private-key custody, author-to-signer
+identity mapping and the protected launch path are deployment obligations.
+The wrapper's author-email comparison is an additional defense, not sufficient
+proof of separation. An attacker allowed to alter the trust policy, review
+signing keys or invocation can defeat the gate.
+
+## Usage
+
+\`\`\`bash
+# Non-mutating preflight:
 python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
   --repo . --base main --head feature/example \
-  --evidence /tmp/review-evidence.json \
-  --checks-file /tmp/project-checks.json \
+  --evidence /protected/review-evidence.json \
+  --signature /protected/review-evidence.json.sig \
+  --trust-policy /protected/review-policy.json
+
+# Only the explicit --create authorizes remote PR creation:
+python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
+  --repo . --base main --head feature/example \
+  --evidence /protected/review-evidence.json \
+  --signature /protected/review-evidence.json.sig \
+  --trust-policy /protected/review-policy.json \
   --create --title "feat: example" --body-file /tmp/pr-description.md
 \`\`\`
 
-The wrapper checks a clean local worktree, the final local head and published
-remote head, the exact PR diff against merge-base, complete review coverage,
-and successful execution of every configured required check. It rechecks
-head/base/freshness after checks, then and only then calls \`gh pr create\`.
-\`--create\` is **not** implied by a dry-run success.
+Requires Python 3.10+, Git, OpenSSH \`ssh-keygen\`, and authenticated GitHub CLI
+only for \`--create\`. The wrapper does not install or configure these tools.
+It will fail closed if any required trust anchor or verification is unavailable.
 
-## Scope and Limits
+## Boundaries
 
-* An empty/missing check manifest, missing review attestation, failed checks,
-  changed branch, dirty worktree, unpublished head or incomplete review
-  **blocks** remote creation through this adapter.
-* This does **not** prevent another GitHub client or user from bypassing the
-  wrapper. Organizations must enforce permissions/branch protections and
-  integrate the wrapper as the only permitted creation path where needed.
-* The manifest must reflect **all** repository-established checks. The
-  wrapper cannot prove that an arbitrary supplied command has the right
-  semantic coverage, or that the independent reviewer actually reviewed
-  the files; the adapter/operator must trust provenance appropriately.
-* The configuration and evidence are treated as inputs and must not be
-  allowed to weaken a protected gate. Use a protected/trusted checks manifest
-  in production.
-* GitHub Actions \`pull_request\` runs are **post-creation** and cannot meet
-  this pre-creation requirement. This adapter executes configured checks
-  before creation; separate CI review is still useful afterward.
-* This implementation is GitHub-specific by design; other hosts can
-  implement the same canonical gate with their own API/CLI.
+* \`gh pr create\` is not invoked when preflight fails. A PR may have been
+  created **before** post-creation verification fails: the wrapper reports
+  \`created_unverified\` and the URL rather than claiming success, closing
+  the PR or creating a duplicate automatically.
+* This is **not a global GitHub authorization boundary**. Other clients
+  can still bypass it unless enforced through an approved runtime,
+  permission model and repository/organization policy.
+* The wrapper cannot prove that repository tests truly cover every relevant
+  behavior; the protected policy must represent effective project checks.
+  CI triggered only by PR creation is not a substitute for preflight checks.
+* The actual code review belongs to the separate Review context. Neither
+  the SSH signature nor the output of the adapter performs a review.
 
 ## Tests
 
-\`tests/test_guarded_pr.py\` uses a real temporary Git repository and local
-bare Git remote, with fake checks and intercepted \`gh\` invocation. It tests
-PASS, failure, stale target, insufficient coverage, dirty/unpublished
-branches and proof that \`gh\` is never called when preflight fails.
+\`tests/test_guarded_pr.py\` uses real local Git and bare remote fixtures,
+generates temporary SSH signing keys, tests signed/forged/stale evidence and
+protected check-policy failures, and simulates \`gh pr create\` plus subsequent
+\`gh api\` verification. No real PR is created by the tests.

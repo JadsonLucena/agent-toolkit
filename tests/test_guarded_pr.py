@@ -1,9 +1,10 @@
-"""Behavioral tests for the actual, fail-closed GitHub PR creation preflight."""
+"""Integration tests for signed, trusted GitHub PR preflight and remote verification."""
 from __future__ import annotations
 
 import contextlib
 import io
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -20,6 +21,7 @@ def git(cwd: Path, *args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=cwd, stderr=subprocess.DEVNULL).decode().strip()
 
 
+@unittest.skipUnless(shutil.which("ssh-keygen"), "OpenSSH ssh-keygen is required for SSHSIG integration tests")
 class GuardedPRTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -46,57 +48,114 @@ class GuardedPRTests(unittest.TestCase):
         git(self.repo, "commit", "-q", "-m", "change")
         git(self.repo, "push", "-q", "origin", "feature")
         self.head = git(self.repo, "rev-parse", "HEAD")
-        self.paths = ["app.py", "test_app.py"]
+        self.review_paths = ["app.py", "test_app.py"]
+        self.reviewer = "reviewer@example.invalid"
         self.evidence = self.root / "review.json"
-        self.checks = self.root / "checks.json"
+        self.signature = self.root / "review.json.sig"
+        self.check_policy = self.root / "trusted-policy.json"
+        self.allowed_signers = self.root / "trusted-signers"
+        self.key = self.root / "reviewer-ed25519"
         self.body = self.root / "pr.md"
         self.body.write_text("# PR\n")
+        subprocess.run(
+            ["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(self.key)],
+            check=True, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        self.allowed_signers.write_text(self.reviewer + " " + (self.root / "reviewer-ed25519.pub").read_text())
+        self.write_policy()
         self.write_evidence()
-        self.write_checks()
 
-    def write_evidence(self, **changes):
-        value = {
-            "review_status": "PASS", "coverage_status": "complete",
-            "reviewer": "independent-reviewer-session-123",
-            "reviewer_independent": True,
-            "target": {"base_sha": self.base, "head_sha": self.head},
-            "changed_files": self.paths,
-            "reviewed_files": self.paths,
-            "unreviewed_files": [], "blocking_findings": [], "unresolved_questions": [],
-        }
-        value.update(changes)
-        self.evidence.write_text(json.dumps(value))
-
-    def write_checks(self, fail: str | None = None):
+    def write_policy(self, *, fail: str | None = None, **changes):
         def cmd(name: str):
             script = "import sys;sys.exit(1)" if fail == name else "print('ok')"
             return [sys.executable, "-c", script]
-        self.checks.write_text(json.dumps({"checks": {"lint": cmd("lint"), "tests": cmd("tests")}}))
+        value = {
+            "schema_version": 1, "github_repository": "org/repo",
+            "remote_url": str(self.remote), "allowed_signers_file": str(self.allowed_signers),
+            "reviewers": [self.reviewer],
+            "checks": {"lint": cmd("lint"), "tests": cmd("tests")},
+        }
+        value.update(changes)
+        self.check_policy.write_text(json.dumps(value))
+        return value
+
+    def write_evidence(self, *, sign=True, **changes):
+        value = {
+            "repository": "org/repo", "review_status": "PASS",
+            "coverage_status": "complete", "reviewer": self.reviewer,
+            "reviewer_independent": True,
+            "target": {"base_sha": self.base, "head_sha": self.head},
+            "changed_files": self.review_paths, "reviewed_files": self.review_paths,
+            "unreviewed_files": [], "blocking_findings": [], "unresolved_questions": [],
+        }
+        value.update(changes)
+        self.evidence.write_text(json.dumps(value, sort_keys=True))
+        if sign:
+            self.signature.unlink(missing_ok=True)
+            subprocess.run(
+                ["ssh-keygen", "-Y", "sign", "-f", str(self.key), "-n",
+                 gate.SIGNATURE_NAMESPACE, str(self.evidence)],
+                check=True, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            )
+        return value
 
     def preflight(self):
-        return gate.guard(self.repo, "main", "feature", self.evidence, self.checks)
+        return gate.guard(self.repo, "main", "feature", self.evidence, self.signature, self.check_policy)
 
     def test_repository_check_manifest_matches_ci_commands(self):
-        checks = gate.read_checks(ROOT / ".github" / "toolkit-pr-checks.json")
+        checks = gate.read_checks(gate.load_json(ROOT / ".github" / "toolkit-pr-checks.json"))
         workflow = (ROOT / ".github" / "workflows" / "toolkit-validation.yml").read_text()
         self.assertEqual({"lint", "tests"}, set(checks))
         for argv in checks.values():
             self.assertIn(" ".join(argv), workflow)
 
-    def test_runs_actual_checks_and_accepts_complete_evidence(self):
+    def test_signed_review_with_trusted_checks_passes(self):
         result = self.preflight()
         self.assertEqual(self.head, result["head_sha"])
+        self.assertEqual(self.reviewer, result["reviewer"])
+        self.assertTrue(result["signed_review_verified"])
         self.assertEqual({"lint", "tests"}, set(result["checks_passed"]))
-        self.assertEqual(self.paths, result["changed_files"])
+        self.assertEqual(self.review_paths, result["changed_files"])
+
+    def test_forged_pass_without_signature_is_blocked(self):
+        self.write_evidence(review_status="FAIL", sign=True)
+        self.write_evidence(review_status="PASS", sign=False)
+        with self.assertRaisesRegex(gate.GateError, "signature"):
+            self.preflight()
+
+    def test_signature_of_different_ssh_key_is_blocked(self):
+        other = self.root / "attacker"
+        subprocess.run(
+            ["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(other)],
+            check=True, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        self.signature.unlink(missing_ok=True)
+        subprocess.run(
+            ["ssh-keygen", "-Y", "sign", "-f", str(other), "-n",
+             gate.SIGNATURE_NAMESPACE, str(self.evidence)],
+            check=True, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        with self.assertRaisesRegex(gate.GateError, "signature"):
+            self.preflight()
 
     def test_incomplete_review_is_blocked(self):
         self.write_evidence(review_status="INCOMPLETE")
         with self.assertRaisesRegex(gate.GateError, "not PASS"):
             self.preflight()
 
-    def test_self_review_cannot_qualify(self):
+    def test_self_attestation_flag_false_is_blocked(self):
         self.write_evidence(reviewer_independent=False)
         with self.assertRaisesRegex(gate.GateError, "independent-review"):
+            self.preflight()
+
+    def test_reviewer_cannot_match_commit_author(self):
+        self.allowed_signers.write_text(
+            self.allowed_signers.read_text() + "test@example.invalid " +
+            (self.root / "reviewer-ed25519.pub").read_text()
+        )
+        self.write_policy(reviewers=[self.reviewer, "test@example.invalid"])
+        self.write_evidence(reviewer="test@example.invalid")
+        with self.assertRaisesRegex(gate.GateError, "also a change author"):
             self.preflight()
 
     def test_stale_sha_is_blocked(self):
@@ -114,23 +173,37 @@ class GuardedPRTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.GateError, "coverage does not match"):
             self.preflight()
 
-    def test_unresolved_issue_is_blocked(self):
+    def test_material_unresolved_issue_is_blocked(self):
         self.write_evidence(unresolved_questions=["unresolved financial integrity"])
         with self.assertRaisesRegex(gate.GateError, "unresolved"):
             self.preflight()
 
-    def test_missing_required_check_is_blocked(self):
-        self.checks.write_text(json.dumps({"checks": {"lint": [sys.executable, "-c", "pass"]}}))
+    def test_missing_trusted_required_check_is_blocked(self):
+        self.write_policy(checks={"lint": [sys.executable, "-c", "pass"]})
         with self.assertRaisesRegex(gate.GateError, "lint and tests"):
             self.preflight()
 
+    def test_changed_repository_manifest_cannot_weaken_checks(self):
+        (self.repo / ".github").mkdir()
+        (self.repo / ".github" / "toolkit-pr-checks.json").write_text(
+            json.dumps({"checks": {"lint": ["true"], "tests": ["true"]}})
+        )
+        with self.assertRaisesRegex(gate.GateError, "differs from protected"):
+            self.preflight()
+
+    def test_trust_policy_cannot_be_provided_inside_repo(self):
+        local = self.repo / "untrusted.json"
+        local.write_text(self.check_policy.read_text())
+        with self.assertRaisesRegex(gate.GateError, "outside the target"):
+            gate.guard(self.repo, "main", "feature", self.evidence, self.signature, local)
+
     def test_failed_lint_blocks(self):
-        self.write_checks(fail="lint")
+        self.write_policy(fail="lint")
         with self.assertRaisesRegex(gate.GateError, "failed"):
             self.preflight()
 
     def test_failed_tests_block(self):
-        self.write_checks(fail="tests")
+        self.write_policy(fail="tests")
         with self.assertRaisesRegex(gate.GateError, "failed"):
             self.preflight()
 
@@ -148,54 +221,83 @@ class GuardedPRTests(unittest.TestCase):
         (self.repo / "app.py").write_text("value = 3\n")
         git(self.repo, "add", ".")
         git(self.repo, "commit", "-q", "-m", "unpublished")
-        with self.assertRaisesRegex(gate.GateError, "published remote"):
+        with self.assertRaisesRegex(gate.GateError, "remote head"):
             self.preflight()
 
-    def test_real_creation_only_after_preflight_and_explicit_create(self):
+    def gh_mock(self, *, wrong_head=False, wrong_draft=False):
         seen = []
         original = gate.invoke
 
         def intercepted(argv, cwd, timeout=300):
-            if argv[0] == "gh":
-                seen.append(argv)
+            if argv[:3] == ["gh", "pr", "create"]:
+                seen.append("create")
                 return "https://github.com/org/repo/pull/99"
+            if argv[:2] == ["gh", "api"]:
+                seen.append("verify")
+                return json.dumps({
+                    "number": 99, "html_url": "https://github.com/org/repo/pull/99",
+                    "state": "open", "draft": wrong_draft, "title": "Add feature",
+                    "base": {"sha": self.base, "ref": "main",
+                             "repo": {"full_name": "org/repo"}},
+                    "head": {"sha": self.base if wrong_head else self.head,
+                             "ref": "feature", "repo": {"full_name": "org/repo"}},
+                })
             return original(argv, cwd, timeout)
+        return seen, intercepted
 
-        with patch.object(gate, "invoke", side_effect=intercepted):
-            stream = io.StringIO()
-            with contextlib.redirect_stdout(stream):
-                rc = gate.main([
-                    "--repo", str(self.repo), "--base", "main", "--head", "feature",
-                    "--evidence", str(self.evidence), "--checks-file", str(self.checks),
-                    "--create", "--title", "Add feature", "--body-file", str(self.body),
-                ])
-            self.assertEqual(0, rc)
-            self.assertEqual("gh", seen[0][0])
-            self.assertEqual("https://github.com/org/repo/pull/99",
-                             json.loads(stream.getvalue())["created_pr_url"])
+    def cli(self, *extra):
+        return [
+            "--repo", str(self.repo), "--base", "main", "--head", "feature",
+            "--evidence", str(self.evidence), "--signature", str(self.signature),
+            "--trust-policy", str(self.check_policy), *extra,
+        ]
 
-    def test_failed_preflight_never_calls_gh(self):
-        self.write_checks(fail="tests")
-        seen = []
-        original = gate.invoke
+    def test_remote_creation_requires_verification(self):
+        seen, mock = self.gh_mock()
+        with patch.object(gate, "invoke", side_effect=mock):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                rc = gate.main(self.cli("--create", "--title", "Add feature",
+                                        "--body-file", str(self.body)))
+        self.assertEqual(0, rc)
+        self.assertEqual(["create", "verify"], seen)
+        result = json.loads(out.getvalue())
+        self.assertEqual("passed", result["status"])
+        self.assertTrue(result["remote_verified"])
+        self.assertEqual(99, result["pr_number"])
 
-        def intercepted(argv, cwd, timeout=300):
-            if argv[0] == "gh":
-                seen.append(argv)
-                return "should-not-happen"
-            return original(argv, cwd, timeout)
+    def test_wrong_remote_pr_sha_is_created_unverified(self):
+        seen, mock = self.gh_mock(wrong_head=True)
+        with patch.object(gate, "invoke", side_effect=mock):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                rc = gate.main(self.cli("--create", "--title", "Add feature",
+                                        "--body-file", str(self.body)))
+        self.assertEqual(3, rc)
+        self.assertEqual(["create", "verify"], seen)
+        self.assertEqual("created_unverified", json.loads(out.getvalue())["status"])
 
-        with patch.object(gate, "invoke", side_effect=intercepted):
-            stream = io.StringIO()
-            with contextlib.redirect_stdout(stream):
-                rc = gate.main([
-                    "--repo", str(self.repo), "--base", "main", "--head", "feature",
-                    "--evidence", str(self.evidence), "--checks-file", str(self.checks),
-                    "--create", "--title", "Add feature", "--body-file", str(self.body),
-                ])
-            self.assertEqual(2, rc)
-            self.assertEqual([], seen)
-            self.assertEqual("blocked", json.loads(stream.getvalue())["status"])
+    def test_wrong_remote_draft_is_created_unverified(self):
+        seen, mock = self.gh_mock(wrong_draft=True)
+        with patch.object(gate, "invoke", side_effect=mock):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                rc = gate.main(self.cli("--create", "--title", "Add feature",
+                                        "--body-file", str(self.body)))
+        self.assertEqual(3, rc)
+        self.assertEqual("created_unverified", json.loads(out.getvalue())["status"])
+
+    def test_blocked_preflight_never_calls_github(self):
+        self.write_policy(fail="tests")
+        seen, mock = self.gh_mock()
+        with patch.object(gate, "invoke", side_effect=mock):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                rc = gate.main(self.cli("--create", "--title", "Add feature",
+                                        "--body-file", str(self.body)))
+        self.assertEqual(2, rc)
+        self.assertEqual([], seen)
+        self.assertEqual("blocked", json.loads(out.getvalue())["status"])
 
 
 if __name__ == "__main__":
