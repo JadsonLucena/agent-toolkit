@@ -78,13 +78,59 @@ def validate_evidence(evidence: dict[str, Any], context: dict[str, Any], repo: P
     unreviewed = review_paths(evidence.get("unreviewed_files"), "review.unreviewed_files")
     if not reviewed <= expected or not unreviewed <= expected:
         raise EvidenceError("reviewer declared out-of-scope files")
+    profile = context.get("review_profile", "advisory")
+    if profile not in ("advisory", "gate"):
+        raise EvidenceError("unknown review profile")
+    declared_profile = evidence.get("review_profile", profile if profile == "advisory" else None)
+    if declared_profile != profile:
+        raise EvidenceError("review_profile mismatches frozen review context")
+    if verdict == "PASS" and profile == "gate" and evidence.get("reviewer_independent") is not True:
+        raise EvidenceError("gate PASS requires affirmative reviewer independence")
+    findings = evidence.get("findings", [])
+    if not isinstance(findings, list):
+        raise EvidenceError("findings must be an array")
+    for item in findings + evidence.get("blocking_findings", []):
+        if not isinstance(item, dict):
+            raise EvidenceError("finding must be an object")
+        likelihood = item.get("likelihood")
+        if likelihood is not None and likelihood not in ("high", "medium", "low"):
+            raise EvidenceError("likelihood must be high, medium or low")
+        origin = item.get("origin")
+        if origin is not None and origin not in (
+            "introduced", "pre-existing", "amplified-pre-existing"
+        ):
+            raise EvidenceError("invalid finding origin")
+        if origin == "amplified-pre-existing" and (
+            not item.get("amplification_reason")
+            or item.get("disposition") not in ("fix", "decision-needed")
+        ):
+            raise EvidenceError("amplified-pre-existing risk requires justification and fix/decision-needed")
+    external = evidence.get("external_evidence", [])
+    if not isinstance(external, list):
+        raise EvidenceError("external_evidence must be an array")
+    for item in external:
+        if (not isinstance(item, dict) or not isinstance(item.get("repository"), str)
+                or not item["repository"].strip() or not isinstance(item.get("sha"), str)
+                or len(item["sha"]) not in (40, 64)
+                or any(c not in "0123456789abcdefABCDEF" for c in item["sha"])
+                or not isinstance(item.get("files"), list)
+                or not item["files"]
+                or not isinstance(item.get("claim_supported"), str)
+                or not item["claim_supported"].strip()):
+            raise EvidenceError("external_evidence needs repository, pinned SHA, files and claim_supported")
     blockers = evidence.get("blocking_findings", [])
     questions = evidence.get("unresolved_questions", [])
     if not isinstance(blockers, list) or not isinstance(questions, list):
         raise EvidenceError("blockers/questions must be arrays")
+    material_questions = any(
+        not isinstance(question, dict) or question.get("material") is not False
+        for question in questions
+    )
+    if verdict == "FAIL" and any(item.get("lead_confirmed") is not True for item in blockers):
+        raise EvidenceError("confirmed blocking finding requires lead_confirmed=true and direct source inspection")
     if verdict == "PASS":
         if (evidence.get("coverage_status") != "complete" or reviewed != expected
-                or unreviewed or blockers or questions):
+                or unreviewed or blockers or material_questions):
             raise EvidenceError("reviewer claimed PASS without complete native review evidence/coverage")
     if verdict == "INCOMPLETE" and blockers:
         raise EvidenceError("confirmed blockers take precedence as FAIL; retain unresolved questions")
@@ -95,7 +141,9 @@ def validate_evidence(evidence: dict[str, Any], context: dict[str, Any], repo: P
         if evidence.get("review_id") != plan.get("review_id") or evidence.get("risk_profile") != plan.get("risk_profile"):
             raise EvidenceError("reviewer omitted frozen team or risk identity")
         if verdict == "PASS":
-            if plan.get("lead_implemented_change") or evidence.get("reviewer_independent") is not True:
+            if profile == "gate" and (
+                plan.get("lead_implemented_change") or evidence.get("reviewer_independent") is not True
+            ):
                 raise EvidenceError("implementer/self-review cannot claim an independent PASS")
             mode = evidence.get("execution_mode")
             if plan["execution_mode"] == "team-relayed":
@@ -128,6 +176,7 @@ def validate_evidence(evidence: dict[str, Any], context: dict[str, Any], repo: P
                     raise EvidenceError("R3 native review requires source-based second pass")
     # Reviewer-supplied helper metadata is never trusted as execution history.
     evidence = dict(evidence)
+    evidence["review_profile"] = profile
     evidence["optional_helpers"] = context["optional_helpers"]
     ocr_status = context["optional_helpers"]["ocr"]["status"]
     evidence["review_preparation"] = {
@@ -138,6 +187,8 @@ def validate_evidence(evidence: dict[str, Any], context: dict[str, Any], repo: P
     assert_target_fresh(context, repo)
     return {
         "kind": "review-invocation", "review_status": verdict,
+        "review_profile": profile,
+        "review_label": f"{verdict} (advisory)" if profile == "advisory" else verdict,
         "review_evidence": evidence, "native_full_scope": sorted(expected),
         "pre_pr_review_independence_verified": False,
         "note": "A separate protected PR gate verifies signed reviewer identity and independence.",

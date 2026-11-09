@@ -74,6 +74,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--direct-peer-supported", action="store_true")
     ap.add_argument("--lead-implemented-change", action="store_true")
     ap.add_argument("--output-language", help="human report language, e.g. pt-BR")
+    ap.add_argument("--review-profile", choices=("advisory", "gate"), default="advisory",
+                    help="advisory (default) cannot satisfy the protected pre-PR gate")
     phase = ap.add_mutually_exclusive_group()
     phase.add_argument("--prepare-only", action="store_true",
                        help="prepare frozen scope for host-native agent reviewer")
@@ -105,6 +107,7 @@ def main(argv: list[str] | None = None) -> int:
                 args.repo, base=args.base, head=args.head, commit=args.commit,
                 base_branch=args.base_branch, allow_ocr=not args.no_ocr,
                 timeout=args.ocr_timeout, output_language=args.output_language,
+                review_profile=args.review_profile,
             )
             context["preparation_adapter"] = "python-reference"
             if args.task_capable and not args.risk_profile:

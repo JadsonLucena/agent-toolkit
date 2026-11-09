@@ -29,8 +29,11 @@ def prepare_context(
     repo: Path, *, base: str | None = None, head: str | None = None,
     commit: str | None = None, base_branch: str | None = None,
     allow_ocr: bool = True, timeout: int = 30, output_language: str | None = None,
+    review_profile: str = "advisory",
 ) -> dict[str, Any]:
     """Freeze Git scope independently of optional helpers and platform APIs."""
+    if review_profile not in ("advisory", "gate"):
+        raise ValueError("review_profile must be advisory or gate")
     if timeout < 1 or timeout > 120 or (commit is not None and not commit):
         raise ValueError("invalid timeout or empty commit")
     if bool(base) != bool(head) or (commit is not None and (base or head)):
@@ -76,6 +79,7 @@ def prepare_context(
     ]
     return {
         "kind": "review-context", "schema_version": "1",
+        "review_profile": review_profile,
         "repository": str(repo),
         "scope": {"base_ref": base, "head_ref": head,
                   "commit_ref": commit, "base_branch": base_branch},
@@ -106,12 +110,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-ocr", action="store_true")
     ap.add_argument("--timeout", type=int, default=30)
     ap.add_argument("--output-language")
+    ap.add_argument("--review-profile", choices=("advisory", "gate"), default="advisory")
     args = ap.parse_args(argv)
     try:
         payload = prepare_context(
             args.repo, base=args.base, head=args.head, commit=args.commit,
             base_branch=args.base_branch, allow_ocr=not args.no_ocr,
             timeout=args.timeout, output_language=args.output_language,
+            review_profile=args.review_profile,
         )
     except (GitScopeError, ValueError, OSError) as exc:
         print(json.dumps({"kind": "review-context", "status": "blocked",

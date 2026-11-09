@@ -190,6 +190,8 @@ def verify_evidence(
         raise GateError("review evidence bound to another head/base")
     if evidence.get("repository") != repository:
         raise GateError("review evidence refers to another repository")
+    if evidence.get("review_profile") != "gate":
+        raise GateError("pre-PR gate requires explicitly signed review_profile=gate evidence")
     if evidence.get("review_status") != "PASS" or evidence.get("coverage_status") != "complete":
         raise GateError("independent Code Review is not PASS with complete coverage")
     if evidence.get("reviewer_independent") is not True:
@@ -207,9 +209,14 @@ def verify_evidence(
     reviewed = paths(evidence.get("reviewed_files"), "reviewed_files")
     if recorded != actual or not actual <= reviewed:
         raise GateError("review inventory or reviewed-file coverage does not match actual PR diff")
-    for field in ("unreviewed_files", "blocking_findings", "unresolved_questions"):
+    for field in ("unreviewed_files", "blocking_findings"):
         if evidence.get(field) != []:
             raise GateError(f"review has missing or unresolved {field} evidence")
+    questions = evidence.get("unresolved_questions")
+    if not isinstance(questions, list) or any(
+        not isinstance(q, dict) or q.get("material") is not False for q in questions
+    ):
+        raise GateError("review has missing or unresolved material questions")
     if evidence.get("limitations") and not evidence.get("limitations_accepted_by_policy"):
         raise GateError("material review limitations have no explicit policy disposition")
     return reviewer

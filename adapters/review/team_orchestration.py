@@ -107,6 +107,7 @@ def freeze(
         "repository": str(repo.resolve()), "target": dict(fresh["target"]),
         "scope": dict(scope), "mode": context["mode"],
         "changed_files": list(fresh["changed_files"]), "risk_profile": risk_profile,
+        "review_profile": context.get("review_profile", "advisory"),
         "selected_roles": [CONCERN_ROLES[c] for c in selected],
         "role_assignments": {
             CONCERN_ROLES[c]: {"concern": c, "reason": f"diff concern: {c}"}
@@ -463,6 +464,7 @@ async def execute(
     return {
         "review_id": plan["review_id"], "repository": plan["repository"],
         "target": plan["target"], "scope": plan["scope"],
+        "review_profile": plan.get("review_profile", "advisory"),
         "changed_files": plan["changed_files"], "risk_profile": plan["risk_profile"],
         "execution_mode": execution_mode,
         "team_members": [
@@ -533,7 +535,8 @@ def finalize(
                     or any(v not in ("confirmed", "refuted", "deferred")
                            for v in finding_dispositions.values())):
                 reasons.append("candidate finding disposition coverage incomplete")
-    if not lead_independent or result["lead_implemented_change"]:
+    profile = result.get("review_profile", "advisory")
+    if profile == "gate" and (not lead_independent or result["lead_implemented_change"]):
         reasons.append("lead independence from implementation not established")
     if result["risk_profile"] == "R3" and result["independent_verification"]["mode"] != "isolated-agent" \
             and result["team_members"]:
