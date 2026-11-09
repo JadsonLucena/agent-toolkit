@@ -194,6 +194,16 @@ def _validate_finding(finding: Any, inventory: set[str]) -> None:
         raise TeamPlanningError("candidate finding severity invalid")
     if finding["confidence"] not in {"high", "medium", "low"}:
         raise TeamPlanningError("candidate finding confidence invalid")
+    if finding.get("likelihood") is not None and finding["likelihood"] not in ("high", "medium", "low"):
+        raise TeamPlanningError("candidate finding likelihood invalid")
+    origin = finding.get("origin")
+    if origin is not None and origin not in ("introduced", "pre-existing", "amplified-pre-existing"):
+        raise TeamPlanningError("candidate finding origin invalid")
+    if origin == "amplified-pre-existing" and (
+        not finding.get("amplification_reason")
+        or finding.get("disposition") not in ("fix", "decision-needed")
+    ):
+        raise TeamPlanningError("amplified-pre-existing finding requires rationale and disposition")
     if not any(finding["location"].startswith(path + ":") for path in inventory):
         raise TeamPlanningError("candidate finding location must identify changed file:line")
     for field in ("claim", "evidence", "consequence"):
@@ -515,7 +525,11 @@ def finalize(
     covered = set(lead_reviewed_files)
     if len(covered) != len(lead_reviewed_files) or not covered <= required:
         raise TeamPlanningError("lead declared duplicate or out-of-scope file coverage")
-    reasons = list(result["unresolved_questions"]) + list(unresolved_material)
+    observed_questions = list(result["unresolved_questions"]) + list(unresolved_material)
+    reasons = [
+        question for question in observed_questions
+        if not (isinstance(question, dict) and question.get("material") is False)
+    ]
     if not same:
         reasons.append("reviewed Git target/fingerprint changed")
     if covered != required:
@@ -551,8 +565,14 @@ def finalize(
                     "source_evidence": list(native_second_pass_evidence),
                 },
             }
-    if verified_blockers:
-        verdict = "FAIL"  # verified blockers dominate; preserve unresolved reasons
+    unconfirmed_blocker = bool(verified_blockers) and any(
+        not isinstance(blocker, dict) or blocker.get("lead_confirmed") is not True
+        for blocker in verified_blockers
+    )
+    if unconfirmed_blocker:
+        reasons.append("blocking finding lacks lead-confirmed source inspection")
+    if verified_blockers and not unconfirmed_blocker:
+        verdict = "FAIL"  # verified, lead-confirmed blockers dominate uncertainty
     else:
         verdict = "INCOMPLETE" if reasons else "PASS"
     return {
@@ -560,6 +580,8 @@ def finalize(
         "coverage_status": "complete" if covered == required else "partial",
         "reviewed_files": sorted(covered),
         "blocking_findings": list(verified_blockers),
-        "unresolved_questions": reasons,
+        "unresolved_questions": observed_questions + [
+            reason for reason in reasons if reason not in observed_questions
+        ],
         "reviewer_independent": bool(lead_independent and not result["lead_implemented_change"]),
     }
