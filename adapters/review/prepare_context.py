@@ -13,16 +13,23 @@ import sys
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ocr"))
-from delegate import adapter as ocr_adapter, git_inventory, AdapterError  # noqa: E402
+from git_scope import git_inventory, GitScopeError
+
+
+def ocr_adapter(**kwargs: Any) -> dict[str, Any]:
+    """Load OCR code only in the explicitly permitted OCR-first branch."""
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ocr"))
+    from delegate import adapter  # noqa: PLC0415
+
+    return adapter(**kwargs)
 
 
 def prepare_context(
     repo: Path, *, base: str | None = None, head: str | None = None,
     commit: str | None = None, allow_ocr: bool = True, timeout: int = 30,
 ) -> dict[str, Any]:
-    # Delegation mode never calls a provider LLM. OCR is allowed only by the
-    # host policy; without approval use the same Git-native inventory path.
+    # OCR-first means optional file/rule delegation BEFORE host native review.
+    # --no-ocr never imports the OCR adapter or executes its binary.
     if allow_ocr:
         helper = ocr_adapter(
             repo=repo, from_ref=base, to_ref=head, commit_ref=commit,
@@ -80,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
             args.repo, base=args.base, head=args.head,
             commit=args.commit, allow_ocr=not args.no_ocr, timeout=args.timeout,
         )
-    except (AdapterError, ValueError, OSError) as exc:
+    except (GitScopeError, ValueError, OSError) as exc:
         print(json.dumps({"kind": "review-context", "status": "blocked",
                           "diagnostics": [str(exc)], "review_performed": False,
                           "review_verdict": None}))

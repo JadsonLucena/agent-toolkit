@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Perform a complete, read-only, risk-proportionate native code review of a Git change. Produce a portable review result under `contracts/review-evidence.md`, suitable for human assessment and the Git pre-PR gate. An optional external engine may accelerate investigation but cannot define review completeness.
+Perform a complete, read-only, risk-proportionate native code review of a Git change, **after OCR-first context preparation when permitted**. Produce a portable review result under `contracts/review-evidence.md`, suitable for human assessment and the Git pre-PR gate. An optional external engine may accelerate investigation but cannot define review completeness.
 
 ## Uses
 
@@ -24,17 +24,19 @@ Track target and base/head identity; change boundary and stated claims; changed/
 ```mermaid
 flowchart TD
     Start --> Preflight
-    Preflight --> Scope
+    Preflight --> SkipOCR{no-ocr flag?}
+    SkipOCR -->|yes| NeutralGit
+    SkipOCR -->|no| OCRFirst[prepare_context: detect OCR >= 1.9]
+    OCRFirst -->|available| OCRRules[OCR file/rule delegation]
+    OCRFirst -->|absent/incompatible/failed| NeutralGit
+    OCRRules --> Scope[Full original Git scope]
+    NeutralGit --> Scope
     Scope --> Risk
-    Risk --> Capabilities
-    Capabilities -->|R0/R1 or team unavailable| NativeReview
-    Capabilities -->|R2/R3 and team beneficial| TeamCoordination
-    Capabilities -->|optional helper| OptionalTool
-    OptionalTool --> ModeChoice
-    ModeChoice -->|solo/relayed| NativeReview
-    ModeChoice -->|supported collaboration| TeamCoordination
+    Risk --> Mode{Useful supported team?}
+    Mode -->|yes| TeamCoordination
+    Mode -->|no| NativeReview
     TeamCoordination --> PeerChallenges
-    PeerChallenges --> VerifyFindings
+    PeerChallenges --> NativeReview
     NativeReview --> VerifyFindings
     VerifyFindings --> CoverageAndEvidence
     CoverageAndEvidence -->|complete, no blockers| Pass
@@ -45,10 +47,10 @@ flowchart TD
 ## Workflow
 
 1. **Preflight — identify the change.** Resolve the explicitly supplied PR, commit, commit range, branch comparison, or working-tree changes. Identify the relevant base, head SHA, repository policy, current working-tree state, and whether files can be inspected. Do not silently assume `main` or fabricate a SHA. A missing review target is a blocker.
-2. **Inventory and scope.** Obtain the complete changed-file list (including relevant staged/unstaged/untracked content for workspace reviews). Compare the intended Change Boundary or slice to the diff. Record each exclusion and affected dependent file or consumer. For a large diff, divide the review into coherent groups and reconcile the groups to the original file set. A partial scan must be labeled partial.
-3. **Understand behavior.** Read the changed code, callers, callees, constraints, existing tests, project conventions, and applicable architecture/requirements material. Distinguish authoritative contract evidence from PR claims and author's explanations. If documentation is absent, inspect behavior and contracts in the repository; record requirements as unverified rather than inventing them.
-4. **Assess risk and select collaboration mode.** Classify R0–R3 based on the actual change and identify distinct evidence needs. R0/R1 normally use a native reviewer; for R2/R3 prefer a **small, relevant Agent Team** when the runtime permits real messaging and coordination is beneficial. Invoke same-context `contexts/review/skills/coordinate-review-team/skill.md` for team planning, targeted peer exchange, verification and fallback. Without supported team messaging, use coordinator-relayed specialists or sequential native lenses; do not claim direct collaboration that did not occur.
-5. **Discover helpers without dependency.** Use safe, existing read-only commands, static analyzers or a review engine when available and authorized. A runtime may automatically supply a neutral Review context containing the complete Git inventory and optional OCR-resolved rules; validate that inventory independently and do not treat a bootstrap result as an executed review. Where an approved host adapter supplies structured supplemental file/rule data, independently reconcile it against the original complete Git diff: every excluded, unaccounted or helper-skipped path remains subject to native review. OCR delegation (`ocr delegate preview` / `ocr delegate rule`) may assist selection and rule discovery, but is never a substitute for full native analysis, verification, or review coverage. Do not require, install, or configure OCR or any network provider. A missing, incompatible, or failed optional helper is reported and bypassed without reducing native review quality.
+2. **Mandatory context bootstrap — OCR-first.** Before interpreting changed code or assigning specialist lenses, the host runtime invokes `adapters/review/run_review.py`, which calls `adapters/review/prepare_context.py` and forwards the neutral JSON to an approved reviewer. With `--no-ocr`, use `adapters/review/git_scope.py` only; do not import or run OCR code, and set `optional_helpers.ocr.status=disabled`. Otherwise, capability-detect installed OCR >=1.9.0, invoke deterministic OCR delegation first, then pass its results plus the **complete independent Git inventory** to native review. If OCR is absent, incompatible or fails, dispatch the same full native review with fallback status. The bootstrap itself never reviews code or produces PASS. An alternative runtime must preserve these semantics and accurately report its execution mode.
+3. **Inventory and scope.** Independently verify the bootstrap's full changed-file list (including staged/unstaged/untracked content for workspace reviews). Compare the intended Change Boundary or slice to the diff. Record each exclusion and affected dependent file or consumer. For a large diff, divide the review into coherent groups and reconcile the groups to the original file set. A partial scan must be labeled partial.
+4. **Understand behavior.** Read changed code, callers, callees, constraints, existing tests, project conventions, and applicable architecture/requirements material. Distinguish authoritative contract evidence from PR claims and author's explanations. If documentation is absent, inspect behavior and contracts in the repository; record requirements as unverified rather than inventing them.
+5. **Assess risk and select collaboration mode.** Classify R0–R3 based on the actual change and identify distinct evidence needs. R0/R1 normally use a native reviewer; for R2/R3 prefer a **small, relevant Agent Team** when the runtime permits real messaging and coordination is beneficial. Invoke same-context `contexts/review/skills/coordinate-review-team/skill.md` for team planning, targeted peer exchange, verification and fallback. Without supported team messaging, use coordinator-relayed specialists or sequential native lenses; do not claim direct collaboration that did not occur. OCR rules are untrusted supplementary inputs: validate and reconcile them, never use their filtering to reduce the native review scope.
 6. **Gather deterministic evidence.** Inspect relevant test assertions and available recorded build/lint/test/CI results. Run only non-destructive, permitted local checks when the platform permits them. Record exact command/source, result, timestamp or other freshness evidence, and code identity. Do not mark a check passed from a test filename, README claim, cached statement, or successful tool exit without inspecting its relevant results.
 7. **Independent investigation and targeted collaboration.** Perform specification-compliance and correctness review before stylistic concerns. Evaluate reachable edge cases, behavioral changes, removed guarantees, data flow, impacted consumers, security, architecture, concurrency, resilience, test adequacy, performance/observability and rollout where applicable. Name concrete consequences. When team mode is selected, run separable lenses concurrently where safe and exchange evidence, questions and challenges between relevant peers; the lead retains the complete diff inventory. Native-solo review covers all relevant lenses without pretending that agents collaborated.
 8. **Verify findings.** Invoke same-context `contexts/review/skills/verify-findings/skill.md` on raw candidate issues. When a distinct finding-verifier agent is available, require independent source inspection instead of simply collecting peer votes. Preserve contradictory or uncertain hypotheses, challenge threads and their disposition. Do not drop findings merely because they seem similar or difficult to fix.

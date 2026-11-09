@@ -40,8 +40,10 @@ class ReviewContextTests(unittest.TestCase):
         self.head = git(self.repo, "rev-parse", "HEAD")
 
     def test_native_context_keeps_all_files_and_no_approval(self):
-        with patch.object(review, "ocr_adapter", side_effect=AssertionError("OCR must not run")) as mock:
-            got = review.prepare_context(self.repo, base=self.base, head=self.head, allow_ocr=False)
+        # An unavailable OCR Python module must not affect native-only mode.
+        with patch.dict(sys.modules, {"delegate": None}):
+            with patch.object(review, "ocr_adapter", side_effect=AssertionError("OCR must not run")) as mock:
+                got = review.prepare_context(self.repo, base=self.base, head=self.head, allow_ocr=False)
         mock.assert_not_called()
         self.assertEqual(["src.py", "tests.py"], got["review_required_files"])
         self.assertEqual("disabled", got["optional_helpers"]["ocr"]["status"])

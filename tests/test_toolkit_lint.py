@@ -85,6 +85,30 @@ class ToolkitLintTests(unittest.TestCase):
         self.assertEqual([], lint_toolkit(self.root))
         self.assertTrue((self.root / "contexts/review/agents/code-reviewer.md").is_file())
 
+    def test_review_command_requires_runtime_bootstrap(self):
+        self.change(
+            "contexts/review/commands/review-code.md",
+            "adapters/review/run_review.py",
+            "manual-review-only",
+        )
+        self.assert_error("missing executable OCR-first review bootstrap")
+
+    def test_no_ocr_override_is_not_optional_policy(self):
+        self.change(
+            "contexts/review/commands/review-code.md",
+            "Optional flag `--no-ocr`",
+            "Optional flag `--no-helper`",
+        )
+        self.assert_error("missing native-only --no-ocr override")
+
+    def test_review_workflow_requires_context_before_analysis(self):
+        self.change(
+            "contexts/review/skills/review-change/skill.md",
+            "Mandatory context bootstrap",
+            "Unordered context bootstrap",
+        )
+        self.assert_error("review must bootstrap context before analysis")
+
     def test_review_command_cannot_become_mutating(self):
         self.change(
             "contexts/review/commands/review-code.md",

@@ -16,14 +16,13 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "review"))
+from git_scope import GitScopeError as AdapterError, git_inventory  # noqa: E402
+
 MAX_OUTPUT_BYTES = 8 * 1024 * 1024
 BATCH_SIZE = 40
 SUPPORTED_SCHEMA = "1"
 MIN_OCR_VERSION = (1, 9, 0)
-
-
-class AdapterError(Exception):
-    """A helper cannot provide trustworthy structured scaffolding."""
 
 
 def invoke(args: list[str], *, cwd: Path, timeout: int) -> subprocess.CompletedProcess[bytes]:
@@ -38,14 +37,6 @@ def invoke(args: list[str], *, cwd: Path, timeout: int) -> subprocess.CompletedP
     if len(completed.stdout) > MAX_OUTPUT_BYTES or len(completed.stderr) > MAX_OUTPUT_BYTES:
         raise AdapterError("helper output exceeded size limit")
     return completed
-
-
-def git(args: list[str], *, cwd: Path, timeout: int) -> bytes:
-    result = invoke(["git", "--no-pager", *args], cwd=cwd, timeout=timeout)
-    if result.returncode != 0:
-        # stderr is untrusted and can contain repository content; avoid echoing it.
-        raise AdapterError(f"git command failed ({result.returncode}): {args[0]}")
-    return result.stdout
 
 
 def decode_json(result: subprocess.CompletedProcess[bytes], command: str) -> dict[str, Any]:
@@ -76,64 +67,6 @@ def check_ocr_version(output: bytes) -> str:
     if parts < MIN_OCR_VERSION:
         raise AdapterError(f"OCR {'.'.join(map(str, parts))} is unsupported; requires OCR >= 1.9.0")
     return ".".join(map(str, parts))
-
-
-def safe_ref(ref: str) -> str:
-    if not ref or ref.startswith("-") or "\x00" in ref or "\n" in ref:
-        raise AdapterError("invalid Git ref")
-    return ref
-
-
-def git_commit(ref: str, repo: Path, timeout: int) -> str:
-    return git(["rev-parse", "--verify", "--end-of-options", f"{safe_ref(ref)}^{{commit}}"], cwd=repo, timeout=timeout).decode().strip()
-
-
-def git_inventory(*, repo: Path, timeout: int, from_ref: str | None, to_ref: str | None, commit_ref: str | None) -> dict[str, Any]:
-    root = Path(git(["rev-parse", "--show-toplevel"], cwd=repo, timeout=timeout).decode().strip()).resolve()
-    if root != repo.resolve():
-        raise AdapterError("--repo must name the Git worktree root")
-    head = git_commit("HEAD", repo, timeout)
-    mode = "workspace"
-    target: dict[str, Any] = {"head_sha": head, "base_sha": None, "merge_base_sha": None}
-    if commit_ref:
-        mode = "commit"
-        commit = git_commit(commit_ref, repo, timeout)
-        # diff-tree without -m/-c omits merge commit changes. Review changes
-        # introduced relative to the first parent (standard PR merge semantics).
-        parents = git(["rev-list", "--parents", "-n", "1", commit], cwd=repo, timeout=timeout).decode("ascii").split()
-        if not parents or parents[0] != commit:
-            raise AdapterError("could not resolve commit parents")
-        if len(parents) > 1:
-            raw = git([
-                "diff", "--no-ext-diff", "--no-textconv", "--no-renames",
-                "--name-only", "-z", parents[1], commit,
-            ], cwd=repo, timeout=timeout)
-        else:
-            raw = git([
-                "diff-tree", "--root", "--no-renames", "--no-commit-id",
-                "--name-only", "-r", "-z", commit,
-            ], cwd=repo, timeout=timeout)
-        target["head_sha"] = commit
-        target["first_parent_sha"] = parents[1] if len(parents) > 1 else None
-        target["merge_commit"] = len(parents) > 2
-    elif from_ref and to_ref:
-        mode = "range"
-        base = git_commit(from_ref, repo, timeout)
-        tip = git_commit(to_ref, repo, timeout)
-        merge_base = git(["merge-base", base, tip], cwd=repo, timeout=timeout).decode().strip()
-        target = {"head_sha": tip, "base_sha": base, "merge_base_sha": merge_base}
-        raw = git(["diff", "--no-ext-diff", "--no-textconv", "--no-renames", "--name-only", "-z", merge_base, tip], cwd=repo, timeout=timeout)
-    else:
-        # Compare the worktree to HEAD, including the index. Disable rename
-        # detection so both old and new paths are present in the native scope.
-        raw = git([
-            "diff", "--no-ext-diff", "--no-textconv", "--no-renames",
-            "--name-only", "-z", "HEAD",
-        ], cwd=repo, timeout=timeout)
-        raw += git(["ls-files", "--others", "--exclude-standard", "-z"], cwd=repo, timeout=timeout)
-    names = [x.decode("utf-8", errors="surrogateescape") for x in raw.split(b"\x00") if x]
-    target["workspace_unpinned"] = mode == "workspace"
-    return {"mode": mode, "target": target, "changed_files": sorted(set(names))}
 
 
 def valid_path(path: Any) -> bool:

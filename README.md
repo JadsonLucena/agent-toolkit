@@ -176,7 +176,7 @@ Run it against a target repository with `python3 /path/to/agent-toolkit/adapters
 
 Executable runtime integration examples (not additional canonical owners):
 
-* [Review context bootstrap](adapters/review/README.md) — automatically probes authorized installed OCR and preserves native Git scope; no AI review or verdict is emitted.
+* [Review command runtime entrypoint](adapters/review/README.md) — `adapters/review/run_review.py` **always calls** `prepare_context.py` before dispatching an approved native reviewer: OCR-first by default, native-only on missing/unsupported OCR, or explicitly native-only with `--no-ocr` (no OCR adapter import). The bootstrap alone cannot issue a review verdict.
 * [Agent Team peer-message transport](adapters/teams/README.md) — bounded cross-specialist exchanges with `review_id`, requests, responses and explicit thread resolution; unresolved challenges prevent successful completion. In-process handlers are **not** isolated `team-live` model agents.
 * [Guarded GitHub PR creation](adapters/github/README.md) — validates a **detached SSH-signed independent review** against reviewer keys and check commands supplied by a deployment-protected policy, verifies the exact remote head/base and executes required checks before an explicitly authorized `gh pr create`. The newly created PR is queried and verified (including head/base SHA, title and Draft state). This cannot prevent a separate GitHub client from bypassing the wrapper; key custody and policy selection belong to the trusted runtime.
 
