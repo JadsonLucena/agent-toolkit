@@ -146,6 +146,23 @@ class PortableReviewTests(unittest.TestCase):
         self.assertEqual(2, code, result)
         self.assertIn("amplified", result["reason"])
 
+    def test_malformed_blocker_container_is_fails_closed_not_uncaught(self):
+        context = self.prepare()
+        evidence = self.valid_evidence(context)
+        evidence["blocking_findings"] = {"not": "an array"}
+        code, result = self.validate(evidence)
+        self.assertEqual(2, code)
+        self.assertEqual("INCOMPLETE", result["review_status"])
+        self.assertIn("blockers", result["reason"])
+
+    def test_gate_never_promotes_legacy_advisory_evidence(self):
+        context = self.prepare("--review-profile", "gate")
+        evidence = self.valid_evidence(context)
+        evidence["reviewer_independent"] = True
+        code, result = self.validate(evidence)
+        self.assertEqual(2, code)
+        self.assertIn("review_profile", result["reason"])
+
     def test_fail_requires_lead_confirmation_of_blocker(self):
         context = self.prepare()
         evidence = self.valid_evidence(context)
