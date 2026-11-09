@@ -87,9 +87,12 @@ def validate_evidence(evidence: dict[str, Any], context: dict[str, Any], repo: P
     if verdict == "PASS" and profile == "gate" and evidence.get("reviewer_independent") is not True:
         raise EvidenceError("gate PASS requires affirmative reviewer independence")
     findings = evidence.get("findings", [])
+    blockers = evidence.get("blocking_findings", [])
     if not isinstance(findings, list):
         raise EvidenceError("findings must be an array")
-    for item in findings + evidence.get("blocking_findings", []):
+    if not isinstance(blockers, list):
+        raise EvidenceError("blockers must be an array")
+    for item in findings + blockers:
         if not isinstance(item, dict):
             raise EvidenceError("finding must be an object")
         likelihood = item.get("likelihood")
