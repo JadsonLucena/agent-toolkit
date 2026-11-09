@@ -175,9 +175,9 @@ def lint_toolkit(root: Path) -> list[str]:
                 errors.append(f"{rel}: review invocation must remain read-only")
             if "does not authorize" not in authority:
                 errors.append(f"{rel}: review command must forbid out-of-scope mutations")
-            if "adapters/review/run_review.py" not in section(content, "Invocation"):
+            if "the approved host runtime must invoke `adapters/review/run_review.py`" not in section(content, "Invocation").lower():
                 errors.append(f"{rel}: missing executable OCR-first review bootstrap")
-            if "--no-ocr" not in section(content, "Inputs"):
+            if "optional flag `--no-ocr` propagated" not in section(content, "Inputs").lower():
                 errors.append(f"{rel}: missing native-only --no-ocr override")
         if rel == "contexts/review/skills/review-change/skill.md":
             if "mandatory context bootstrap" not in section(content, "Workflow").lower():
