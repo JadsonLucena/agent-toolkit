@@ -70,3 +70,28 @@ Former top-level `rules/`, `skills/`, and `agents/` copies were removed after mi
 Detailed procedures removed from agents are not semantic losses when their durable constraints remain in rules or their reusable workflow moved into a skill.
 
 No vendor-specific adapter files are introduced by this migration.
+
+## 2026-11 — Portable Review evidence and host-native execution
+
+* Added two-phase review: `run_review.py --prepare-only --out /tmp/context.json`
+  and `run_review.py --validate-evidence /tmp/evidence.json --context /tmp/context.json`.
+  Subprocess `-- <reviewer-command>` remains supported. Both paths use one
+  validator with target freshness and complete coverage checks.
+* Added `--base-branch` to resolve a local or cached remote-tracking base,
+  without fetching. Local divergence from cached `origin/<branch>` warns.
+* Added `--output-language` for human prose. Machine field names stay English.
+* `--concern` canonical names are `contract`, `correctness`,
+  `security`, `reliability`, `testing`, `architecture`; aliases
+  `spec`, `specification` and `arch` normalize to canonical values.
+* Small R3 changes with one or two real concerns are valid but must record
+  below-ideal N. Isolated verifier remains required when isolated tasks exist.
+* Confirmed blockers yield FAIL even when unresolved questions remain. Every
+  question is retained. R2 may use two independent lenses for cost efficiency.
+* Specialist outputs now require self-contained source evidence and verified
+  head identity under `contracts/review-specialist-evidence.md`.
+  **Compatibility:** host serializers returning only free-form narratives or
+  "previous message" pointers must adapt to this contract. CLI changes are
+  additive; adapters may implement equivalent semantics without Python.
+* OCR-excluded paths remain required natively and system OCR rules are generic,
+  nonbinding hints. Project-specific OCR rule injection was **not** added
+  without an independently verified adapter capability.

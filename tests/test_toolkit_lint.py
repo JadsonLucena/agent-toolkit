@@ -88,24 +88,24 @@ class ToolkitLintTests(unittest.TestCase):
     def test_review_command_requires_runtime_bootstrap(self):
         self.change(
             "contexts/review/commands/review-code.md",
-            "adapters/review/run_review.py",
-            "manual-review-only",
+            "Mandatory semantics; optional adapter",
+            "Manual preparation optional",
         )
-        self.assert_error("missing executable OCR-first review bootstrap")
+        self.assert_error("missing mandatory host-neutral review preparation")
 
     def test_no_ocr_override_is_not_optional_policy(self):
         self.change(
             "contexts/review/commands/review-code.md",
-            "Optional flag `--no-ocr`",
-            "Optional flag `--no-helper`",
+            "`--no-ocr` (or equivalent host-native setting)",
+            "`--no-helper`",
         )
         self.assert_error("missing native-only --no-ocr override")
 
     def test_review_workflow_requires_context_before_analysis(self):
         self.change(
             "contexts/review/skills/review-change/skill.md",
-            "Mandatory context bootstrap",
-            "Unordered context bootstrap",
+            "Mandatory host-neutral preparation",
+            "Optional, unordered preparation",
         )
         self.assert_error("review must bootstrap context before analysis")
 

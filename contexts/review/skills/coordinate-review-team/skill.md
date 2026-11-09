@@ -43,9 +43,10 @@ Use one isolated subagent per distinct concern, with the actual corresponding
 
 **Never** dispatch one all-purpose specialist at R2/R3 because peer messaging
 is unavailable; **never** dispatch all seven by default. At most the six
-investigation roles plus one `finding-verifier`. If R2/R3 has fewer distinct
-concerns than the minimum, revisit scope/risk or report the planning gap
-`INCOMPLETE`; do not manufacture concerns to fill quotas.
+investigation roles plus one `finding-verifier`. R2 with fewer than two
+distinct concerns needs scope/risk reconsideration. **R3 with only one or two
+genuine concerns is valid:** activate those lenses, record the below-ideal N
+and keep the source-inspecting isolated verifier. Never invent concerns.
 
 Concern mapping:
 
@@ -76,12 +77,21 @@ and the final `PASS` still requires a genuinely independent lead/session.
 3. `native-solo` only when subagents cannot be used, or R0/R1 has no
    separable concern. Native solo still covers every applicable lens.
 
-In Cursor Agent, sibling `Task` calls do **not** inherently communicate.
-`resume` on an existing subagent ID is a lead → specialist delivery and
-remains `team-relayed`. If resume is unsupported, the lead may create a
+In hosts where sibling tasks do not communicate, a resume operation on an
+existing subagent identity is a lead-mediated delivery and remains
+`team-relayed`. If resuming is unsupported, the lead may create a
 new isolated `Task` with the narrow question and original immutable target,
 recording the new task ID and transfer; do not invent a prior conversation.
 No platform-specific APIs are made canonical.
+
+## Dispatch and Result Contract
+
+Use `contexts/review/templates/specialist-dispatch.md` for neutral first-pass
+assignments and `contracts/review-specialist-evidence.md` for specialist and
+verifier outputs. Supply frozen facts, **not the Lead's hypotheses**, to
+first-pass investigators. Every reply must be self-contained with a verified
+target, inspected files, source-backed findings, actual runtime task identity,
+and requests for other lenses. Never reference an unseen previous message.
 
 ## Collaboration Protocol
 
@@ -171,3 +181,10 @@ material threads remain unresolved, an R3 verifier with available subagents
 cannot be established, or independent review cannot be established.
 An unavailable team runtime alone does not invalidate a **complete,
 separately independent** native review.
+
+## Optional Lean R2 Profile
+
+For an ordinary R2 change with exactly two independent concerns, activate
+those two isolated specialists. The verifier is needed only for material
+findings, and challenges are relayed only when a real cross-lens dependency
+requires resolution. This is cost guidance, not a relaxed quality gate.

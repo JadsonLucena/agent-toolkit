@@ -83,3 +83,37 @@ The host reviewer receives a single `review-context` JSON object on stdin with `
 The runner compares the returned target/inventory against the preparer's original values. It rejects an unjustified `PASS` with partial native coverage, overwrites any forged helper-execution metadata with bootstrap data, and returns `INCOMPLETE` when dispatch or validation fails. It **does not authenticate the identity or independence of the host reviewer**; the separate signed Git pre-PR gate is responsible for that check. Only run an explicitly authorized reviewer command with permissible source-code access. No shell expansion, software installation, code edits, Git commits or PR operations are performed by the runner.
 
 Use `adapters/review/prepare_context.py` separately for debugging the preparation JSON (without dispatching a reviewer). `tests/test_review_dispatch.py` uses a fake OCR executable, Git fixture, and a fake reviewer to verify end-to-end ordering and all fallback paths. `tests/test_review_context.py` tests the bootstrap alone.
+
+## Host-Agent Two-Phase Workflow
+
+For a host-native reviewer (regardless of IDE, model or provider) use:
+
+```bash
+python3 adapters/review/run_review.py --repo . --base-branch origin/main \
+  --risk-profile R3 --concern security --output-language pt-BR \
+  --prepare-only --out /tmp/review-context.json
+
+# Host independently reviews the frozen context using its own runtime tools.
+
+python3 adapters/review/run_review.py --repo . \
+  --validate-evidence /tmp/review-evidence.json \
+  --context /tmp/review-context.json
+```
+
+`--prepare-only` does not require or call a subprocess reviewer.
+`--validate-evidence` uses exactly the same validator as subprocess dispatch.
+Both modes recheck base/head or workspace fingerprint, inventory, team identity,
+coverage and verdict consistency. Context files for workspace reviews belong
+outside the reviewed checkout.
+
+Valid `--concern`: `contract`, `correctness`, `security`,
+`reliability`, `testing`, `architecture`; aliases `spec`,
+`specification` and `arch`. `--base-branch` never fetches.
+`helper_excluded_requires_native_review` names OCR-skipped Git files that
+must still be reviewed natively; OCR system rules are generic, nonbinding.
+
+The `TaskRuntime` protocol is a **reference adapter contract**, not a
+requirement for a specific product API. A host with isolated agents uses its
+own task creation, resume or new bounded follow-up and (if available)
+direct-delivery audit. Observability is required for `team-live`; otherwise
+use honest `team-relayed` provenance.

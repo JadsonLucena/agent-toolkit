@@ -126,7 +126,7 @@ The Code Reviewer performs a full, independent, read-only, risk-proportionate re
 
 Review is **native and provider-neutral**: OCR or other installed review helpers may accelerate discovery but are optional. No installation, network provider, or adapter is required for a complete native review.
 
-**Collaborative Agent Teams:** the `code-reviewer` is the **Code Review Lead**. For R2/R3 changes, it preferentially activates a small set of relevant specialists when the platform supports independent agents and **actual peer-to-peer messaging**. Specialists share evidence, ask targeted questions and challenge conclusions; a distinct finding-verifier independently attempts falsification before the lead issues the sole verdict. R0/R1 changes normally run solo. On platforms without messaging, the lead relays questions between specialist passes or reviews natively. The record distinguishes `team-live`, `team-relayed`, and `native-solo`; mere subagent parallelism is not a collaborative Agent Team.
+**Collaborative Agent Teams:** the `code-reviewer` is the **Code Review Lead**. For R2/R3 changes, it preferentially activates a small set of relevant specialists when the platform supports independent agents and **actual peer-to-peer messaging**. Specialists share evidence, ask targeted questions and challenge conclusions; a distinct finding-verifier independently attempts falsification before the lead issues the sole verdict. R0/R1 changes normally run solo. On platforms without messaging, the lead relays questions between specialist passes or reviews natively. The record distinguishes `team-live`, `team-relayed`, and `native-solo`; parallel isolated specialists alone are not evidence of collaboration; `team-relayed` is a collaborative team with actual Lead-mediated exchange, and `team-live` requires host-observed direct peer delivery.
 
 The toolkit defines the roles and `contexts/review/skills/coordinate-review-team/skill.md` messaging workflow, **not a concrete provider's agent-spawning API**. Live team coordination requires a platform adapter/runtime that supports it, while native review remains fully functional without one. Independent review cannot be established by simply renaming the implementation author's role.
 
@@ -351,3 +351,26 @@ Canonical Skills use lowercase `skill.md` without requiring Agent Skills frontma
 ## Goal
 
 The goal is not a collection of prompts. It is a **composable software engineering system for AI agents** where responsibility, evidence, workflow, boundaries, and context are structured to produce consistent engineering outcomes.
+
+### Portable Two-Phase Code Review
+
+Review semantics, not a particular IDE, provider, LLM or Python adapter, are
+the source of truth. Hosts where the agent is itself the reviewer can prepare
+a frozen context with `run_review.py --prepare-only --out /tmp/review-context.json`,
+conduct isolated source investigation with their own runtime mechanisms, and
+validate evidence through `run_review.py --validate-evidence <evidence.json>
+--context /tmp/review-context.json`. The older
+`-- <approved-reviewer-command>` subprocess mode remains an optional adapter;
+both use the **same evidence validator**.
+
+The reference CLI accepts `--base-branch <ref>` (local or cached remote ref,
+no fetch), `--output-language pt-BR`, and `--concern` values
+`contract|correctness|security|reliability|testing|architecture` (aliases
+`spec|specification→contract`, `arch→architecture`). See
+[Review runtime integration](adapters/review/README.md).
+
+The canonical mode/N policy belongs to
+`contexts/review/skills/coordinate-review-team/skill.md`, and the optional OCR
+policy to `contexts/review/rules/code-review.md`. An R3 diff with 1–2 real
+concerns is valid and still requires the source-inspecting isolated verifier
+when isolated agents are available.

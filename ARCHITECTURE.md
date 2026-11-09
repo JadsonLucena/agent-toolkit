@@ -155,6 +155,7 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Git | `commands/create-pull-request.md` | Command | Create a remote PR with explicit creation-only authorization |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
 | Cross-context | `contracts/review-evidence.md` | Contract | Portable independent code-review evidence and pre-PR eligibility semantics |
+| Cross-context | `contracts/review-specialist-evidence.md` | Contract | Self-contained specialist and verifier evidence |
 | Cross-context | `contracts/requirements.md` | Contract | Neutral elicitation and requirement-definition handoff semantics |
 | Cross-context | `contracts/work-item.md` | Contract | Neutral planning-item handoff semantics |
 | Cross-context | `contracts/test-basis.md` | Contract | Optional portable Scenario Set and behavioral evidence handoff for Testing |
@@ -390,3 +391,20 @@ The following do not currently require first-class commands:
 Promote one to a command only when there is a clear user-facing invocation intent. Reusable internal procedures may remain skills without public command entry points.
 
 See `MIGRATION.md` for structural renames and responsibility movement.
+
+### Portable Review Execution
+
+The canonical Rule/Skill/Agent/Command/Contract artifacts define the required
+semantics. Adapters in `adapters/review/` are optional reference implementations,
+not the source of truth for any IDE, model, issue tracker, Git host or runtime.
+
+Host-native Review follows the same **prepare → independent investigation →
+validate evidence** contract as a subprocess reviewer. Preparation freezes
+repository, base/head or workspace fingerprint, full inventory and R0–R3
+risk before any isolated task. The validator checks that the same snapshot
+remains current. Optional OCR hints never reduce native review coverage.
+
+Canonical concerns: `contract`, `correctness`, `security`, `reliability`,
+`testing`, `architecture`. The CLI accepts aliases `spec`,
+`specification` and `arch`. `--base-branch` resolves local/cached
+refs without fetch; `--output-language` selects human report prose.

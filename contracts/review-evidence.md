@@ -13,7 +13,6 @@ A review result should carry:
 * `repository` and `target` — actual repository and commit/branch/workspace subject;
 * `base_sha` and `head_sha` — resolved full commit identities for a committed comparison; workspace reviews additionally declare a working-tree fingerprint or note that a stable identity could not be established;
 * `reviewer` — independent native reviewer/lead identity and any optional auxiliary tools or specialist agents used; tool/team usage is metadata, not a validity requirement;
-* `risk_profile` — R0/R1/R2/R3 or equivalent contextual classification with reasons;
 * `reviewed_at` — observation time where reliable, and `limitations`.
 
 ## Optional Collaborative Team Evidence
@@ -21,9 +20,6 @@ A review result should carry:
 For team-based reviews, add a compact, provider-neutral collaboration record without requiring Agent Teams for valid solo reviews:
 
 * `execution_mode` — `native-solo`, `team-relayed`, or `team-live`. A live designation requires **host-observed direct question/challenge + response delivery between isolated subagent IDs**; a capability flag, shared queue, lead relay or Cursor Task siblings do not suffice;
-* `team_members` — activated roles, scoped assignments and actual participants/isolated sessions when available, including the lead and verifier if present;
-* `coordination` — relevant reviewer capability, messaging transport type, concurrency/relaying limitations, and why team mode was selected or skipped;
-* `peer_threads` — material evidence exchange: `thread_id`, `message_id`, origin/recipient, `kind`, target identity, claim, bounded code location, evidence references, question/challenge, response/resolution and open state;
 * `independent_verification` — `{mode: isolated-agent, task_id, inspected_files}` for actual isolated source inspection, or `{mode: native-second-pass, independent: false, source_evidence}` for an observed native falsification pass; do not invent isolation;
 * `unresolved_collaboration` — interrupted specialists, unanswered high-impact challenges, source contradictions and coverage gaps.
 
@@ -111,3 +107,17 @@ Project tests and lint are **separate** required pre-PR checks when applicable; 
 * When the head/base is unavailable or changes, identify the missing evidence; do not claim a stale review proves a new revision safe.
 * The runtime or CI must enforce any automated gate; Markdown contract text alone cannot prohibit remote operations.
 
+
+## Human Output and Verdict Precedence
+
+Portable evidence keys remain English regardless of model, IDE, provider or
+runtime. Human-facing descriptions follow the user's or project's language;
+an explicitly selected `output_language` takes precedence. The neutral report
+template is `contexts/review/templates/human-review-report.md` and specialist
+evidence follows `contracts/review-specialist-evidence.md`.
+
+When a **confirmed blocking defect** and material uncertainty coexist, the
+single verdict is **FAIL**; preserve all uncertainty under
+`unresolved_questions`. Without a confirmed blocker, unavailable or stale
+required evidence yields **INCOMPLETE**. A PASS requires complete coverage,
+current required checks and no unresolved blockers/unknowns. Consensus is not proof.

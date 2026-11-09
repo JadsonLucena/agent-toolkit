@@ -63,6 +63,11 @@ def lint_toolkit(root: Path) -> list[str]:
             rel = path.relative_to(root)
             kind = classify(rel)
             if kind is None:
+                # Review templates are supporting documentation, not a new
+                # canonical artifact kind. All Markdown links still get checked.
+                if (len(rel.parts) == 4 and rel.parts[:3] ==
+                        ("contexts", "review", "templates") and rel.suffix == ".md"):
+                    continue
                 errors.append(f"{rel}: invalid canonical artifact location")
             else:
                 discovered[rel.as_posix()] = kind
@@ -177,12 +182,12 @@ def lint_toolkit(root: Path) -> list[str]:
                 errors.append(f"{rel}: review invocation must remain read-only")
             if "does not authorize" not in authority:
                 errors.append(f"{rel}: review command must forbid out-of-scope mutations")
-            if "the approved host runtime must invoke `adapters/review/run_review.py`" not in section(content, "Invocation").lower():
-                errors.append(f"{rel}: missing executable OCR-first review bootstrap")
-            if "optional flag `--no-ocr` propagated" not in section(content, "Inputs").lower():
+            if "mandatory semantics; optional adapter" not in section(content, "Invocation").lower():
+                errors.append(f"{rel}: missing mandatory host-neutral review preparation")
+            if "--no-ocr" not in section(content, "Inputs").lower():
                 errors.append(f"{rel}: missing native-only --no-ocr override")
         if rel == "contexts/review/skills/review-change/skill.md":
-            if "mandatory context bootstrap" not in section(content, "Workflow").lower():
+            if "mandatory host-neutral preparation" not in section(content, "Workflow").lower():
                 errors.append(f"{rel}: review must bootstrap context before analysis")
         # Narrow policy-drift guards, not proof that a runtime actually runs checks.
         if rel == "contexts/git/rules/git.md":
