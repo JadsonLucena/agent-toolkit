@@ -81,7 +81,7 @@ class FakeTaskHost:
              "sender_task_id": sender, "recipient_task_id": recipient},
             {"review_id": review_id, "via": "direct-peer", "status": "delivered",
              "kind": "response", "thread_id": "direct-1", "message_id": "b",
-             "subject": "Inspected the guard", "evidence_refs": ["payments.py:1"],
+             "response_to": "a", "subject": "Inspected the guard", "evidence_refs": ["payments.py:1"],
              "sender_task_id": recipient, "recipient_task_id": sender},
         ]
 
@@ -200,6 +200,56 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result["coordination"]["real_peer_delivery_observed"])
         self.assertEqual(2, len(result["peer_threads"]))
         self.assertEqual([], host.resumed)
+
+    async def test_r1_nonblocking_observation_does_not_spawn_verifier(self):
+        plan = self.plan("R1", ["correctness"])
+        host = self.host()
+        original = host.task_batch
+
+        async def first_pass(requests):
+            answers = await original(requests)
+            if requests[0]["role"] != "finding-verifier":
+                answers[0]["candidate_findings"] = [
+                    {"finding_id": "low-1", "severity": "low", "blocking": False},
+                ]
+            return answers
+
+        host.task_batch = first_pass
+        result = await team.execute(plan, host)
+        self.assertEqual(1, len(host.batches))
+        self.assertEqual("not-required", result["independent_verification"]["mode"])
+
+    async def test_resume_unavailable_uses_new_narrow_task_and_records_ids(self):
+        plan = self.plan("R2", ["correctness", "reliability"])
+        host = self.host(requests=True)
+        original = host.task_batch
+        narrow_calls = []
+
+        async def new_task(requests):
+            if "relayed_message" not in requests[0]:
+                return await original(requests)
+            req = requests[0]
+            narrow_calls.append(req)
+            msg = req["relayed_message"]
+            return [{
+                "role": req["role"], "review_id": req["review_id"],
+                "target": req["target"], "repository": req["repository"],
+                "task_id": "new-" + req["role"],
+                "kind": "response" if msg["kind"] == "challenge" else "resolution",
+                "subject": "Inspected source", "evidence_refs": ["payments.py:1"],
+            }]
+
+        async def no_resume(task_id, msg):
+            raise NotImplementedError("host has Task but not resume")
+
+        host.task_batch = new_task
+        host.resume = no_resume
+        result = await team.execute(plan, host)
+        self.assertEqual("team-relayed", result["execution_mode"])
+        self.assertEqual("Task+new Task", result["coordination"]["transport"])
+        self.assertEqual(2, len(narrow_calls))
+        self.assertEqual([], result["unresolved_questions"])
+        self.assertTrue(any(m.get("recipient_task_id") for m in result["peer_threads"]))
 
     async def test_stale_specialist_is_rejected(self):
         plan = self.plan()

@@ -117,7 +117,7 @@ def dispatch(
                     if not coordination.get("real_peer_delivery_observed") or not evidence.get("peer_threads"):
                         raise ReviewInvocationError("team-live without observed direct peer delivery")
                 else:
-                    if coordination.get("transport") not in ("Task+resume", "Task (no relay needed)"):
+                    if coordination.get("transport") not in ("Task+resume", "Task+new Task", "Task (no relay needed)"):
                         raise ReviewInvocationError("team-relayed without Task+resume provenance")
             elif evidence.get("execution_mode") != "native-solo":
                 raise ReviewInvocationError("reviewer fabricated team without runtime capability")

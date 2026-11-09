@@ -213,6 +213,30 @@ def _valid_message_reply(reply: Any, plan: dict[str, Any], role: str, kind: str)
         raise TeamPlanningError("peer reply lacks source evidence")
 
 
+async def _deliver(
+    host: TaskRuntime, plan: dict[str, Any], grouped: dict[str, dict[str, Any]],
+    role: str, message: dict[str, Any],
+) -> dict[str, Any]:
+    """Relay to an existing Task, or explicitly open a new narrowly scoped Task."""
+    try:
+        return await host.resume(grouped[role]["task_id"], message)
+    except (AttributeError, NotImplementedError):
+        request = _assignment(plan, role, purpose="narrow relayed peer follow-up")
+        request["relayed_message"] = dict(message)
+        replies = await host.task_batch([request])
+        if not isinstance(replies, list) or len(replies) != 1 or not isinstance(replies[0], dict):
+            raise TeamPlanningError("new Task relay did not return exactly one specialist")
+        reply = replies[0]
+        _check_target(reply, plan)
+        if (reply.get("role") != role or not isinstance(reply.get("task_id"), str)
+                or not reply["task_id"]
+                or reply["task_id"] in {r["task_id"] for r in grouped.values()}):
+            raise TeamPlanningError("new Task relay did not establish fresh isolated identity")
+        message["transport"] = "Task+new Task"
+        message["recipient_task_id"] = reply["task_id"]
+        return reply
+
+
 async def _relay(plan: dict[str, Any], grouped: dict[str, dict[str, Any]], host: TaskRuntime) -> tuple[list[dict], list[str]]:
     ledger: list[dict] = []
     unresolved: list[str] = []
@@ -236,14 +260,14 @@ async def _relay(plan: dict[str, Any], grouped: dict[str, dict[str, Any]], host:
                              requested_action=action, thread_id=thread, message_id=req_id)
         ledger.append(msg)
         try:
-            response = await host.resume(grouped[recipient]["task_id"], msg)
+            response = await _deliver(host, plan, grouped, recipient, msg)
             _valid_message_reply(response, plan, recipient, "response")
             resp_id = uuid.uuid4().hex
             answer = _relay_payload(plan, recipient, sender, "response", response["subject"],
                                     response["evidence_refs"], requested_action=None,
                                     thread_id=thread, message_id=resp_id, response_to=req_id)
             ledger.append(answer)
-            resolved = await host.resume(grouped[sender]["task_id"], answer)
+            resolved = await _deliver(host, plan, grouped, sender, answer)
             _valid_message_reply(resolved, plan, sender, "resolution")
             ledger.append(_relay_payload(plan, sender, recipient, "resolution", resolved["subject"],
                                          resolved["evidence_refs"], requested_action=None,
@@ -278,7 +302,8 @@ def _direct_exchange_observed(events: Any, grouped: dict[str, dict], review_id: 
             requests[tid] = event
         if event.get("kind") == "response" and tid in requests:
             prior = requests[tid]
-            if src == prior["recipient_task_id"] and dst == prior["sender_task_id"]:
+            if (src == prior["recipient_task_id"] and dst == prior["sender_task_id"]
+                    and event.get("response_to") == prior.get("message_id")):
                 return True
     return False
 
@@ -325,9 +350,16 @@ async def execute(
         if execution_mode != "team-live":
             ledger, unresolved = await _relay(plan, grouped, host)
     material = any(v["candidate_findings"] for v in grouped.values())
+    r1_blocker = any(
+        isinstance(f, dict) and (
+            f.get("blocking") is True
+            or f.get("severity") in ("critical", "high")
+        )
+        for v in grouped.values() for f in v["candidate_findings"]
+    )
     verifier_needed = plan["verifier_required"] or (
         plan["risk_profile"] == "R2" and material
-    ) or (plan["risk_profile"] == "R1" and material)
+    ) or (plan["risk_profile"] == "R1" and r1_blocker)
     verifier: dict[str, Any] | None = None
     verification = {"mode": "not-required"}
     if verifier_needed:
@@ -368,7 +400,9 @@ async def execute(
         ],
         "coordination": {
             "transport": (
-                "Task+resume" if ledger and execution_mode == "team-relayed"
+                "Task+new Task" if execution_mode == "team-relayed"
+                    and any(m.get("transport") == "Task+new Task" for m in ledger)
+                else "Task+resume" if ledger and execution_mode == "team-relayed"
                 else "Task (no relay needed)" if execution_mode == "team-relayed"
                 else "observed direct-peer audit" if execution_mode == "team-live" else "none"
             ),
