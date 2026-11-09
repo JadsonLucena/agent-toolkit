@@ -160,7 +160,9 @@ def lint_toolkit(root: Path) -> list[str]:
                 if token not in authority:
                     errors.append(f"{rel}: missing pre-PR quality gate for {token}")
         if rel == "contexts/review/agents/code-reviewer.md":
-            for phrase in ("coordinate-review-team/skill.md", "peer-to-peer messages", "review lead"):
+            if "coordinate-review-team/skill.md" not in section(content, "Uses"):
+                errors.append(f"{rel}: missing team-lead coordination: canonical Uses entry")
+            for phrase in ("peer-to-peer messages", "review lead"):
                 if phrase not in content.lower():
                     errors.append(f"{rel}: missing team-lead coordination: {phrase}")
         if rel == "contexts/review/skills/review-change/skill.md":
