@@ -29,7 +29,7 @@ Use to review a specified PR, branch diff, commit/range, file set, or current wo
 
 ## Output
 
-A `PASS`, `FAIL`, or `INCOMPLETE` machine verdict labeled by `review_profile` (for example `PASS (advisory)` in the human report), with the frozen target, complete scope, calibrated findings, observed checks and collaboration evidence. Format follows `contracts/review-evidence.md` and `contexts/review/templates/human-review-report.md`; checklist heuristics are never automatic blockers.
+A `PASS`, `FAIL`, or `INCOMPLETE` machine verdict labeled by `review_profile` (for example `PASS (advisory)` in the human report), with the frozen target, complete scope, calibrated findings, documentation assessment (including justified non-applicability), observed checks and collaboration evidence. Format follows `contracts/review-evidence.md` and `contexts/review/templates/human-review-report.md`; checklist heuristics are never automatic blockers.
 
 ## Boundary
 

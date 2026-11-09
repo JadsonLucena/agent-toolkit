@@ -41,6 +41,13 @@ Record the original changed-file inventory separately from selection and executi
 * `excluded_files` — excluded paths with explicit reason and whether any critical unreviewed surface remains;
 * `unreviewed_files` — selected or otherwise required files that were not examined, with reason;
 * `coverage_status` — `complete`, `partial`, or `unknown`.
+* `documentation_assessment` — additive, portable record with `status`
+  (`checked`, `not-applicable`, `blocked`), inspected documentation/code
+  sources and target revision, affected documentation (including unchanged
+  files), and any finding references or reason for non-applicability/blocked
+  inspection. Refer to `contexts/review/rules/code-review.md` for normative
+  investigation and proportionality; this metadata is not an automatic
+  Git-gate override and does not retroactively invalidate legacy evidence.
 
 A completed tool run does not imply complete coverage. Partial or unknown required coverage cannot support a clean pre-PR gate. Excluded files must not be silently subtracted from the denominator.
 

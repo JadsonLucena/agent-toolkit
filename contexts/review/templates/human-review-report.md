@@ -14,6 +14,15 @@ If none, write "None confirmed".
 Material nonblocking findings with impact, likelihood, confidence, origin,
 exposure and disposition; list decision-needed requirement conflicts.
 
+## Documentation assessment
+
+Record `documentation_assessment.status` (`checked`, `not-applicable`,
+or `blocked`), the documents and implementation sources inspected at the
+reviewed target, affected but unchanged documentation, and the reason when
+no applicable documentation exists or inspection was blocked. Refer to
+individual findings for confirmed drift, contradictions, ambiguity or
+harmful duplication. Do not claim that every repository document was audited.
+
 ## Refuted candidates
 
 Candidate IDs and source-supported falsification.

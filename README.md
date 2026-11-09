@@ -122,7 +122,16 @@ contexts/review/
     └── finding-verifier.md
 ```
 
-The Code Reviewer performs a full, read-only, risk-proportionate review of Git changes in either `advisory` or independently executed `gate` profile. It inspects the actual diff, relevant context, requirements when supplied, tests, affected consumers, security, reliability, architecture, and integration risks. Evidence and coverage are preserved through `contracts/review-evidence.md`.
+The Code Reviewer performs a full, read-only, risk-proportionate review of Git changes in either `advisory` or independently executed `gate` profile. It inspects the actual diff, relevant context, requirements when supplied, tests, affected consumers, security, reliability, architecture, documentation consistency, and integration risks. Evidence and coverage are preserved through `contracts/review-evidence.md`.
+
+The review includes **Documentation Consistency and Drift**: inspect affected
+documentation even when no documentation file changed, and compare its claims
+against implementation and authoritative contracts. Investigate missing,
+outdated, contradictory, ambiguous and duplicated knowledge. Report inspected
+sources, findings or justified non-applicability. Duplicate prose alone is
+not an automatic defect; findings require a concrete consequence. The sole
+normative policy lives in `contexts/review/rules/code-review.md`, with
+optional `documentation_assessment` metadata in `contracts/review-evidence.md`.
 
 Review is **native and provider-neutral**: OCR or other installed review helpers may accelerate discovery but are optional. No installation, network provider, or adapter is required for a complete native review.
 

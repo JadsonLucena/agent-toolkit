@@ -125,3 +125,19 @@ No vendor-specific adapter files are introduced by this migration.
   Choosing whether project conventions (SOLID, DDD, Clean Architecture)
   should be mandatory remains a **team policy proposal**, not enabled by
   this toolkit migration.
+
+## 2026-11 — Documentation Consistency and Drift in Review
+
+* Canonical Review now investigates documentation affected by changed behavior
+  even if documentation itself was not edited, comparing current implementation
+  and applicable contracts in both directions.
+* Review considers missing, outdated/obsolete, contradictory, ambiguous and
+  duplicated claims using source-based counterexamples and impact-based triage;
+  repetition without demonstrated harm is not an automatic finding.
+* The Lead records `documentation_assessment`; the neutral evidence contract
+  accepts this additive record and human reporting includes inspected sources
+  or a justified `not-applicable`/`blocked` status. Older evidence remains
+  readable; no new Git-gate schema check or IDE adapter is imposed.
+* Existing specification and architecture specialists reference the one
+  Review Rule rather than maintaining separate documentation checklists.
+  Reviewer independence, SSHSIG, and advisory/gate boundaries are unchanged.

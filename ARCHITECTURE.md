@@ -126,7 +126,7 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Testing | `skills/generate-tests/skill.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
 | Testing | `commands/generate-tests.md` | Command | Start automated-test creation or modification |
 | Testing | `agents/test-engineer.md` | Agent | Own testing specialization, evidence discipline, and scope boundaries |
-| Review | `rules/code-review.md` | Rule | Advisory/gate profiles, calibrated findings and evidence-driven Review policy |
+| Review | `rules/code-review.md` | Rule | Advisory/gate profiles, calibrated findings, documentation drift and evidence-driven Review policy |
 | Review | `rules/high-risk-patterns.md` | Rule | Eight source-grounded risk counterexamples used as investigation heuristics |
 | Review | `skills/review-change/skill.md` | Skill | Native review of a complete diff with context, coverage, risk, optional helpers, and evidence |
 | Review | `skills/coordinate-review-team/skill.md` | Skill | Risk-based Agent Team coordination, peer messaging, challenge routing, verification and native fallback |
@@ -427,3 +427,16 @@ regardless of a PASS, signer or local success.
 agents rather than copied into their prompts. Repository-owned, versioned
 conventions can be discovered from existing project documentation; no
 specific IDE format, tracker, provider, model or execution engine is required.
+
+## Documentation Consistency in Code Review
+
+The Review Rule is the sole normative source for documentation drift:
+the Lead examines relevant documentation (including unchanged files) against
+the actual code and applicable contracts. The existing specification and
+architecture agents may contribute; no separate documentation agent or
+platform-dependent review concern is created. The review skill performs
+the bounded inspection and the evidence contract optionally records
+`documentation_assessment`. Missing, obsolete, contradictory, ambiguous
+or duplicated knowledge becomes a finding only with relevant observed impact,
+not by checklist matching. The signed Git gate, reviewer independence and
+risk-proportionate review policies are unchanged.

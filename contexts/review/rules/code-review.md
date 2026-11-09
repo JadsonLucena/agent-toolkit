@@ -69,6 +69,76 @@ Evaluate applicable concerns, with evidence and reachable consequences:
 * Discover **repository-owned, versioned conventions** from existing project instructions or contribution documents (`AGENTS.md`, `CONTRIBUTING.md`, ADRs, a documented project policy file or another declared equivalent). Record the actual source path/revision and applicability; do not require a particular vendor file, IDE-specific rules format, issue tracker or a new default file. A locally enforceable convention becomes a review criterion when explicitly declared and does not override safety or external contracts. Convention-only violations are normally low/medium and nonblocking unless a repository-owned policy **explicitly** makes them gating and the impact is justified.
 * If no project convention is declared, architectural preferences remain recommendations and are not independent defects. Whether teams should adopt mandatory SOLID/DDD/Object Calisthenics/Clean Architecture conventions is a **team policy decision**, not a toolkit default.
 
+## Documentation Consistency and Drift
+
+**Documentation is a review concern whenever the change affects observable
+behavior, interfaces, operations or documented decisions, even if the changed
+file inventory contains no documentation files.** Review both directions:
+whether implementation meets applicable documentation and whether user-facing
+or maintainer-facing documentation still describes the actual behavior at the
+frozen review target. Do not treat documentation or code as automatically
+authoritative for *intended* behavior; resolve source authority according to
+Requirement Authority and Project Conventions.
+
+* **Bounded discovery:** identify documentation likely affected by the change
+  from the changed interfaces, entry points, configs, schemas, scripts,
+  consumers and risk profile. Consider existing README/getting-started guides,
+  API/event references, examples, ADRs, migration instructions, runbooks,
+  configuration/deployment guides, architecture diagrams and relevant code
+  comments. Include unchanged documentation whose claims the diff invalidates;
+  do not demand a repository-wide documentation audit for each change.
+* **Grounded comparison:** inspect the current documentation's exact path and
+  passage alongside actual code, schemas, behavior-defining tests, commands,
+  config or other verifiable source at the reviewed revision. Distinguish
+  actual implementation from an explicitly planned future state. Do not
+  assume missing prose is a defect where no documentation contract or
+  reasonable consumer need exists.
+* **Missing:** identify an undocumented change only where an existing
+  documented interface, operational procedure or declared documentation
+  obligation requires an update.
+* **Outdated or obsolete:** detect steps, examples, parameter names, state
+  descriptions and architecture claims that no longer match the current
+  implementation, including stale instructions in unchanged documentation.
+* **Contradictory:** compare documentation against actual behavior *and*
+  other authoritative docs. Cite both passages and code evidence; when
+  requirement sources materially conflict without established precedence,
+  raise `decision-needed` rather than silently declaring either side right.
+* **Ambiguous:** challenge wording with two plausible interpretations that
+  lead to different observable usage, integration or operational decisions.
+  Record the interpretations and their concrete consequence; mere stylistic
+  vagueness without a meaningful consequence is not a defect.
+* **Duplicated:** look for repeated assertions of the same rule, contract,
+  command or configuration across docs (or between docs and generated
+  sources). Identify contradictory copies, unclear authority or realistic
+  maintenance drift. Duplication alone is not a defect: audience-specific
+  explanations and intentionally repeated safety warnings can be useful.
+  Prefer one authoritative source plus references or generation when a
+  demonstrable inconsistency or maintenance risk warrants change.
+* **Evidence and disposition:** record the affected documentation path/line
+  (or bounded section), inspected code/contract counterpart, relevant target
+  identity, triggering change, plausible reader/operator consequence,
+  severity, confidence, and suggested correction or `decision-needed`
+  disposition. A document not touched in the diff is still a valid finding
+  location. Apply the existing severity and material-uncertainty policy;
+  documentation gaps are **not automatic blockers**. A misleading production
+  procedure or security-sensitive API contract may warrant a blocker only
+  when its credible impact and source evidence justify one.
+
+**Documentation assessment record:** the Lead records a
+`documentation_assessment` with `status: checked | not-applicable | blocked`,
+inspected sources/target, affected documents and a concise finding summary
+(or explanation for `not-applicable` or `blocked`). A checked assessment
+must be supported by actual inspected documents or evidence establishing
+that no relevant documentation exists; do not claim inspection by guessing
+filenames. A blocked assessment is a material limitation only if it could
+change a blocker decision or high/critical finding. All cases remain
+subject to the normal PASS/FAIL/INCOMPLETE and coverage requirements.
+
+This is a **risk-proportionate investigative heuristic** and a reporting
+obligation, not a new specialist, mandatory format, universal document
+inventory or automatic failure criterion. Apply it in both advisory and
+gate profiles, and retain the existing independence and signature boundaries.
+
 ## Finding Integrity and Decision
 
 * A finding must name the subject, code location or bounded scope, triggering condition, supporting evidence, realistic consequence, and recommended outcome when known. Do not invent line numbers or unseen code.
