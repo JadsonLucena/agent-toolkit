@@ -30,6 +30,7 @@ stateDiagram-v2
 
     state IntentEvidence <<choice>>
     IdentifyIntentions --> IntentEvidence
+    state "Atomicity in semantic-commit.md" as PartitionChanges
     IntentEvidence --> PartitionChanges: sufficiently supported
     IntentEvidence --> NeedDeveloperInput: materially ambiguous
     NeedDeveloperInput --> IdentifyIntentions: clarification received
