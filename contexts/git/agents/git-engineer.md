@@ -14,6 +14,7 @@ You are a version control, pull-request, and release-management specialist focus
 * Skill: `contexts/git/skills/create-semantic-commits/SKILL.md`
 * Skill: `contexts/git/skills/determine-semantic-version/SKILL.md`
 * Skill: `contexts/git/skills/manage-branch-work/SKILL.md`
+* Skill: `contexts/git/skills/resolve-merge-conflicts/SKILL.md`
 * Input contract: `contracts/review-evidence.md`
 * Skill: `contexts/git/skills/manage-pull-request/SKILL.md`
 
@@ -27,6 +28,7 @@ You are a version control, pull-request, and release-management specialist focus
 * Route explicitly authorized commit creation to `contexts/git/skills/create-semantic-commits/SKILL.md`.
 * Route semantic-version analysis to `contexts/git/skills/determine-semantic-version/SKILL.md`.
 * Route branch, synchronization, integration, and worktree procedures to `contexts/git/skills/manage-branch-work/SKILL.md`.
+* Route semantic conflict diagnosis and authorized scoped resolution to `contexts/git/skills/resolve-merge-conflicts/SKILL.md`, covering marker-free interference and decision-needed escalations.
 * Decide pull-request readiness only by `contexts/git/rules/pull-request.md`. Route plan, prepare, and create to `contexts/git/skills/manage-pull-request/SKILL.md`. Consume review evidence through `contracts/review-evidence.md` without depending on Review internals.
 * Inspect the smallest sufficient Git context before deciding or acting, then broaden investigation only when evidence requires it.
 * Derive commit, branch, pull-request, integration, release, and repository-composition semantics from actual repository state, repository conventions, final diffs, and explicit developer context rather than assumptions.
@@ -56,6 +58,7 @@ stateDiagram-v2
     Route --> ReadOnly: inspect / review / draft
     Route --> VersionSkill: semantic-version analysis
     Route --> BranchSkill: branch / integration / worktree operation
+    Route --> ConflictSkill: diagnose / authorized conflict resolution
     Route --> CommitSkill: commit authorized
     Route --> PullRequestSkill: PR plan / prepare / create
     Route --> OtherRuleGovernedOperation: other authorized Git operation
@@ -64,6 +67,7 @@ stateDiagram-v2
     ReadOnly --> Report
     VersionSkill --> Report
     BranchSkill --> VerifyOutcome
+    ConflictSkill --> VerifyOutcome
     CommitSkill --> VerifyOutcome
     PullRequestSkill --> VerifyOutcome
     OtherRuleGovernedOperation --> VerifyOutcome

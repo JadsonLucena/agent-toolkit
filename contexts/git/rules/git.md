@@ -154,6 +154,20 @@
 * Do not claim a release exists merely because a local tag exists; distinguish tagged, pushed, published, deployed, and released states.
 * When a release operation must update multiple remote refs together and the remote supports atomic pushes, consider an atomic push when repository policy benefits from all-or-nothing publication.
 
+## Intent-Preserving Conflict Resolution
+
+* Resolve integration conflicts against the **required integrated behavior**, not syntactic appearance or age of either side. Preserve still-valid prior guarantees and each side's valid intent; explicitly superseded behavior need not survive.
+* Reconstruct the original behavior and independent changes from a verified common ancestor or available Git index stages, plus commit history, affected consumers, tests and authoritative requirements when available. Record missing ancestry/provenance; commit messages and branch names are clues, not proof.
+* Inspect the active operation before interpreting `ours` and `theirs`. In a regular merge, stage 2 is the checked-out side and stage 3 the incoming side; rebase/cherry-pick can invert intuitive branch ownership. Stage 1, 2 or 3 may be absent in deletion/addition cases. Never assume all three versions exist.
+* Investigate textual overlap, structural changes (symbols, signatures, imports, moves), and **semantic interference without conflict markers** (cross-file contracts, state transitions, ordering, side effects, security and persistence invariants). A clean merge, compilation or passing tests of each original branch is not proof of integrated correctness.
+* Establish valid source precedence and explicit supersession; the newest commit, a named branch, a PR narrative or a helper recommendation is not automatically authoritative. When material intentions conflict without reliable precedence, preserve the evidence and report `decision-needed` rather than inventing a business decision.
+* Evaluate `ACCEPT_OURS`, `ACCEPT_THEIRS`, `COMBINE_BOTH`, `PARTIAL_COMBINATION`, `SYNTHESIZE_NEW` and `DEFER_DECISION` as **reasoned semantic outcomes**, not Git command flags or priorities. Choose the smallest implementation that satisfies integrated requirements within the authorized Change Boundary; do not concatenate code merely to retain both sides.
+* Justify each material decision with the previous behavior, each change's intent, required after-state, preserved or superseded invariants, source identity, rejected alternatives, and verification method. Rewriting unrelated behavior or fixing an unrelated defect requires separate authorization.
+* Protect pre-existing worktree/index changes, branches and published history. Diagnosis is read-only by default; modifying or staging selected paths requires explicit authorization. Resolving conflicts does not authorize `merge --continue`, `rebase --continue`, `cherry-pick --continue`, commit, push, force-update, deploy or release.
+* Verify the **integrated snapshot** proportionally to risk: inspect unresolved index entries, accidental conflict markers, resulting diff/history, preserved legacy behavior, each valid branch behavior and interaction tests between changes, plus impacted consumers, contracts, documentation, security and data invariants. Test results from either original branch alone do not verify their integration.
+* Bind checks to the exact resolved snapshot. Record observed command, outcome, limitations and stale/not-run results; marker removal, `git add`, a clean exit code or an unexecuted test does not establish semantic correctness. Stop if ambiguity, unsafe mutation, missing permission, or missing required verification prevents a credible result.
+
+
 ## Conflict and Failure Handling
 
 * Surface merge conflicts, divergent history, rejected pushes, missing upstreams, unavailable remotes, and ambiguous repository state instead of hiding or bypassing them.
@@ -207,6 +221,9 @@ Foundational references used to shape this rule include:
 
 * The official Git reference documentation for revisions, branches, worktrees, merge, rebase, reset, reflog, push, tags, and hooks.
 * Scott Chacon and Ben Straub, *Pro Git*, 2nd Edition.
+* Susan Horwitz, Jan Prins and Thomas Reps (1989), *Integrating Non-Interfering Versions of Programs*.
+* Tom Mens (2002), *A State-of-the-Art Survey on Software Merging*.
+* Sven Apel et al. (2011), *Semistructured Merge: Rethinking Merge in Revision Control Systems*.
 * Martin Fowler, *Continuous Integration* and *Patterns for Managing Source Code Branches*.
 * Jez Humble and David Farley (2010), *Continuous Delivery*.
 

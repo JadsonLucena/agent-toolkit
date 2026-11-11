@@ -153,17 +153,21 @@ contexts/git/
 │   ├── create-semantic-commits/SKILL.md
 │   ├── determine-semantic-version/SKILL.md
 │   ├── manage-branch-work/SKILL.md
+│   ├── resolve-merge-conflicts/SKILL.md
 │   └── manage-pull-request/SKILL.md
 ├── commands/
 │   ├── commit.md
 │   ├── determine-semantic-version.md
 │   ├── plan-pull-requests.md
 │   ├── prepare-pull-request.md
+│   ├── resolve-conflicts.md
 │   └── create-pull-request.md
 └── agents/git-engineer.md
 ```
 
 Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
+
+Merge/rebase/cherry-pick conflict resolution uses `contexts/git/skills/resolve-merge-conflicts/SKILL.md` to reconstruct three-way intent, reconcile contracts and verify the complete integrated snapshot, including semantic interference without markers. `/git/resolve-conflicts` defaults to read-only diagnosis. Editing, staging and continuing the Git operation are separately authorized actions.
 
 Pull-request readiness, draft, and gate claims are decided in `contexts/git/rules/pull-request.md`. The procedure is the diagram in `contexts/git/skills/manage-pull-request/SKILL.md`. Check discovery stays in `contexts/git/rules/git.md`. Creating a pull request does not authorize push, merge, auto-merge, release, or deployment.
 
@@ -207,6 +211,7 @@ Commands express engineering intent rather than low-level tool aliases:
 /git/determine-semantic-version
 /git/plan-pull-requests
 /git/prepare-pull-request
+/git/resolve-conflicts
 /git/create-pull-request
 ```
 
