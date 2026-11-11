@@ -22,6 +22,7 @@
 ## Scope, Coverage, and Risk
 
 * **Before any Task spawn:** freeze repository identity, exact base/head or workspace fingerprint (HEAD, index, tracked diff, untracked content), full Git file inventory, R0–R3 risk profile and distinct concerns. Give every specialist and verifier identical target identity and recheck freshness before the final decision.
+* Resolve only an explicitly supplied review target. Do not assume `main` or fabricate a SHA. A missing target is a blocker.
 * Inventory the full changed-file set before excluding or grouping files. Record per-file disposition: `reviewed`, `excluded` with reason, `not-reviewed`, or `blocked`. Do not calculate coverage using only a silently filtered denominator.
 * Review all reviewable changed files and relevant dependent code. For large diffs, partition or escalate rather than silently skip.
 * Classify risk using actual reachable impact, not diff size: R0 (non-behavioral), R1 (local and reversible), R2 (cross-boundary or materially operational), and R3 (critical security, privacy, compliance, financial or data integrity). Use the trigger table below; small diffs can be R3.
