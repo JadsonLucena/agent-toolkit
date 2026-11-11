@@ -41,19 +41,22 @@ The diagram selects existing capabilities. Each specialist keeps its own procedu
 
 ```mermaid
 flowchart TD
-    Inspect["Earliest capability still needed"] --> Need{"Intent, scope, or Change Boundary missing?"}
-    Need -->|yes| Elicitation
-    Need -->|no| Definition
-    Elicitation --> Definition
-    Definition --> Validation
+    Inspect["Earliest capability still needed"] --> Entry{"Which capability is still necessary?"}
+    Entry -->|intent, scope, or Change Boundary missing| Elicitation
+    Entry -->|formal semantics still missing| Definition
+    Entry -->|not validated for planning| Validation
+    Entry -->|sufficient for the planning horizon| Plan{"Backlog exists?"}
+    Entry -->|authority or evidence missing| Stop["Stop the affected path"]
+    Elicitation --> Recheck
+    Definition --> Recheck
     Validation -->|needs-clarification| Elicitation
     Validation -->|needs-revision| Definition
-    Validation -->|sufficient| Plan{"Backlog exists?"}
+    Validation -->|sufficient| Recheck
     Plan -->|no| Build
     Plan -->|yes| Refine
-    Build --> Recheck["Only the next necessary transition"]
+    Build --> Recheck
     Refine --> Recheck
-    Recheck -->|authority or evidence missing| Stop["Stop the affected path"]
+    Recheck["Only the next necessary transition"] -->|authority or evidence missing| Stop
     Recheck -->|another decision remains| Inspect
 ```
 
