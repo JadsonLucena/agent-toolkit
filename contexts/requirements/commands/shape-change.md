@@ -18,10 +18,10 @@ Invocation does not authorize architecture selection, implementation, automated-
 * Agent: `contexts/requirements/agents/requirements-elicitor.md`
 * Agent: `contexts/requirements/agents/requirements-specifier.md`
 * Agent: `contexts/requirements/agents/backlog-planner.md`
-* Skill: `contexts/requirements/skills/elicitation/skill.md`
-* Skill: `contexts/requirements/skills/definition/skill.md`
-* Skill: `contexts/requirements/skills/validation/skill.md`
-* Skill: `contexts/requirements/skills/backlog-planning/skill.md`
+* Skill: `contexts/requirements/skills/elicitation/SKILL.md`
+* Skill: `contexts/requirements/skills/definition/SKILL.md`
+* Skill: `contexts/requirements/skills/validation/SKILL.md`
+* Skill: `contexts/requirements/skills/backlog-planning/SKILL.md`
 * Contract: `contracts/requirements.md`
 * Contract: `contracts/work-item.md`
 

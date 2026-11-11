@@ -10,7 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 
 RULE = "contexts/review/rules/code-review.md"
-WORKFLOW = "contexts/review/skills/review-change/skill.md"
+WORKFLOW = "contexts/review/skills/review-change/SKILL.md"
 LEAD = "contexts/review/agents/code-reviewer.md"
 SPEC = "contexts/review/agents/specification-reviewer.md"
 ARCH = "contexts/review/agents/architecture-reviewer.md"

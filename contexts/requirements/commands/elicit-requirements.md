@@ -13,7 +13,7 @@ This command is an engineering-intent entry point. It selects the Requirements E
 * Rule: `contexts/requirements/rules/tailoring.md`
 
 * Agent: `contexts/requirements/agents/requirements-elicitor.md`
-* Skill: `contexts/requirements/skills/elicitation/skill.md`
+* Skill: `contexts/requirements/skills/elicitation/SKILL.md`
 * Rule: `contexts/requirements/rules/requirements.md`
 * Contract: `contracts/requirements.md`
 

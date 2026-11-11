@@ -1,3 +1,8 @@
+---
+name: elicitation
+description: "Discover and structure the knowledge needed to understand a change before formal specification. Use when stakeholder needs and unknowns are not yet precise enough to specify."
+---
+
 # Requirements Elicitation
 
 ## Purpose

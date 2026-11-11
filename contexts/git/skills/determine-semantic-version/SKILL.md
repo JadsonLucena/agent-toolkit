@@ -1,3 +1,8 @@
+---
+name: determine-semantic-version
+description: "Recommend a semantic-version increment from verified compatibility impact and repository release policy. Use when a version decision is requested and release intent must not be invented."
+---
+
 # Determine Semantic Version
 
 ## Purpose

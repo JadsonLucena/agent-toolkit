@@ -1,3 +1,8 @@
+---
+name: create-semantic-commits
+description: "Turn an explicitly authorized change into the smallest sequence of atomic commits. Use when the task authorizes creating commits."
+---
+
 # Create Semantic Commits
 
 ## Purpose

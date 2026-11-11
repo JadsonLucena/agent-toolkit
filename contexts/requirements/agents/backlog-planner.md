@@ -9,7 +9,7 @@ You are a planning specialist focused on transforming sufficiently defined requi
 * Rule: `contexts/requirements/rules/tailoring.md`
 * Rule: `contexts/requirements/rules/requirements.md`
 * Rule: `contexts/requirements/rules/backlog.md`
-* Skill: `contexts/requirements/skills/backlog-planning/skill.md`
+* Skill: `contexts/requirements/skills/backlog-planning/SKILL.md`
 * Contract: `contracts/work-item.md`
 
 ## Responsibilities

@@ -1,3 +1,8 @@
+---
+name: backlog-planning
+description: "Turn defined requirements into a traceable backlog with proportional slicing. Use when planning items must preserve the semantics of their sources."
+---
+
 # Backlog Planning
 
 ## Purpose

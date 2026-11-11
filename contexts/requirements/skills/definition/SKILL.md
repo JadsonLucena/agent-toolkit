@@ -1,3 +1,8 @@
+---
+name: definition
+description: "Turn understood needs into precise, verifiable, traceable requirements. Use when the evidence is sufficient to specify without inventing stakeholder intent."
+---
+
 # Requirements Definition
 
 ## Purpose
@@ -8,7 +13,7 @@ Use to transform sufficiently understood needs and evidence into precise, verifi
 
 * Rule: `contexts/requirements/rules/tailoring.md`
 * Rule: `contexts/requirements/rules/requirements.md`
-* Skill (conditional): `contexts/requirements/skills/example-discovery/skill.md`
+* Skill (conditional): `contexts/requirements/skills/example-discovery/SKILL.md`
 * Contract: `contracts/requirements.md`
 * Optional handoff: `contracts/test-basis.md`
 
@@ -51,7 +56,7 @@ stateDiagram-v2
    * transition requirements distinct from permanent solution requirements.
 6. Use requirement patterns only as prompts to investigate potentially relevant concerns; never copy a pattern into the specification without supporting evidence. When a local requirements template/schema/notation applies, preserve it as the representation structure without fabricating semantics to fill unsupported fields.
 7. Define acceptance criteria, fit criteria, or other observable evidence of satisfaction without prescribing an unnecessary test level or implementation technique.
-8. When behavioral scenarios are material, preserve or establish stable scenario identities and their traceability to requirements, rules, use cases, and slices. Use `contexts/requirements/skills/example-discovery/skill.md` when scenarios/examples need dedicated exploration.
+8. When behavioral scenarios are material, preserve or establish stable scenario identities and their traceability to requirements, rules, use cases, and slices. Use `contexts/requirements/skills/example-discovery/SKILL.md` when scenarios/examples need dedicated exploration.
 9. Use concrete examples or boundary cases when they improve shared understanding; keep business examples free of implementation noise unless that detail is itself required.
 10. Preserve source provenance, rationale, authority, requirement identifiers, rule identifiers, and scenario identifiers when available.
 11. Check necessity, clarity, singularity, consistency, feasibility status, verifiability, completeness for the intended downstream use, and proportionality to the selected rigor.

@@ -1,3 +1,8 @@
+---
+name: verify-findings
+description: "Investigate candidate review findings and classify them with evidence. Use before a finding becomes a blocker."
+---
+
 # Verify Review Findings
 
 ## Purpose

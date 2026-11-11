@@ -1,3 +1,8 @@
+---
+name: validation
+description: "Run a read-only quality gate over requirements knowledge. Use before a downstream decision to check coherence, traceability, and verifiability."
+---
+
 # Requirements Validation
 
 ## Purpose

@@ -11,7 +11,7 @@ This command performs version analysis only. It does not authorize editing versi
 ## Uses
 
 * Agent: `contexts/git/agents/git-engineer.md`
-* Skill: `contexts/git/skills/determine-semantic-version/skill.md`
+* Skill: `contexts/git/skills/determine-semantic-version/SKILL.md`
 * Rule: `contexts/git/rules/semantic-version.md`
 
 ## Inputs

@@ -13,7 +13,7 @@ Invocation authorizes a draft when publication is explicitly requested and the f
 ## Uses
 
 * Agent: `contexts/git/agents/git-engineer.md`
-* Skill: `contexts/git/skills/manage-pull-request/skill.md` in `create` mode
+* Skill: `contexts/git/skills/manage-pull-request/SKILL.md` in `create` mode
 * Rule: `contexts/git/rules/pull-request.md`
 * Rule: `contexts/git/rules/git.md`
 * Rule: `contexts/git/rules/gitflow.md` when applicable

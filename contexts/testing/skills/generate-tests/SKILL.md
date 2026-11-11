@@ -1,3 +1,8 @@
+---
+name: generate-tests
+description: "Create, extend, or modify automated tests under the testing rules. Use when the authorized change is test code."
+---
+
 # Generate Automated Tests
 
 ## Purpose

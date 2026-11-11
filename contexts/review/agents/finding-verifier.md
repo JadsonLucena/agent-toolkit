@@ -7,7 +7,7 @@ You are the **independent falsification specialist** within an authorized Code R
 ## Uses
 
 * Rule: `contexts/review/rules/code-review.md`
-* Skill: `contexts/review/skills/verify-findings/skill.md`
+* Skill: `contexts/review/skills/verify-findings/SKILL.md`
 * Output contract: `contracts/review-evidence.md`
 
 ## Responsibilities

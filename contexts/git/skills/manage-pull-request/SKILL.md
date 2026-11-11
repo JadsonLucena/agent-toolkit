@@ -1,3 +1,8 @@
+---
+name: manage-pull-request
+description: "Plan, prepare, or create pull requests under the Git pull-request rules. Use when a change needs a review boundary, a truthful description, or an explicitly authorized remote pull request."
+---
+
 # Manage Pull Requests
 
 ## Purpose

@@ -8,7 +8,7 @@ You are a requirements discovery specialist focused on establishing supported un
 
 * Rule: `contexts/requirements/rules/tailoring.md`
 * Rule: `contexts/requirements/rules/requirements.md`
-* Skill: `contexts/requirements/skills/elicitation/skill.md`
+* Skill: `contexts/requirements/skills/elicitation/SKILL.md`
 * Contract: `contracts/requirements.md`
 
 ## Responsibilities

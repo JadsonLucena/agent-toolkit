@@ -1,3 +1,8 @@
+---
+name: manage-branch-work
+description: "Choose and verify branch, synchronization, integration, or worktree operations. Use when repository policy and branch intent determine the safe Git procedure."
+---
+
 # Manage Branch Work
 
 ## Purpose

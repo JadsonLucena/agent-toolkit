@@ -1,3 +1,8 @@
+---
+name: coordinate-review-team
+description: "Orchestrate a risk-proportionate code-review team and record whether coordination was live, relayed, or native. Use when a review may need isolated specialists."
+---
+
 # Coordinate Review Team
 
 ## Purpose
@@ -12,7 +17,7 @@ or helper output to manufacture one `PASS`.
 ## Uses
 
 * Rule: `contexts/review/rules/code-review.md`
-* Skill: `contexts/review/skills/verify-findings/skill.md`
+* Skill: `contexts/review/skills/verify-findings/SKILL.md`
 * Output contract: `contracts/review-evidence.md`
 * Optional input contract: `contracts/requirements.md`
 * Optional input contract: `contracts/test-basis.md`

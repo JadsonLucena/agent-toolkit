@@ -11,7 +11,7 @@ This command authorizes commit creation only for the defined change scope. It do
 ## Uses
 
 * Agent: `contexts/git/agents/git-engineer.md`
-* Skill: `contexts/git/skills/create-semantic-commits/skill.md`
+* Skill: `contexts/git/skills/create-semantic-commits/SKILL.md`
 * Rule: `contexts/git/rules/git.md`
 * Rule: `contexts/git/rules/semantic-commit.md`
 

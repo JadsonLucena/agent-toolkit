@@ -3,7 +3,7 @@
 \`adapters/teams/peer_bus.py\` supplies a bounded, provider-neutral,
 **in-process** transport for host-provided Review specialist handlers. It
 implements the collaboration envelope of
-\`contexts/review/skills/coordinate-review-team/skill.md\`:
+\`contexts/review/skills/coordinate-review-team/SKILL.md\`:
 
 * \`review_id\`, immutable \`target_head_sha\` / \`target_base_sha\`,
   \`message_id\`, \`thread_id\`, \`sender_role\` / \`recipient_role\`;

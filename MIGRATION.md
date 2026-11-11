@@ -11,9 +11,9 @@ The repository moved from artifact-type-first top-level folders to context-first
 
 ## Moved Responsibility
 
-* Detailed atomic commit execution moved from `git-engineer.md` to `contexts/git/skills/create-semantic-commits/skill.md`.
-* Semantic-version decision procedure lives in `contexts/git/skills/determine-semantic-version/skill.md`.
-* Branch, synchronization, integration, and worktree procedure lives in `contexts/git/skills/manage-branch-work/skill.md`.
+* Detailed atomic commit execution moved from `git-engineer.md` to `contexts/git/skills/create-semantic-commits/SKILL.md`.
+* Semantic-version decision procedure lives in `contexts/git/skills/determine-semantic-version/SKILL.md`.
+* Branch, synchronization, integration, and worktree procedure lives in `contexts/git/skills/manage-branch-work/SKILL.md`.
 * `git-engineer.md` owns Git specialization, evidence discipline, routing, authorization boundaries, and handoffs.
 * Testing consumes `contracts/test-basis.md` only as optional evidence and remains independent from Requirements agents and skills.
 
@@ -22,7 +22,7 @@ The repository moved from artifact-type-first top-level folders to context-first
 The following names were made more explicit so commands express engineering intent and backlog artifacts own a narrower concern:
 
 * `contexts/requirements/rules/planning.md` → `contexts/requirements/rules/backlog.md`
-* `contexts/requirements/skills/planning/skill.md` → `contexts/requirements/skills/backlog-planning/skill.md`
+* `contexts/requirements/skills/planning/SKILL.md` → `contexts/requirements/skills/backlog-planning/SKILL.md`
 * `contexts/requirements/commands/elicit.md` → `elicit-requirements.md`
 * `contexts/requirements/commands/specify.md` → `specify-requirements.md`
 * `contexts/requirements/commands/audit.md` → `validate-requirements.md`
@@ -54,7 +54,7 @@ The context-first migration was also hardened against later requirements-review 
 * `requirements/rules/tailoring.md` makes rigor proportional to risk and uncertainty instead of document count.
 * Elicitation now separates Need, Business Goal, success evidence, Current/Future State, Work Scope, Product Boundary, and candidate solutions when those concerns are material.
 * Requirements semantics now cover conditional data, quality, security, transition, scenario, rationale, and rule-governance concerns without making every concern mandatory.
-* `example-discovery/skill.md` owns stable behavioral Scenario Sets plus domain examples, counterexamples, boundaries, and questions before test automation.
+* `example-discovery/SKILL.md` owns stable behavioral Scenario Sets plus domain examples, counterexamples, boundaries, and questions before test automation.
 * `contracts/test-basis.md` preserves portable scenario identity into Testing, while `contracts/test-evidence.md` records scenario-to-test coverage and verification without mutating upstream semantics.
 * Backlog planning now supports coherent vertical/use-case/journey slicing, explicit learning work, trim-the-tail candidates, critical guarantees, optional Story Mapping semantics, User Story diagnostics, and fuller Use-Case 2.0 progression from simplest useful to sufficient behavior.
 * Requirement Patterns now preserve applicability, investigation guidance, related concerns, downstream considerations, and organizational learning without becoming automatic requirements.
