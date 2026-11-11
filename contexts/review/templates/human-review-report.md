@@ -1,7 +1,8 @@
 # Review Result: {{PASS|FAIL|INCOMPLETE}} ({{advisory|gate}})
 
 The machine `review_status` remains one of PASS/FAIL/INCOMPLETE. Show
-`PASS (advisory)` to users for non-gating reviews; it never grants PR readiness.
+`PASS (advisory)` when the frozen profile is advisory. A complete advisory
+PASS can satisfy the ready review record. It does not attest gate.
 
 ## Blocking findings
 
