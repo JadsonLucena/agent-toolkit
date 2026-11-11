@@ -74,7 +74,7 @@ stateDiagram-v2
 1. Inspect the current branch, upstream, working tree, staged changes, unstaged changes, relevant diff, nearby commit conventions, and explicit developer context.
 2. Identify the logical intentions and dependencies represented by the authorized changes.
 3. If semantic intent or the relationship between changes is materially ambiguous, ask before partitioning or committing.
-4. Partition the authorized changes into the smallest coherent set of atomic commits; do not partition by file boundaries alone.
+4. Partition the authorized changes into the smallest coherent set of atomic commits. Do not partition by file boundaries alone, and do not keep two intents together because they share a file. A file that contains two intents is split with hunk staging. The cost of hunk staging does not justify one commit. The misleading-intermediate exception applies only when no hunk cut leaves each commit coherent and verifiable. Reaching for that exception to avoid hunk staging is the ambiguous case: split or ask. Do not resolve it by committing once.
 5. Preserve unrelated pre-existing staged and working-tree changes.
 6. Stage exactly one logical unit, using path- or hunk-level staging when necessary.
 7. Inspect the complete staged diff.
