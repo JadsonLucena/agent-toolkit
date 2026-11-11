@@ -12,11 +12,11 @@ contexts/
 │   │   ├── requirements.md
 │   │   └── backlog.md
 │   ├── skills/
-│   │   ├── elicitation/skill.md
-│   │   ├── definition/skill.md
-│   │   ├── example-discovery/skill.md
-│   │   ├── validation/skill.md
-│   │   └── backlog-planning/skill.md
+│   │   ├── elicitation/SKILL.md
+│   │   ├── definition/SKILL.md
+│   │   ├── example-discovery/SKILL.md
+│   │   ├── validation/SKILL.md
+│   │   └── backlog-planning/SKILL.md
 │   ├── commands/
 │   │   ├── shape-change.md
 │   │   ├── elicit-requirements.md
@@ -30,15 +30,15 @@ contexts/
 │       └── backlog-planner.md
 ├── testing/
 │   ├── rules/testing.md
-│   ├── skills/generate-tests/skill.md
+│   ├── skills/generate-tests/SKILL.md
 │   ├── commands/generate-tests.md
 │   └── agents/test-engineer.md
 ├── review/
 │   ├── rules/code-review.md
 │   ├── skills/
-│   │   ├── review-change/skill.md
-│   │   ├── coordinate-review-team/skill.md
-│   │   └── verify-findings/skill.md
+│   │   ├── review-change/SKILL.md
+│   │   ├── coordinate-review-team/SKILL.md
+│   │   └── verify-findings/SKILL.md
 │   ├── commands/review-code.md
 │   └── agents/
 │       ├── code-reviewer.md
@@ -57,10 +57,10 @@ contexts/
     │   ├── semantic-version.md
     │   └── pull-request.md
     ├── skills/
-    │   ├── create-semantic-commits/skill.md
-    │   ├── determine-semantic-version/skill.md
-    │   ├── manage-branch-work/skill.md
-    │   └── manage-pull-request/skill.md
+    │   ├── create-semantic-commits/SKILL.md
+    │   ├── determine-semantic-version/SKILL.md
+    │   ├── manage-branch-work/SKILL.md
+    │   └── manage-pull-request/SKILL.md
     ├── commands/
     │   ├── commit.md
     │   ├── determine-semantic-version.md
@@ -108,11 +108,11 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Requirements | `rules/tailoring.md` | Rule | Risk-proportional rigor, applicable-knowledge selection, governance, and anti-bureaucracy invariants |
 | Requirements | `rules/requirements.md` | Rule | Strategic framing, requirement semantics, evidence, ambiguity, quality, acceptance, change impact, and traceability invariants |
 | Requirements | `rules/backlog.md` | Rule | Backlog integrity, decomposition, readiness, dependency, tracker compatibility, refinement, and closure invariants |
-| Requirements | `skills/elicitation/skill.md` | Skill | Discover and consolidate supported stakeholder needs and unknowns |
-| Requirements | `skills/definition/skill.md` | Skill | Transform supported needs into verifiable requirement definitions at the required rigor |
-| Requirements | `skills/example-discovery/skill.md` | Skill | Discover domain examples, counterexamples, boundaries, and questions before test automation |
-| Requirements | `skills/validation/skill.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
-| Requirements | `skills/backlog-planning/skill.md` | Skill | Build or refine traceable planning items while preserving source semantics |
+| Requirements | `skills/elicitation/SKILL.md` | Skill | Discover and consolidate supported stakeholder needs and unknowns |
+| Requirements | `skills/definition/SKILL.md` | Skill | Transform supported needs into verifiable requirement definitions at the required rigor |
+| Requirements | `skills/example-discovery/SKILL.md` | Skill | Discover domain examples, counterexamples, boundaries, and questions before test automation |
+| Requirements | `skills/validation/SKILL.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
+| Requirements | `skills/backlog-planning/SKILL.md` | Skill | Build or refine traceable planning items while preserving source semantics |
 | Requirements | `commands/shape-change.md` | Command | Route the minimum necessary Requirements capabilities toward validated planning; specialist orchestration remains with agents |
 | Requirements | `commands/elicit-requirements.md` | Command | Start requirements discovery |
 | Requirements | `commands/specify-requirements.md` | Command | Start formal requirement definition |
@@ -123,14 +123,14 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Requirements | `agents/requirements-specifier.md` | Agent | Own formal requirement semantics, evidence discipline, and validation routing |
 | Requirements | `agents/backlog-planner.md` | Agent | Own backlog decomposition, traceability, dependencies, tracker alignment, and readiness boundaries |
 | Testing | `rules/testing.md` | Rule | Automated-testing standards and quality invariants |
-| Testing | `skills/generate-tests/skill.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
+| Testing | `skills/generate-tests/SKILL.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
 | Testing | `commands/generate-tests.md` | Command | Start automated-test creation or modification |
 | Testing | `agents/test-engineer.md` | Agent | Own testing specialization, evidence discipline, and scope boundaries |
 | Review | `rules/code-review.md` | Rule | Advisory/gate profiles, calibrated findings, documentation drift and evidence-driven Review policy |
 | Review | `rules/high-risk-patterns.md` | Rule | Eight source-grounded risk counterexamples used as investigation heuristics |
-| Review | `skills/review-change/skill.md` | Skill | Native review of a complete diff with context, coverage, risk, optional helpers, and evidence |
-| Review | `skills/coordinate-review-team/skill.md` | Skill | Risk-based Agent Team coordination, peer messaging, challenge routing, verification and native fallback |
-| Review | `skills/verify-findings/skill.md` | Skill | Falsification, verification, deduplication, and triage of candidate findings |
+| Review | `skills/review-change/SKILL.md` | Skill | Native review of a complete diff with context, coverage, risk, optional helpers, and evidence |
+| Review | `skills/coordinate-review-team/SKILL.md` | Skill | Risk-based Agent Team coordination, peer messaging, challenge routing, verification and native fallback |
+| Review | `skills/verify-findings/SKILL.md` | Skill | Falsification, verification, deduplication, and triage of candidate findings |
 | Review | `commands/review-code.md` | Command | Start read-only independent review of a bounded code change |
 | Review | `agents/code-reviewer.md` | Agent | Lead independent reviews, select specialists, coordinate team exchanges and issue one evidence-backed verdict |
 | Review | `agents/specification-reviewer.md` | Agent | Investigate specification and contract compliance |
@@ -145,10 +145,10 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Git | `rules/semantic-commit.md` | Rule | Commit semantics, message structure, and atomicity invariants |
 | Git | `rules/semantic-version.md` | Rule | Semantic-version compatibility and increment invariants |
 | Git | `rules/pull-request.md` | Rule | PR boundary, reviewability, decomposition, template, description, readiness, traceability, and remote-creation invariants |
-| Git | `skills/create-semantic-commits/skill.md` | Skill | Atomic staging, verification, message derivation, commit creation, and post-check workflow |
-| Git | `skills/determine-semantic-version/skill.md` | Skill | Compatibility analysis, version-policy evaluation, and evidence-backed semantic-version recommendation |
-| Git | `skills/manage-branch-work/skill.md` | Skill | Branch, synchronization, integration, and worktree decision and verification workflow |
-| Git | `skills/manage-pull-request/skill.md` | Skill | Plan, prepare, and explicitly create coherent pull requests with scoped authorization |
+| Git | `skills/create-semantic-commits/SKILL.md` | Skill | Atomic staging, verification, message derivation, commit creation, and post-check workflow |
+| Git | `skills/determine-semantic-version/SKILL.md` | Skill | Compatibility analysis, version-policy evaluation, and evidence-backed semantic-version recommendation |
+| Git | `skills/manage-branch-work/SKILL.md` | Skill | Branch, synchronization, integration, and worktree decision and verification workflow |
+| Git | `skills/manage-pull-request/SKILL.md` | Skill | Plan, prepare, and explicitly create coherent pull requests with scoped authorization |
 | Git | `commands/commit.md` | Command | Start explicitly requested semantic commit creation |
 | Git | `commands/determine-semantic-version.md` | Command | Start semantic-version analysis without release mutation |
 | Git | `commands/plan-pull-requests.md` | Command | Plan coherent PR boundaries without repository mutation |
@@ -314,17 +314,14 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 
 ## Skill Format and Portability
 
-Canonical Skills are **semantic artifacts**, stored at `contexts/<context>/skills/<capability>/skill.md`. This lowercase Markdown file is the source of truth; it is **not directly compliant** with the open [Agent Skills specification](https://agentskills.io/specification), which requires `SKILL.md` and YAML frontmatter containing `name` and `description`.
+Canonical Skills are stored at `contexts/<context>/skills/<capability>/SKILL.md` and follow the [Agent Skills specification](https://agentskills.io/specification). The file starts with YAML frontmatter:
 
-Adapters may produce Agent Skills-compatible exports, subject to these invariants:
+* `name` matches the capability directory: lowercase letters, digits, and hyphens.
+* `description` says what the skill does and when to use it. Hosts compare the request with this field and load the body only when it matches, or when the user invokes the skill by name.
 
-* Export each canonical Skill as a capability directory with `SKILL.md` and valid required frontmatter; derive `name` from the capability identifier and `description` from the canonical purpose without inventing capabilities.
-* Preserve procedure, preconditions, stop conditions, policy dependencies, and authorization limits; translate canonical paths/references to reachable exported locations.
-* Keep exports generated or adapter-owned; never treat a generated `SKILL.md` as a second canonical source of truth.
-* Validate generated artifacts against the target format and runtime restrictions. Compatibility is an **adapter guarantee to verify**, not a property of `skill.md` files merely because their semantics align.
-* Platform-specific metadata (such as model or reasoning effort) belongs to the adapter/runtime, not to canonical Agent definitions.
+The body states the procedure once, as a diagram under Workflow. A decision node names the rule section that owns the invariant and does not restate it. Do not keep a numbered list that retells the diagram. Foundational Guidance stays in the rule as the theoretical reference for reviewers of the artifact. Do not add provider metadata such as model, reasoning effort, or tool allowlists to the canonical frontmatter.
 
-This decision favors semantic portability now; changing the canonical serialization itself requires a separate compatibility/migration decision.
+A host install path, such as `.claude/skills/` or `.agents/skills/`, may symlink or copy the canonical file. That installation is not a second source of truth.
 
 ## Command Terminology
 
@@ -365,11 +362,12 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 14. A generic `shared/` directory is intentionally avoided.
 15. `/requirements/shape-change` is the optional composite Requirements entry point for feature, defect, migration, regulatory, operational, or other change contexts; it routes existing capabilities and does not create a second source of requirement semantics.
 16. Requirements may establish a Change Boundary distinct from Work Scope and Product Boundary, reconcile material scope drift explicitly, work in next-decision-oriented knowledge batches, preserve local representation conventions without confusing them with semantics, and keep lifecycle/completion states distinct.
-17. Pull-request work is owned by Git as a review/integration concern: durable PR policy lives in `rules/pull-request.md`, reusable plan/prepare/create procedure lives in `skills/manage-pull-request/skill.md`, and separate commands preserve different authorization levels. Implementation remains outside Git.
+17. Pull-request work is owned by Git as a review/integration concern: durable PR policy lives in `rules/pull-request.md`, reusable plan/prepare/create procedure lives in `skills/manage-pull-request/SKILL.md`, and separate commands preserve different authorization levels. Implementation remains outside Git.
 
 18. Code Review is a separate, read-only context. It operates natively without required providers/adapters; OCR and similar helpers are optional. Requirements, Testing, and Git retain their own authority.
 19. Independent review, applicable tests, and lint are distinct pre-creation prerequisites for PRs. Git consumes `contracts/review-evidence.md` without depending on Review's internal procedures. Enforcing this policy requires runtime/CI controls; Markdown alone cannot block unauthorized remote creation.
 20. Review uses an optional risk-driven Agent Team, with the Code Review Lead coordinating specialist-to-specialist evidence exchange and independent falsification. R2/R3 favor relevant collaborative specialists where runtime support exists; native-solo and lead-relayed fallback remain valid. Provider-specific team orchestration is a runtime responsibility, not a requirement for canonical review.
+21. One fact has one owner. A command states the authorization and points at the skill. An agent routes to the skill. The skill diagram names the rule section for each decision. The rule owns the invariant and its Foundational Guidance. The contract owns the evidence shape.
 
 ## Framework Scope Roadmap
 

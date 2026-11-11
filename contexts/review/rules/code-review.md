@@ -8,7 +8,7 @@
 * Evidence precedes assertions. Do not claim tests passed, checks succeeded, requirements were met, or a change is safe without relevant evidence bound to the examined state.
 * Judge concrete reachable consequences, not checklist compliance. A code smell, metric, pattern preference, or undocumented speculative future use is not by itself a defect.
 * Balance completeness with cost. Review depth is risk-proportionate; do not require every specialist or test technique for every change.
-* Select modes, team size and verifier requirements using the single normative source `contexts/review/skills/coordinate-review-team/skill.md`. A platform-specific Task API is never the source of truth; no peer messaging or consensus may be invented.
+* Select modes, team size and verifier requirements using the single normative source `contexts/review/skills/coordinate-review-team/SKILL.md`. A platform-specific Task API is never the source of truth; no peer messaging or consensus may be invented.
 * Only an independently executed reviewer can satisfy `gate` independence; assigning another role to an author's session does not create independence. A verifier examines the source rather than accepting consensus. See Review Profiles below.
 * Keep review findings, verification evidence, risk decisions, and the Git PR readiness decision separate. Review produces `contracts/review-evidence.md`; Git owns remote PR creation.
 * Repository-specific rules and enforceable project conventions take precedence over generic preferences when they preserve critical safety guarantees. A narrower local rule must not silently remove security, data-integrity, or evidence obligations.
@@ -44,8 +44,8 @@ investigation concern and still require the appropriate verification.
 
 ## Team Collaboration Integrity
 
-* The Code Review Lead owns completeness, evidence integrity and the only final verdict. Relevant role selection and the exception for small critical R3 diffs are defined solely in `contexts/review/skills/coordinate-review-team/skill.md`; do not repeat the N table in other artifacts.
-* Apply the collaboration and relay protocol in `contexts/review/skills/coordinate-review-team/skill.md`. Preserve real evidence and transport provenance; no vendor-specific session operation is a canonical requirement.
+* The Code Review Lead owns completeness, evidence integrity and the only final verdict. Relevant role selection and the exception for small critical R3 diffs are defined solely in `contexts/review/skills/coordinate-review-team/SKILL.md`; do not repeat the N table in other artifacts.
+* Apply the collaboration and relay protocol in `contexts/review/skills/coordinate-review-team/SKILL.md`. Preserve real evidence and transport provenance; no vendor-specific session operation is a canonical requirement.
 * Preserve authorship and provenance for each material observation, challenge, answer and unresolved conflict. Peer agreement is not proof; a specialist's finding must be source-verified and material disagreement cannot be voted away.
 * A failed team mechanism does not block an otherwise complete independent native review, but a lost mandatory file, stale target, unaddressed high-impact challenge or unverifiable evidence makes the result INCOMPLETE.
 

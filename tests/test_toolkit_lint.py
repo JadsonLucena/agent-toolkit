@@ -42,15 +42,15 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_broken_canonical_reference(self):
         self.change(
-            "contexts/requirements/skills/definition/skill.md",
-            "contexts/requirements/skills/example-discovery/skill.md",
-            "contexts/requirements/skills/never-existed/skill.md",
+            "contexts/requirements/skills/definition/SKILL.md",
+            "contexts/requirements/skills/example-discovery/SKILL.md",
+            "contexts/requirements/skills/never-existed/SKILL.md",
         )
         self.assert_error("broken reference")
 
     def test_skill_cannot_depend_on_command(self):
         self.change(
-            "contexts/requirements/skills/definition/skill.md",
+            "contexts/requirements/skills/definition/SKILL.md",
             "## Uses\n",
             "## Uses\n\n* Command: \x60contexts/requirements/commands/shape-change.md\x60\n",
         )
@@ -103,7 +103,7 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_review_workflow_requires_context_before_analysis(self):
         self.change(
-            "contexts/review/skills/review-change/skill.md",
+            "contexts/review/skills/review-change/SKILL.md",
             "Mandatory host-neutral preparation",
             "Optional, unordered preparation",
         )
@@ -117,6 +117,13 @@ class ToolkitLintTests(unittest.TestCase):
         )
         self.assert_error("review invocation must remain read-only")
 
+    def test_skill_requires_name_and_description(self):
+        target = self.root / "contexts/git/skills/create-semantic-commits/SKILL.md"
+        text = target.read_text(encoding="utf-8")
+        self.assertTrue(text.startswith("---\n"))
+        target.write_text(text.split("---\n", 2)[-1], encoding="utf-8")
+        self.assert_error("name and description frontmatter")
+
     def test_ready_pr_does_not_require_signed_gate(self):
         self.change(
             "contexts/git/rules/pull-request.md",
@@ -128,7 +135,7 @@ class ToolkitLintTests(unittest.TestCase):
     def test_pr_creation_requires_independent_review(self):
         self.change(
             "contexts/git/commands/create-pull-request.md",
-            "independent code review (PASS)",
+            "contexts/git/rules/pull-request.md",
             "optional analysis",
         )
         self.assert_error("missing pre-PR quality gate")
@@ -136,8 +143,8 @@ class ToolkitLintTests(unittest.TestCase):
     def test_pr_creation_requires_lint(self):
         self.change(
             "contexts/git/commands/create-pull-request.md",
-            "and lint have satisfied",
-            "have satisfied",
+            "contexts/git/skills/manage-pull-request/SKILL.md",
+            "optional procedure",
         )
         self.assert_error("missing pre-PR quality gate")
 
@@ -151,7 +158,7 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_precommit_must_reference_shared_policy(self):
         self.change(
-            "contexts/git/skills/create-semantic-commits/skill.md",
+            "contexts/git/skills/create-semantic-commits/SKILL.md",
             "shared quality-gate discovery and evidence policy",
             "local ad-hoc verification",
         )
@@ -159,39 +166,39 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_prepr_hook_discovery_cannot_be_removed(self):
         self.change(
-            "contexts/git/skills/manage-pull-request/skill.md",
-            "effective pre-commit/pre-push hooks",
-            "some checks",
+            "contexts/git/skills/manage-pull-request/SKILL.md",
+            "Pre-Creation Quality Gate",
+            "local checklist",
         )
         self.assert_error("missing pre-PR check discovery or execution")
 
     def test_prepr_must_execute_missing_checks(self):
         self.change(
             "contexts/git/commands/create-pull-request.md",
-            "execute missing non-destructive checks",
-            "skip missing checks",
+            "Pre-Creation Quality Gate",
+            "local checklist",
         )
-        self.assert_error("missing pre-PR explicit check fallback")
+        self.assert_error("missing pre-PR quality gate")
 
     def test_review_team_lead_cannot_drop_coordination(self):
         self.change(
             "contexts/review/agents/code-reviewer.md",
-            "coordinate-review-team/skill.md",
+            "coordinate-review-team/SKILL.md",
             "omitted-coordination.md",
         )
         self.assert_error("missing team-lead coordination")
 
     def test_review_workflow_cannot_drop_collaboration_skill(self):
         self.change(
-            "contexts/review/skills/review-change/skill.md",
-            "coordinate-review-team/skill.md",
-            "not-a-team-skill.md",
+            "contexts/review/skills/review-change/SKILL.md",
+            "coordinate-review-team/SKILL.md",
+            "not-a-team-SKILL.md",
         )
         self.assert_error("missing collaborative review skill composition")
 
     def test_team_messaging_and_fallback_are_required(self):
         self.change(
-            "contexts/review/skills/coordinate-review-team/skill.md",
+            "contexts/review/skills/coordinate-review-team/SKILL.md",
             "## Collaboration Protocol",
             "## Absent Protocol",
         )
@@ -199,7 +206,7 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_review_team_requires_r3_proportional_n(self):
         self.change(
-            "contexts/review/skills/coordinate-review-team/skill.md",
+            "contexts/review/skills/coordinate-review-team/SKILL.md",
             "R3 | 3–5 relevant roles",
             "R3 | unlimited roles",
         )
@@ -207,7 +214,7 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_review_team_requires_task_resume(self):
         self.change(
-            "contexts/review/skills/coordinate-review-team/skill.md",
+            "contexts/review/skills/coordinate-review-team/SKILL.md",
             "`Task+resume`",
             "`arbitrary sequential review`",
         )
@@ -233,9 +240,9 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_cycle_between_skills(self):
         self.change(
-            "contexts/requirements/skills/example-discovery/skill.md",
+            "contexts/requirements/skills/example-discovery/SKILL.md",
             "## Uses\n",
-            "## Uses\n\n* Skill: \x60contexts/requirements/skills/definition/skill.md\x60\n",
+            "## Uses\n\n* Skill: \x60contexts/requirements/skills/definition/SKILL.md\x60\n",
         )
         self.assert_error("cyclic Skill -> Skill")
 
