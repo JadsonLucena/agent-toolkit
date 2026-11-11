@@ -11,7 +11,7 @@ import uuid
 from pathlib import Path
 from typing import Any, Protocol
 
-from git_scope import GitScopeError, git_inventory
+from git_scope import GitScopeError, git as git_bytes, git_inventory
 
 # Stable semantic concerns, with one specialist per distinct investigation.
 CONCERN_ROLES = {
@@ -183,7 +183,50 @@ def _assignment(plan: dict[str, Any], role: str, *, purpose: str, findings: Any 
     }
 
 
-def _validate_finding(finding: Any, inventory: set[str]) -> None:
+_DOC_SUFFIXES = {".md", ".markdown", ".rst", ".adoc"}
+_DOC_DIRS = {"docs", "doc", "adr", "adrs", "runbook", "runbooks"}
+
+
+def _documentation_path(path: str) -> bool:
+    if not path or path.startswith(("/", "\\")) or "\\" in path or ".." in Path(path).parts:
+        return False
+    name = Path(path).name.lower()
+    if name.startswith("readme") or name in {"contributing.md", "changelog.md", "agents.md"}:
+        return True
+    suffix = Path(path).suffix.lower()
+    if suffix in _DOC_SUFFIXES:
+        return True
+    parents = {part.lower() for part in Path(path).parts[:-1]}
+    return bool(parents & _DOC_DIRS) and suffix in (_DOC_SUFFIXES | {".txt"})
+
+
+def _verified_documentation_location(location: str, repo: Path, head: str) -> bool:
+    path, sep, line = location.rpartition(":")
+    if (not sep or not line.isdigit() or not _documentation_path(path)
+            or len(head) not in (40, 64)
+            or any(c not in "0123456789abcdefABCDEF" for c in head)):
+        return False
+    try:
+        git_bytes(["cat-file", "-e", f"{head}:{path}"], cwd=repo, timeout=30)
+    except GitScopeError:
+        return False
+    return True
+
+
+def _location_in_scope(
+    location: str, inventory: set[str], repo: Path | None, head: str | None,
+) -> bool:
+    if any(location.startswith(path + ":") for path in inventory):
+        return True
+    # Unchanged documentation can locate a finding and stays out of the coverage set.
+    if repo is None or head is None:
+        return False
+    return _verified_documentation_location(location, repo, head)
+
+
+def _validate_finding(
+    finding: Any, inventory: set[str], *, repo: Path | None = None, head: str | None = None,
+) -> None:
     if not isinstance(finding, dict):
         raise TeamPlanningError("candidate finding must be a JSON object")
     for field in ("finding_id", "location", "claim", "trigger", "evidence",
@@ -204,7 +247,7 @@ def _validate_finding(finding: Any, inventory: set[str]) -> None:
         or finding.get("disposition") not in ("fix", "decision-needed")
     ):
         raise TeamPlanningError("amplified-pre-existing finding requires rationale and disposition")
-    if not any(finding["location"].startswith(path + ":") for path in inventory):
+    if not _location_in_scope(finding["location"], inventory, repo, head):
         raise TeamPlanningError("candidate finding location must identify changed file:line")
     for field in ("claim", "evidence", "consequence"):
         if any(marker in finding[field].lower() for marker in ("previous message", "above message")):
@@ -248,7 +291,10 @@ def _validate_first_pass(replies: list[dict[str, Any]], plan: dict[str, Any]) ->
         if len(reply["relay_requests"]) > MAX_RELAY_REQUESTS:
             raise TeamPlanningError("too many peer requests")
         for finding in reply["candidate_findings"]:
-            _validate_finding(finding, inventory)
+            _validate_finding(
+                finding, inventory,
+                repo=Path(plan["repository"]), head=plan["target"]["head_sha"],
+            )
         for item in reply["uncertainties"]:
             if not isinstance(item, str) or not item.strip():
                 raise TeamPlanningError("specialist uncertainties must be self-contained text")
@@ -310,10 +356,14 @@ async def _deliver(
         return reply
 
 
-async def _relay(plan: dict[str, Any], grouped: dict[str, dict[str, Any]], host: TaskRuntime) -> tuple[list[dict], list[str]]:
+async def _relay(
+    plan: dict[str, Any], grouped: dict[str, dict[str, Any]], host: TaskRuntime,
+    pending: list[tuple[str, Any]] | None = None,
+) -> tuple[list[dict], list[str]]:
     ledger: list[dict] = []
     unresolved: list[str] = []
-    pending = [(role, req) for role, reply in grouped.items() for req in reply["relay_requests"]]
+    if pending is None:
+        pending = [(role, req) for role, reply in grouped.items() for req in reply["relay_requests"]]
     if len(pending) > MAX_RELAY_REQUESTS:
         raise TeamPlanningError("peer relay budget exceeded")
     for sender, request in pending:
@@ -381,6 +431,47 @@ def _direct_exchange_observed(events: Any, grouped: dict[str, dict], review_id: 
     return False
 
 
+def _audit_covers_request(
+    sender: str, request: Any, grouped: dict[str, dict], events: Any, review_id: str,
+) -> bool:
+    """True when the audit already delivered this request and its response."""
+    if not isinstance(request, dict) or not isinstance(events, list) or sender not in grouped:
+        return False
+    recipient = request.get("recipient_role")
+    subject = request.get("subject")
+    kind = request.get("kind")
+    if recipient not in grouped or not isinstance(subject, str) or not subject.strip():
+        return False
+    sender_id = grouped[sender]["task_id"]
+    recipient_id = grouped[recipient]["task_id"]
+    for event in events:
+        if not isinstance(event, dict) or event.get("review_id") != review_id:
+            continue
+        if event.get("via") != "direct-peer" or event.get("status") != "delivered":
+            continue
+        if event.get("kind") != kind or event.get("subject") != subject:
+            continue
+        if event.get("sender_task_id") != sender_id or event.get("recipient_task_id") != recipient_id:
+            continue
+        thread = event.get("thread_id")
+        message = event.get("message_id")
+        if not isinstance(thread, str) or not isinstance(message, str):
+            continue
+        for reply in events:
+            if not isinstance(reply, dict):
+                continue
+            if (reply.get("review_id") == review_id
+                    and reply.get("via") == "direct-peer"
+                    and reply.get("status") == "delivered"
+                    and reply.get("kind") == "response"
+                    and reply.get("thread_id") == thread
+                    and reply.get("response_to") == message
+                    and reply.get("sender_task_id") == recipient_id
+                    and reply.get("recipient_task_id") == sender_id):
+                return True
+    return False
+
+
 async def execute(
     plan: dict[str, Any], host: TaskRuntime | None,
     *, independent_lead: bool = False,
@@ -404,6 +495,7 @@ async def execute(
             for role in roles
         ]
         grouped = _validate_first_pass(await host.task_batch(asks), plan)
+        observed: Any = []
         if plan["capabilities"]["direct_peer_supported"]:
             try:
                 observed = await host.direct_message_audit(plan["review_id"])
@@ -420,8 +512,15 @@ async def execute(
                           and e.get("review_id") == plan["review_id"]
                           and e.get("via") == "direct-peer"
                           and e.get("status") == "delivered"][:MAX_RELAY_REQUESTS]
-        if execution_mode != "team-live":
-            ledger, unresolved = await _relay(plan, grouped, host)
+        outstanding = [
+            (role, request)
+            for role, reply in grouped.items()
+            for request in reply["relay_requests"]
+            if not _audit_covers_request(role, request, grouped, observed, plan["review_id"])
+        ]
+        if outstanding or execution_mode != "team-live":
+            relayed, unresolved = await _relay(plan, grouped, host, outstanding)
+            ledger = [*ledger, *relayed]
     material = any(v["candidate_findings"] for v in grouped.values())
     r1_blocker = any(
         isinstance(f, dict) and (
@@ -579,6 +678,7 @@ def finalize(
         **result, "review_status": verdict,
         "coverage_status": "complete" if covered == required else "partial",
         "reviewed_files": sorted(covered),
+        "unreviewed_files": sorted(required - covered),
         "blocking_findings": list(verified_blockers),
         "unresolved_questions": observed_questions + [
             reason for reason in reasons if reason not in observed_questions

@@ -233,8 +233,8 @@ def verify_evidence(
     return reviewer
 
 
-def _clause_containing(text: str, start: int, end: int) -> str:
-    """Return the clause that holds [start, end), split on sentence boundaries."""
+def _clause_bounds(text: str, start: int, end: int) -> tuple[int, int]:
+    """Return the clause bounds that hold [start, end), split on sentence boundaries."""
     left = 0
     for index in range(start - 1, -1, -1):
         if text[index] in ".!?;\n":
@@ -245,20 +245,39 @@ def _clause_containing(text: str, start: int, end: int) -> str:
         if text[index] in ".!?;\n":
             right = index
             break
-    return text[left:right]
+    return left, right
+
+
+_TRAILING_PASS_NEGATION = re.compile(
+    r"^\s*(?:is|was|are|were)\s+(?:not|absent|missing)\b|^\s*(?:not|absent|missing)\b",
+    re.IGNORECASE,
+)
+
+
+def _negates_pass(clause: str, start: int, end: int) -> bool:
+    """A negation qualifies PASS only when it governs that token.
+
+    A comma starts another claim, so \"no blockers\" or an earlier \"No issues\"
+    does not cancel PASS. A predicate placed immediately after the token does.
+    """
+    before = clause[:start].rsplit(",", 1)[-1]
+    if _PASS_NEGATION.search(before):
+        return True
+    return _TRAILING_PASS_NEGATION.match(clause[end:]) is not None
 
 
 def body_claims_gate_pass(text: str) -> bool:
     """A draft body affirms gate PASS when it records that profile or an unnegated PASS token.
 
-    A negation qualifies PASS only inside the same clause. An earlier sentence
-    that says evidence is absent does not cancel a later affirmative PASS.
+    A negation qualifies PASS only inside the same clause, and only when it
+    governs that token. An earlier sentence that says evidence is absent does
+    not cancel a later affirmative PASS.
     """
     if _GATE_PROFILE.search(text) or _REVIEW_STATUS_PASS.search(text):
         return True
     for match in _PASS_TOKEN.finditer(text):
-        clause = _clause_containing(text, match.start(), match.end())
-        if _PASS_NEGATION.search(clause) is None:
+        left, right = _clause_bounds(text, match.start(), match.end())
+        if not _negates_pass(text[left:right], match.start() - left, match.end() - left):
             return True
     return False
 
@@ -427,7 +446,8 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps({"status": "blocked", "reason": str(exc)}))
         return 2
     if args.create:
-        cmd = ["gh", "pr", "create", "--base", args.base, "--head", args.head,
+        cmd = ["gh", "pr", "create", "--repo", info["repository"],
+               "--base", args.base, "--head", args.head,
                "--title", args.title, "--body-file", str(args.body_file.resolve())]
         if args.draft:
             cmd.append("--draft")

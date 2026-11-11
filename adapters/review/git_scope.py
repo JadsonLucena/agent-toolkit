@@ -33,12 +33,24 @@ def git(args: list[str], *, cwd: Path, timeout: int) -> bytes:
     return result.stdout
 
 
+def _reject_dirty_submodule(repo: Path, timeout: int) -> None:
+    """A parent diff records `<sha>-dirty` and not the submodule worktree."""
+    dirty = git(
+        ["submodule", "foreach", "--recursive", "--quiet", "git status --porcelain=v1 -z"],
+        cwd=repo, timeout=timeout,
+    )
+    if dirty.strip(b"\x00"):
+        raise GitScopeError("dirty submodule is not a stable review target")
+
+
 def workspace_fingerprint(repo: Path, timeout: int) -> str:
     """Hash HEAD, index, tracked worktree diff, and untracked bytes read-only.
 
     A workspace without a fingerprint cannot be a stable review target.
+    A dirty submodule is rejected: its contents are absent from that hash.
     No Git writes (including write-tree), OCR imports or symlink traversal.
     """
+    _reject_dirty_submodule(repo, timeout)
     digest = hashlib.sha256()
     for label, args in (
         (b"head", ["rev-parse", "--verify", "HEAD"]),

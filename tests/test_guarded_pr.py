@@ -27,6 +27,13 @@ class BodyClaimTests(unittest.TestCase):
             "This draft does not claim PASS.\nSigned gate evidence is absent.\n"
         ))
 
+    def test_unrelated_negation_does_not_cancel_an_affirmative_pass(self):
+        self.assertTrue(gate.body_claims_gate_pass("Code Review: PASS (no blockers)"))
+        self.assertTrue(gate.body_claims_gate_pass("No issues found, Code Review PASS"))
+
+    def test_negation_attached_after_pass_cancels_the_claim(self):
+        self.assertFalse(gate.body_claims_gate_pass("Gate PASS is absent."))
+
 
 def git(cwd: Path, *args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=cwd, stderr=subprocess.DEVNULL).decode().strip()
@@ -283,7 +290,8 @@ class GuardedPRTests(unittest.TestCase):
         ]
 
     def test_remote_creation_requires_verification(self):
-        seen, mock = self.gh_mock()
+        commands = []
+        seen, mock = self.gh_mock(commands=commands)
         with patch.object(gate, "invoke", side_effect=mock):
             out = io.StringIO()
             with contextlib.redirect_stdout(out):
@@ -291,6 +299,7 @@ class GuardedPRTests(unittest.TestCase):
                                         "--body-file", str(self.body)))
         self.assertEqual(0, rc)
         self.assertEqual(["create", "verify"], seen)
+        self.assertEqual("org/repo", commands[0][commands[0].index("--repo") + 1])
         result = json.loads(out.getvalue())
         self.assertEqual("passed", result["status"])
         self.assertTrue(result["remote_verified"])
@@ -354,6 +363,7 @@ class GuardedPRTests(unittest.TestCase):
         self.assertEqual(["create", "verify"], seen)
         self.assertIn("--draft", commands[0])
         self.assertNotIn("--evidence", commands[0])
+        self.assertEqual("org/repo", commands[0][commands[0].index("--repo") + 1])
         self.assertFalse(result["signed_review_verified"])
         self.assertEqual({"lint", "tests"}, set(result["checks_passed"]))
         self.assertTrue(result["remote_verified"])

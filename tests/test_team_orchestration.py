@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "adapters" / "review"))
 from prepare_context import prepare_context  # noqa: E402
 import team_orchestration as team  # noqa: E402
+from evidence_validation import validate_evidence  # noqa: E402
 
 
 def git(repo, *args):
@@ -18,13 +19,15 @@ def git(repo, *args):
 
 
 class FakeTaskHost:
-    def __init__(self, *, requests=False, observe_direct=False, wrong_target=False, bad_verifier=False):
+    def __init__(self, *, requests=False, observe_direct=False, wrong_target=False, bad_verifier=False,
+                 audit_subject="Can retries race?"):
         self.batches = []
         self.resumed = []
         self.requests = requests
         self.observe_direct = observe_direct
         self.wrong_target = wrong_target
         self.bad_verifier = bad_verifier
+        self.audit_subject = audit_subject
         self.by_role = {}
         self.last_review_id = None
 
@@ -78,7 +81,7 @@ class FakeTaskHost:
         return [
             {"review_id": review_id, "via": "direct-peer", "status": "delivered",
              "kind": "challenge", "thread_id": "direct-1", "message_id": "a",
-             "subject": "Can retries race?", "evidence_refs": ["payments.py:1"],
+             "subject": self.audit_subject, "evidence_refs": ["payments.py:1"],
              "sender_task_id": sender, "recipient_task_id": recipient},
             {"review_id": review_id, "via": "direct-peer", "status": "delivered",
              "kind": "response", "thread_id": "direct-1", "message_id": "b",
@@ -118,7 +121,7 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
 
     def host(self, **kwargs):
         host = FakeTaskHost(**kwargs)
-        host._repository = str(self.repo)
+        host._repository = str(self.repo.resolve())
         host._target = dict(self.ctx["target"])
         return host
 
@@ -387,6 +390,116 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
             native_second_pass_evidence=["payments.py:1"],
         )
         self.assertEqual("PASS", supported["review_status"])
+
+    async def test_live_mode_still_relays_requests_the_audit_did_not_answer(self):
+        plan = self.plan(concerns=["correctness", "reliability"], direct=True)
+        host = self.host(requests=True, observe_direct=True)
+        result = await team.execute(plan, host)
+        self.assertEqual("team-live", result["execution_mode"])
+        self.assertEqual(2, len(host.resumed))
+        self.assertIn("Can two charges race?", [m.get("subject") for m in result["peer_threads"]])
+        self.assertEqual([], result["unresolved_questions"])
+
+    async def test_live_mode_keeps_a_request_the_audit_already_answered(self):
+        plan = self.plan(concerns=["correctness", "reliability"], direct=True)
+        host = self.host(requests=True, observe_direct=True, audit_subject="Can two charges race?")
+        result = await team.execute(plan, host)
+        self.assertEqual("team-live", result["execution_mode"])
+        self.assertEqual([], host.resumed)
+        self.assertEqual([], result["unresolved_questions"])
+
+    async def test_finalized_evidence_lists_unreviewed_files(self):
+        plan = self.plan()
+        result = await team.execute(plan, self.host())
+        proof = team.finalize(
+            result, self.ctx, self.repo,
+            lead_reviewed_files=list(self.ctx["changed_files"]),
+            lead_independent=True, verified_blockers=[], unresolved_material=[],
+        )
+        self.assertEqual([], proof["unreviewed_files"])
+        validate_evidence(proof, self.ctx, self.repo)
+        partial = team.finalize(
+            result, self.ctx, self.repo,
+            lead_reviewed_files=["payments.py"],
+            lead_independent=True, verified_blockers=[], unresolved_material=[],
+        )
+        self.assertEqual(
+            sorted(set(self.ctx["changed_files"]) - {"payments.py"}),
+            partial["unreviewed_files"],
+        )
+
+    def test_verified_readme_outside_the_diff_is_a_valid_finding_location(self):
+        (self.repo / "README.md").write_text("# Payments\n")
+        git(self.repo, "add", "README.md")
+        git(self.repo, "commit", "-q", "-m", "docs")
+        head = git(self.repo, "rev-parse", "HEAD")
+        finding = {
+            "finding_id": "doc-1", "location": "README.md:1",
+            "claim": "The guide still describes the old amount",
+            "trigger": "amount change", "evidence": "README.md:1",
+            "consequence": "An operator follows a stale step",
+            "severity": "medium", "confidence": "high",
+        }
+        team._validate_finding(finding, {"payments.py"}, repo=self.repo, head=head)
+
+    def test_unchanged_source_file_is_not_a_documentation_location(self):
+        finding = {
+            "finding_id": "src-1", "location": "tests.py:1",
+            "claim": "A source file outside the diff",
+            "trigger": "change", "evidence": "tests.py:1",
+            "consequence": "unrelated",
+            "severity": "low", "confidence": "low",
+        }
+        with self.assertRaisesRegex(team.TeamPlanningError, "changed file"):
+            team._validate_finding(finding, {"payments.py"}, repo=self.repo, head=self.head)
+
+    async def test_readme_finding_does_not_abort_the_specialist_batch(self):
+        git(self.repo, "checkout", "-q", self.base)
+        (self.repo / "README.md").write_text("# Payments\n")
+        git(self.repo, "add", "README.md")
+        git(self.repo, "commit", "-q", "-m", "docs")
+        docs = git(self.repo, "rev-parse", "HEAD")
+        (self.repo / "payments.py").write_text("amount=2\n")
+        (self.repo / "tests.py").write_text("assert True\n")
+        git(self.repo, "add", ".")
+        git(self.repo, "commit", "-q", "-m", "feature")
+        head = git(self.repo, "rev-parse", "HEAD")
+        ctx = prepare_context(self.repo, base=docs, head=head, allow_ocr=False)
+        plan = team.freeze(
+            ctx, self.repo, risk_profile="R2", concerns=["correctness", "reliability"],
+            task_available=True, isolated_tasks=True, direct_peer_supported=False,
+            lead_implemented_change=False, review_id="review-a",
+        )
+        host = self.host()
+        host._repository = str(self.repo.resolve())
+        host._target = dict(ctx["target"])
+        original = host.task_batch
+        finding = {
+            "finding_id": "doc-1", "location": "README.md:1",
+            "claim": "The guide still describes the old amount",
+            "trigger": "amount change", "evidence": "README.md:1",
+            "consequence": "An operator follows a stale step",
+            "severity": "medium", "confidence": "high",
+        }
+
+        async def first_pass(requests):
+            answers = await original(requests)
+            if requests[0]["role"] == "finding-verifier":
+                answers[0]["verified_findings"] = [{
+                    "finding_id": "doc-1", "verification_status": "confirmed",
+                    "location": "README.md:1",
+                    "source_evidence": "README.md:1 names the old amount",
+                }]
+                return answers
+            for answer in answers:
+                if answer["role"] == "correctness-reviewer":
+                    answer["candidate_findings"] = [finding]
+            return answers
+
+        host.task_batch = first_pass
+        result = await team.execute(plan, host)
+        self.assertEqual("README.md:1", result["raw_findings"][0]["location"])
+        self.assertNotIn("README.md", result["changed_files"])
 
 
 if __name__ == "__main__":

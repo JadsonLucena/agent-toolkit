@@ -13,6 +13,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "adapters" / "review"))
+import git_scope  # noqa: E402
 import prepare_context as review  # noqa: E402
 
 
@@ -83,6 +84,45 @@ class ReviewContextTests(unittest.TestCase):
             rc = review.main(["--repo", str(self.repo / "does-not-exist")])
         self.assertEqual(2, rc)
         self.assertEqual("blocked", json.loads(out.getvalue())["status"])
+
+
+class WorkspaceFingerprintTests(unittest.TestCase):
+    def test_dirty_submodule_is_not_a_stable_review_target(self):
+        parent, _sub = self._parent_with_submodule()
+        (parent / "sub" / "app.py").write_text("v=2\n")
+        with self.assertRaisesRegex(git_scope.GitScopeError, "dirty submodule"):
+            git_scope.workspace_fingerprint(parent, 30)
+
+    def test_clean_submodule_stays_fingerprintable(self):
+        parent, _sub = self._parent_with_submodule()
+        first = git_scope.workspace_fingerprint(parent, 30)
+        second = git_scope.workspace_fingerprint(parent, 30)
+        self.assertEqual(first, second)
+        self.assertEqual(64, len(first))
+
+    def _parent_with_submodule(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        root = Path(temp.name)
+        sub = root / "sub"
+        parent = root / "parent"
+        sub.mkdir()
+        parent.mkdir()
+        git(sub, "init", "-q")
+        git(sub, "config", "user.email", "test@example.invalid")
+        git(sub, "config", "user.name", "Test")
+        (sub / "app.py").write_text("v=1\n")
+        git(sub, "add", "app.py")
+        git(sub, "commit", "-q", "-m", "sub")
+        git(parent, "init", "-q")
+        git(parent, "config", "user.email", "test@example.invalid")
+        git(parent, "config", "user.name", "Test")
+        subprocess.check_call(
+            ["git", "-c", "protocol.file.allow=always", "submodule", "add", "-q", str(sub), "sub"],
+            cwd=parent, stdout=subprocess.DEVNULL,
+        )
+        git(parent, "commit", "-q", "-m", "add sub")
+        return parent, sub
 
 
 if __name__ == "__main__":
