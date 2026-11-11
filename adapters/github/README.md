@@ -109,13 +109,21 @@ python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
   --signature /protected/review-evidence.json.sig \
   --trust-policy /protected/review-policy.json
 
-# Only the explicit --create authorizes remote PR creation:
+# Only the explicit --create authorizes remote PR creation.
+# A ready PR requires the signed gate evidence:
 python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
   --repo . --base main --head feature/example \
   --evidence /protected/review-evidence.json \
   --signature /protected/review-evidence.json.sig \
   --trust-policy /protected/review-policy.json \
   --create --title "feat: example" --body-file /tmp/pr-description.md
+
+# An explicitly authorized draft without signed evidence.
+# The body must name the gap and must not affirm PASS:
+python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
+  --repo . --base main --head feature/example \
+  --trust-policy /protected/review-policy.json \
+  --draft --create --title "feat: example" --body-file /tmp/pr-description.md
 \`\`\`
 
 Requires Python 3.10+, Git, OpenSSH \`ssh-keygen\`, and authenticated GitHub CLI
@@ -147,11 +155,21 @@ protected check-policy failures, and simulates \`gh pr create\` plus subsequent
 ## Gate Profile Integrity
 
 The protected pre-PR validator accepts only SSHSIG-signed evidence explicitly
-declaring `review_profile: gate`. Signed `advisory` results, missing legacy
-profiles and independent-looking flags cannot bypass the gate. The profile
-is part of the **exact signed JSON bytes**; no adapter may retroactively
-promote an advisory finding. An advisory PASS may be useful in an IDE,
-but has no PR-creation authority. Explicitly nonmaterial questions with
+declaring `review_profile: gate` for a ready PR. Signed `advisory` results,
+missing legacy profiles and independent-looking flags cannot bypass the gate.
+The profile is part of the **exact signed JSON bytes**; no adapter may
+retroactively promote an advisory finding. An advisory PASS may be useful in
+an IDE, but has no ready-PR authority. Explicitly nonmaterial questions with
 `material:false` may remain without granting false certainty about
 material unresolved issues. The signer and protected runtime remain
 responsible for actual reviewer independence.
+
+`--draft` without `--evidence` and without `--signature` creates an unsigned
+draft. It does not read review evidence and does not verify
+`review_profile=gate`. It refuses a body that records `review_profile=gate`
+or affirms the status token `PASS` (a negation in the preceding words, such
+as "does not claim PASS", is not an affirmation). Trusted lint and tests,
+the clean published head, and the protected repository identity still apply.
+`signed_review_verified` is false. Passing `--draft` together with
+`--signature` keeps the signed path. Passing `--evidence` without
+`--signature` is refused, so an unverified file is not treated as a review.

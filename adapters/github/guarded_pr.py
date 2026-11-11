@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Explicit GitHub PR creation guarded by signed review evidence and trusted checks.
 
-This is an optional GitHub runtime adapter. The invoking deployment MUST
-protect the external trust policy and reviewer signing keys. This adapter
-cannot regulate unrelated GitHub clients or establish isolation by itself.
+This is an optional GitHub runtime adapter. A ready PR requires an SSH-signed
+``review_profile=gate`` attestation. An explicitly authorized draft may be
+created without that attestation; the draft body must not affirm gate PASS.
+The invoking deployment MUST protect the external trust policy and reviewer
+signing keys. This adapter cannot regulate unrelated GitHub clients or
+establish isolation by itself.
 """
 from __future__ import annotations
 
@@ -18,6 +21,14 @@ from typing import Any
 REQUIRED_CHECKS = {"lint", "tests"}
 MAX_EVIDENCE_BYTES = 2_000_000
 SIGNATURE_NAMESPACE = "agent-toolkit-code-review"
+_PASS_TOKEN = re.compile(r"(?<![A-Za-z0-9_])PASS(?![A-Za-z0-9_])")
+_PASS_NEGATION = re.compile(
+    r"\b(?:not|no|without|absent|missing|never|cannot|can't|don't|doesn't|isn't|"
+    r"is not|do not|does not|não|nao|sem)\b",
+    re.IGNORECASE,
+)
+_GATE_PROFILE = re.compile(r"review_profile\s*[:=]\s*[`'\"]?gate\b", re.IGNORECASE)
+_REVIEW_STATUS_PASS = re.compile(r"review_status\s*[:=]\s*[`'\"]?PASS\b")
 
 
 class GateError(Exception):
@@ -222,10 +233,67 @@ def verify_evidence(
     return reviewer
 
 
+def body_claims_gate_pass(text: str) -> bool:
+    """A draft body affirms gate PASS when it records that profile or an unnegated PASS token."""
+    if _GATE_PROFILE.search(text) or _REVIEW_STATUS_PASS.search(text):
+        return True
+    for match in _PASS_TOKEN.finditer(text):
+        window = text[max(0, match.start() - 80):match.start()]
+        if _PASS_NEGATION.search(window) is None:
+            return True
+    return False
+
+
 def remote_head(repo: Path, remote: str, branch: str, expected: str, what: str) -> None:
     refs = git(repo, "ls-remote", "--heads", remote, branch)
     if not any(row.split()[0] == expected for row in refs.splitlines() if row.split()):
         raise GateError(f"remote {what} does not match reviewed {what}")
+
+
+def require_checkout(
+    repo: Path, base_ref: str, head_ref: str, trust_policy_path: Path, remote: str,
+) -> dict[str, Any]:
+    repo = repo.resolve()
+    if Path(git(repo, "rev-parse", "--show-toplevel")).resolve() != repo:
+        raise GateError("repository path must be its worktree root")
+    policy, checks, original_policy = load_trust_policy(trust_policy_path, repo, remote)
+    state = {
+        "repo": repo, "policy": policy, "checks": checks,
+        "original_policy": original_policy,
+        "original_allowed_signers": read_bytes(Path(policy["allowed_signers_file"])),
+        "base": commit(repo, base_ref), "head": commit(repo, head_ref),
+    }
+    if commit(repo, "HEAD") != state["head"]:
+        raise GateError("must check out the exact proposed PR head")
+    if git(repo, "status", "--porcelain=v1", "--untracked-files=all"):
+        raise GateError("dirty worktree: checks would not validate proposed head")
+    remote_head(repo, remote, base_ref, state["base"], "base")
+    remote_head(repo, remote, head_ref, state["head"], "head")
+    return state
+
+
+def recheck_checkout(
+    state: dict[str, Any], base_ref: str, head_ref: str, remote: str, trust_policy_path: Path,
+) -> None:
+    repo, base, head = state["repo"], state["base"], state["head"]
+    if commit(repo, "HEAD") != head or git(repo, "status", "--porcelain=v1", "--untracked-files=all"):
+        raise GateError("repository changed during verification")
+    remote_head(repo, remote, head_ref, head, "head")
+    remote_head(repo, remote, base_ref, base, "base")
+    if commit(repo, base_ref) != base:
+        raise GateError("base changed during verification")
+    if read_bytes(external_path(trust_policy_path, repo, "trust policy")) != state["original_policy"]:
+        raise GateError("trusted policy changed during verification")
+    if read_bytes(Path(state["policy"]["allowed_signers_file"])) != state["original_allowed_signers"]:
+        raise GateError("trusted reviewer keys changed during verification")
+
+
+def run_checks(state: dict[str, Any], timeout: int) -> list[str]:
+    completed = []
+    for name, argv in state["checks"].items():
+        invoke(argv, state["repo"], timeout)
+        completed.append(name)
+    return completed
 
 
 def guard(
@@ -233,19 +301,8 @@ def guard(
     signature_path: Path, trust_policy_path: Path,
     *, remote: str = "origin", timeout: int = 300,
 ) -> dict[str, Any]:
-    repo = repo.resolve()
-    if Path(git(repo, "rev-parse", "--show-toplevel")).resolve() != repo:
-        raise GateError("repository path must be its worktree root")
-    policy, checks, original_policy = load_trust_policy(trust_policy_path, repo, remote)
-    original_allowed_signers = read_bytes(Path(policy["allowed_signers_file"]))
-    base = commit(repo, base_ref)
-    head = commit(repo, head_ref)
-    if commit(repo, "HEAD") != head:
-        raise GateError("must check out the exact proposed PR head")
-    if git(repo, "status", "--porcelain=v1", "--untracked-files=all"):
-        raise GateError("dirty worktree: checks would not validate proposed head")
-    remote_head(repo, remote, base_ref, base, "base")
-    remote_head(repo, remote, head_ref, head, "head")
+    state = require_checkout(repo, base_ref, head_ref, trust_policy_path, remote)
+    repo, policy, base, head = state["repo"], state["policy"], state["base"], state["head"]
     actual = changed_paths(repo, base, head)
     evidence = load_json(evidence_path)
     reviewer = verify_evidence(
@@ -253,20 +310,8 @@ def guard(
         repository=policy["github_repository"], reviewers=policy["reviewers"], repo=repo,
     )
     verify_signature(evidence_path, signature_path, reviewer, policy["allowed_signers_file"], repo)
-    completed = []
-    for name, argv in checks.items():
-        invoke(argv, repo, timeout)
-        completed.append(name)
-    if commit(repo, "HEAD") != head or git(repo, "status", "--porcelain=v1", "--untracked-files=all"):
-        raise GateError("repository changed during verification")
-    remote_head(repo, remote, head_ref, head, "head")
-    remote_head(repo, remote, base_ref, base, "base")
-    if commit(repo, base_ref) != base:
-        raise GateError("base changed during verification")
-    if read_bytes(external_path(trust_policy_path, repo, "trust policy")) != original_policy:
-        raise GateError("trusted policy changed during verification")
-    if read_bytes(Path(policy["allowed_signers_file"])) != original_allowed_signers:
-        raise GateError("trusted reviewer keys changed during verification")
+    completed = run_checks(state, timeout)
+    recheck_checkout(state, base_ref, head_ref, remote, trust_policy_path)
     # Reverify signature if evidence or signer file could have changed during
     # long checks. The signed content and trusted keys must remain current.
     if evidence != load_json(evidence_path):
@@ -276,6 +321,25 @@ def guard(
         "repository": policy["github_repository"], "reviewer": reviewer,
         "base_sha": base, "head_sha": head, "changed_files": sorted(actual),
         "checks_passed": completed, "signed_review_verified": True,
+    }
+
+
+def guard_unsigned_draft(
+    repo: Path, base_ref: str, head_ref: str, body_path: Path, trust_policy_path: Path,
+    *, remote: str = "origin", timeout: int = 300,
+) -> dict[str, Any]:
+    state = require_checkout(repo, base_ref, head_ref, trust_policy_path, remote)
+    body = read_bytes(body_path).decode("utf-8", "replace")
+    if body_claims_gate_pass(body):
+        raise GateError("draft body affirms gate PASS")
+    completed = run_checks(state, timeout)
+    recheck_checkout(state, base_ref, head_ref, remote, trust_policy_path)
+    if read_bytes(body_path).decode("utf-8", "replace") != body:
+        raise GateError("draft body changed during verification")
+    return {
+        "repository": state["policy"]["github_repository"],
+        "base_sha": state["base"], "head_sha": state["head"],
+        "checks_passed": completed, "signed_review_verified": False,
     }
 
 
@@ -310,8 +374,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--repo", type=Path, default=Path.cwd())
     ap.add_argument("--base", required=True)
     ap.add_argument("--head", required=True, help="local and remote branch name")
-    ap.add_argument("--evidence", type=Path, required=True)
-    ap.add_argument("--signature", type=Path, required=True)
+    ap.add_argument("--evidence", type=Path)
+    ap.add_argument("--signature", type=Path)
     ap.add_argument("--trust-policy", type=Path, required=True,
                     help="deployment-protected policy outside target repository")
     ap.add_argument("--timeout", type=int, default=300)
@@ -326,8 +390,20 @@ def main(argv: list[str] | None = None) -> int:
     if args.create and (not args.title or args.body_file is None):
         ap.error("--create requires --title and --body-file")
     try:
-        info = guard(args.repo, args.base, args.head, args.evidence, args.signature,
-                     args.trust_policy, remote=args.remote, timeout=args.timeout)
+        if args.draft and args.signature is None:
+            if args.evidence is not None:
+                raise GateError("unsigned draft does not accept review evidence")
+            if args.body_file is None:
+                raise GateError("unsigned draft requires a body file")
+            info = guard_unsigned_draft(
+                args.repo, args.base, args.head, args.body_file, args.trust_policy,
+                remote=args.remote, timeout=args.timeout,
+            )
+        else:
+            if args.evidence is None or args.signature is None:
+                raise GateError("signed preflight requires --evidence and --signature")
+            info = guard(args.repo, args.base, args.head, args.evidence, args.signature,
+                         args.trust_policy, remote=args.remote, timeout=args.timeout)
     except GateError as exc:
         print(json.dumps({"status": "blocked", "reason": str(exc)}))
         return 2
