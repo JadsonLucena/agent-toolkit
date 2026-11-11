@@ -233,13 +233,32 @@ def verify_evidence(
     return reviewer
 
 
+def _clause_containing(text: str, start: int, end: int) -> str:
+    """Return the clause that holds [start, end), split on sentence boundaries."""
+    left = 0
+    for index in range(start - 1, -1, -1):
+        if text[index] in ".!?;\n":
+            left = index + 1
+            break
+    right = len(text)
+    for index in range(end, len(text)):
+        if text[index] in ".!?;\n":
+            right = index
+            break
+    return text[left:right]
+
+
 def body_claims_gate_pass(text: str) -> bool:
-    """A draft body affirms gate PASS when it records that profile or an unnegated PASS token."""
+    """A draft body affirms gate PASS when it records that profile or an unnegated PASS token.
+
+    A negation qualifies PASS only inside the same clause. An earlier sentence
+    that says evidence is absent does not cancel a later affirmative PASS.
+    """
     if _GATE_PROFILE.search(text) or _REVIEW_STATUS_PASS.search(text):
         return True
     for match in _PASS_TOKEN.finditer(text):
-        window = text[max(0, match.start() - 80):match.start()]
-        if _PASS_NEGATION.search(window) is None:
+        clause = _clause_containing(text, match.start(), match.end())
+        if _PASS_NEGATION.search(clause) is None:
             return True
     return False
 

@@ -17,6 +17,17 @@ sys.path.insert(0, str(ROOT / "adapters" / "github"))
 import guarded_pr as gate  # noqa: E402
 
 
+class BodyClaimTests(unittest.TestCase):
+    def test_negation_in_an_earlier_clause_does_not_cancel_a_later_pass(self):
+        self.assertTrue(gate.body_claims_gate_pass("Signed gate evidence is absent.\nGate: PASS\n"))
+        self.assertTrue(gate.body_claims_gate_pass("No remaining implementation work. Gate: PASS"))
+
+    def test_negation_in_the_same_clause_cancels_pass(self):
+        self.assertFalse(gate.body_claims_gate_pass(
+            "This draft does not claim PASS.\nSigned gate evidence is absent.\n"
+        ))
+
+
 def git(cwd: Path, *args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=cwd, stderr=subprocess.DEVNULL).decode().strip()
 
