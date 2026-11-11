@@ -1,3 +1,8 @@
+---
+name: coordinate-review-team
+description: "Orchestrate a risk-proportionate code-review team and record whether coordination was live, relayed, or native. Use when a review may need isolated specialists."
+---
+
 # Coordinate Review Team
 
 ## Purpose
@@ -12,7 +17,7 @@ or helper output to manufacture one `PASS`.
 ## Uses
 
 * Rule: `contexts/review/rules/code-review.md`
-* Skill: `contexts/review/skills/verify-findings/skill.md`
+* Skill: `contexts/review/skills/verify-findings/SKILL.md`
 * Output contract: `contracts/review-evidence.md`
 * Optional input contract: `contracts/requirements.md`
 * Optional input contract: `contracts/test-basis.md`
@@ -73,23 +78,16 @@ and the final `PASS` still requires a genuinely independent lead/session.
 
 ## Mode Selection — Strict Precedence
 
-1. `team-live` only if the runtime isolates agents **and** an independent
-   host audit observes direct **peer-to-peer** question/challenge **and**
-   response delivery between the corresponding subagent IDs. A capability
-   flag, shared memory, ordinary parallel Task calls, or in-process queues
-   do not qualify.
-2. `team-relayed` is the **default fallback when isolated subagents exist**
-   but direct messages cannot be observed. Launch all selected sibling Tasks
-   in the same turn; the lead acts as the actual message bus.
-3. `native-solo` only when subagents cannot be used, or R0/R1 has no
-   separable concern. Native solo still covers every applicable lens.
+```mermaid
+flowchart TD
+    Start --> Live{"An audit observes direct peer-to-peer question, challenge, and response between subagent IDs?"}
+    Live -->|yes| TeamLive["team-live"]
+    Live -->|no| Subagents{"Isolated subagents exist?"}
+    Subagents -->|yes| Relayed["team-relayed is the default fallback"]
+    Subagents -->|no| Solo["native-solo"]
+```
 
-In hosts where sibling tasks do not communicate, a resume operation on an
-existing subagent identity is a lead-mediated delivery and remains
-`team-relayed`. If resuming is unsupported, the lead may create a
-new isolated `Task` with the narrow question and original immutable target,
-recording the new task ID and transfer; do not invent a prior conversation.
-No platform-specific APIs are made canonical.
+`team-live` requires observed delivery. A capability flag, shared memory, ordinary parallel Task calls, or an in-process queue does not qualify. Where sibling tasks do not communicate, resuming the existing subagent stays lead-mediated and remains `team-relayed`. If resuming is unsupported, create a new isolated Task with the narrow question and the original immutable target. Do not invent a prior conversation. No platform-specific API is canonical.
 
 ## Dispatch and Result Contract
 
@@ -121,39 +119,17 @@ or material disagreement remain open and prevent a clean verdict.
 
 ## Workflow
 
-1. **Freeze before Task:** repository, full inventory, resolved target/fingerprint,
-   risk profile, separable concerns and allocation plan. Use
-   `adapters/review/team_orchestration.py` or an equivalent approved host
-   adapter; require the same target on every specialist response.
-2. **Select mode and N:** apply the strict precedence and table above.
-   `team-live` is only a candidate until direct peer delivery is observed;
-   otherwise report `team-relayed`. No Task -> `native-solo`.
-3. **First pass — one simultaneous Task batch:** dispatch one independent
-   subagent per activated lens in the **same host turn**, using its canonical
-   agent file and common frozen SHA. Return candidate findings, reviewed
-   file paths and uncertainties; specialists do not issue PASS/FAIL.
-4. **Second pass — relayed cross-lens exchange:** for each material dependency,
-   the lead creates a structured message with a target and action and delivers
-   it via `Task resume` to the recipient's ID (or a new narrow Task).
-   Relay the evidence-backed response to the original requester and record
-   its resolution. Example: correctness raises duplicate payment; relay a
-   challenge to reliability about idempotency and testing about assertions.
-   Preserve the actual transport, IDs and exact thread status. Never pretend
-   agent-to-agent delivery occurred without it.
-5. **Third pass — independent falsification:** R3 **always** requests an
-   isolated `finding-verifier` even when initial findings are empty; R2
-   requests one for material findings; R1 only for blocker candidates.
-   Verification means independent **source inspection**, not vote counting.
-   If no isolated verifier exists, perform a separate source-backed native
-   falsification pass and honestly mark `native-second-pass`.
-6. **Reconcile:** the lead checks every original Git changed file, including
-   paths OCR or specialists excluded, and verifies any raw candidate's
-   explicit disposition. Recheck the frozen snapshot. Missing file,
-   unresolved challenge or unknown high-impact claim => `INCOMPLETE`.
-7. **One verdict and report:** the lead alone issues `PASS`, `FAIL`,
-   or `INCOMPLETE` using `contracts/review-evidence.md`.
-   A team quorum, shared confidence or successful tool exit cannot grant
-   PASS. Independence of the lead remains a separate prerequisite.
+```mermaid
+flowchart TD
+    Freeze["Freeze the snapshot before any spawn"] --> Mode["Mode Selection and the Team Activation table"]
+    Mode --> First["One simultaneous Task batch; specialists do not issue one PASS"]
+    First --> Relay["Collaboration Protocol"]
+    Relay --> Verifier["finding-verifier when the table requires it"]
+    Verifier --> Reconcile["Every original changed file and every raw candidate"]
+    Reconcile --> Verdict["The lead alone issues one PASS, FAIL, or INCOMPLETE"]
+```
+
+The diagram is the procedure. Team size and relay policy stay in Team Activation, Mode Selection, and Collaboration Protocol above. Apply `contexts/review/rules/code-review.md` for advisory versus gate independence.
 
 ## Output
 

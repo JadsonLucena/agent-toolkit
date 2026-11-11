@@ -13,7 +13,7 @@ This command selects the Requirements Specifier and validation workflow. It auth
 * Rule: `contexts/requirements/rules/tailoring.md`
 
 * Agent: `contexts/requirements/agents/requirements-specifier.md`
-* Skill: `contexts/requirements/skills/validation/skill.md`
+* Skill: `contexts/requirements/skills/validation/SKILL.md`
 * Rule: `contexts/requirements/rules/requirements.md`
 * Contract: `contracts/requirements.md`
 

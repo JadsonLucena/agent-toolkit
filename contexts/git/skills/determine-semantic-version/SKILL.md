@@ -1,3 +1,8 @@
+---
+name: determine-semantic-version
+description: "Recommend a semantic-version increment from verified compatibility impact and repository release policy. Use when a version decision is requested and release intent must not be invented."
+---
+
 # Determine Semantic Version
 
 ## Purpose
@@ -24,14 +29,16 @@ Maintain:
 
 ## Workflow
 
-1. Inspect the current version, versioning policy, public API or consumer contract, relevant changes, and release context.
-2. Determine whether the change is breaking, backward-compatible additive behavior, backward-compatible correction, or not release-relevant under repository policy.
-3. Distinguish implementation size, effort, or file count from compatibility impact.
-4. Apply pre-1.0 or repository-specific versioning policy when applicable.
-5. Reconcile code evidence, documented intent, tests, release metadata, and optional planning evidence.
-6. If compatibility impact or release intent is materially ambiguous, ask the developer rather than choosing the larger or smaller increment by default.
-7. Propose the increment and resulting version only when the current version and applicable policy are verified.
-8. Report the compatibility rationale, supporting evidence, and remaining uncertainty.
+```mermaid
+flowchart TD
+    Inspect["Current version and public contract"] --> Impact["Compatibility impact: semantic-version.md"]
+    Impact --> Policy["Repository and pre-1.0 policy: semantic-version.md"]
+    Policy --> Ask{"Impact or release intent ambiguous?"}
+    Ask -->|yes| Stop
+    Ask -->|no| Propose["Increment and rationale; size is not impact"]
+```
+
+The diagram is the procedure. Apply `contexts/git/rules/semantic-version.md`. Do not restate it.
 
 ## Stop Conditions
 

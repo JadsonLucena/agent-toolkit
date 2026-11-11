@@ -8,12 +8,12 @@ Create a remote pull request for an already published change using a verified he
 
 Use only when remote pull-request creation is explicitly requested.
 
-Invocation authorizes creation of the remote PR object only **after** explicitly signed `review_profile=gate` independent code review (PASS), applicable project tests, and lint have satisfied the pre-creation gate, including for draft PRs. Advisory evidence never satisfies this condition. The skill must discover repository-defined lint/tests and established coverage checks, inspect effective pre-commit/pre-push hooks and completed CI evidence, reuse only results valid for the intended revision and full scope, and execute missing non-destructive checks when authorized before creation. A workflow triggered only after PR creation does not satisfy this gate. The skill may perform the read-only preparation checks required to create it safely and truthfully; when review evidence is missing, an explicitly authorized multi-context orchestrator may obtain a separate read-only Review result before retrying. The Git workflow consumes the neutral contract and does not invoke Review internals.
+Readiness, draft, and gate claims are the Pre-Creation Quality Gate in `contexts/git/rules/pull-request.md`. Execute that decision through `contexts/git/skills/manage-pull-request/SKILL.md` in `create` mode. Check discovery stays in `contexts/git/rules/git.md`. This invocation does not authorize a description that claims gate when that rule does not.
 
 ## Uses
 
 * Agent: `contexts/git/agents/git-engineer.md`
-* Skill: `contexts/git/skills/manage-pull-request/skill.md` in `create` mode
+* Skill: `contexts/git/skills/manage-pull-request/SKILL.md` in `create` mode
 * Rule: `contexts/git/rules/pull-request.md`
 * Rule: `contexts/git/rules/git.md`
 * Rule: `contexts/git/rules/gitflow.md` when applicable
@@ -51,4 +51,4 @@ This command authorizes only remote PR creation plus the read-only checks needed
 
 It does not authorize pushing unpublished commits, creating commits, rewriting history, changing the implementation, assigning reviewers, applying labels or milestones, enabling auto-merge, merging, closing an existing PR, deleting branches, releasing, or deploying unless those operations are separately and explicitly authorized.
 
-Do not create the PR when independent review is missing, not PASS, stale or incomplete; applicable tests/lint are missing, failed or stale; the head branch is unpublished; the base is materially ambiguous; preparation is `blocked`; or any required verification makes creation unsafe or misleading.
+Do not create a pull request when `contexts/git/rules/pull-request.md` does not allow that publication. Do not claim gate in the description unless that rule says the gate is satisfied.

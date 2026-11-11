@@ -59,11 +59,11 @@ contexts/requirements/
 │   ├── requirements.md
 │   └── backlog.md
 ├── skills/
-│   ├── elicitation/skill.md
-│   ├── definition/skill.md
-│   ├── example-discovery/skill.md
-│   ├── validation/skill.md
-│   └── backlog-planning/skill.md
+│   ├── elicitation/SKILL.md
+│   ├── definition/SKILL.md
+│   ├── example-discovery/SKILL.md
+│   ├── validation/SKILL.md
+│   └── backlog-planning/SKILL.md
 ├── commands/
 │   ├── shape-change.md
 │   ├── elicit-requirements.md
@@ -94,7 +94,7 @@ Elicitation and specification share `contracts/requirements.md` so Need/Goal con
 ```text
 contexts/testing/
 ├── rules/testing.md
-├── skills/generate-tests/skill.md
+├── skills/generate-tests/SKILL.md
 ├── commands/generate-tests.md
 └── agents/test-engineer.md
 ```
@@ -107,9 +107,9 @@ Testing remains autonomous. Requirements evidence may improve test design throug
 contexts/review/
 ├── rules/code-review.md
 ├── skills/
-│   ├── review-change/skill.md
-│   ├── coordinate-review-team/skill.md
-│   └── verify-findings/skill.md
+│   ├── review-change/SKILL.md
+│   ├── coordinate-review-team/SKILL.md
+│   └── verify-findings/SKILL.md
 ├── commands/review-code.md
 └── agents/
     ├── code-reviewer.md
@@ -137,7 +137,7 @@ Review is **native and provider-neutral**: OCR or other installed review helpers
 
 **Collaborative Agent Teams:** the `code-reviewer` is the **Code Review Lead**. For R2/R3 changes, it selects relevant isolated specialists when the runtime supports them; direct peer messaging is not required for a genuine Lead-relayed team. Specialists share evidence, ask targeted questions and challenge conclusions; a distinct finding-verifier independently attempts falsification before the lead issues the sole verdict. R0/R1 changes normally run solo. On platforms without messaging, the lead relays questions between specialist passes or reviews natively. The record distinguishes `team-live`, `team-relayed`, and `native-solo`; parallel isolated specialists alone are not evidence of collaboration; `team-relayed` is a collaborative team with actual Lead-mediated exchange, and `team-live` requires host-observed direct peer delivery.
 
-The toolkit defines the roles and `contexts/review/skills/coordinate-review-team/skill.md` messaging workflow, **not a concrete provider's agent-spawning API**. Live team coordination requires a platform adapter/runtime that supports it, while native review remains fully functional without one. Independent review cannot be established by simply renaming the implementation author's role.
+The toolkit defines the roles and `contexts/review/skills/coordinate-review-team/SKILL.md` messaging workflow, **not a concrete provider's agent-spawning API**. Live team coordination requires a platform adapter/runtime that supports it, while native review remains fully functional without one. Independent review cannot be established by simply renaming the implementation author's role.
 
 ### Git
 
@@ -150,10 +150,10 @@ contexts/git/
 │   ├── semantic-version.md
 │   └── pull-request.md
 ├── skills/
-│   ├── create-semantic-commits/skill.md
-│   ├── determine-semantic-version/skill.md
-│   ├── manage-branch-work/skill.md
-│   └── manage-pull-request/skill.md
+│   ├── create-semantic-commits/SKILL.md
+│   ├── determine-semantic-version/SKILL.md
+│   ├── manage-branch-work/SKILL.md
+│   └── manage-pull-request/SKILL.md
 ├── commands/
 │   ├── commit.md
 │   ├── determine-semantic-version.md
@@ -165,9 +165,7 @@ contexts/git/
 
 Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
 
-Pull-request workflows preserve three distinct intents: planning review boundaries, preparing a truthful PR from the final diff, and explicitly creating the remote review request. **Before any remote PR is created (including draft PRs), an explicitly signed, independently attested `review_profile=gate` review must PASS for the current change, and applicable project tests and lint must pass separately.** An advisory PASS never qualifies. Missing or stale required evidence blocks creation; non-applicability must be justified. The Git context consumes review evidence but does not own Code Review.
-
-The pre-PR gate reuses Git's shared quality-gate policy with pre-commit: discover repository checks and effective hooks, validate completed hook/CI evidence against the final head/base and full change scope, and explicitly execute missing authorized checks before PR creation. A workflow that runs only **after** PR creation does not satisfy the pre-creation gate. Coverage-enabled tests are required only when coverage is already established by the project. PRs are bounded by coherent/verifiable integration units rather than line count alone; repository PR templates take precedence over the generic fallback; and PR creation never implies push, merge, auto-merge, release, or deployment authorization.
+Pull-request readiness, draft, and gate claims are decided in `contexts/git/rules/pull-request.md`. The procedure is the diagram in `contexts/git/skills/manage-pull-request/SKILL.md`. Check discovery stays in `contexts/git/rules/git.md`. Creating a pull request does not authorize push, merge, auto-merge, release, or deployment.
 
 ## Contracts
 
@@ -186,8 +184,8 @@ Run it against a target repository with `python3 /path/to/agent-toolkit/adapters
 Executable runtime integration examples (not additional canonical owners):
 
 * [Portable Review runtime adapter](adapters/review/README.md) — `run_review.py` supports two-phase host-native and subprocess flows; both freeze context before investigation and share evidence validation. OCR remains optional; an adapter is not a canonical dependency.
-* [Risk-sized Team orchestration and peer transport](adapters/teams/README.md) — the reference `adapters/review/team_orchestration.py` implements the neutral team policy defined in `contexts/review/skills/coordinate-review-team/skill.md`. Direct messaging, host Tasks and in-process queues are distinct capabilities, never sources of review policy.
-* [Guarded GitHub PR creation](adapters/github/README.md) — validates a **detached SSH-signed independent review** against reviewer keys and check commands supplied by a deployment-protected policy, verifies the exact remote head/base and executes required checks before an explicitly authorized `gh pr create`. The newly created PR is queried and verified (including head/base SHA, title and Draft state). This cannot prevent a separate GitHub client from bypassing the wrapper; key custody and policy selection belong to the trusted runtime.
+* [Risk-sized Team orchestration and peer transport](adapters/teams/README.md) — the reference `adapters/review/team_orchestration.py` implements the neutral team policy defined in `contexts/review/skills/coordinate-review-team/SKILL.md`. Direct messaging, host Tasks and in-process queues are distinct capabilities, never sources of review policy.
+* [Guarded GitHub PR creation](adapters/github/README.md) — validates a **detached SSH-signed independent review** against reviewer keys and check commands supplied by a deployment-protected policy, verifies the exact remote head/base and executes required checks before an explicitly authorized ready `gh pr create`. An explicitly authorized draft may omit the signature; that mode does not verify `review_profile=gate`, refuses a body that affirms PASS, and still runs the trusted checks. The newly created PR is queried and verified (including head/base SHA, title and Draft state). This cannot prevent a separate GitHub client from bypassing the wrapper; key custody and policy selection belong to the trusted runtime.
 
 ## Commands
 
@@ -355,7 +353,7 @@ Additional Git commands should be introduced only when a reusable procedure also
 
 Canonical definitions are neutral Markdown. Adapters may transform them into provider-specific formats while preserving canonical semantics.
 
-Canonical Skills use lowercase `skill.md` without requiring Agent Skills frontmatter. They are **not directly Agent Skills-compatible**. An adapter may export compliant `SKILL.md` files with `name`/`description` metadata, reference rewriting, and format validation. The canonical source remains authoritative; see `ARCHITECTURE.md` for the compatibility contract.
+Canonical Skills are `SKILL.md` files with `name` and `description` frontmatter, so a host that implements Agent Skills can discover them. The body remains the procedure. A provider install directory may point at that file; it does not redefine it. See `ARCHITECTURE.md`.
 
 ## Goal
 
@@ -379,19 +377,22 @@ no fetch), `--output-language pt-BR`, and `--concern` values
 [Review runtime integration](adapters/review/README.md).
 
 The canonical mode/N policy belongs to
-`contexts/review/skills/coordinate-review-team/skill.md`, and the optional OCR
+`contexts/review/skills/coordinate-review-team/SKILL.md`, and the optional OCR
 policy to `contexts/review/rules/code-review.md`. An R3 diff with 1–2 real
 concerns is valid and still requires the source-inspecting isolated verifier
 when isolated agents are available.
 
 ## Review Profiles, Calibrated Findings and Project Conventions
 
-Choose `advisory` for daily IDE or self-review when independent reviewer
-identity cannot be attested. It can return **PASS (advisory)** after full
-coverage and source verification but never unlocks PR creation. Choose
-`gate` for separately independent, signed pre-PR evidence. Machine status
-remains `PASS | FAIL | INCOMPLETE`. The Git gate accepts **only** explicitly
-signed `review_profile=gate` evidence under its protected SSHSIG policy.
+Choose `advisory` for the portable review record, including author self-review,
+when an external reviewer identity cannot be attested. It can return
+**PASS (advisory)** after full coverage and source verification. That result
+can satisfy ready-for-review when the floor also passed, and it must be
+labeled advisory. Choose `gate` for separately independent evidence attested
+by an external enforcement path. Machine status remains
+`PASS | FAIL | INCOMPLETE`. The optional GitHub adapter accepts a gate claim
+only from explicitly signed `review_profile=gate` evidence under its protected
+SSHSIG policy. Other hosts may attest the same semantics without SSHSIG.
 
 The normative calibration and project convention mechanisms live in
 [`contexts/review/rules/code-review.md`](contexts/review/rules/code-review.md):

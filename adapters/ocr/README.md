@@ -42,7 +42,7 @@ OCR may exclude tests by default; these files **remain required** for native rev
 
 This vendor-specific code lives outside `contexts/` and the canonical artifact matrix. It may consume Review's neutral semantics, but **no canonical rule, skill, agent or contract depends on it**.
 
-An explicitly configured host runtime may invoke the adapter when OCR is locally installed and approved, and pass its output as supplemental evidence to `contexts/review/skills/review-change/skill.md`. The Review agent independently inspects every applicable changed file, verifies candidate findings and produces `contracts/review-evidence.md`. Adapter success can never satisfy the pre-PR Code Review `PASS` by itself.
+An explicitly configured host runtime may invoke the adapter when OCR is locally installed and approved, and pass its output as supplemental evidence to `contexts/review/skills/review-change/SKILL.md`. The Review agent independently inspects every applicable changed file, verifies candidate findings and produces `contracts/review-evidence.md`. Adapter success can never satisfy the pre-PR Code Review `PASS` by itself.
 
 ## Tests
 

@@ -13,7 +13,7 @@ Invocation authorizes read-only repository inspection and non-destructive projec
 ## Uses
 
 * Agent: `contexts/git/agents/git-engineer.md`
-* Skill: `contexts/git/skills/manage-pull-request/skill.md` in `prepare` mode
+* Skill: `contexts/git/skills/manage-pull-request/SKILL.md` in `prepare` mode
 * Rule: `contexts/git/rules/pull-request.md`
 * Rule: `contexts/git/rules/git.md`
 * Rule: `contexts/git/rules/gitflow.md` when applicable

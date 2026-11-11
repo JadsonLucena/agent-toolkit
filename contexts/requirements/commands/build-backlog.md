@@ -13,7 +13,7 @@ This command selects the Backlog Planner and the `build` mode of the backlog-pla
 * Rule: `contexts/requirements/rules/tailoring.md`
 
 * Agent: `contexts/requirements/agents/backlog-planner.md`
-* Skill: `contexts/requirements/skills/backlog-planning/skill.md`
+* Skill: `contexts/requirements/skills/backlog-planning/SKILL.md`
 * Mode: `build`
 * Rule: `contexts/requirements/rules/backlog.md`
 * Contract: `contracts/work-item.md`
