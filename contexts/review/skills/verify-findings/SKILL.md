@@ -20,15 +20,19 @@ Preserve each raw candidate's identity and originating specialist(s), peer chall
 
 ## Workflow
 
-1. **Normalize without loss.** Assign each raw finding an identifier and preserve its originating reviewer, location, allegation, and relevant evidence. Do not merge similar comments before investigating the specific root cause.
-2. **Attempt independent falsification.** Do not substitute team agreement for investigation. Read beyond the changed hunk, follow relevant caller/callee or guards, and identify the concrete runtime/input/state condition required for the alleged behavior. Check whether the source file and location contain the claimed code and whether nearby or cross-file checks contradict the claim. Treat an author's PR description as an assertion to verify, not proof.
-3. **Check test implications.** For a claimed verification gap, inspect the actual assertions and test execution path. Name a realistic regression that could escape. Test file existence or coverage percentage is not proof of test adequacy.
-4. **Challenge across lenses.** When a claim depends on another specialist's domain or has contradictory peer evidence, send a targeted challenge/question through the approved team runtime or ask the lead to relay it. Preserve the thread and any unresolved material disagreement.
-5. **Classify truth separately from impact.** Mark each candidate `confirmed` when supported by directly checked evidence, `supported` when plausible and grounded but not conclusively demonstrated, `unverified` when decisive evidence is unavailable, or `refuted` when contradictory evidence disproves the claim. Preserve refuted claims with reasons.
-6. **Assess consequences.** Classify `critical`, `high`, `medium`, or `low` based on realistic impact, then assign qualitative confidence (`high`, `medium`, `low`). Priority may also consider exposure and urgency, without changing severity. A high-impact uncertain claim remains open for investigation.
-7. **Deduplicate by cause.** After verification, group findings only when they share a demonstrated cause. Preserve raw IDs and originating reviewers; separate independent defects even if found at the same line.
-8. **Decide disposition.** Select `fix` for an actionable defect, `investigate` when evidence is missing, `decision-needed` when a material design/business choice is ambiguous, or `defer` for explicitly identified pre-existing debt consistent with local policy. Never silently defer a defect introduced by the reviewed change.
-9. **Return evidence.** For each surviving issue report file/line or scoped location, triggering condition, code/test evidence, consequence, practical remediation, verification state, severity, confidence, and open questions. Report reasons for all discarded/refuted findings.
+```mermaid
+flowchart TD
+    Normalize --> Falsify["Independent source inspection, not agreement"]
+    Falsify --> Tests["Assertions and a realistic escaped regression"]
+    Tests --> Lenses["Challenge through the team runtime when another lens owns the evidence"]
+    Lenses --> Truth{"confirmed, supported, unverified, or refuted"}
+    Truth --> Impact["Severity and confidence: code-review.md"]
+    Impact --> Dedup["Group only a demonstrated shared cause"]
+    Dedup --> Disposition{"fix, investigate, decision-needed, or defer"}
+    Disposition --> Evidence["Return location, trigger, consequence, and discarded reasons"]
+```
+
+The diagram is the procedure. Apply `contexts/review/rules/code-review.md` for severity, external context, and amplified pre-existing risk. Record the result in `contracts/review-evidence.md`.
 
 ## Output
 

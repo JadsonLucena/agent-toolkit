@@ -55,60 +55,20 @@ Report the downstream target separately as `readiness_for`.
 
 ## Workflow
 
-1. **Establish validation context.**
-   * Identify the intended next decision, supplied artifacts/evidence, rigor profile, applicable concerns, sources, decisions, assumptions, conflicts, and open questions.
-   * If no rigor profile exists and rigor materially changes what "sufficient" means, assess the context before judging completeness.
+```mermaid
+flowchart TD
+    Start --> Context["Next decision and rigor: tailoring.md"]
+    Context --> Tailor["Validate tailoring: tailoring.md"]
+    Tailor --> Frame["Strategic Framing and Change Boundary: requirements.md"]
+    Frame --> Semantics["Requirement Quality and applicable semantics: requirements.md"]
+    Semantics --> UseCases["Functional Behavior, Use Cases, and Scenarios when Use Cases exist"]
+    UseCases --> Consistency["Requirements Architecture and Traceability"]
+    Consistency --> Uncertainty["Ambiguity, Assumptions, Unknowns, and Options"]
+    Uncertainty --> Classify["Classify findings; do not mutate the specification"]
+    Classify --> Ready["Completion-State Semantics for the actual readiness_for target"]
+```
 
-2. **Validate tailoring.**
-   * Check whether the selected rigor is proportional to business/customer/financial impact, security, privacy, compliance, complexity, integrations, teams, migration, reversibility, uncertainty, and solution lifetime when relevant.
-   * Identify both under-engineering and over-engineering.
-   * Do not fail a concern merely because a preferred document type is absent.
-
-3. **Validate strategic framing when applicable.**
-   * Check Need, Business Goal, success evidence, Current/Future State, material gaps, Work Scope, Product Boundary, Change Boundary when present, transition needs, and candidate-solution assumptions.
-   * Detect solution-first statements, output presented as outcome, software scope assumed without support, and material scope drift that was silently absorbed rather than explicitly decided.
-
-4. **Validate requirements and business knowledge.**
-   * Check each material requirement for evidence, necessity, rationale, scope, clarity, consistency, singularity, feasibility status, verifiability, traceability, and sufficient completeness.
-   * Check domain terms, facts, business rules, governance, constraints, assumptions, unknowns, options, dependencies, states, invariants, and scenario semantics where applicable.
-   * Check functional, data, quality, security, interface, operational, and transition semantics at the depth required by the selected rigor.
-   * Check acceptance and fit evidence for observable behavior and justified precision.
-
-5. **Validate the Use-Case set when Use Cases are a material representation.**
-   * Check whether relevant actors and actor goals are covered without requiring a Use Case for every requirement.
-   * Detect materially missing actor goals, duplicated goals, inconsistent goal levels, scope inconsistencies, artificial CRUD/technical mini Use Cases, and oversized Use Cases that combine distinct goals.
-   * Check whether meaningful alternatives or exceptions required for the intended downstream decision are represented.
-   * Apply this review only when Use Cases are actually part of the requirements model.
-
-6. **Validate cross-artifact consistency when the corresponding artifacts exist.**
-   * Need/Goal ↔ Requirements.
-   * Rules/Policies ↔ Requirements/Use Cases/Scenarios.
-   * Requirements ↔ quality/security constraints.
-   * Requirements/Use Cases ↔ slices/work items.
-   * Change Boundary ↔ requirements/rules/scenarios/work items when a Change Boundary exists.
-   * Rules/Requirements ↔ examples/test basis.
-   * Requirements ↔ design/architecture references.
-   * Requirements ↔ implementation/test evidence.
-   * Success metrics ↔ production/outcome evidence.
-   * Identify contradictions, drift, duplicated knowledge, orphan relationships, and boundary expansions/narrowings that lack supporting scope decisions.
-
-7. **Validate uncertainty and solution decisions.**
-   * Surface implicit assumptions, unresolved unknowns, expiring options, unsupported thresholds, and hidden design decisions.
-   * Distinguish a missing requirement from a legitimate downstream design choice.
-   * Distinguish candidate solution evidence from accepted requirement semantics.
-
-8. **Classify findings.**
-   * Assign finding type and severity.
-   * Describe evidence, affected identifiers/relationships, material impact, and the smallest evidence-backed remediation.
-   * For a correctable defect, describe the revision but do not mutate the specification.
-
-9. **Determine readiness.**
-   * Identify relationships that would require revalidation if a recommended revision is later authorized and applied.
-   * Determine overall status for the actual `readiness_for` target.
-   * Keep lifecycle claims distinct: requirements validated for a target does not imply planning readiness, implementation, acceptance, deployment, release, or business outcome.
-   * Do not convert unresolved findings into a pass merely to keep work moving.
-   * Do not require unrelated knowledge merely because the framework knows how to model it.
-   * Check that local templates or schemas were used as representation constraints rather than as a substitute for semantic sufficiency.
+The diagram is the procedure. Apply the named section of `contexts/requirements/rules/requirements.md` or `contexts/requirements/rules/tailoring.md`. Do not restate it.
 
 ## Output
 

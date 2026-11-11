@@ -135,7 +135,7 @@ class ToolkitLintTests(unittest.TestCase):
     def test_pr_creation_requires_independent_review(self):
         self.change(
             "contexts/git/commands/create-pull-request.md",
-            "independent code review (PASS)",
+            "contexts/git/rules/pull-request.md",
             "optional analysis",
         )
         self.assert_error("missing pre-PR quality gate")
@@ -143,8 +143,8 @@ class ToolkitLintTests(unittest.TestCase):
     def test_pr_creation_requires_lint(self):
         self.change(
             "contexts/git/commands/create-pull-request.md",
-            "and lint have satisfied",
-            "have satisfied",
+            "contexts/git/skills/manage-pull-request/SKILL.md",
+            "optional procedure",
         )
         self.assert_error("missing pre-PR quality gate")
 
@@ -167,18 +167,18 @@ class ToolkitLintTests(unittest.TestCase):
     def test_prepr_hook_discovery_cannot_be_removed(self):
         self.change(
             "contexts/git/skills/manage-pull-request/SKILL.md",
-            "effective pre-commit/pre-push hooks",
-            "some checks",
+            "Pre-Creation Quality Gate",
+            "local checklist",
         )
         self.assert_error("missing pre-PR check discovery or execution")
 
     def test_prepr_must_execute_missing_checks(self):
         self.change(
             "contexts/git/commands/create-pull-request.md",
-            "execute missing non-destructive checks",
-            "skip missing checks",
+            "Pre-Creation Quality Gate",
+            "local checklist",
         )
-        self.assert_error("missing pre-PR explicit check fallback")
+        self.assert_error("missing pre-PR quality gate")
 
     def test_review_team_lead_cannot_drop_coordination(self):
         self.change(

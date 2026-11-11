@@ -64,50 +64,11 @@ Maintain only the concerns that are material to the context, including when rele
 
 ## Workflow
 
-1. **Assess context and required rigor.**
-   * Consider business/customer/financial impact, security, privacy, compliance, domain and technical complexity, integrations, teams, migration/legacy, reversibility, uncertainty, expected change frequency, and solution lifetime when relevant.
-   * Select `lightweight`, `standard`, or `high-assurance` only when a rigor label is useful, and record why.
-   * Determine which knowledge concerns are applicable; do not turn the framework into a mandatory artifact checklist.
-   * Identify the intended next decision or handoff and limit discovery to the smallest coherent knowledge batch that can support it safely at the selected rigor.
+Follow the State Model.
 
-2. **Establish strategic framing.**
-   * Identify the underlying Need or opportunity without prematurely encoding a solution.
-   * Identify supported Business Goals and observable success evidence.
-   * Distinguish business success metrics from fit criteria, acceptance criteria, and test assertions.
-
-3. **Understand change and scope.**
-   * Capture relevant Current State, desired Future State, and material gaps.
-   * Distinguish Work Scope from Product Boundary when the change may involve people, process, policy, purchased products, manual operations, or partial automation.
-   * Establish or preserve a Change Boundary when a specific change is being shaped: primary objective, included/excluded/deferred scope, affected semantics, critical guarantees, dependencies, unresolved scope decisions, and expected state after the bounded change when material.
-   * Keep Work Scope, Product Boundary, and Change Boundary distinct.
-   * Inspect applicable local requirements templates/schemas/notations and preserve them as representation constraints without treating their fields as stakeholder intent.
-   * Ask, when material, why the problem needs software rather than assuming it does.
-   * Identify transition concerns separately from permanent product behavior.
-
-4. **Investigate business behavior and knowledge.**
-   * Inspect supplied evidence before asking questions that it already answers.
-   * Identify materially affected stakeholder perspectives or authoritative sources that are not represented.
-   * Discover goals, needs, actors, workflows, business events, rules, constraints, failures, dependencies, exclusions, and success signals.
-   * Preserve important domain terms and facts; distinguish true business rules from historical implementation limitations.
-   * Reconcile newly discovered scope against the Change Boundary: incorporate supported clarification, surface material expansion/narrowing for an explicit scope decision, keep independently valuable related needs as separate change candidates unless authorized otherwise, and do not defer a critical guarantee needed for the bounded change.
-
-5. **Separate evidence from interpretation.**
-   * Distinguish directly stated information, derived implications, assumptions, options, proposed solutions, and explicit decisions.
-   * Detect contradictions, overloaded terms, hidden decisions, and solution-first statements.
-   * When a proposed solution is not a supported constraint or decision, recover the underlying need and keep the proposal as an option.
-
-6. **Explore uncertainty proportionally.**
-   * For material unknowns, record the risk if unresolved and how the knowledge could be obtained.
-   * When solution uncertainty matters, preserve candidate alternatives and consider whether a prototype, experiment, probe, spike, or thin slice is the appropriate next learning step.
-   * Ask focused clarification questions only when ambiguity can materially change semantics, scope, acceptance, risk, or downstream work.
-
-7. **Consolidate and validate understanding.**
-   * Consolidate equivalent statements without erasing meaningful differences in source, actor, condition, authority, or rationale.
-   * Validate the resulting understanding against available evidence and represented stakeholder context.
-   * Check for both under-engineering and unnecessary analysis/documentation.
-   * Confirm that the resulting knowledge still matches the current Change Boundary or that every material boundary revision is explicit and supported.
-   * Record the lifecycle claim as elicitation sufficient only for the stated next decision/handoff; do not imply specification, validation, planning readiness, implementation, or acceptance.
-   * Stop with explicit unresolved questions when required evidence or authority is unavailable.
+* AssessContext applies `contexts/requirements/rules/tailoring.md`.
+* Discover through Consolidate apply Strategic Framing, Scope and Solution Boundary, Change Boundary and Scope Drift, and Business Knowledge and Rules in `contexts/requirements/rules/requirements.md`.
+* Do not restate those sections.
 
 ## Output
 

@@ -29,15 +29,18 @@ Maintain:
 
 ## Workflow
 
-1. Inspect repository state, branch role, upstreams, worktrees, active Git operations, and relevant remote references.
-2. Refresh remote state when freshness materially affects synchronization, integration, or publication decisions.
-3. Determine the branch lifecycle and correct base or target from repository policy and explicit intent rather than branch-name assumptions.
-4. If branch role, base, target, publication state, or intended integration semantics are materially ambiguous, ask the developer.
-5. Choose merge, rebase, fast-forward, worktree preparation, or another repository-supported strategy according to publication state, topology, repository policy, and explicit authorization.
-6. Protect unrelated work, shared history, occupied worktrees, and remote state outside the authorized scope.
-7. Execute only the specifically authorized mutation.
-8. Inspect resulting history, working-tree state, worktrees, upstream relationships, and required verification.
-9. Report verified state without implying push, merge, publication, release, or cleanup that did not occur.
+```mermaid
+flowchart TD
+    Inspect["Repository, upstreams, worktrees, and active operations"] --> Refresh["Refresh remotes when freshness changes the decision"]
+    Refresh --> Role["Branch role and base: git.md, and gitflow.md when Gitflow applies"]
+    Role --> Ask{"Role, base, or integration semantics ambiguous?"}
+    Ask -->|yes| Stop
+    Ask -->|no| Strategy["Merge, rebase, fast-forward, or worktree only as authorized"]
+    Strategy --> Protect["Unrelated work and shared history stay outside the mutation"]
+    Protect --> Execute --> Result["Resulting history and upstreams"]
+```
+
+The diagram is the procedure. Apply `contexts/git/rules/git.md` and, when Gitflow applies, `contexts/git/rules/gitflow.md`.
 
 ## Parallel Work
 

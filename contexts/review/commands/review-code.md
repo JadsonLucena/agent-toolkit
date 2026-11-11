@@ -20,7 +20,7 @@ Use to review a specified PR, branch diff, commit/range, file set, or current wo
 
 ## Inputs
 
-* Explicit target or identified current workspace change, intended comparison base when known, and `review_profile: advisory | gate`. Choose `advisory` by default when independent execution cannot be attested; only explicit `gate` evidence can satisfy the Git pre-PR prerequisite. The Python reference CLI exposes `--review-profile`; any host can implement equivalent semantics.
+* Explicit target or identified current workspace change, intended comparison base when known, and `review_profile: advisory | gate`. Profile meaning is in `contexts/review/rules/code-review.md`. Whether the record satisfies a ready pull request is decided in `contexts/git/rules/pull-request.md`. The Python reference CLI exposes `--review-profile`; any host can implement equivalent semantics.
 * Optional change objective, Change Boundary, requirements, scenarios, work item, ADRs, PR claims, test evidence, risk constraints or project review instructions.
 * Determine actual runtime capabilities according to `contexts/review/skills/coordinate-review-team/SKILL.md`. Reference CLI accepts `--risk-profile`, repeated `--concern` (`contract|correctness|security|reliability|testing|architecture`), `--task-capable`, `--isolated-subagents`, `--direct-peer-supported`, `--lead-implemented-change`, `--base-branch` and `--output-language`. Aliases: `spec|specification` → `contract`, `arch` → `architecture`.
 * Optional helper opt-out `--no-ocr` (or equivalent host-native setting) follows the mandatory behavior in `contexts/review/rules/code-review.md`.

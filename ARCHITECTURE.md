@@ -319,7 +319,7 @@ Canonical Skills are stored at `contexts/<context>/skills/<capability>/SKILL.md`
 * `name` matches the capability directory: lowercase letters, digits, and hyphens.
 * `description` says what the skill does and when to use it. Hosts compare the request with this field and load the body only when it matches, or when the user invokes the skill by name.
 
-The body remains the procedure: preconditions, steps, stop conditions, and authorization limits. Do not add provider metadata such as model, reasoning effort, or tool allowlists to the canonical frontmatter.
+The body states the procedure once, as a diagram under Workflow. A decision node names the rule section that owns the invariant and does not restate it. Do not keep a numbered list that retells the diagram. Foundational Guidance stays in the rule as the theoretical reference for reviewers of the artifact. Do not add provider metadata such as model, reasoning effort, or tool allowlists to the canonical frontmatter.
 
 A host install path, such as `.claude/skills/` or `.agents/skills/`, may symlink or copy the canonical file. That installation is not a second source of truth.
 
@@ -367,6 +367,7 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 18. Code Review is a separate, read-only context. It operates natively without required providers/adapters; OCR and similar helpers are optional. Requirements, Testing, and Git retain their own authority.
 19. Independent review, applicable tests, and lint are distinct pre-creation prerequisites for PRs. Git consumes `contracts/review-evidence.md` without depending on Review's internal procedures. Enforcing this policy requires runtime/CI controls; Markdown alone cannot block unauthorized remote creation.
 20. Review uses an optional risk-driven Agent Team, with the Code Review Lead coordinating specialist-to-specialist evidence exchange and independent falsification. R2/R3 favor relevant collaborative specialists where runtime support exists; native-solo and lead-relayed fallback remain valid. Provider-specific team orchestration is a runtime responsibility, not a requirement for canonical review.
+21. One fact has one owner. A command states the authorization and points at the skill. An agent routes to the skill. The skill diagram names the rule section for each decision. The rule owns the invariant and its Foundational Guidance. The contract owns the evidence shape.
 
 ## Framework Scope Roadmap
 
