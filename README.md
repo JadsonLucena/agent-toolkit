@@ -165,7 +165,7 @@ contexts/git/
 
 Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
 
-Pull-request workflows preserve three distinct intents: planning review boundaries, preparing a truthful PR from the final diff, and explicitly creating the remote review request. A ready-for-review PR requires an explicitly signed, independently attested `review_profile=gate` review `PASS` for the current change, and applicable project tests and lint must pass separately. An advisory PASS never qualifies as ready. Missing or stale required evidence blocks ready publication. An explicitly authorized draft may still be opened and must name the gap; opening it does not satisfy the gate. Non-applicability must be justified. Markdown does not enforce the block; a configured preflight wrapper or branch protection does. The Git context consumes review evidence but does not own Code Review.
+Pull-request workflows preserve three distinct intents: planning review boundaries, preparing a truthful PR from the final diff, and explicitly creating the remote review request. A ready-for-review PR requires the floor — applicable project tests and lint for the current change — and a proportionate native review frozen as `review_profile=advisory` with complete coverage. The description states `advisory` and states that gate attestation is absent or `not-applicable`. Signed `review_profile=gate` evidence is required only to claim that an external enforcement path attested the gate. Missing or stale floor or advisory evidence blocks ready publication. An explicitly authorized draft may still be opened and must name the gap. Non-applicability of a check must be justified. Gate attestation is `not-applicable` when no enforcement path is configured, and that absence does not block ready. Markdown does not enforce the block; a configured preflight wrapper or branch protection enforces what that deployment configured. The Git context consumes review evidence but does not own Code Review.
 
 The pre-PR gate reuses Git's shared quality-gate policy with pre-commit: discover repository checks and effective hooks, validate completed hook/CI evidence against the final head/base and full change scope, and explicitly execute missing authorized checks before PR creation. A workflow that runs only **after** PR creation does not satisfy the pre-creation gate. Coverage-enabled tests are required only when coverage is already established by the project. PRs are bounded by coherent/verifiable integration units rather than line count alone; repository PR templates take precedence over the generic fallback; and PR creation never implies push, merge, auto-merge, release, or deployment authorization.
 
@@ -386,12 +386,15 @@ when isolated agents are available.
 
 ## Review Profiles, Calibrated Findings and Project Conventions
 
-Choose `advisory` for daily IDE or self-review when independent reviewer
-identity cannot be attested. It can return **PASS (advisory)** after full
-coverage and source verification but never unlocks PR creation. Choose
-`gate` for separately independent, signed pre-PR evidence. Machine status
-remains `PASS | FAIL | INCOMPLETE`. The Git gate accepts **only** explicitly
-signed `review_profile=gate` evidence under its protected SSHSIG policy.
+Choose `advisory` for the portable review record, including author self-review,
+when an external reviewer identity cannot be attested. It can return
+**PASS (advisory)** after full coverage and source verification. That result
+can satisfy ready-for-review when the floor also passed, and it must be
+labeled advisory. Choose `gate` for separately independent evidence attested
+by an external enforcement path. Machine status remains
+`PASS | FAIL | INCOMPLETE`. The optional GitHub adapter accepts a gate claim
+only from explicitly signed `review_profile=gate` evidence under its protected
+SSHSIG policy. Other hosts may attest the same semantics without SSHSIG.
 
 The normative calibration and project convention mechanisms live in
 [`contexts/review/rules/code-review.md`](contexts/review/rules/code-review.md):

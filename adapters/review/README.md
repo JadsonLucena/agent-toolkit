@@ -137,9 +137,11 @@ python3 adapters/review/run_review.py --repo . \
 
 The machine field remains `review_status=PASS`, presented to humans as
 `PASS (advisory)`. Advisory results do not prove reviewer independence
-and cannot be signed as PR gate evidence. For a gate attempt, prepare
-with `--review-profile gate` and supply separately independent reviewer
-evidence; the Git adapter requires signed `review_profile=gate`.
+and cannot be promoted to gate. A ready PR may record them as
+`review_profile=advisory`. For a gate attempt, prepare with
+`--review-profile gate` and supply separately independent reviewer
+evidence. The optional GitHub wrapper requires signed `review_profile=gate`
+before it creates a PR that claims the gate.
 New optional finding fields are calibrated by `contexts/review/rules/code-review.md`;
 the high-risk pattern prompts in `contexts/review/rules/high-risk-patterns.md`
 do not themselves prove a defect.

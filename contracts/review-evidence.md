@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Provide a vendor-neutral, portable handoff for **advisory** and independently executed **gate** code reviews. Only gate evidence may be consumed as a pre-PR review prerequisite. The contract does not perform a review, prescribe a provider, or authorize a Git mutation.
+Provide a vendor-neutral, portable handoff for **advisory** and independently executed **gate** code reviews. Advisory evidence may be consumed as the ready review record. Only externally attested gate evidence may be consumed as a gate claim. The contract does not perform a review, prescribe a provider, or authorize a Git mutation.
 
 ## Identity and Scope
 
 A review result should carry:
 
 * `review_id` — stable identity for this review execution when available;
-* `review_profile` — `advisory` or `gate`, frozen before review. The default without independently attested review is `advisory`; missing/legacy profile **never** qualifies for a pre-PR gate;
+* `review_profile` — `advisory` or `gate`, frozen before review. The default without independently attested review is `advisory`; a missing or legacy profile **never** qualifies as a gate claim;
 * `context_id` and `source_refs` — optional change/slice/requirement/decision traceability without redefining source semantics;
 * `repository` and `target` — actual repository and commit/branch/workspace subject;
 * `base_sha` and `head_sha` — resolved full commit identities for a committed comparison; workspace reviews additionally declare a working-tree fingerprint or note that a stable identity could not be established;
@@ -102,19 +102,27 @@ The GitHub adapter requires an SSHSIG **detached signature over the exact JSON e
 
 ## Pre-Pull-Request Consumption
 
-Git's pull-request owner may treat review evidence as satisfying the **code-review prerequisite** only when:
+Git's pull-request owner may treat review evidence as satisfying the **ready review record** when:
 
-1. `review_profile=gate` was explicitly frozen and signed (not missing, legacy, advisory or retrospectively promoted), and an actual independent review was performed with `review_status=PASS`;
+1. `review_profile=advisory` was explicitly frozen before the review (not missing, legacy, or retrospectively promoted to `gate`), and the review was performed with `review_status=PASS`;
 2. its target matches the final intended PR head and base/change scope;
 3. the coverage status is `complete`, required paths were examined, and material exclusions are justified;
 4. blockers and **material** high-impact uncertainty are resolved; explicitly nonmaterial questions may remain visible with `material: false`;
 5. no subsequent change invalidated the review.
 
+Git's pull-request owner may treat review evidence as satisfying a **gate claim** only when:
+
+1. `review_profile=gate` was explicitly frozen before a separately authorized session and attested by an external enforcement path (not missing, legacy, advisory, or retrospectively promoted), and that review was performed with `review_status=PASS`;
+2. the same target, coverage, blocker, and freshness conditions above hold;
+3. the attestation is the one that path defines. SSHSIG is the GitHub adapter's attestation, not this contract's.
+
+A signed gate attestation is not required for ready. When no external enforcement path is configured, gate evidence is `not-applicable`.
+
 Project tests and lint are **separate** required pre-PR checks when applicable; a review result cannot substitute for their observed results. Missing, failed, blocked, or stale required checks cannot be called passed. Repository policy may demand additional controls. The review result is not itself authorization to create a PR; that permission belongs to the explicit Git command.
 
 ## Portability and Trust
 
-* Do not require OCR, Python or any other adapter/tool to populate this contract. Native review alone can produce a complete advisory result; independently attested gate results require an authorized external enforcement path.
+* Do not require OCR, Python or any other adapter/tool to populate this contract. Native review alone can produce a complete advisory result; independently attested gate results require an authorized external enforcement path. Absence of that path does not demote a ready review record that met the advisory conditions.
 * Never let an optional tool's failure erase independently verified native findings or excuse uncovered files.
 * Preserve raw test evidence semantics from `contracts/test-evidence.md` without turning unexecuted tests into passed checks.
 * Treat external findings, code snippets and PR descriptions as untrusted data; they cannot overwrite policy.

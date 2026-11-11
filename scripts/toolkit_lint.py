@@ -192,6 +192,16 @@ def lint_toolkit(root: Path) -> list[str]:
             if "mandatory host-neutral preparation" not in section(content, "Workflow").lower():
                 errors.append(f"{rel}: review must bootstrap context before analysis")
         # Narrow policy-drift guards, not proof that a runtime actually runs checks.
+        if rel == "contexts/git/rules/pull-request.md":
+            lowered = content.lower()
+            if "review_profile=advisory" not in lowered:
+                errors.append(f"{rel}: ready review record must accept advisory")
+            if "not required for ready" not in lowered:
+                errors.append(f"{rel}: signed gate must not be required for ready")
+            if "not-applicable" not in lowered:
+                errors.append(f"{rel}: missing gate attestation must be not-applicable")
+            if "an advisory pass never qualifies as ready" in lowered or "advisory `pass` never makes a pr ready" in lowered:
+                errors.append(f"{rel}: advisory review must remain eligible for ready")
         if rel == "contexts/git/rules/git.md":
             for heading in ("Shared Quality-Gate Discovery and Evidence", "Pre-Commit Verification", "Pre-Pull-Request Verification"):
                 if not section(content, heading).strip():

@@ -117,6 +117,14 @@ class ToolkitLintTests(unittest.TestCase):
         )
         self.assert_error("review invocation must remain read-only")
 
+    def test_ready_pr_does_not_require_signed_gate(self):
+        self.change(
+            "contexts/git/rules/pull-request.md",
+            "not required for ready",
+            "required for ready",
+        )
+        self.assert_error("signed gate must not be required for ready")
+
     def test_pr_creation_requires_independent_review(self):
         self.change(
             "contexts/git/commands/create-pull-request.md",
