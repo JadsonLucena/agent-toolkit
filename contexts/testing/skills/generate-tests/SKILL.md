@@ -36,7 +36,7 @@ The workflow progressively establishes and refines:
 ```mermaid
 flowchart TD
     START --> Understand["Scenario Traceability in testing.md"]
-    Understand --> Infer["Test Levels and Specialized Testing in testing.md"]
+    Understand --> Infer["Test Levels, Test Structure and Design, and Specialized Testing in testing.md"]
     Infer --> DefineSuccess["lowest sufficient level and coverage plan"]
     DefineSuccess --> Review["Testability Signals in testing.md"]
 
