@@ -37,19 +37,27 @@ Invocation does not authorize architecture selection, implementation, automated-
 
 ### Routing
 
-The steps below select existing capabilities at the invocation boundary. Each specialist agent retains ownership of dynamic orchestration and handoffs within its capability, and each skill retains its reusable procedure. The command does not reimplement either.
+The diagram selects existing capabilities. Each specialist keeps its own procedure. This command does not reimplement it.
 
-1. Inspect supplied evidence, identify the intended next material decision/handoff, and determine the earliest Requirements capability that is still necessary; do not repeat work merely because this command spans the full path. Work in the smallest coherent knowledge batch that can safely support that next decision.
-2. If material stakeholder intent, Need/Goal context, scope, Change Boundary, business knowledge, or uncertainty is not sufficiently understood, route through Requirements Elicitation.
-3. When evidence is sufficient for formal semantics, route through Requirements Definition.
-4. Run Requirements Validation as a separate read-only pass before claiming readiness for planning.
-5. Route `needs-clarification` findings back to the capability that owns the missing stakeholder/domain knowledge and route evidence-backed `needs-revision` findings back to Requirements Definition; do not repair the specification silently under validation authority. A material Change Boundary expansion/narrowing requires an explicit scope decision rather than automatic absorption.
-6. When requirements are sufficient for the intended planning horizon, route to Backlog Planning:
-   * use `build` when no planning representation exists;
-   * use `refine` when an existing backlog was supplied and only planning refinement is authorized.
-7. Preserve identifiers, provenance, Change Boundary, scope-change decisions, representation conventions, lifecycle claims, decisions, assumptions, unknowns, business rules, scenarios, critical guarantees, and unresolved issues across each handoff.
-8. After each routed capability, re-evaluate the resulting Requirements state against the intended next decision or readiness target and select only the next necessary transition; do not pre-route later capabilities based only on predicted need.
-9. Stop only the affected path when material evidence or authority is missing. Preserve independently valid knowledge rather than restarting the entire workflow.
+```mermaid
+flowchart TD
+    Inspect["Earliest capability still needed"] --> Need{"Intent, scope, or Change Boundary missing?"}
+    Need -->|yes| Elicitation
+    Need -->|no| Definition
+    Elicitation --> Definition
+    Definition --> Validation
+    Validation -->|needs-clarification| Elicitation
+    Validation -->|needs-revision| Definition
+    Validation -->|sufficient| Plan{"Backlog exists?"}
+    Plan -->|no| Build
+    Plan -->|yes| Refine
+    Build --> Recheck["Only the next necessary transition"]
+    Refine --> Recheck
+    Recheck -->|authority or evidence missing| Stop["Stop the affected path"]
+    Recheck -->|another decision remains| Inspect
+```
+
+Batch size follows `contexts/requirements/rules/tailoring.md`. Preserve identifiers, provenance, Change Boundary, and lifecycle claims across handoffs. Do not repair a specification under validation authority. A material Change Boundary change needs an explicit scope decision.
 
 ## Output
 

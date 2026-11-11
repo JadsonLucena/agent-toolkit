@@ -47,25 +47,18 @@ The identifier exists to preserve semantic traceability across representations, 
 
 ## Workflow
 
-1. Inspect the source behavior, rules, use cases, acceptance semantics, constraints, existing scenarios, and unresolved questions.
-2. Reuse existing scenario identities and relationships when they already represent the behavior correctly.
-3. Identify the material behavioral situations or paths that require explicit understanding. Keep a scenario distinct from the concrete examples that illustrate it.
-4. For each material scenario, establish enough supported semantics to make the behavior understandable:
-   * source references;
-   * useful scenario dimensions;
-   * relevant starting context and preconditions;
-   * trigger, actor action, event, or condition;
-   * expected observable outcomes and guarantees;
-   * applicable rules, invariants, and acceptance/fit evidence;
-   * material assumptions, risks, and open questions.
-5. Produce concrete domain-oriented examples using business language rather than UI, transport, storage, or test-framework details unless those details are themselves required.
-6. Add counterexamples where they clarify what must not satisfy the rule or behavior.
-7. Identify behavior-change boundaries and include examples immediately around those boundaries when useful.
-8. Use scenarios and examples to expose contradictions, missing rules, hidden assumptions, ambiguous thresholds, incomplete paths, and oversized or immature slices.
-9. Keep unanswered questions explicit; do not invent an answer merely to complete a Scenario Set.
-10. Consolidate redundant examples once the underlying rule or scenario is clear. Examples support scenarios/rules rather than replacing them.
-11. Preserve traceability from each material scenario and example to the requirement, rule, use case, slice, or other behavior source it illustrates.
-12. When test automation will follow, expose the relevant Scenario Set through `contracts/test-basis.md` without coupling this skill to Testing internals.
+```mermaid
+flowchart TD
+    Inspect["Source behavior and open questions"] --> Reuse["Reuse a scenario that already represents the behavior"]
+    Reuse --> Situations["Keep the scenario distinct from the examples that illustrate it"]
+    Situations --> Semantics["Functional Behavior, Use Cases, and Scenarios in requirements.md"]
+    Semantics --> Examples["Domain language, counterexamples, and boundaries when they clarify the rule"]
+    Examples --> Expose["Surface contradictions; do not invent an answer"]
+    Expose --> Trace["Trace each scenario to its source"]
+    Trace --> Handoff["Hand off contracts/test-basis.md when automation will follow"]
+```
+
+The diagram is the procedure. Apply `contexts/requirements/rules/requirements.md` and `contexts/requirements/rules/tailoring.md`. The handoff shape is `contracts/test-basis.md`.
 
 ## Output
 

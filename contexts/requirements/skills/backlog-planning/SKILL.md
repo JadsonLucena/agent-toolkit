@@ -55,29 +55,9 @@ stateDiagram-v2
 
 ## Workflow
 
-1. Inspect validated requirements, rigor profile, applicable concerns, Change Boundary and scope-change decisions when present, goals, use cases/scenarios when present, examples, defects, risks, decisions, learning needs, the existing backlog when refining, and target tracker conventions when one exists.
-2. Separate requirement semantics from planning choices and preserve the actor/user/business goal and governing Change Boundary when one exists.
-3. Preserve established tracker hierarchy, item kinds, and required metadata unless they conflict with semantic integrity.
-4. Classify work by coherent outcome, behavior, use-case/journey slice, migration/transition obligation, defect, compliance obligation, technical enabler, operational task, or explicit learning objective when those distinctions improve planning. Do not force everything into a User Story.
-5. Shape the smallest coherent delivery or learning slices that preserve source semantics:
-   * prefer end-to-end, observable, verifiable, informative slices over layer-by-layer decomposition;
-   * keep the goal whole while slicing delivery;
-   * when a Use Case exists, preserve its reference and identify the meaningful story, flow, or scenario realized by the slice when known;
-   * prefer the simplest useful use-case story first, then enough additional stories to make the intended release sufficient; do not assume all known stories belong in the current commitment;
-   * keep known behavioral space, committed release scope, and implemented behavior distinguishable;
-   * when a Story Map is useful, preserve narrative flow, backbone context, details/variations, and coherent release slices; do not confuse story-map User Tasks with Engineering Tasks;
-   * when User Stories are used, preserve Card/Conversation/Confirmation intent and use INVEST only as a diagnostic heuristic rather than a mandatory gate;
-   * preserve relevant business rules, quality/security constraints, acceptance evidence, and critical guarantees;
-   * when uncertainty is the primary risk, prefer explicit learning work over speculative implementation.
-6. Keep technical tasks subordinate to the outcome/slice they realize unless the task itself is independently meaningful work.
-7. Record dependencies, preferred sequencing, risks, assumptions, blockers, learning objectives, unresolved questions, and `change_boundary_ref` when applicable.
-8. Avoid implementation decomposition that would prematurely select an unsupported solution.
-9. Evaluate whether each item has sufficient semantic context for the intended planning horizon and selected rigor; do not require design details that can legitimately be decided later.
-10. Identify low-value tail, speculative flexibility, rare variants, or unused configurability that may be candidates for deferment or removal, but do not make that product decision without authority.
-11. Perform closure analysis: identify orphan source obligations, orphan work items, duplicated scope, hidden scope expansion, Change Boundary mismatches, lost critical guarantees, inconsistent acceptance semantics, and unresolved dependency cycles.
-12. Account explicitly for material source obligations that are deferred, rejected, external, out of scope, or otherwise intentionally unplanned.
-13. Return material semantic ambiguity or proposed scope expansion/narrowing beyond the governing Change Boundary to requirements definition or elicitation rather than inventing or approving it during planning.
-14. In `refine` mode, preserve source semantics while improving clarity, slicing, traceability, examples, learning intent, and dependency information.
+Follow the State Model.
+
+Apply `contexts/requirements/rules/backlog.md` for slicing, traceability, and closure. Do not change requirement semantics; that authority stays in `contexts/requirements/rules/requirements.md`.
 
 ## Output
 

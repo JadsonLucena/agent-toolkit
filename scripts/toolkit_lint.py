@@ -137,6 +137,9 @@ def lint_toolkit(root: Path) -> list[str]:
             for required in ("Purpose", "Uses", "Workflow", "Output"):
                 if required not in headings or not section(content, required).strip():
                     errors.append(f"{rel}: skill missing {required} section")
+            workflow = section(content, "Workflow")
+            if "```mermaid" not in workflow and "state model" not in workflow.lower():
+                errors.append(f"{rel}: workflow must be one diagram or follow its state model")
             # Skills can invoke other Skills from their Workflow section too.
             for target in PATH_REF.findall(content):
                 if target != rel and classify(Path(target)) == ("Skill", context):
@@ -171,8 +174,13 @@ def lint_toolkit(root: Path) -> list[str]:
             if "does not authorize" not in authority:
                 errors.append(f"{rel}: missing explicit non-authorization statement")
         if rel == "contexts/git/commands/create-pull-request.md":
-            for token in ("independent code review (pass)", "project tests", "and lint have satisfied"):
-                if token not in authority:
+            invocation = section(content, "Invocation").lower()
+            for token in (
+                "contexts/git/rules/pull-request.md",
+                "contexts/git/skills/manage-pull-request/skill.md",
+                "pre-creation quality gate",
+            ):
+                if token not in invocation:
                     errors.append(f"{rel}: missing pre-PR quality gate for {token}")
         if rel == "contexts/review/agents/code-reviewer.md":
             if "coordinate-review-team/SKILL.md" not in section(content, "Uses"):
@@ -228,13 +236,12 @@ def lint_toolkit(root: Path) -> list[str]:
             if "shared quality-gate discovery and evidence policy" not in content.lower():
                 errors.append(f"{rel}: pre-commit must reuse shared quality-gate policy")
         if rel == "contexts/git/skills/manage-pull-request/SKILL.md":
-            for phrase in ("shared quality-gate discovery and evidence", "effective pre-commit/pre-push hooks", "execute missing non-destructive project checks"):
-                if phrase not in content.lower():
+            workflow = section(content, "Workflow").lower()
+            for phrase in ("pre-creation quality gate", "shared quality-gate discovery and evidence"):
+                if phrase not in workflow:
                     errors.append(f"{rel}: missing pre-PR check discovery or execution: {phrase}")
-        if rel == "contexts/git/commands/create-pull-request.md":
-            for phrase in ("effective pre-commit/pre-push hooks", "execute missing non-destructive checks", "after pr creation does not satisfy"):
-                if phrase not in content.lower():
-                    errors.append(f"{rel}: missing pre-PR explicit check fallback: {phrase}")
+            if "contexts/git/rules/git.md" not in content or "contexts/git/rules/pull-request.md" not in content:
+                errors.append(f"{rel}: missing pre-PR check discovery or execution: rule reference")
         if rel == "contexts/git/commands/plan-pull-requests.md" and "read-only" not in authority:
             errors.append(f"{rel}: planning must remain read-only")
         if rel == "contexts/requirements/commands/validate-requirements.md" and (

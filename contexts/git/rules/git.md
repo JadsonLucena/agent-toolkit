@@ -188,7 +188,7 @@ Apply **Shared Quality-Gate Discovery and Evidence** to the *final intended PR h
 * Evaluate evidence from effective pre-commit/pre-push hooks, explicit commands, and **already completed** CI runs. Reuse their results only when equivalent in scope and valid for the final PR revision. Merely pushing a branch, configuring CI, or assuming a hook fired does not demonstrate success.
 * A CI workflow triggered **only by opening a PR** runs after creation and **cannot** satisfy a pre-creation gate. Execute missing checks before creation or use other completed, scope-equivalent evidence (for example, a successful push CI result for the same head).
 * Recheck that head/base and relevant code/configuration still match the verified inputs immediately before creating a ready remote PR. Missing or invalid evidence blocks ready creation. An explicitly authorized draft may be created when `contexts/git/rules/pull-request.md` allows it; the description records the gap and must not claim the checks passed. Preparing a local PR description remains read-only and may report incomplete results.
-* Code Review is a separate required record for ready: a valid test/lint/hook/CI run cannot replace a matching native review whose frozen profile is `review_profile=advisory` and whose status is `PASS`, nor can that review replace the checks. Signed `review_profile=gate` evidence is an external attestation. When no enforcement path is configured, its absence is `not-applicable` and does not block ready.
+* The ready review record is decided by the Pre-Creation Quality Gate in `contexts/git/rules/pull-request.md`. A test, lint, hook, or CI result does not replace that record, and that record does not replace the checks.
 
 ## Quality Guardrails
 
