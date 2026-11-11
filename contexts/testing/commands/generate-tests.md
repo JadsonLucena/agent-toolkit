@@ -11,7 +11,7 @@ This command selects the Test Engineer and test-generation workflow. It authoriz
 ## Uses
 
 * Agent: `contexts/testing/agents/test-engineer.md`
-* Skill: `contexts/testing/skills/generate-tests/skill.md`
+* Skill: `contexts/testing/skills/generate-tests/SKILL.md`
 * Rule: `contexts/testing/rules/testing.md`
 * Optional input contract: `contracts/test-basis.md`
 * Output contract: `contracts/test-evidence.md`

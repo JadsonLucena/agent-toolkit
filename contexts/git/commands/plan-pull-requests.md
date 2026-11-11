@@ -13,7 +13,7 @@ Invocation authorizes read-only analysis and PR-boundary planning. It does not a
 ## Uses
 
 * Agent: `contexts/git/agents/git-engineer.md`
-* Skill: `contexts/git/skills/manage-pull-request/skill.md` in `plan` mode
+* Skill: `contexts/git/skills/manage-pull-request/SKILL.md` in `plan` mode
 * Rule: `contexts/git/rules/pull-request.md`
 * Rule: `contexts/git/rules/git.md`
 * Optional contract: `contracts/work-item.md`

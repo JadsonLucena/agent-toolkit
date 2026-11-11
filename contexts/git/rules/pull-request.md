@@ -96,6 +96,16 @@ A PR can be technically prepared while not ready for final review. Use a draft/r
 
 Ready for review does not mean ready for production.
 
+## Pre-Creation Quality Gate
+
+* **Before creating a ready-for-review pull request**, apply the shared check-discovery, hook/CI-evidence and missing-check execution policy from `contexts/git/rules/git.md`. Require passing project tests and lint where applicable (coverage-enabled tests only when established), plus a proportionate native review under `contracts/review-evidence.md` whose `review_profile=advisory` was frozen before the read, with complete coverage and `review_status=PASS` for the exact head/base. The description states `advisory` and states that gate attestation is absent or `not-applicable`. These are distinct checks; review cannot substitute for test/lint execution, and green test/lint results cannot substitute for review. A signed `review_profile=gate` attestation is not required for ready. It is required only to claim that the gate is satisfied.
+* **Before creating a draft** that the user explicitly authorized, run the same discovery. A draft is the result when the floor or the applicable native review is missing, stale, failed, or `INCOMPLETE` with a material question. The description names that gap and does not record `review_profile=gate`. Opening the draft does not make the PR ready.
+* Required evidence for a ready PR must correspond to the final intended head/base and review scope. A hook or CI configuration alone, a partial pre-commit result, or a workflow that will run only after PR publication cannot satisfy the pre-creation gate. Reuse only successful, completed evidence of equivalent or stronger scope; run missing checks explicitly. Any code change that invalidates review or check evidence requires fresh verification before ready creation.
+* If an applicable test or lint check cannot run, fails, is skipped without an authorized applicable policy, or has stale/uncorroborated results, block ready PR creation. A draft may still be published when publication was explicitly authorized and the description states that the check did not run, failed, or is stale. If a check is genuinely not applicable, state a specific reason instead of inventing a pass. Proportionate native `review_profile=advisory` review is required before a ready PR, even for R0/documentation-only changes. Signed gate review is not this requirement.
+* If review evidence is absent, request or perform the **separate read-only Review capability** through an explicitly authorized multi-context orchestration, and consume its neutral contract. Git must not duplicate Review internals or require OCR or any vendor adapter. Record the result at the profile that was frozen. Do not promote `advisory` to `gate`. When no external enforcement path is configured, gate evidence is `not-applicable`, and that absence does not block ready once the floor and the advisory review have passed.
+* A `draft` preparation state may still be produced before these checks complete; preparing a description is not remote creation. Publishing a draft does not make the PR ready, and the description must not present a draft or an advisory ready PR as gate-reviewed. Claiming `review_profile=gate` without external attestation is forbidden.
+* A reviewer-only Markdown instruction is not an enforcement mechanism. A configured runtime, preflight wrapper, or CI/branch protection enforces what that deployment configured; never claim enforcement from the presence of this rule alone. When a protected runtime is configured, a creation that claims gate uses that runtime's signed path and a nonzero exit is the block. An explicitly authorized draft without gate attestation uses the runtime's unsigned draft mode when that runtime provides one. That mode does not verify `review_profile=gate` and refuses a body that affirms gate `PASS`. A ready PR that has only advisory evidence uses the host pull-request command, and the description states that gate was not attested. When no runtime is configured, this rule does not stop that host command.
+
 ## Template Precedence
 
 Before writing a PR description, inspect applicable repository and organization instructions, including when present:
@@ -176,7 +186,8 @@ When no applicable repository template exists, use only the sections that are re
 ## Validation
 
 - Acceptance criteria / scenarios covered:
-- Tests / checks executed and observed result:
+- Tests / lint checks executed and observed result:
+- Independent code review: verdict, head/base, coverage, findings or remaining blockers:
 - Not executed / limitations:
 
 ## Impact and risks
@@ -202,6 +213,7 @@ Do not infer one state from another.
 
 ## Remote Creation Safety
 
+* Before ready PR creation, revalidate the floor (applicable tests/lint) and the `review_profile=advisory` review for the final intended revision. Revalidate a signed `review_profile=gate` attestation only when the creation claims gate. A draft records missing evidence instead of claiming that revalidation passed.
 * Creating a PR requires explicit authorization to create the remote review object.
 * Preparing or drafting a PR does not authorize remote PR creation.
 * PR creation does not authorize pushing unpublished commits, rewriting history, assigning reviewers, adding labels, enabling auto-merge, merging, closing, deleting branches, releasing, or deploying unless separately authorized.

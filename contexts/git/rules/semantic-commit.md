@@ -75,6 +75,7 @@
 * Split changes that have different purposes or can be meaningfully reviewed or reverted separately.
 * A plan, branch, pull request, or single delivery is not a commit unit. Split intents that can be reverted separately even when they ship together.
 * Keep changes together when separating them would create an invalid, incomplete, unverified, or misleading intermediate state.
+* A file that contains two intents is split with hunk staging. The cost of hunk staging does not justify one commit. That exception applies only when no hunk cut leaves each commit coherent and verifiable. Reaching for it to avoid hunk staging means split or ask.
 * Implementation and its directly related tests normally belong to the same commit when they jointly constitute one behavior change.
 * Atomicity is based on logical intent and dependency, not file boundaries, file count, or diff size.
 

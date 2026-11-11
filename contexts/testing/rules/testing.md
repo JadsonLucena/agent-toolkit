@@ -41,6 +41,7 @@ A Scenario Set is optional. When it does not exist, tests may trace directly to 
 * Use Arrange/Act/Assert for structural clarity and Given/When/Then for narrative workflows when it improves readability; follow project convention when present.
 * Prefer a single Act/When phase; use multiple phases only for explicit workflows or state transitions.
 * Explore and cover relevant edge cases, risks, invariants, boundaries, decisions, states, and input partitions.
+* Select a technique only when the risk needs it: equivalence partitioning, boundary value analysis, decision tables, state transition, use-case paths, path analysis, pairwise, or negative cases. Contract, security, concurrency, resilience, performance, property-based, fuzz, and mutation testing stay in Specialized Testing.
 * Use cyclomatic complexity only as a signal for additional path analysis.
 * For decisions, defaults, fallbacks, and transformations, assert observable consequences and relevant invariants.
 * Prefer parameterized tests when scenarios share behavior and differ mainly by input and expected outcome, provided readability is preserved.

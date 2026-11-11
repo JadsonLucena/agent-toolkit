@@ -12,11 +12,11 @@ contexts/
 │   │   ├── requirements.md
 │   │   └── backlog.md
 │   ├── skills/
-│   │   ├── elicitation/skill.md
-│   │   ├── definition/skill.md
-│   │   ├── example-discovery/skill.md
-│   │   ├── validation/skill.md
-│   │   └── backlog-planning/skill.md
+│   │   ├── elicitation/SKILL.md
+│   │   ├── definition/SKILL.md
+│   │   ├── example-discovery/SKILL.md
+│   │   ├── validation/SKILL.md
+│   │   └── backlog-planning/SKILL.md
 │   ├── commands/
 │   │   ├── shape-change.md
 │   │   ├── elicit-requirements.md
@@ -30,9 +30,25 @@ contexts/
 │       └── backlog-planner.md
 ├── testing/
 │   ├── rules/testing.md
-│   ├── skills/generate-tests/skill.md
+│   ├── skills/generate-tests/SKILL.md
 │   ├── commands/generate-tests.md
 │   └── agents/test-engineer.md
+├── review/
+│   ├── rules/code-review.md
+│   ├── skills/
+│   │   ├── review-change/SKILL.md
+│   │   ├── coordinate-review-team/SKILL.md
+│   │   └── verify-findings/SKILL.md
+│   ├── commands/review-code.md
+│   └── agents/
+│       ├── code-reviewer.md
+│       ├── specification-reviewer.md
+│       ├── correctness-reviewer.md
+│       ├── security-reviewer.md
+│       ├── reliability-reviewer.md
+│       ├── testing-reviewer.md
+│       ├── architecture-reviewer.md
+│       └── finding-verifier.md
 └── git/
     ├── rules/
     │   ├── git.md
@@ -41,10 +57,10 @@ contexts/
     │   ├── semantic-version.md
     │   └── pull-request.md
     ├── skills/
-    │   ├── create-semantic-commits/skill.md
-    │   ├── determine-semantic-version/skill.md
-    │   ├── manage-branch-work/skill.md
-    │   └── manage-pull-request/skill.md
+    │   ├── create-semantic-commits/SKILL.md
+    │   ├── determine-semantic-version/SKILL.md
+    │   ├── manage-branch-work/SKILL.md
+    │   └── manage-pull-request/SKILL.md
     ├── commands/
     │   ├── commit.md
     │   ├── determine-semantic-version.md
@@ -57,8 +73,19 @@ contracts/
 ├── requirements.md
 ├── work-item.md
 ├── test-basis.md
-└── test-evidence.md
+├── test-evidence.md
+└── review-evidence.md
 ```
+
+## Optional Vendor Adapters
+
+`adapters/` contains noncanonical provider/runtime-specific integrations. For example, `adapters/ocr/` bridges Alibaba OpenCodeReview's **delegation-mode** file/rule discovery into structured supplemental data for Review. It is excluded from the canonical artifact matrix: adapters may consume canonical semantics, while canonical rules, skills, agents, commands and contracts must remain fully operable without them.
+
+Agent Teams runtime integration is optional as well. The Review context defines team roles and a provider-neutral messaging workflow; **actual peer-to-peer delivery, isolated agent spawning, and progress tracking require a runtime adapter capable of those actions**. No Markdown file or OCR adapter creates runtime messaging by itself. Where unsupported, the lead uses relayed or native-solo review and reports the actual execution mode.
+
+`adapters/review/run_review.py` is the reference entrypoint for canonical `/review/review-code`: it calls `prepare_context.py` **before** the approved reviewer, verifies Git head/diff or workspace fingerprint afterward, and freezes R0–R3 risk/concerns before any advertised Task spawn. Preparation prioritizes OCR >=1.9.0 when allowed and preserves neutral inventory in `adapters/review/git_scope.py`; `--no-ocr` never imports OCR. `adapters/review/team_orchestration.py` is the provider-neutral Task protocol: risk-proportionate N from the canonical coordinate-review-team skill, including small critical diffs with fewer genuine concerns; isolated Tasks without observed direct exchange are `team-relayed`, not `team-live`. A host must actually bind its Task API to the protocol: Markdown alone never spawns or isolates agents. `adapters/teams/peer_bus.py` implements bounded in-process peer messages with explicit request/response/resolution tracking for host-supplied role handlers, not independent model spawning or a `team-live` review. `adapters/github/guarded_pr.py` is an explicitly invoked GitHub CLI preflight-and-create adapter: it verifies SSH-signed review evidence from a key approved by an **external protected policy**, executes the policy's required checks, and verifies the created remote PR after mutation. The trusted runtime must protect signer keys, policies and their selection. No wrapper can prevent bypass through unrelated GitHub clients without separate platform authorization enforcement.
+
+An adapter must not claim review coverage, bypass verification, publish remote changes, install dependencies or mutate project artifacts merely because the helper exists. OCR's excluded/unaccounted paths remain in the independent review's Git inventory. Adapter failures trigger native fallback when Git context is still inspectable.
 
 ## Responsibility Model
 
@@ -81,11 +108,11 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Requirements | `rules/tailoring.md` | Rule | Risk-proportional rigor, applicable-knowledge selection, governance, and anti-bureaucracy invariants |
 | Requirements | `rules/requirements.md` | Rule | Strategic framing, requirement semantics, evidence, ambiguity, quality, acceptance, change impact, and traceability invariants |
 | Requirements | `rules/backlog.md` | Rule | Backlog integrity, decomposition, readiness, dependency, tracker compatibility, refinement, and closure invariants |
-| Requirements | `skills/elicitation/skill.md` | Skill | Discover and consolidate supported stakeholder needs and unknowns |
-| Requirements | `skills/definition/skill.md` | Skill | Transform supported needs into verifiable requirement definitions at the required rigor |
-| Requirements | `skills/example-discovery/skill.md` | Skill | Discover domain examples, counterexamples, boundaries, and questions before test automation |
-| Requirements | `skills/validation/skill.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
-| Requirements | `skills/backlog-planning/skill.md` | Skill | Build or refine traceable planning items while preserving source semantics |
+| Requirements | `skills/elicitation/SKILL.md` | Skill | Discover and consolidate supported stakeholder needs and unknowns |
+| Requirements | `skills/definition/SKILL.md` | Skill | Transform supported needs into verifiable requirement definitions at the required rigor |
+| Requirements | `skills/example-discovery/SKILL.md` | Skill | Discover domain examples, counterexamples, boundaries, and questions before test automation |
+| Requirements | `skills/validation/SKILL.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
+| Requirements | `skills/backlog-planning/SKILL.md` | Skill | Build or refine traceable planning items while preserving source semantics |
 | Requirements | `commands/shape-change.md` | Command | Route the minimum necessary Requirements capabilities toward validated planning; specialist orchestration remains with agents |
 | Requirements | `commands/elicit-requirements.md` | Command | Start requirements discovery |
 | Requirements | `commands/specify-requirements.md` | Command | Start formal requirement definition |
@@ -96,24 +123,40 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Requirements | `agents/requirements-specifier.md` | Agent | Own formal requirement semantics, evidence discipline, and validation routing |
 | Requirements | `agents/backlog-planner.md` | Agent | Own backlog decomposition, traceability, dependencies, tracker alignment, and readiness boundaries |
 | Testing | `rules/testing.md` | Rule | Automated-testing standards and quality invariants |
-| Testing | `skills/generate-tests/skill.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
+| Testing | `skills/generate-tests/SKILL.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
 | Testing | `commands/generate-tests.md` | Command | Start automated-test creation or modification |
 | Testing | `agents/test-engineer.md` | Agent | Own testing specialization, evidence discipline, and scope boundaries |
+| Review | `rules/code-review.md` | Rule | Advisory/gate profiles, calibrated findings, documentation drift and evidence-driven Review policy |
+| Review | `rules/high-risk-patterns.md` | Rule | Eight source-grounded risk counterexamples used as investigation heuristics |
+| Review | `skills/review-change/SKILL.md` | Skill | Native review of a complete diff with context, coverage, risk, optional helpers, and evidence |
+| Review | `skills/coordinate-review-team/SKILL.md` | Skill | Risk-based Agent Team coordination, peer messaging, challenge routing, verification and native fallback |
+| Review | `skills/verify-findings/SKILL.md` | Skill | Falsification, verification, deduplication, and triage of candidate findings |
+| Review | `commands/review-code.md` | Command | Start read-only independent review of a bounded code change |
+| Review | `agents/code-reviewer.md` | Agent | Lead independent reviews, select specialists, coordinate team exchanges and issue one evidence-backed verdict |
+| Review | `agents/specification-reviewer.md` | Agent | Investigate specification and contract compliance |
+| Review | `agents/correctness-reviewer.md` | Agent | Investigate behavioral correctness and regressions |
+| Review | `agents/security-reviewer.md` | Agent | Investigate security and privacy boundaries |
+| Review | `agents/reliability-reviewer.md` | Agent | Investigate data integrity, concurrency and resilience |
+| Review | `agents/testing-reviewer.md` | Agent | Investigate assertion and test/CI evidence adequacy |
+| Review | `agents/architecture-reviewer.md` | Agent | Investigate architecture, compatibility and operational constraints |
+| Review | `agents/finding-verifier.md` | Agent | Independently falsify candidate findings and challenge peer conclusions |
 | Git | `rules/git.md` | Rule | Repository-state, history, synchronization, worktree, composition, remote safety, and commit-safety verification gates |
 | Git | `rules/gitflow.md` | Rule | Gitflow applicability and branch-lifecycle invariants |
 | Git | `rules/semantic-commit.md` | Rule | Commit semantics, message structure, and atomicity invariants |
 | Git | `rules/semantic-version.md` | Rule | Semantic-version compatibility and increment invariants |
 | Git | `rules/pull-request.md` | Rule | PR boundary, reviewability, decomposition, template, description, readiness, traceability, and remote-creation invariants |
-| Git | `skills/create-semantic-commits/skill.md` | Skill | Atomic staging, verification, message derivation, commit creation, and post-check workflow |
-| Git | `skills/determine-semantic-version/skill.md` | Skill | Compatibility analysis, version-policy evaluation, and evidence-backed semantic-version recommendation |
-| Git | `skills/manage-branch-work/skill.md` | Skill | Branch, synchronization, integration, and worktree decision and verification workflow |
-| Git | `skills/manage-pull-request/skill.md` | Skill | Plan, prepare, and explicitly create coherent pull requests with scoped authorization |
+| Git | `skills/create-semantic-commits/SKILL.md` | Skill | Atomic staging, verification, message derivation, commit creation, and post-check workflow |
+| Git | `skills/determine-semantic-version/SKILL.md` | Skill | Compatibility analysis, version-policy evaluation, and evidence-backed semantic-version recommendation |
+| Git | `skills/manage-branch-work/SKILL.md` | Skill | Branch, synchronization, integration, and worktree decision and verification workflow |
+| Git | `skills/manage-pull-request/SKILL.md` | Skill | Plan, prepare, and explicitly create coherent pull requests with scoped authorization |
 | Git | `commands/commit.md` | Command | Start explicitly requested semantic commit creation |
 | Git | `commands/determine-semantic-version.md` | Command | Start semantic-version analysis without release mutation |
 | Git | `commands/plan-pull-requests.md` | Command | Plan coherent PR boundaries without repository mutation |
 | Git | `commands/prepare-pull-request.md` | Command | Inspect the final change and prepare a truthful PR without remote mutation |
 | Git | `commands/create-pull-request.md` | Command | Create a remote PR with explicit creation-only authorization |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
+| Cross-context | `contracts/review-evidence.md` | Contract | Portable independent code-review evidence and pre-PR eligibility semantics |
+| Cross-context | `contracts/review-specialist-evidence.md` | Contract | Self-contained specialist and verifier evidence |
 | Cross-context | `contracts/requirements.md` | Contract | Neutral elicitation and requirement-definition handoff semantics |
 | Cross-context | `contracts/work-item.md` | Contract | Neutral planning-item handoff semantics |
 | Cross-context | `contracts/test-basis.md` | Contract | Optional portable Scenario Set and behavioral evidence handoff for Testing |
@@ -262,7 +305,7 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 
 ## Naming
 
-* Context names are stable engineering nouns: `requirements`, `testing`, `git`.
+* Context names are stable engineering nouns: `requirements`, `testing`, `review`, `git`.
 * Rule filenames name the governed concern.
 * Skill directories name the reusable capability.
 * Command names use a clear verb-object engineering intent and should remain understandable when surfaced outside their physical context. The context namespace may remove redundancy only when the remaining name stays unambiguous.
@@ -271,17 +314,14 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 
 ## Skill Format and Portability
 
-Canonical Skills are **semantic artifacts**, stored at `contexts/<context>/skills/<capability>/skill.md`. This lowercase Markdown file is the source of truth; it is **not directly compliant** with the open [Agent Skills specification](https://agentskills.io/specification), which requires `SKILL.md` and YAML frontmatter containing `name` and `description`.
+Canonical Skills are stored at `contexts/<context>/skills/<capability>/SKILL.md` and follow the [Agent Skills specification](https://agentskills.io/specification). The file starts with YAML frontmatter:
 
-Adapters may produce Agent Skills-compatible exports, subject to these invariants:
+* `name` matches the capability directory: lowercase letters, digits, and hyphens.
+* `description` says what the skill does and when to use it. Hosts compare the request with this field and load the body only when it matches, or when the user invokes the skill by name.
 
-* Export each canonical Skill as a capability directory with `SKILL.md` and valid required frontmatter; derive `name` from the capability identifier and `description` from the canonical purpose without inventing capabilities.
-* Preserve procedure, preconditions, stop conditions, policy dependencies, and authorization limits; translate canonical paths/references to reachable exported locations.
-* Keep exports generated or adapter-owned; never treat a generated `SKILL.md` as a second canonical source of truth.
-* Validate generated artifacts against the target format and runtime restrictions. Compatibility is an **adapter guarantee to verify**, not a property of `skill.md` files merely because their semantics align.
-* Platform-specific metadata (such as model or reasoning effort) belongs to the adapter/runtime, not to canonical Agent definitions.
+The body states the procedure once, as a diagram under Workflow. A decision node names the rule section that owns the invariant and does not restate it. Do not keep a numbered list that retells the diagram. Foundational Guidance stays in the rule as the theoretical reference for reviewers of the artifact. Do not add provider metadata such as model, reasoning effort, or tool allowlists to the canonical frontmatter.
 
-This decision favors semantic portability now; changing the canonical serialization itself requires a separate compatibility/migration decision.
+A host install path, such as `.claude/skills/` or `.agents/skills/`, may symlink or copy the canonical file. That installation is not a second source of truth.
 
 ## Command Terminology
 
@@ -322,7 +362,12 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 14. A generic `shared/` directory is intentionally avoided.
 15. `/requirements/shape-change` is the optional composite Requirements entry point for feature, defect, migration, regulatory, operational, or other change contexts; it routes existing capabilities and does not create a second source of requirement semantics.
 16. Requirements may establish a Change Boundary distinct from Work Scope and Product Boundary, reconcile material scope drift explicitly, work in next-decision-oriented knowledge batches, preserve local representation conventions without confusing them with semantics, and keep lifecycle/completion states distinct.
-17. Pull-request work is owned by Git as a review/integration concern: durable PR policy lives in `rules/pull-request.md`, reusable plan/prepare/create procedure lives in `skills/manage-pull-request/skill.md`, and separate commands preserve different authorization levels. Implementation remains outside Git.
+17. Pull-request work is owned by Git as a review/integration concern: durable PR policy lives in `rules/pull-request.md`, reusable plan/prepare/create procedure lives in `skills/manage-pull-request/SKILL.md`, and separate commands preserve different authorization levels. Implementation remains outside Git.
+
+18. Code Review is a separate, read-only context. It operates natively without required providers/adapters; OCR and similar helpers are optional. Requirements, Testing, and Git retain their own authority.
+19. Independent review, applicable tests, and lint are distinct pre-creation prerequisites for PRs. Git consumes `contracts/review-evidence.md` without depending on Review's internal procedures. Enforcing this policy requires runtime/CI controls; Markdown alone cannot block unauthorized remote creation.
+20. Review uses an optional risk-driven Agent Team, with the Code Review Lead coordinating specialist-to-specialist evidence exchange and independent falsification. R2/R3 favor relevant collaborative specialists where runtime support exists; native-solo and lead-relayed fallback remain valid. Provider-specific team orchestration is a runtime responsibility, not a requirement for canonical review.
+21. One fact has one owner. A command states the authorization and points at the skill. An agent routes to the skill. The skill diagram names the rule section for each decision. The rule owns the invariant and its Foundational Guidance. The contract owns the evidence shape.
 
 ## Framework Scope Roadmap
 
@@ -345,3 +390,51 @@ The following do not currently require first-class commands:
 Promote one to a command only when there is a clear user-facing invocation intent. Reusable internal procedures may remain skills without public command entry points.
 
 See `MIGRATION.md` for structural renames and responsibility movement.
+
+### Portable Review Execution
+
+The canonical Rule/Skill/Agent/Command/Contract artifacts define the required
+semantics. Adapters in `adapters/review/` are optional reference implementations,
+not the source of truth for any IDE, model, issue tracker, Git host or runtime.
+
+Host-native Review follows the same **prepare → independent investigation →
+validate evidence** contract as a subprocess reviewer. Preparation freezes
+repository, base/head or workspace fingerprint, full inventory and R0–R3
+risk before any isolated task. The validator checks that the same snapshot
+remains current. Optional OCR hints never reduce native review coverage.
+
+Canonical concerns: `contract`, `correctness`, `security`, `reliability`,
+`testing`, `architecture`. The CLI accepts aliases `spec`,
+`specification` and `arch`. `--base-branch` resolves local/cached
+refs without fetch; `--output-language` selects human report prose.
+
+## Advisory and Gate Review Semantics
+
+Canonical `contexts/review/rules/code-review.md` owns the two review
+profiles and calibrated finding policy. `advisory` can support complete
+read-only local reviews without independent session attestation; it must be
+visibly labeled and **cannot** satisfy remote PR preflight. `gate` additionally
+requires independently executed review and protected, externally verified
+SSHSIG evidence. The Git adapter rejects missing/legacy/advisory profile
+regardless of a PASS, signer or local success.
+
+`contracts/review-evidence.md` defines portable `review_profile`, optional
+`likelihood`, `origin`, `lead_confirmed`, and pinned
+`external_evidence[]`. Source-based falsification prompts live **only** in
+`contexts/review/rules/high-risk-patterns.md`, referenced by specialist
+agents rather than copied into their prompts. Repository-owned, versioned
+conventions can be discovered from existing project documentation; no
+specific IDE format, tracker, provider, model or execution engine is required.
+
+## Documentation Consistency in Code Review
+
+The Review Rule is the sole normative source for documentation drift:
+the Lead examines relevant documentation (including unchanged files) against
+the actual code and applicable contracts. The existing specification and
+architecture agents may contribute; no separate documentation agent or
+platform-dependent review concern is created. The review skill performs
+the bounded inspection and the evidence contract optionally records
+`documentation_assessment`. Missing, obsolete, contradictory, ambiguous
+or duplicated knowledge becomes a finding only with relevant observed impact,
+not by checklist matching. The signed Git gate, reviewer independence and
+risk-proportionate review policies are unchanged.

@@ -19,6 +19,11 @@ agent-toolkit/
 │   │   ├── skills/
 │   │   ├── commands/
 │   │   └── agents/
+│   ├── review/
+│   │   ├── rules/
+│   │   ├── skills/
+│   │   ├── commands/
+│   │   └── agents/
 │   └── git/
 │       ├── rules/
 │       ├── skills/
@@ -54,11 +59,11 @@ contexts/requirements/
 │   ├── requirements.md
 │   └── backlog.md
 ├── skills/
-│   ├── elicitation/skill.md
-│   ├── definition/skill.md
-│   ├── example-discovery/skill.md
-│   ├── validation/skill.md
-│   └── backlog-planning/skill.md
+│   ├── elicitation/SKILL.md
+│   ├── definition/SKILL.md
+│   ├── example-discovery/SKILL.md
+│   ├── validation/SKILL.md
+│   └── backlog-planning/SKILL.md
 ├── commands/
 │   ├── shape-change.md
 │   ├── elicit-requirements.md
@@ -89,12 +94,50 @@ Elicitation and specification share `contracts/requirements.md` so Need/Goal con
 ```text
 contexts/testing/
 ├── rules/testing.md
-├── skills/generate-tests/skill.md
+├── skills/generate-tests/SKILL.md
 ├── commands/generate-tests.md
 └── agents/test-engineer.md
 ```
 
 Testing remains autonomous. Requirements evidence may improve test design through the optional `contracts/test-basis.md`, but Testing does not invoke Requirements skills or agents merely to obtain that evidence. When stable scenarios are supplied, Testing preserves their identities and reports coverage/verification separately through `contracts/test-evidence.md`.
+
+### Review
+
+```text
+contexts/review/
+├── rules/code-review.md
+├── skills/
+│   ├── review-change/SKILL.md
+│   ├── coordinate-review-team/SKILL.md
+│   └── verify-findings/SKILL.md
+├── commands/review-code.md
+└── agents/
+    ├── code-reviewer.md
+    ├── specification-reviewer.md
+    ├── correctness-reviewer.md
+    ├── security-reviewer.md
+    ├── reliability-reviewer.md
+    ├── testing-reviewer.md
+    ├── architecture-reviewer.md
+    └── finding-verifier.md
+```
+
+The Code Reviewer performs a full, read-only, risk-proportionate review of Git changes in either `advisory` or independently executed `gate` profile. It inspects the actual diff, relevant context, requirements when supplied, tests, affected consumers, security, reliability, architecture, documentation consistency, and integration risks. Evidence and coverage are preserved through `contracts/review-evidence.md`.
+
+The review includes **Documentation Consistency and Drift**: inspect affected
+documentation even when no documentation file changed, and compare its claims
+against implementation and authoritative contracts. Investigate missing,
+outdated, contradictory, ambiguous and duplicated knowledge. Report inspected
+sources, findings or justified non-applicability. Duplicate prose alone is
+not an automatic defect; findings require a concrete consequence. The sole
+normative policy lives in `contexts/review/rules/code-review.md`, with
+optional `documentation_assessment` metadata in `contracts/review-evidence.md`.
+
+Review is **native and provider-neutral**: OCR or other installed review helpers may accelerate discovery but are optional. No installation, network provider, or adapter is required for a complete native review.
+
+**Collaborative Agent Teams:** the `code-reviewer` is the **Code Review Lead**. For R2/R3 changes, it selects relevant isolated specialists when the runtime supports them; direct peer messaging is not required for a genuine Lead-relayed team. Specialists share evidence, ask targeted questions and challenge conclusions; a distinct finding-verifier independently attempts falsification before the lead issues the sole verdict. R0/R1 changes normally run solo. On platforms without messaging, the lead relays questions between specialist passes or reviews natively. The record distinguishes `team-live`, `team-relayed`, and `native-solo`; parallel isolated specialists alone are not evidence of collaboration; `team-relayed` is a collaborative team with actual Lead-mediated exchange, and `team-live` requires host-observed direct peer delivery.
+
+The toolkit defines the roles and `contexts/review/skills/coordinate-review-team/SKILL.md` messaging workflow, **not a concrete provider's agent-spawning API**. Live team coordination requires a platform adapter/runtime that supports it, while native review remains fully functional without one. Independent review cannot be established by simply renaming the implementation author's role.
 
 ### Git
 
@@ -107,10 +150,10 @@ contexts/git/
 │   ├── semantic-version.md
 │   └── pull-request.md
 ├── skills/
-│   ├── create-semantic-commits/skill.md
-│   ├── determine-semantic-version/skill.md
-│   ├── manage-branch-work/skill.md
-│   └── manage-pull-request/skill.md
+│   ├── create-semantic-commits/SKILL.md
+│   ├── determine-semantic-version/SKILL.md
+│   ├── manage-branch-work/SKILL.md
+│   └── manage-pull-request/SKILL.md
 ├── commands/
 │   ├── commit.md
 │   ├── determine-semantic-version.md
@@ -122,14 +165,27 @@ contexts/git/
 
 Git is cross-cutting but is not automatically invoked by other contexts. Planning metadata may provide supporting intent, while repository evidence remains authoritative for repository operations.
 
-Pull-request workflows preserve three distinct intents: planning review boundaries, preparing a truthful PR from the final diff, and explicitly creating the remote review request. PRs are bounded by coherent/verifiable integration units rather than line count alone; repository PR templates take precedence over the generic fallback; and PR creation never implies push, merge, auto-merge, release, or deployment authorization.
+Pull-request readiness, draft, and gate claims are decided in `contexts/git/rules/pull-request.md`. The procedure is the diagram in `contexts/git/skills/manage-pull-request/SKILL.md`. Check discovery stays in `contexts/git/rules/git.md`. Creating a pull request does not authorize push, merge, auto-merge, release, or deployment.
 
 ## Contracts
 
 * `contracts/requirements.md` — elicitation and requirement-definition semantics, including optional Change Boundary, scope-change, lifecycle, and representation-convention context.
 * `contracts/work-item.md` — planning-item semantics.
 * `contracts/test-basis.md` — optional portable Scenario Set and behavioral evidence for Testing.
+* `contracts/review-evidence.md` — review target, file coverage, verified findings, risk and pre-PR review status.
 * `contracts/test-evidence.md` — scenario-to-automation coverage and verification evidence.
+
+## Optional Provider Adapters
+
+Vendor-specific adapters are runtime-facing helpers, not canonical contexts. The Alibaba OpenCodeReview integration lives in `adapters/ocr/` (see its [README](adapters/ocr/README.md)) and provides structured `delegate preview` / `delegate rule` output when OCR is already installed. It does **not** run or approve a code review.
+
+Run it against a target repository with `python3 /path/to/agent-toolkit/adapters/ocr/delegate.py --repo . --from main --to HEAD`. The host agent must still independently review the complete Git change inventory, including files OCR excludes. Missing or failing OCR never blocks native code review and never satisfies the pre-PR Code Review gate by itself.
+
+Executable runtime integration examples (not additional canonical owners):
+
+* [Portable Review runtime adapter](adapters/review/README.md) — `run_review.py` supports two-phase host-native and subprocess flows; both freeze context before investigation and share evidence validation. OCR remains optional; an adapter is not a canonical dependency.
+* [Risk-sized Team orchestration and peer transport](adapters/teams/README.md) — the reference `adapters/review/team_orchestration.py` implements the neutral team policy defined in `contexts/review/skills/coordinate-review-team/SKILL.md`. Direct messaging, host Tasks and in-process queues are distinct capabilities, never sources of review policy.
+* [Guarded GitHub PR creation](adapters/github/README.md) — validates a **detached SSH-signed independent review** against reviewer keys and check commands supplied by a deployment-protected policy, verifies the exact remote head/base and executes required checks before an explicitly authorized ready `gh pr create`. An explicitly authorized draft may omit the signature; that mode does not verify `review_profile=gate`, refuses a body that affirms PASS, and still runs the trusted checks. The newly created PR is queried and verified (including head/base SHA, title and Draft state). This cannot prevent a separate GitHub client from bypassing the wrapper; key custody and policy selection belong to the trusted runtime.
 
 ## Commands
 
@@ -144,6 +200,8 @@ Commands express engineering intent rather than low-level tool aliases:
 /requirements/refine-backlog
 
 /testing/generate-tests
+
+/review/review-code
 
 /git/commit
 /git/determine-semantic-version
@@ -172,7 +230,7 @@ Elicitation ↔ Specification ↔ Validation ↔ Backlog / Plan
                     └───────────────────┘
                             │
                             ▼
-                     Verification → Review
+                     Verification → Independent Review → PR gate
 
 Cross-cutting: Git, security, conventions, …
 ```
@@ -285,7 +343,7 @@ The lint checks canonical artifact paths, matrix ownership, dependency direction
 
 ## Roadmap
 
-Next contexts should cover Product Discovery, architecture and design, implementation, code review, security engineering, release evidence, solution/outcome evaluation, and Lean/delivery-flow concerns without collapsing specialties. Requirements may carry Needs, Goals, constraints, candidate solutions, uncertainty, quality/security drivers, and other semantic evidence, but it does not own those disciplines' internal procedures.
+Next contexts should cover Product Discovery, architecture and design, implementation, security engineering, release evidence, solution/outcome evaluation, and Lean/delivery-flow concerns without collapsing specialties. Requirements may carry Needs, Goals, constraints, candidate solutions, uncertainty, quality/security drivers, and other semantic evidence, but it does not own those disciplines' internal procedures.
 
 Product Discovery should later own opportunity/user discovery, Impact Mapping, solution hypotheses, Valuable/Usable/Feasible evaluation, prototypes/experiments, and validated learning. Lean/delivery flow should later own explicit WIP, queue, batch-size, handoff, feedback-delay, flow-efficiency, built-in-integrity, and whole-system concerns when needed.
 
@@ -295,8 +353,56 @@ Additional Git commands should be introduced only when a reusable procedure also
 
 Canonical definitions are neutral Markdown. Adapters may transform them into provider-specific formats while preserving canonical semantics.
 
-Canonical Skills use lowercase `skill.md` without requiring Agent Skills frontmatter. They are **not directly Agent Skills-compatible**. An adapter may export compliant `SKILL.md` files with `name`/`description` metadata, reference rewriting, and format validation. The canonical source remains authoritative; see `ARCHITECTURE.md` for the compatibility contract.
+Canonical Skills are `SKILL.md` files with `name` and `description` frontmatter, so a host that implements Agent Skills can discover them. The body remains the procedure. A provider install directory may point at that file; it does not redefine it. See `ARCHITECTURE.md`.
 
 ## Goal
 
 The goal is not a collection of prompts. It is a **composable software engineering system for AI agents** where responsibility, evidence, workflow, boundaries, and context are structured to produce consistent engineering outcomes.
+
+### Portable Two-Phase Code Review
+
+Review semantics, not a particular IDE, provider, LLM or Python adapter, are
+the source of truth. Hosts where the agent is itself the reviewer can prepare
+a frozen context with `run_review.py --prepare-only --out /tmp/review-context.json`,
+conduct isolated source investigation with their own runtime mechanisms, and
+validate evidence through `run_review.py --validate-evidence <evidence.json>
+--context /tmp/review-context.json`. The older
+`-- <approved-reviewer-command>` subprocess mode remains an optional adapter;
+both use the **same evidence validator**.
+
+The reference CLI accepts `--base-branch <ref>` (local or cached remote ref,
+no fetch), `--output-language pt-BR`, and `--concern` values
+`contract|correctness|security|reliability|testing|architecture` (aliases
+`spec|specification→contract`, `arch→architecture`). See
+[Review runtime integration](adapters/review/README.md).
+
+The canonical mode/N policy belongs to
+`contexts/review/skills/coordinate-review-team/SKILL.md`, and the optional OCR
+policy to `contexts/review/rules/code-review.md`. An R3 diff with 1–2 real
+concerns is valid and still requires the source-inspecting isolated verifier
+when isolated agents are available.
+
+## Review Profiles, Calibrated Findings and Project Conventions
+
+Choose `advisory` for the portable review record, including author self-review,
+when an external reviewer identity cannot be attested. It can return
+**PASS (advisory)** after full coverage and source verification. That result
+can satisfy ready-for-review when the floor also passed, and it must be
+labeled advisory. Choose `gate` for separately independent evidence attested
+by an external enforcement path. Machine status remains
+`PASS | FAIL | INCOMPLETE`. The optional GitHub adapter accepts a gate claim
+only from explicitly signed `review_profile=gate` evidence under its protected
+SSHSIG policy. Other hosts may attest the same semantics without SSHSIG.
+
+The normative calibration and project convention mechanisms live in
+[`contexts/review/rules/code-review.md`](contexts/review/rules/code-review.md):
+reachable severity (`critical/high/medium/low`), independent
+`likelihood` (`high/medium/low`), confidence, exposure-sensitive priority,
+requirement conflicts, pinned external evidence, and
+`introduced/pre-existing/amplified-pre-existing` origin. The eight
+counterexample-driven investigations in
+[`high-risk-patterns.md`](contexts/review/rules/high-risk-patterns.md)
+are **heuristics, not automatic blockers**. No SOLID/DDD/Clean Architecture
+rule is imposed without a project-owned, versioned convention or demonstrated
+critical defect. Host/IDE-specific conventions are adapters or optional
+repository evidence, never canonical toolkit defaults.
