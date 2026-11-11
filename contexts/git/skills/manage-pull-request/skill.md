@@ -162,9 +162,9 @@ Use after implementation exists or when a branch/diff is ready to be inspected f
     * traceability/slice contribution;
     * remaining work.
 15. Determine readiness:
-    * **ready** — the PR is coherent, safe to integrate, and sufficiently evidenced for review under repository policy, including independent review PASS and applicable tests/lint;
-    * **draft** — preparation remains incomplete for final review; remote publication still requires all mandatory pre-creation checks;
-    * **blocked** — creating/presenting the PR would be unsafe, materially misleading, or incompatible with repository policy.
+    * **ready** — the PR is coherent and safe to integrate, with signed `review_profile=gate` `PASS` and applicable tests/lint for the exact head/base. An advisory `PASS` is not ready;
+    * **draft** — publication was explicitly authorized while signed gate evidence, tests, or lint are missing, stale, failed, or only advisory. The description names that gap. Opening the draft does not satisfy the gate and must not present the PR as gate-reviewed;
+    * **blocked** — creating the PR would be unsafe or materially misleading, such as an ambiguous base, an unpublished head without push authorization, secrets, or a description that would claim `PASS` without signed evidence.
 16. Recheck that PR readiness is not being used as evidence that the larger task, Product Slice, story, deployment, or release is complete.
 
 ### 4. Create Mode
@@ -181,7 +181,7 @@ Use only when remote PR creation is explicitly authorized.
    * whether an equivalent open PR already exists.
 3. If the head branch is not published, do not push it unless push is separately authorized.
 4. If an equivalent PR already exists, report/reuse it rather than creating a duplicate.
-5. Reapply **Shared Quality-Gate Discovery and Evidence** to the final remote head/base and whole PR scope. Inspect the effective hooks, explicitly executed checks, and already completed CI evidence; validate successful test/lint and established coverage checks, executing any missing non-destructive checks before creation when authorized. Do **not** count a workflow triggered only after PR creation. Require independently attested `review_profile=gate` Code Review `PASS`, complete required coverage, and no unresolved material blockers for the exact target. An advisory PASS never qualifies. If any mandatory evidence is missing, stale, failed or incomplete, do not create **any** remote PR, including a draft. When a runtime explicitly orchestrates cross-context work, it may obtain new read-only review evidence and retry this check without importing Review internals into Git.
+5. Reapply **Shared Quality-Gate Discovery and Evidence** to the final remote head/base and whole PR scope. Inspect the effective hooks, explicitly executed checks, and already completed CI evidence; validate successful test/lint and established coverage checks, executing any missing non-destructive checks before creation when authorized. Do **not** count a workflow triggered only after PR creation. A ready PR requires independently attested `review_profile=gate` Code Review `PASS`, applicable tests and lint, complete required coverage, and no unresolved material blockers for the exact target. An advisory PASS never qualifies as ready. If a protected pre-creation runtime is configured, invoke that runtime for creation and stop on a nonzero exit; do not call the host PR command in its place. If no protected runtime is configured and the user explicitly authorized publication, missing, stale, failed, or advisory-only gate evidence does not forbid a draft. Create that draft and name the gap in the description. Do not write `review_profile=gate` or `PASS`. Do not create a ready-for-review PR in that case. Explicit authorization to publish does not make a ready PR truthful when signed gate evidence is absent. When a runtime explicitly orchestrates cross-context work, it may obtain new read-only review evidence and retry this check without importing Review internals into Git.
 6. Do not create a PR whose preparation state is `blocked`.
 7. Create the PR as draft when preparation indicates `draft`, unless explicit repository/user direction requires another state and doing so remains truthful.
 8. Create a ready-for-review PR only when preparation indicates `ready`.
@@ -254,7 +254,7 @@ Produce:
 * Creating authorizes only creation of the remote PR object described by the command. It does not authorize push, history rewrite, reviewer assignment, labels, milestones, auto-merge, merge, branch deletion, release, or deployment unless separately authorized.
 * This skill may diagnose scope, test, implementation, or architecture defects, but diagnosis does not authorize changing those artifacts.
 * Do not alter the final diff merely to make the PR description look coherent unless a separate implementation authorization exists.
-* Remote PR creation must not bypass independent code review, applicable tests or lint merely because the target is a draft. Absence of a specific review engine (including OCR) is not a justification to skip native review.
+* A draft must not be described as gate-reviewed. Do not mark a PR ready to bypass missing signed review or failing checks. Absence of a specific review engine (including OCR) is not a justification to skip native review, and it is not a justification to claim gate `PASS`.
 * Do not claim verification, readiness, publication, merge, release, or deployment states without corresponding evidence.
 
 ## Stop Conditions
@@ -266,7 +266,7 @@ Stop only the affected decision and report the blocker when:
 * multiple PR templates are plausible and no selection rule exists;
 * the diff cannot be reconciled with one coherent objective;
 * integration would expose incomplete behavior without required safety guarantees;
-* current independent review PASS, applicable test, or lint evidence is missing, stale, failed, or incomplete when remote creation is requested;
+* signed gate `PASS` or applicable test/lint evidence is missing, stale, failed, or incomplete when a ready-for-review PR is requested. An explicitly authorized draft that names the gap is not this stop;
 * critical verification required by repository policy is unavailable or failing;
 * source intent is materially ambiguous and changes the PR boundary;
 * secrets or sensitive data would be exposed;
