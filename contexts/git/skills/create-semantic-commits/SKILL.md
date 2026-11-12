@@ -1,13 +1,13 @@
 ---
 name: create-semantic-commits
-description: "Turn an explicitly authorized change into the smallest sequence of atomic commits. Use when the task authorizes creating commits."
+description: "Create verified atomic commits for completed intentions during authorized implementation or for explicitly requested changes. Use when the implementation task permits local commits or a commit is requested."
 ---
 
 # Create Semantic Commits
 
 ## Purpose
 
-Use when a task explicitly authorizes creating one or more commits. Convert an authorized set of changes into the smallest coherent sequence of atomic commits while applying the Git and semantic-commit rules.
+Use for each completed intention during authorized implementation, or to partition an explicitly requested change set into the smallest coherent sequence of atomic commits. Apply the same Git and semantic-commit rules in either mode.
 
 ## Uses
 
@@ -16,7 +16,7 @@ Use when a task explicitly authorizes creating one or more commits. Convert an a
 
 ## Preconditions
 
-* Creating commits is explicitly authorized for a defined change scope.
+* Local commits are permitted by a scoped implementation task, or commit creation is explicitly requested for a defined change set.
 * The repository is inspectable.
 * No unresolved Git operation or conflict makes committing unsafe.
 * The authorized change set can be distinguished from unrelated work.
@@ -25,7 +25,10 @@ Use when a task explicitly authorizes creating one or more commits. Convert an a
 
 ```mermaid
 stateDiagram-v2
-    [*] --> InspectRepository
+    [*] --> SelectTrigger
+    SelectTrigger --> AwaitCompletedIntention: authorized implementation
+    SelectTrigger --> InspectRepository: explicit commit request
+    AwaitCompletedIntention --> InspectRepository: current intention complete
     InspectRepository --> IdentifyIntentions
 
     state IntentEvidence <<choice>>
@@ -68,8 +71,8 @@ stateDiagram-v2
     CommitValid --> Blocked: resulting state unexpected
 
     state RemainingChanges <<choice>>
-    RemainingChanges --> IdentifyIntentions: more authorized logical units
-    RemainingChanges --> Completed: none
+    RemainingChanges --> IdentifyIntentions: explicit request with more authorized units
+    RemainingChanges --> Completed: implementation unit committed / none remaining
 
     Completed --> [*]
     Blocked --> [*]
