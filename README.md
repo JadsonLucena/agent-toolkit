@@ -117,6 +117,7 @@ Design turns supported requirements or a bounded technical change into decisions
 contexts/implementation/
 ├── rules/implementation.md
 ├── skills/implement-slice/SKILL.md
+├── skills/test-driven-development/SKILL.md
 ├── commands/implement-slice.md
 └── agents/implementation-engineer.md
 ```
@@ -285,7 +286,7 @@ Requirements stages are iterative. Validation is a separate, read-only requireme
 
 Verification remains distinct from the TDD inner loop: it checks the integrated result against applicable acceptance criteria, scenario coverage, contracts, functional and non-functional requirements, and project quality gates. TDD does not replace integration, security, resilience, performance, or acceptance verification. A material discrepancy discovered in test design or execution must be returned to the appropriate requirement owner, not silently change expected behavior.
 
-The current `/testing/generate-tests` command authorizes **test-artifact changes only**; it does not authorize production implementation. A future TDD capability should be owned by the Implementation context and invoked with explicit scope for both test and production-code changes, reusing Testing's standards and portable test evidence without changing their canonical ownership. The diagram expresses the target workflow; it does not claim that a TDD skill or Implementation agent already exists. Projects not using TDD may use another authorized, risk-appropriate delivery workflow while preserving test traceability and verification.
+The current `/testing/generate-tests` command authorizes **test-artifact changes only**; it does not authorize production implementation. The optional `contexts/implementation/skills/test-driven-development/SKILL.md` capability now owns RED/GREEN/REFACTOR inside an authorized Implementation slice, with explicit scope for test and production-code changes. Testing retains test-quality standards and portable evidence; the workflow is not automatic proof that host-side TDD execution occurred. Projects not using TDD may use another authorized, risk-appropriate delivery workflow while preserving test traceability and verification.
 
 ## Cross-Context Composition
 
