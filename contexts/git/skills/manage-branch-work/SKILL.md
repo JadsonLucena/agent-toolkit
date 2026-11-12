@@ -13,6 +13,7 @@ Use for authorized branch, synchronization, integration, or worktree operations 
 
 * Rule: `contexts/git/rules/git.md`
 * Rule: `contexts/git/rules/gitflow.md` only when Gitflow applies.
+* Skill: `contexts/git/skills/resolve-merge-conflicts/SKILL.md` for integration conflicts and interfering changes.
 
 ## Working State
 
@@ -24,7 +25,8 @@ Maintain:
 * active merge, rebase, cherry-pick, bisect, or conflict state;
 * applicable repository workflow and integration policy;
 * worktree occupancy and parallel-work constraints;
-* explicit authorization scope;
+* explicit authorization scope, including separate conflict edit/stage/continue permissions;
+* relevant conflict stages and semantic interaction risks;
 * verification evidence and unresolved ambiguity.
 
 ## Workflow
@@ -35,12 +37,20 @@ flowchart TD
     Refresh --> Role["Branch role and base: git.md, and gitflow.md when Gitflow applies"]
     Role --> Ask{"Role, base, or integration semantics ambiguous?"}
     Ask -->|yes| Stop
-    Ask -->|no| Strategy["Merge, rebase, fast-forward, or worktree only as authorized"]
+    Ask -->|no| Active{"Active integration or unresolved index entries?"}
+    Active -->|yes| Resolve["Resolve conflicts under resolve-merge-conflicts skill"]
+    Active -->|no| Strategy["Merge, rebase, fast-forward, or worktree only as authorized"]
     Strategy --> Protect["Unrelated work and shared history stay outside the mutation"]
-    Protect --> Execute --> Result["Resulting history and upstreams"]
+    Protect --> Execute --> Interference{"Conflicts or material semantic interference?"}
+    Interference -->|yes| Resolve
+    Interference -->|no| Verify["Verify resulting history, checks and integrated behavior"]
+    Resolve --> Assessment{"Decision supported and patch authorized?"}
+    Assessment -->|no| Stop
+    Assessment -->|yes| Verify
+    Verify --> Result["Verified state, evidence and remaining authorized transitions"]
 ```
 
-The diagram is the procedure. Apply `contexts/git/rules/git.md` and, when Gitflow applies, `contexts/git/rules/gitflow.md`.
+The diagram is the procedure. Apply `contexts/git/rules/git.md` and, when Gitflow applies, `contexts/git/rules/gitflow.md`. The conflict branch uses `contexts/git/skills/resolve-merge-conflicts/SKILL.md`; it never implicitly continues or commits a partially resolved operation.
 
 ## Parallel Work
 

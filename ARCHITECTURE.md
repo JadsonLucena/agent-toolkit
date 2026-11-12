@@ -60,12 +60,14 @@ contexts/
     │   ├── create-semantic-commits/SKILL.md
     │   ├── determine-semantic-version/SKILL.md
     │   ├── manage-branch-work/SKILL.md
+    │   ├── resolve-merge-conflicts/SKILL.md
     │   └── manage-pull-request/SKILL.md
     ├── commands/
     │   ├── commit.md
     │   ├── determine-semantic-version.md
     │   ├── plan-pull-requests.md
     │   ├── prepare-pull-request.md
+    │   ├── resolve-conflicts.md
     │   └── create-pull-request.md
     └── agents/git-engineer.md
 
@@ -148,11 +150,13 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Git | `skills/create-semantic-commits/SKILL.md` | Skill | Atomic staging, verification, message derivation, commit creation, and post-check workflow |
 | Git | `skills/determine-semantic-version/SKILL.md` | Skill | Compatibility analysis, version-policy evaluation, and evidence-backed semantic-version recommendation |
 | Git | `skills/manage-branch-work/SKILL.md` | Skill | Branch, synchronization, integration, and worktree decision and verification workflow |
+| Git | `skills/resolve-merge-conflicts/SKILL.md` | Skill | Three-way intent reconstruction, reconciliation, authorized patching and integrated-behavior verification |
 | Git | `skills/manage-pull-request/SKILL.md` | Skill | Plan, prepare, and explicitly create coherent pull requests with scoped authorization |
 | Git | `commands/commit.md` | Command | Start explicitly requested semantic commit creation |
 | Git | `commands/determine-semantic-version.md` | Command | Start semantic-version analysis without release mutation |
 | Git | `commands/plan-pull-requests.md` | Command | Plan coherent PR boundaries without repository mutation |
 | Git | `commands/prepare-pull-request.md` | Command | Inspect the final change and prepare a truthful PR without remote mutation |
+| Git | `commands/resolve-conflicts.md` | Command | Begin read-only conflict diagnosis or explicitly authorized scoped application |
 | Git | `commands/create-pull-request.md` | Command | Create a remote PR with explicit creation-only authorization |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
 | Cross-context | `contracts/review-evidence.md` | Contract | Portable independent code-review evidence and pre-PR eligibility semantics |
@@ -356,7 +360,7 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 8. Testing consumes requirements-derived evidence optionally through `contracts/test-basis.md` and never requires Requirements workflows.
 9. Git consumes planning intent only as optional evidence and never treats it as stronger than repository state.
 10. Detailed atomic commit execution lives in a dedicated skill.
-11. Reusable branch/integration/worktree and semantic-version decision procedures live in dedicated skills.
+11. Reusable branch/integration/worktree and semantic-version decision procedures live in dedicated skills. Merge-conflict semantic reconciliation has a dedicated Git skill; the existing Git Engineer coordinates it.
 12. Semantic-version analysis has a public command because it has a clear user-facing intent and a non-mutating authorization boundary.
 13. Contracts exist because contexts exchange semantics. They remain neutral schemas rather than a new artifact category.
 14. A generic `shared/` directory is intentionally avoided.
