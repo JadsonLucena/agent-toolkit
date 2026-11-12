@@ -85,18 +85,18 @@ flowchart TD
     Fallback --> Describe
     Describe --> Gate["Pre-Creation Quality Gate in pull-request.md"]
 
-    Gate -->|ready| PreparedReady
-    Gate -->|reviewable but incomplete| PreparedDraft
-    Gate -->|unsafe or unsupported| Blocked
+    Gate -->|prepare: ready| PreparedReady
+    Gate -->|prepare: reviewable but incomplete| PreparedDraft
+    Gate -->|create: ready or explicitly authorized draft| CreationGate
+    Gate -->|blocked| Blocked
 
     SelectMode -->|create| LoadPreparedState
     LoadPreparedState --> VerifyRemoteContext
     VerifyRemoteContext --> ExistingPR
 
     ExistingPR -->|equivalent PR exists| ReportExisting
-    ExistingPR -->|none| CreationEvidence["Pre-Creation Quality Gate in pull-request.md"]
-    CreationEvidence -->|ready or explicitly authorized draft| CreationGate["Remote Creation Safety in pull-request.md"]
-    CreationEvidence -->|blocked| Blocked
+    ExistingPR -->|none| Gate
+    CreationGate["Remote Creation Safety in pull-request.md"]
 
     CreationGate -->|blocked| Blocked
     CreationGate -->|authorized and publishable| CreateRemotePR
