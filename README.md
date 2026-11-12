@@ -340,11 +340,29 @@ Stable or repeatedly used project information may be cached when the execution p
 * **Task oriented** — commands express clear engineering intent.
 * **Quality driven** — verification distinguishes evidence from assumptions and unverified conclusions.
 
+## Requirements Behavioral Evaluation Baseline
+
+The initial [Requirements evaluation corpus](evals/requirements/README.md)
+covers elicitation, definition, examples, validation, backlog, and composite
+`shape-change` behavior. The provider-neutral evidence checker at
+`scripts/requirements_evals.py` validates catalog structure and documented
+review observations against complete agent transcripts. It does not execute
+an AI agent or automatically judge its semantic correctness.
+
+CI validates the corpus and the checker with stdlib-only regression tests.
+Actual agent behavior must still be exercised in a host and reviewed against
+the rubrics before claiming behavioral readiness.
+
+`/requirements/shape-change` already routes elicitation through planning.
+It may yield supported granular backlog slices, but not speculative
+architecture-specific implementation tasks. Cross-context technical task
+generation belongs to a later SDD delivery workflow.
+
 ## Toolkit Self-Validation
 
 Run `python3 scripts/toolkit_lint.py` and `python3 -m unittest discover -s tests -v`. GitHub Actions runs both on pull requests and pushes to `main`.
 
-The lint checks canonical artifact paths, matrix ownership, dependency direction, same-context Skill composition cycles, broken Markdown references, required Command/Skill sections, and selected authorization-boundary markers. These are **structural fitness checks**, not proof of semantic consistency or runtime authorization enforcement. Behavioral agent evals and adapter capability tests remain a separate follow-up.
+The lint checks canonical artifact paths, matrix ownership, dependency direction, same-context Skill composition cycles, broken Markdown references, required Command/Skill sections, and selected authorization-boundary markers. These are **structural fitness checks**, not proof of semantic consistency or runtime authorization enforcement. Behavioral agent execution and adapter capability tests remain a separate follow-up; the Requirements rubric corpus and evidence checker alone do not prove agent behavior.
 
 ## Roadmap
 

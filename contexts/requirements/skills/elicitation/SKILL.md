@@ -22,14 +22,17 @@ stateDiagram-v2
     [*] --> AssessContext
     AssessContext --> Discover
     Discover --> Investigate
-    Investigate --> EvaluateUnderstanding
+    Investigate --> MapDecisionDependencies
+    MapDecisionDependencies --> ResolveFacts
+    ResolveFacts --> SelectQuestionFrontier
+    SelectQuestionFrontier --> EvaluateUnderstanding
 
     state EvaluateUnderstanding <<choice>>
     EvaluateUnderstanding --> Clarify: material ambiguity
     EvaluateUnderstanding --> Consolidate: evidence sufficient
     EvaluateUnderstanding --> Blocked: required evidence unavailable
 
-    Clarify --> Investigate: clarification received
+    Clarify --> MapDecisionDependencies: clarification received
     Consolidate --> ValidateUnderstanding
     ValidateUnderstanding --> Validation
 
@@ -60,7 +63,8 @@ Maintain only the concerns that are material to the context, including when rele
 * candidate solutions or learning options when solution uncertainty matters;
 * transition needs for migration, rollout, compatibility, cutover, training, or decommissioning;
 * risks, dependencies, assumptions, unknowns, options, conflicts, and provenance;
-* open questions and decisions required.
+* open questions and decisions required;
+* when material, a transient decision map: each decision's prerequisites, source/authority, current resolution, impact on the next handoff, and questions unblocked by its resolution.
 
 ## Workflow
 
@@ -69,6 +73,18 @@ Follow the State Model.
 * AssessContext applies `contexts/requirements/rules/tailoring.md`.
 * Discover through Consolidate apply Strategic Framing, Scope and Solution Boundary, Change Boundary and Scope Drift, and Business Knowledge and Rules in `contexts/requirements/rules/requirements.md`.
 * Do not restate those sections.
+* MapDecisionDependencies through SelectQuestionFrontier apply the protocol below; it is an elicitation procedure, not a second source of business rules.
+
+### Decision-frontier interview protocol
+
+1. **Expose material decisions.** Map only decisions that could change the current Need, Change Boundary, requirement meaning, critical guarantee, or intended next handoff. For each, distinguish verifiable facts, stakeholder-authority decisions, unresolved assumptions, and conditional branches; record prerequisite relationships only when material. Do not manufacture a full decision tree for trivial changes.
+2. **Resolve facts before questioning.** Inspect supplied evidence and accessible context to settle factual prerequisites, citing provenance. A missing authoritative business decision is not a fact the agent may infer. If a source cannot be inspected, retain that uncertainty rather than calling the fact settled.
+3. **Choose the decision frontier.** A question is eligible only when its prerequisite facts and decisions are settled. Two questions may share a round only if answering one cannot change whether, or how, the other should be asked. Prioritize pivots that reshape the next material decision; defer dependent, speculative, low-impact, or out-of-boundary questions.
+4. **Ask proportionally.** For each selected stakeholder question, state why the answer changes the next decision and present relevant options/trade-offs. Recommend an option only when supported by evidence, label it as a recommendation, and wait for authorized confirmation. Group independent questions when that reduces interaction cost; ask sequentially when answers are dependent or cognitively demanding.
+5. **Recompute after each answer or new source.** Update the dependency map, decisions, provenance and any affected Change Boundary proposal. Reopen a previously settled decision when contradictory evidence emerges. Do not silently decide a downstream question whose prerequisites changed.
+6. **Stop on sufficiency, not exhaustive interviewing.** Exit when the next material decision is safely supported at the selected rigor; retain explicit unresolved or deferred branches. A missing critical guarantee, conflicting authority, or material semantic ambiguity blocks only the affected path. Follow existing Stop Conditions rather than forcing all branches of the tree to be answered.
+
+The decision-tree/frontier technique draws on [Matt Pocock's grilling skill](https://github.com/mattpocock/skills/blob/main/skills/productivity/grilling/SKILL.md); the toolkit's tailoring, scope authority and stop criteria remain canonical.
 
 ## Output
 

@@ -184,6 +184,9 @@ A storage type such as `datetime` or `decimal` is not a complete data requiremen
 * Capture quality concerns as contextualized goals rather than vague adjectives.
 * Refine broad concerns when necessary to make trade-offs and verification meaningful.
 * When objective acceptance is required, use fit criteria that state the relevant context, operation or stimulus, conditions/workload, expected response, metric or observable property, threshold when justified, and rationale.
+* For material quality fit criteria requiring objective acceptance, identify the **verification approach** (inspection, analysis, demonstration, testing, or equivalent), the **evaluation conditions** needed for a meaningful result, and the **expected evidence** that supports an acceptance decision. Specify the observation boundary, measurement window, or sampling assumptions when they materially affect interpretation.
+* Keep the verification approach technology-neutral unless an authoritative constraint requires a specific tool, framework, or environment. Requirements define what credible verification must establish; Testing selects and executes the technical procedure.
+* If a necessary verification approach or evaluation condition is unsupported, preserve it as an explicit unknown and assess whether it blocks the intended downstream decision. Do not invent a method, measurement, threshold, or acceptance evidence merely to claim completeness.
 * Do not invent arbitrary thresholds or percentiles merely to make a requirement measurable.
 * Record relevant quality trade-offs and assumptions when one decision helps one goal while hurting another.
 * For material reliability concerns, make the expected failure model explicit enough to reason about timeouts, retries, partial failure, duplicates, crashes, dependency outages, lag, and concurrent updates.
@@ -201,6 +204,7 @@ For requirements whose correctness depends materially on **states, time, event o
 Use structured natural language or the project's established notation. **FRETish is optional**, not a mandated schema or a claim that a natural-language sentence has been translated to temporal logic. Unknown semantics remain explicit questions; avoid false precision and unsupported guarantees.
 
 Distinguish three evidence levels: **semantic inspection/examples**, **formalization against a defined model**, and **executed formal analysis**. Satisfiability is not realizability: a consistent trace does not prove that an implementation can meet all obligations against admissible environment behavior. Claim a formal result only with actual tool/model evidence, property and assumption scope, version when available, and outcome; otherwise report **not executed**, **inconclusive**, or **not applicable** as appropriate. Never claim model-checking or realizability from an LLM's reasoning alone.
+
 
 ## Security Requirements
 
@@ -321,6 +325,7 @@ Outcome Evidence
 ## Foundational Guidance
 
 Temporal structuring and the distinction between formalization and executed formal analysis draw on [NASA FRET](https://github.com/NASA-SW-VnV/fret) and its [FRETish requirements guide](https://github.com/NASA-SW-VnV/fret/blob/master/fret-electron/docs/_media/user-interface/writingReqs.md). This guidance does not make FRET a required dependency.
+
 
 These rules synthesize established requirements-engineering guidance on stakeholder needs, scope, evidence, requirement quality, scenarios, use cases, traceability, validation, and change management. Supported project evidence and authorized decisions remain authoritative for the semantics of a specific change.
 
