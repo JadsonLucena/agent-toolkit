@@ -17,6 +17,8 @@ class ToolkitLintTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         shutil.copytree(ROOT / "contexts", self.root / "contexts")
         shutil.copytree(ROOT / "contracts", self.root / "contracts")
+        if (ROOT / "evals").is_dir():
+            shutil.copytree(ROOT / "evals", self.root / "evals")
         if (ROOT / "adapters").is_dir():
             shutil.copytree(ROOT / "adapters", self.root / "adapters",
                             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
