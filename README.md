@@ -65,7 +65,7 @@ contexts/requirements/
 │   ├── validation/SKILL.md
 │   └── backlog-planning/SKILL.md
 ├── commands/
-│   ├── shape-change.md
+│   ├── specify-and-plan-change.md
 │   ├── elicit-requirements.md
 │   ├── specify-requirements.md
 │   ├── validate-requirements.md
@@ -87,7 +87,7 @@ Requirements also favors the smallest coherent **knowledge batch** that safely s
 
 Elicitation and specification share `contracts/requirements.md` so Need/Goal context, source evidence, decisions, assumptions, conflicts, applicable concerns, and traceability survive the transformation without coupling their workflows. Example Discovery can define stable Scenario Sets, refine rules/examples/boundaries before automation, and hand optional evidence to Testing through `contracts/test-basis.md`.
 
-`/requirements/shape-change` is an optional composite entry point that routes the existing elicitation, definition, read-only validation, and backlog-planning capabilities according to the evidence already available. It works toward the next material decision using the smallest coherent knowledge batch, preserves/reconciles the Change Boundary when present, and remains neutral to feature, defect, migration, regulatory, and other change types. It does not authorize design, implementation, testing, or Git mutation.
+`/requirements/specify-and-plan-change` is an optional composite entry point that routes the existing elicitation, definition, read-only validation, and backlog-planning capabilities according to the evidence already available. It works toward the next material decision using the smallest coherent knowledge batch, preserves/reconciles the Change Boundary when present, and remains neutral to feature, defect, migration, regulatory, and other change types. It does not authorize design, implementation, testing, or Git mutation.
 
 ### Testing
 
@@ -196,7 +196,7 @@ Executable runtime integration examples (not additional canonical owners):
 Commands express engineering intent rather than low-level tool aliases:
 
 ```text
-/requirements/shape-change
+/requirements/specify-and-plan-change
 /requirements/elicit-requirements
 /requirements/specify-requirements
 /requirements/validate-requirements
@@ -344,7 +344,7 @@ Stable or repeatedly used project information may be cached when the execution p
 
 The initial [Requirements evaluation corpus](evals/requirements/README.md)
 covers elicitation, definition, examples, validation, backlog, and composite
-`shape-change` behavior. The provider-neutral evidence checker at
+`specify-and-plan-change` behavior. The provider-neutral evidence checker at
 `scripts/requirements_evals.py` validates catalog structure and documented
 review observations against complete agent transcripts. It does not execute
 an AI agent or automatically judge its semantic correctness.
@@ -353,7 +353,7 @@ CI validates the corpus and the checker with stdlib-only regression tests.
 Actual agent behavior must still be exercised in a host and reviewed against
 the rubrics before claiming behavioral readiness.
 
-`/requirements/shape-change` already routes elicitation through planning.
+`/requirements/specify-and-plan-change` already routes elicitation through planning.
 It may yield supported granular backlog slices, but not speculative
 architecture-specific implementation tasks. Cross-context technical task
 generation belongs to a later SDD delivery workflow.
