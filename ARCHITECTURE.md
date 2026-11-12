@@ -18,7 +18,7 @@ contexts/
 │   │   ├── validation/SKILL.md
 │   │   └── backlog-planning/SKILL.md
 │   ├── commands/
-│   │   ├── shape-change.md
+│   │   ├── specify-and-plan-change.md
 │   │   ├── elicit-requirements.md
 │   │   ├── specify-requirements.md
 │   │   ├── validate-requirements.md
@@ -115,7 +115,7 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Requirements | `skills/example-discovery/SKILL.md` | Skill | Discover domain examples, counterexamples, boundaries, and questions before test automation |
 | Requirements | `skills/validation/SKILL.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
 | Requirements | `skills/backlog-planning/SKILL.md` | Skill | Build or refine traceable planning items while preserving source semantics |
-| Requirements | `commands/shape-change.md` | Command | Route the minimum necessary Requirements capabilities toward validated planning; specialist orchestration remains with agents |
+| Requirements | `commands/specify-and-plan-change.md` | Command | Route the minimum necessary Requirements capabilities toward validated planning; specialist orchestration remains with agents |
 | Requirements | `commands/elicit-requirements.md` | Command | Start requirements discovery |
 | Requirements | `commands/specify-requirements.md` | Command | Start formal requirement definition |
 | Requirements | `commands/validate-requirements.md` | Command | Start the separate requirement-quality gate |
@@ -364,7 +364,7 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 12. Semantic-version analysis has a public command because it has a clear user-facing intent and a non-mutating authorization boundary.
 13. Contracts exist because contexts exchange semantics. They remain neutral schemas rather than a new artifact category.
 14. A generic `shared/` directory is intentionally avoided.
-15. `/requirements/shape-change` is the optional composite Requirements entry point for feature, defect, migration, regulatory, operational, or other change contexts; it routes existing capabilities and does not create a second source of requirement semantics.
+15. `/requirements/specify-and-plan-change` is the optional composite Requirements entry point for feature, defect, migration, regulatory, operational, or other change contexts; it routes existing capabilities and does not create a second source of requirement semantics.
 16. Requirements may establish a Change Boundary distinct from Work Scope and Product Boundary, reconcile material scope drift explicitly, work in next-decision-oriented knowledge batches, preserve local representation conventions without confusing them with semantics, and keep lifecycle/completion states distinct.
 17. Pull-request work is owned by Git as a review/integration concern: durable PR policy lives in `rules/pull-request.md`, reusable plan/prepare/create procedure lives in `skills/manage-pull-request/SKILL.md`, and separate commands preserve different authorization levels. Implementation remains outside Git.
 
