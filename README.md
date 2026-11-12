@@ -225,6 +225,7 @@ Pull-request readiness, draft, and gate claims are decided in `contexts/git/rule
 
 ## Contracts
 
+* `contracts/outcome-evidence.md` — optional observation and PDCA feedback handoff, distinct from technical acceptance.
 * `contracts/design-evidence.md` — portable technical design decisions and implementation handoff.
 * `contracts/requirements.md` — elicitation and requirement-definition semantics, including optional Change Boundary, scope-change, lifecycle, and representation-convention context.
 * `contracts/work-item.md` — planning-item semantics.

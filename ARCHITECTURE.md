@@ -188,6 +188,7 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Git | `commands/resolve-conflicts.md` | Command | Begin read-only conflict diagnosis or explicitly authorized scoped application |
 | Git | `commands/create-pull-request.md` | Command | Create a remote PR with explicit creation-only authorization |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
+| Cross-context | `contracts/outcome-evidence.md` | Contract | Optional post-delivery outcome observations and feedback |
 | Cross-context | `contracts/design-evidence.md` | Contract | Portable technical design decisions and handoff to Implementation |
 | Cross-context | `contracts/review-evidence.md` | Contract | Portable independent code-review evidence and pre-PR eligibility semantics |
 | Cross-context | `contracts/review-specialist-evidence.md` | Contract | Self-contained specialist and verifier evidence |
