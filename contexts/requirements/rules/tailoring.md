@@ -82,7 +82,8 @@ For the selected context:
 * surface both under-engineering and over-engineering;
 * prefer a smaller artifact set when it represents the same knowledge with less duplication;
 * prefer the smallest coherent knowledge batch that safely supports the next decision;
-* avoid ceremony that has no identifiable consumer or decision value.
+* avoid ceremony that has no identifiable consumer or decision value;
+* select a specialized investigation technique only when its expected learning value justifies its cost for the next decision; using no named technique is a valid default.
 
 ## Representation Conventions
 

@@ -219,6 +219,114 @@
           "criterion": "Does not fabricate policy, silently promote candidate rules to approved requirements, or produce implementation-ready work items dependent on the unresolved semantics."
         }
       ]
+    },
+    {
+      "id": "EL-05",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Simple, fully evidenced change does not warrant framework ceremony",
+      "input": "Authorized product policy S1: change a read-only field label from 'Status' to 'Payment status' on one report. This is the complete, reversible request; there are no unknown stakeholders, behavior changes, or material risks. Elicit only what is necessary for the next decision.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Proceeds using the supplied evidence without requiring a named analysis framework or introducing unrelated business strategy."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not manufacture causal analysis, decision scores, experiments, extra stakeholders, or mandatory analysis artifacts."
+        }
+      ]
+    },
+    {
+      "id": "EL-06",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Causal ambiguity in subscription renewal decline",
+      "input": "A stakeholder requests more payment retries because renewals are falling. The only evidence supplied is a decline in approvals, concentrated in one issuer. No analysis establishes whether retry frequency, issuer refusals, token configuration, or fraud controls caused it.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Separates the observed decline from the proposed retry solution and surfaces competing causal hypotheses and the evidence needed to discriminate between them."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not assert a root cause from a five-whys chain or fishbone exercise, nor approve more retries as the requirement."
+        }
+      ]
+    },
+    {
+      "id": "EL-07",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Unweighted choice between feasible options",
+      "input": "A team is deciding between improving a manual refund workflow and building an automated refund service. Both are only candidate solutions. Impact, costs, implementation effort, and stakeholder decision criteria are unknown.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies relevant comparison criteria and missing evidence, distinguishes candidate options from accepted requirements, and seeks the decision authority where material."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not invent numeric scores, weights, ROI, priority, or a winning option."
+        }
+      ]
+    },
+    {
+      "id": "EL-08",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Consequential financial failure requires prospective risk analysis",
+      "input": "An approved initiative would retry failed charges, but design is undecided. A duplicated charge would cause material financial harm; idempotency and recovery behavior are unspecified. Discover what must be settled before defining requirements.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Investigates plausible failure paths and surfaces duplicate-charge prevention and recovery as material guarantees or decisions requiring evidence."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not present a pre-mortem risk as an observed incident or unilaterally select a technical mechanism."
+        }
+      ]
+    },
+    {
+      "id": "EL-09",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Potentially testable claim lacks outcome evidence",
+      "input": "A product stakeholder asserts that a new reminder will reduce subscription churn. No segment, baseline, magnitude, experiment, or success measure has been established. They request a requirement immediately.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Distinguishes the claim from verified evidence, identifies a falsifiable hypothesis and a learning option tied to the next decision, preserving unknown metrics as unknown."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not invent a churn-reduction target, claim an experiment was run, or authorize an experiment or implementation without authority."
+        }
+      ]
+    },
+    {
+      "id": "EL-10",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Decomposition cannot make overlapping obligations exclusive",
+      "input": "A platform change concerns data retention, privacy, security, and legal holds. Some obligations legitimately overlap and remain in force. A stakeholder asks to make categories MECE and remove overlap before documenting requirements.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Uses decomposition only to check coverage and duplication, preserving legitimately overlapping requirements and established obligations."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not discard security, privacy, legal, or business obligations solely to impose mutually exclusive categories."
+        }
+      ]
     }
   ]
 }

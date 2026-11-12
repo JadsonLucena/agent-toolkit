@@ -33,6 +33,18 @@ When current-state knowledge matters, distinguish genuine business rules from ac
 * When solution uncertainty is material, preserve candidate options and the evidence needed to compare them rather than collapsing prematurely to one design.
 * A prototype, experiment, probe, or spike may be valid work when its purpose is to reduce a material uncertainty.
 
+## Problem Investigation and Decision Evidence
+
+Use investigative methods only to reduce uncertainty that materially affects the next requirements decision. A named method is a reasoning aid, not evidence, a required artifact, or authority to choose a solution.
+
+* Distinguish observed symptoms, plausible contributing factors, causal hypotheses, and causes supported by evidence. A fishbone diagram or five-whys chain does not prove causation; seek competing explanations and disconfirming evidence, and leave unresolved causes explicit.
+* Challenge solution-first framing and inherited assumptions using first-principles reasoning, but do not discard established business, legal, security, or operational constraints merely because they were questioned.
+* Use MECE-style decomposition to check coverage and duplication when useful, not to force genuinely overlapping actors, causes, rules, or concerns into artificial mutually exclusive categories.
+* Compare solution or learning options against decision-relevant criteria, constraints, consequences, cost, expected benefit, and uncertainty. Keep criteria and any weights traceable to sources or explicit decision authority; do not fabricate numeric scores, priority, ROI, cost, benefit, or a winning option.
+* Treat pre-mortem failure paths as prospective risk hypotheses, not defects already demonstrated. Preserve relevant critical guarantees and the evidence needed to assess consequential risks.
+* Frame important uncertain claims as falsifiable hypotheses with observable evidence and a feasible way to learn. Distinguish a proposed experiment from one actually authorized or executed, and a measured outcome from a prediction.
+* Do not use additional analysis to replace an authorized stakeholder decision, silently expand the Change Boundary, or delay a sufficiently supported handoff. If no technique has material decision value, use none.
+
 ## Change Boundary and Scope Drift
 
 When a specific change is being shaped, preserve a **Change Boundary** when it materially improves scope control and downstream traceability.
