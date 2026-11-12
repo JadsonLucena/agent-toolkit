@@ -61,7 +61,8 @@ flowchart TD
     Context --> Tailor["Validate tailoring: tailoring.md"]
     Tailor --> Frame["Strategic Framing and Change Boundary: requirements.md"]
     Frame --> Semantics["Requirement Quality and applicable semantics: requirements.md"]
-    Semantics --> UseCases["Functional Behavior, Use Cases, and Scenarios when Use Cases exist"]
+    Semantics --> Temporal["Temporal Behavior and Formal Assurance when applicable"]
+    Temporal --> UseCases["Functional Behavior, Use Cases, and Scenarios when Use Cases exist"]
     UseCases --> Consistency["Requirements Architecture and Traceability"]
     Consistency --> Uncertainty["Ambiguity, Assumptions, Unknowns, and Options"]
     Uncertainty --> Classify["Classify findings; do not mutate the specification"]
@@ -80,6 +81,7 @@ Produce a concise validation report containing:
 * findings with type, severity, affected identifiers, evidence, impact, and remediation;
 * cross-artifact contradictions, drift, duplication, orphan relationships, and material Change Boundary mismatches when present;
 * missing **knowledge**, not merely missing documents;
+* for material temporal properties: ambiguous event/clock/boundary semantics, model assumptions, and whether any formal finding is supported by executed tool evidence rather than prose alone;
 * premature solution decisions and implicit assumptions when present;
 * evidence-backed revision recommendations;
 * unresolved questions/decisions and evidence needed to resolve them;
@@ -87,7 +89,7 @@ Produce a concise validation report containing:
 
 ## Boundary
 
-Validation is read-only unless a separate command or explicit authorization permits modifying the specification or another artifact. This skill may describe an evidence-backed revision but must not apply it silently.
+Validation is read-only unless a separate command or explicit authorization permits modifying the specification or another artifact. A model-checker or FRET adapter is not a prerequisite: when absent, report formal analysis as not executed rather than calling a semantic review a proof. This skill may describe an evidence-backed revision but must not apply it silently.
 
 ## Stop Conditions
 
