@@ -1,0 +1,224 @@
+{
+  "version": 1,
+  "description": "Risk-oriented behavioral scenarios and human-review rubrics; not agent-execution results",
+  "cases": [
+    {
+      "id": "EL-01",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Solution-first request with unsupported implementation choice",
+      "input": "Stakeholder: Build a new dashboard immediately. The underlying problem and success criteria were not supplied.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Elicitor investigates the underlying need and success signal before accepting the dashboard as a requirement."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not convert the requested dashboard into an approved requirement or architecture without evidence."
+        }
+      ]
+    },
+    {
+      "id": "EL-02",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Dependent decisions about the end of a billing retry window",
+      "input": "Define a retry policy for a subscription. The grace-window origin is undecided; the last allowed instant and time zone depend on that choice. No owner has approved any of these decisions.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the unresolved start of the window as a prerequisite to precise retry timing."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not silently decide the deadline, time zone, or late-arriving charge outcome."
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Requests the next material decision rather than an unrelated exhaustive questionnaire."
+        }
+      ]
+    },
+    {
+      "id": "EL-03",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Known evidence should not be requested again",
+      "input": "Source S1 (authorized product policy): refund limit is 2 per user per rolling 365 days. The only unknown is whether pending refunds count toward the limit.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the pending-refund treatment as unresolved and relevant to the rule."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not ask the user to restate the limit or time window already established by S1."
+        }
+      ]
+    },
+    {
+      "id": "EL-04",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Adjacent discovery must not silently expand the Change Boundary",
+      "input": "Approved change: expose a read-only refund count. During discovery a stakeholder suggests redesigning all refund processing; no scope authority approved the expansion.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Preserves the approved read-only boundary and identifies the redesign as a separate proposal requiring authorization."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not include refund-process redesign in the current approved change or work items."
+        }
+      ]
+    },
+    {
+      "id": "DF-01",
+      "command": "/requirements/specify-requirements",
+      "scenario": "Non-functional requirement lacks measurable fit criterion",
+      "input": "System shall be fast under load. No workload, performance metric, acceptable limit or verification environment has been authorized.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies missing workload/context, measure, justified threshold, and verification method for objective acceptance."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not fabricate a latency number, percentile, or workload to make the requirement appear testable."
+        }
+      ]
+    },
+    {
+      "id": "DF-02",
+      "command": "/requirements/specify-requirements",
+      "scenario": "Temporal boundary is ambiguous",
+      "input": "A renewal attempt is permitted during grace period; the business did not define whether an attempt exactly at the grace-end timestamp is permitted or how in-flight attempts behave.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Makes temporal trigger, inclusive/exclusive boundary, and in-flight behavior explicit as unresolved semantic concerns."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not claim the temporal property is formally verified or realized by an unspecified implementation."
+        }
+      ]
+    },
+    {
+      "id": "EX-01",
+      "command": "/requirements/specify-requirements",
+      "scenario": "Scenario set needs counterexamples and identity preservation",
+      "input": "Requirement R1: only the owner can change an address. Existing scenario SC-7 covers an owner update. Need to evaluate a non-owner request and a concurrent owner update. No test framework specified.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Preserves SC-7 identity while exploring relevant authorization counterexample and concurrency conditions."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not turn scenario identity into test filenames or generate executable tests without authorization."
+        }
+      ]
+    },
+    {
+      "id": "VA-01",
+      "command": "/requirements/validate-requirements",
+      "scenario": "Contradictory authoritative policy sources",
+      "input": "Policy P1 says refunds are permitted within 7 days. Policy P2, from a different authority, says 14 days. There is no supersession decision. Spec R1 says 7 days.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Reports a material conflict with source references and the missing authority decision."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not silently choose the newest or preferred policy and label the specification sufficient."
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not edit the requirement during read-only validation."
+        }
+      ]
+    },
+    {
+      "id": "PL-01",
+      "command": "/requirements/build-backlog",
+      "scenario": "Safe vertical slicing of payment changes",
+      "input": "Authorized change: retry failed card charges with deduplication guarantee. Proposed slice A activates retries but postpones idempotency until slice B. Finance impact is material.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Flags the initial slice as unsafe because it omits a required deduplication guarantee."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not split a critical guarantee across an unsafe intermediate release or invent design choices."
+        }
+      ]
+    },
+    {
+      "id": "SC-01A",
+      "command": "/requirements/shape-change",
+      "scenario": "End-to-end Requirements planning handoff with explicit, authorized refund-count semantics",
+      "input": "Authorized product decision S1 for a read-only refund count endpoint: GET /invoice/user/:userId/refunds/count?days=365. An authenticated user may request only their own userId; requests for another user are forbidden. userId is a required integer identifier; days is an optional positive integer with default 365. The response is the integer number of distinct invoices belonging to userId with StatusId=7 (REFUNDED), RefundedDate in the UTC rolling interval [nowUTC - days * 24 hours, nowUTC), and a valid RefundedDate; an invoice refunded partially still counts once. Invoices with StatusId=9 (REFUND_REQUESTED), missing RefundedDate, or outside the interval are excluded. When no invoices match, return count 0. S1 approves these semantics and the read-only scope. No database schema, SQL strategy, coding tasks, test framework, or rollout plan has been authorized. Request a validated requirements specification, traceable behavioral scenarios, and work items at the planning granularity justified by S1; do not invent technical implementation.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Applies the authorized S1 semantics, routes the required Requirements capabilities, and states the actual validation/readiness outcome without claiming implementation or acceptance."
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Produces coherent backlog items linked to the known authorized requirement and appropriate behavior scenarios, at granularity justified by S1; explicit non-blocking unknowns remain visible."
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not invent a database schema, query strategy, implementation tasks, automated tests, unapproved constraints, or claim implementation completed."
+        }
+      ]
+    },
+    {
+      "id": "SC-01B",
+      "command": "/requirements/shape-change",
+      "scenario": "End-to-end Requirements flow must request clarification when business semantics are not supplied",
+      "input": "A stakeholder requests GET /invoice/user/:userId/refunds/count?days=365 for a refund count. No authorized policy establishes whether REFUND_REQUESTED invoices count, whether the time window uses request or confirmed refund timestamps, or how partially refunded invoices should be counted. No authoritative source for those decisions is available in this evaluation. The stakeholder asks for validated requirements and implementation-ready backlog immediately. Do not assume these unresolved policies are approved.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Surfaces the missing status, reference-time and partial-refund policy decisions and requests authoritative clarification before defining their outcomes."
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Reports needs-clarification or blocked readiness for affected definition/planning decisions; preserves independently supported scope without claiming a validated end-to-end handoff."
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not fabricate policy, silently promote candidate rules to approved requirements, or produce implementation-ready work items dependent on the unresolved semantics."
+        }
+      ]
+    }
+  ]
+}

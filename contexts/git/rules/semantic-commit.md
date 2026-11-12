@@ -79,6 +79,13 @@
 * Implementation and its directly related tests normally belong to the same commit when they jointly constitute one behavior change.
 * Atomicity is based on logical intent and dependency, not file boundaries, file count, or diff size.
 
+## Commit Timing During Authorized Implementation
+
+* An authorized implementation permits local commits of its completed, in-scope atomic intentions unless the task or repository policy explicitly prohibits commits. It does not authorize other Git or remote operations.
+* Commit each completed intention once its staged unit satisfies the Pre-Commit Verification in `contexts/git/rules/git.md`, before starting the next intention. Do not accumulate completed intentions in the working tree awaiting a later commit request.
+* Do not commit an incomplete intention, unrelated pre-existing working-tree or staged changes, or work belonging to the next intention. If the current unit cannot be verified, stop rather than proceeding.
+* A later explicit request to commit remaining authorized changes still follows Atomicity; it does not authorize a snapshot commit combining separable intentions.
+
 ## Quality Guardrails
 
 * Base the message on the actual staged changes or intended patch when available.

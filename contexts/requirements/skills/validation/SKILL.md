@@ -61,7 +61,8 @@ flowchart TD
     Context --> Tailor["Validate tailoring: tailoring.md"]
     Tailor --> Frame["Strategic Framing and Change Boundary: requirements.md"]
     Frame --> Semantics["Requirement Quality and applicable semantics: requirements.md"]
-    Semantics --> UseCases["Functional Behavior, Use Cases, and Scenarios when Use Cases exist"]
+    Semantics --> Temporal["Temporal Behavior and Formal Assurance when applicable"]
+    Temporal --> UseCases["Functional Behavior, Use Cases, and Scenarios when Use Cases exist"]
     UseCases --> Consistency["Requirements Architecture and Traceability"]
     Consistency --> Reconcile["Requirement Change and Impact when prior semantics exist"]
     Reconcile --> Uncertainty["Ambiguity, Assumptions, Unknowns, and Options"]
@@ -70,6 +71,8 @@ flowchart TD
 ```
 
 The diagram is the procedure. Apply the named section of `contexts/requirements/rules/requirements.md` or `contexts/requirements/rules/tailoring.md`. Do not restate it.
+
+For the `Quality Requirements` pass, check whether each **material** fit criterion has a supported verification approach, necessary evaluation conditions, and expected acceptance evidence as defined by the canonical rule. Where their absence affects `readiness_for`, report a `gap` or `needs-clarification` with its consequence; do not invent the missing method, demand an arbitrary testing tool, or block unrelated decisions.
 
 ## Output
 
@@ -82,6 +85,7 @@ Produce a concise validation report containing:
 * cross-artifact contradictions, drift, duplication, orphan relationships, and material Change Boundary mismatches when present;
 * for known semantic changes, baseline comparison, authorization state, confirmed/possible/unaffected/uninspectable dependent references, and the specific owner or evidence needed for reconciliation;
 * missing **knowledge**, not merely missing documents;
+* for material temporal properties: ambiguous event/clock/boundary semantics, model assumptions, and whether any formal finding is supported by executed tool evidence rather than prose alone;
 * premature solution decisions and implicit assumptions when present;
 * evidence-backed revision recommendations;
 * unresolved questions/decisions and evidence needed to resolve them;
@@ -89,7 +93,7 @@ Produce a concise validation report containing:
 
 ## Boundary
 
-Validation is read-only unless a separate command or explicit authorization permits modifying the specification or another artifact. Reconcile only from observed old/new semantics and known links; lack of an authoritative baseline or access to downstream consumers cannot be reported as a successful impact audit. This skill may describe an evidence-backed revision but must not apply it silently.
+Validation is read-only unless a separate command or explicit authorization permits modifying the specification or another artifact. Reconcile only from observed old/new semantics and known links; lack of an authoritative baseline or access to downstream consumers cannot be reported as a successful impact audit. A model-checker or FRET adapter is not a prerequisite: when absent, report formal analysis as not executed rather than calling a semantic review a proof. This skill may describe an evidence-backed revision but must not apply it silently.
 
 ## Stop Conditions
 

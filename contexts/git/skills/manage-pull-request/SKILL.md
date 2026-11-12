@@ -30,6 +30,7 @@ This skill supports three modes:
 Maintain, when relevant:
 
 * mode: `plan`, `prepare`, or `create`;
+* PR strategy for a multi-outcome request: the authorized increment, candidate single/independent/stacked boundaries, actual dependencies, and whether the assessment preceded implementation;
 * repository and hosting-provider conventions;
 * intended head and base;
 * branch publication state and freshness when material;
@@ -58,7 +59,9 @@ Maintain, when relevant:
 ```mermaid
 flowchart TD
     START --> Inspect
-    Inspect --> SelectMode
+    Inspect --> AssessStrategy["Pre-Implementation PR Strategy in pull-request.md"]
+    AssessStrategy -->|composite, not yet planned, before implementation| DiscoverChange
+    AssessStrategy -->|single coherent, plan already assessed, or implementation exists| SelectMode
 
     SelectMode -->|plan| DiscoverChange
     DiscoverChange --> BuildBoundaries["PR Boundary, Decomposition and Reviewability, Size and Complexity in pull-request.md"]
@@ -82,16 +85,18 @@ flowchart TD
     Fallback --> Describe
     Describe --> Gate["Pre-Creation Quality Gate in pull-request.md"]
 
-    Gate -->|ready| PreparedReady
-    Gate -->|reviewable but incomplete| PreparedDraft
-    Gate -->|unsafe or unsupported| Blocked
+    Gate -->|prepare: ready| PreparedReady
+    Gate -->|prepare: reviewable but incomplete| PreparedDraft
+    Gate -->|create: ready or explicitly authorized draft| CreationGate
+    Gate -->|blocked| Blocked
 
     SelectMode -->|create| LoadPreparedState
     LoadPreparedState --> VerifyRemoteContext
     VerifyRemoteContext --> ExistingPR
 
     ExistingPR -->|equivalent PR exists| ReportExisting
-    ExistingPR -->|none| CreationGate["Remote Creation Safety in pull-request.md"]
+    ExistingPR -->|none| Gate
+    CreationGate["Remote Creation Safety in pull-request.md"]
 
     CreationGate -->|blocked| Blocked
     CreationGate -->|authorized and publishable| CreateRemotePR
@@ -105,7 +110,7 @@ flowchart TD
     Blocked --> Done
 ```
 
-The diagram is the procedure. Apply the rule section named on each decision node. Do not restate it.
+The diagram is the procedure. Apply the rule section named on each decision node. Do not restate it. For existing diffs, assess decomposition in `prepare` without claiming that pre-implementation planning occurred. A scoped request for one increment does not authorize implementing the entire roadmap.
 
 ## Decomposition Signals
 
