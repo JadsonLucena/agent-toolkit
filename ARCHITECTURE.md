@@ -28,6 +28,11 @@ contexts/
 │       ├── requirements-elicitor.md
 │       ├── requirements-specifier.md
 │       └── backlog-planner.md
+├── design/
+│   ├── rules/design.md
+│   ├── skills/design-solution/SKILL.md
+│   ├── commands/design-solution.md
+│   └── agents/design-engineer.md
 ├── testing/
 │   ├── rules/testing.md
 │   ├── skills/generate-tests/SKILL.md
@@ -124,6 +129,10 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Requirements | `agents/requirements-elicitor.md` | Agent | Own discovery scope, provenance, clarification, and elicitation handoff |
 | Requirements | `agents/requirements-specifier.md` | Agent | Own formal requirement semantics, evidence discipline, and validation routing |
 | Requirements | `agents/backlog-planner.md` | Agent | Own backlog decomposition, traceability, dependencies, tracker alignment, and readiness boundaries |
+| Design | `rules/design.md` | Rule | Technical decision, risk, traceability, compatibility and reversible slice invariants |
+| Design | `skills/design-solution/SKILL.md` | Skill | Evidence-backed design of the next bounded implementation slice |
+| Design | `commands/design-solution.md` | Command | Start scoped technical design without implementation authority |
+| Design | `agents/design-engineer.md` | Agent | Own technical design decisions and handoff integrity |
 | Testing | `rules/testing.md` | Rule | Automated-testing standards and quality invariants |
 | Testing | `skills/generate-tests/SKILL.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
 | Testing | `commands/generate-tests.md` | Command | Start automated-test creation or modification |
@@ -159,6 +168,7 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Git | `commands/resolve-conflicts.md` | Command | Begin read-only conflict diagnosis or explicitly authorized scoped application |
 | Git | `commands/create-pull-request.md` | Command | Create a remote PR with explicit creation-only authorization |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
+| Cross-context | `contracts/design-evidence.md` | Contract | Portable technical design decisions and handoff to Implementation |
 | Cross-context | `contracts/review-evidence.md` | Contract | Portable independent code-review evidence and pre-PR eligibility semantics |
 | Cross-context | `contracts/review-specialist-evidence.md` | Contract | Self-contained specialist and verifier evidence |
 | Cross-context | `contracts/requirements.md` | Contract | Neutral elicitation and requirement-definition handoff semantics |
@@ -309,7 +319,7 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 
 ## Naming
 
-* Context names are stable engineering nouns: `requirements`, `testing`, `review`, `git`.
+* Context names are stable engineering nouns: `requirements`, `design`, `testing`, `review`, `git`.
 * Rule filenames name the governed concern.
 * Skill directories name the reusable capability.
 * Command names use a clear verb-object engineering intent and should remain understandable when surfaced outside their physical context. The context namespace may remove redundancy only when the remaining name stays unambiguous.

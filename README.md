@@ -14,6 +14,11 @@ agent-toolkit/
 │   │   ├── skills/
 │   │   ├── commands/
 │   │   └── agents/
+│   ├── design/
+│   │   ├── rules/
+│   │   ├── skills/
+│   │   ├── commands/
+│   │   └── agents/
 │   ├── testing/
 │   │   ├── rules/
 │   │   ├── skills/
@@ -88,6 +93,18 @@ Requirements also favors the smallest coherent **knowledge batch** that safely s
 Elicitation and specification share `contracts/requirements.md` so Need/Goal context, source evidence, decisions, assumptions, conflicts, applicable concerns, and traceability survive the transformation without coupling their workflows. Example Discovery can define stable Scenario Sets, refine rules/examples/boundaries before automation, and hand optional evidence to Testing through `contracts/test-basis.md`.
 
 `/requirements/shape-change` is an optional composite entry point that routes the existing elicitation, definition, read-only validation, and backlog-planning capabilities according to the evidence already available. It works toward the next material decision using the smallest coherent knowledge batch, preserves/reconciles the Change Boundary when present, and remains neutral to feature, defect, migration, regulatory, and other change types. It does not authorize design, implementation, testing, or Git mutation.
+
+### Design
+
+```text
+contexts/design/
+├── rules/design.md
+├── skills/design-solution/SKILL.md
+├── commands/design-solution.md
+└── agents/design-engineer.md
+```
+
+Design turns supported requirements or a bounded technical change into decisions and interfaces sufficient for the next slice. It uses `contracts/design-evidence.md` for optional downstream handoff, without authorizing code changes or rewriting business semantics.
 
 ### Testing
 
@@ -173,6 +190,7 @@ Pull-request readiness, draft, and gate claims are decided in `contexts/git/rule
 
 ## Contracts
 
+* `contracts/design-evidence.md` — portable technical design decisions and implementation handoff.
 * `contracts/requirements.md` — elicitation and requirement-definition semantics, including optional Change Boundary, scope-change, lifecycle, and representation-convention context.
 * `contracts/work-item.md` — planning-item semantics.
 * `contracts/test-basis.md` — optional portable Scenario Set and behavioral evidence for Testing.
@@ -202,6 +220,8 @@ Commands express engineering intent rather than low-level tool aliases:
 /requirements/validate-requirements
 /requirements/build-backlog
 /requirements/refine-backlog
+
+/design/design-solution
 
 /testing/generate-tests
 
