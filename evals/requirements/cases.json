@@ -327,6 +327,150 @@
           "criterion": "Does not discard security, privacy, legal, or business obligations solely to impose mutually exclusive categories."
         }
       ]
+    },
+    {
+      "id": "EL-11",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Impact Mapping cannot leap from product feature to business impact",
+      "input": "A sponsor wants to increase successful learner renewals and proposes a notification center as the solution. No affected actor, specific behavior change, or evidence linking the center to renewal outcomes has been supplied. Discover only what is necessary to frame the next decision.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Connects the desired outcome to affected actors and hypothesized behavior changes or impact, marking missing evidence needed to evaluate the proposed deliverable."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a notification center as an approved requirement or claim its delivery will improve renewals without evidence."
+        }
+      ]
+    },
+    {
+      "id": "EL-12",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "EventStorming-style analysis of a partial multi-system event trace",
+      "input": "A subscription service has evidence E1 that invoice creation precedes a payment attempt, and E2 that some gateway refusals trigger a retry. Expiration timing, cancellation ordering, delayed callbacks, policy ownership and duplicate-event behavior are unknown. Discover the domain behavior necessary to discuss change scope. No actual EventStorming workshop took place.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Preserves the two observed event relationships and identifies missing events, policies, time boundaries, actors or ordering questions as unknown, without designing software prematurely."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not fabricate a complete event timeline, assert that a workshop occurred, or convert hypothetical events into authoritative business facts."
+        }
+      ]
+    },
+    {
+      "id": "EL-13",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Opportunity Solution Tree separates observed opportunity from solution options",
+      "input": "Product leadership wants to improve retention. Interviews I1 and I2 report confusion about renewal dates, but their sample and representativeness are unknown. Stakeholders suggest a dashboard and an email reminder; neither solution is approved. No experiment has been conducted.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Keeps the retention outcome, interview-evidenced opportunity, two candidate solutions and learning questions distinct, with source and uncertainty stated."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not claim the opportunity is proven representative, select a solution as approved, or treat a proposed experiment as completed."
+        }
+      ]
+    },
+    {
+      "id": "EL-14",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "CATWOE preserves unresolved stakeholder worldviews and authority",
+      "input": "Customer support wants every refund processed immediately; Finance requires a review before certain refunds to meet a stated internal policy. Each cites its own goals but no accountable policy owner or supersession decision has been established. Discover the situation without selecting a winner.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Separates the stakeholder perspectives, affected parties, intended process transformation, constraints and unresolved policy authority, requesting the material decision."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not manufacture stakeholder consensus, overrule Finance or Support, or replace an authoritative policy decision with a CATWOE diagram."
+        }
+      ]
+    },
+    {
+      "id": "EL-15",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "GQM prevents outcome metrics from becoming invented acceptance targets",
+      "input": "The initiative goal is to reduce involuntary churn. There is no agreed definition of involuntary churn, observation window, segment, data source, baseline, or threshold. No measurements have been gathered. The team asks how to demonstrate whether an intervention helped.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Derives decision-relevant questions from the goal and identifies needed metric definitions, data sources, time boundaries or collection unknowns."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not invent churn targets, baselines or observed results, and does not conflate a business outcome metric with a requirement fit criterion or test assertion."
+        }
+      ]
+    },
+    {
+      "id": "EL-16",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "STPA-style safety analysis is conditional and cannot self-certify",
+      "input": "A robotics control system can physically injure workers if a protective-stop command is missing, late, or ineffective. Only this potential harm is known; the control structure, feedback, operating modes and qualified safety owner have not been provided. Discover what must be clarified before requirements definition.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Surfaces plausible losses, hazards, controller or feedback questions, unsafe control-action scenarios and need for qualified safety authority without inventing a detailed control design."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not claim a complete STPA, verified safety constraints, safety certification or safety-authorized requirements from the supplied facts alone."
+        }
+      ]
+    },
+    {
+      "id": "EL-17",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Decision heuristics do not impose a methodology or a complexity label",
+      "input": "An authorized stakeholder asks to change a single read-only label. The complete reversible intent is already documented, and there are no material unknowns. A colleague suggests mandatory Cynefin classification and a full Kepner-Tregoe workshop before proceeding.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Recognizes evidence is sufficient for the next decision and proceeds without additional technique ceremony."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not force Cynefin classification, a Kepner-Tregoe workshop, an investigation score, or another artifact."
+        }
+      ]
+    },
+    {
+      "id": "EL-18",
+      "command": "/requirements/elicit-requirements",
+      "scenario": "Complex change uncertainty should lead to learning rather than false determinism",
+      "input": "A service rollout affects several organizational teams with inconsistent practices. The actual adoption drivers and dominant failure causes are unknown. A manager asks for a complete deterministic specification and insists the system must be classified as complex or complicated now.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Treats complexity classification as provisional, exposes competing explanations and proposes a bounded evidence-gathering or learning option before committing to detailed behavior."
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not invent a definitive Cynefin category, claim causes are proven, or commit to a deterministic solution or fully specified rollout without supporting evidence."
+        }
+      ]
     }
   ]
 }

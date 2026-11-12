@@ -43,6 +43,13 @@ Use investigative methods only to reduce uncertainty that materially affects the
 * Compare solution or learning options against decision-relevant criteria, constraints, consequences, cost, expected benefit, and uncertainty. Keep criteria and any weights traceable to sources or explicit decision authority; do not fabricate numeric scores, priority, ROI, cost, benefit, or a winning option.
 * Treat pre-mortem failure paths as prospective risk hypotheses, not defects already demonstrated. Preserve relevant critical guarantees and the evidence needed to assess consequential risks.
 * Frame important uncertain claims as falsifiable hypotheses with observable evidence and a feasible way to learn. Distinguish a proposed experiment from one actually authorized or executed, and a measured outcome from a prediction.
+* For a material business outcome, distinguish the goal, affected actors, hypothesized behavior changes or impacts, and candidate deliverables. An Impact Mapping link expresses a proposed contribution, not proof that shipping a deliverable will cause the outcome.
+* Treat opportunities as evidence-backed needs, pain points, or desires rather than renamed features. In an Opportunity Solution Tree, keep outcome, opportunities, candidate solutions, and assumption tests conceptually distinct; an untested branch is not an approved requirement or a demonstrated result.
+* When reconstructing domain behavior, separate observed business events, triggers, actors, policies, exceptions, and timing from hypothesized or missing links. An EventStorming-style map is a working model, not an authoritative event log or evidence of a workshop that never occurred.
+* When stakeholder definitions of success conflict, preserve each perspective, affected parties, desired transformation, relevant worldview, decision owner, and external constraints when material. CATWOE/Soft Systems framing cannot manufacture consensus or replace authorized rule ownership.
+* Connect success questions to goals and measurable evidence using Goal Question Metric (GQM) reasoning where useful. Specify what question a metric answers, relevant population, observation window, unit, source, interpretation and collection feasibility when known; do not invent baselines, targets, measurement results or confuse outcome metrics with fit criteria or test assertions.
+* In genuinely safety-critical contexts, surface potential losses, hazards, control boundaries, unsafe or missing control actions and required constraints as questions for qualified safety authorities. STPA-inspired elicitation is not a completed STPA analysis, verified safety case, formal proof or authorization to change safety policy.
+* Treat Cynefin situation categories and Kepner-Tregoe analysis modes as fallible ways to choose an investigative approach, not objective diagnoses. Reassess the approach as evidence changes; neither classification overrides stakeholder authority, applicable standards or the next-decision sufficiency rule.
 * Do not use additional analysis to replace an authorized stakeholder decision, silently expand the Change Boundary, or delay a sufficiently supported handoff. If no technique has material decision value, use none.
 
 ## Change Boundary and Scope Drift
@@ -341,6 +348,8 @@ Outcome Evidence
 
 
 ## Foundational Guidance
+
+The optional discovery guidance is informed by Gojko Adzic's *Impact Mapping*, Alberto Brandolini's *Introducing EventStorming*, Teresa Torres's *Continuous Discovery Habits*, Peter Checkland's Soft Systems Methodology and CATWOE, Victor Basili's Goal Question Metric approach, and Nancy Leveson and John Thomas's [STPA Handbook](https://www.mit.stamp-institute.com/handbooks). Cynefin and Kepner-Tregoe inform diagnosis of the investigative mode, not mandatory classifications. None of these techniques is a required runtime, artifact or authority for a stakeholder decision.
 
 Temporal structuring and the distinction between formalization and executed formal analysis draw on [NASA FRET](https://github.com/NASA-SW-VnV/fret) and its [FRETish requirements guide](https://github.com/NASA-SW-VnV/fret/blob/master/fret-electron/docs/_media/user-interface/writingReqs.md). This guidance does not make FRET a required dependency.
 
