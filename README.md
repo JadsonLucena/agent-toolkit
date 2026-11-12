@@ -19,6 +19,11 @@ agent-toolkit/
 │   │   ├── skills/
 │   │   ├── commands/
 │   │   └── agents/
+│   ├── implementation/
+│   │   ├── rules/
+│   │   ├── skills/
+│   │   ├── commands/
+│   │   └── agents/
 │   ├── testing/
 │   │   ├── rules/
 │   │   ├── skills/
@@ -105,6 +110,18 @@ contexts/design/
 ```
 
 Design turns supported requirements or a bounded technical change into decisions and interfaces sufficient for the next slice. It uses `contracts/design-evidence.md` for optional downstream handoff, without authorizing code changes or rewriting business semantics.
+
+### Implementation
+
+```text
+contexts/implementation/
+├── rules/implementation.md
+├── skills/implement-slice/SKILL.md
+├── commands/implement-slice.md
+└── agents/implementation-engineer.md
+```
+
+Implementation changes production and related test code only for an authorized bounded slice, reuses Testing quality standards and Git's atomic commit capability, and records observed verification without treating local checks as independent Review.
 
 ### Testing
 
@@ -222,6 +239,8 @@ Commands express engineering intent rather than low-level tool aliases:
 /requirements/refine-backlog
 
 /design/design-solution
+
+/implementation/implement-slice
 
 /testing/generate-tests
 

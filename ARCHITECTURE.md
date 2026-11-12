@@ -33,6 +33,11 @@ contexts/
 │   ├── skills/design-solution/SKILL.md
 │   ├── commands/design-solution.md
 │   └── agents/design-engineer.md
+├── implementation/
+│   ├── rules/implementation.md
+│   ├── skills/implement-slice/SKILL.md
+│   ├── commands/implement-slice.md
+│   └── agents/implementation-engineer.md
 ├── testing/
 │   ├── rules/testing.md
 │   ├── skills/generate-tests/SKILL.md
@@ -133,6 +138,10 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Design | `skills/design-solution/SKILL.md` | Skill | Evidence-backed design of the next bounded implementation slice |
 | Design | `commands/design-solution.md` | Command | Start scoped technical design without implementation authority |
 | Design | `agents/design-engineer.md` | Agent | Own technical design decisions and handoff integrity |
+| Implementation | `rules/implementation.md` | Rule | Authorized slice, verification, reversibility, atomic delivery and recovery invariants |
+| Implementation | `skills/implement-slice/SKILL.md` | Skill | Implement and locally verify one bounded increment |
+| Implementation | `commands/implement-slice.md` | Command | Authorize scoped production/test edits and local implementation |
+| Implementation | `agents/implementation-engineer.md` | Agent | Own implementation evidence, scope and safe handoffs |
 | Testing | `rules/testing.md` | Rule | Automated-testing standards and quality invariants |
 | Testing | `skills/generate-tests/SKILL.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
 | Testing | `commands/generate-tests.md` | Command | Start automated-test creation or modification |
@@ -319,7 +328,7 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 
 ## Naming
 
-* Context names are stable engineering nouns: `requirements`, `design`, `testing`, `review`, `git`.
+* Context names are stable engineering nouns: `requirements`, `design`, `implementation`, `testing`, `review`, `git`.
 * Rule filenames name the governed concern.
 * Skill directories name the reusable capability.
 * Command names use a clear verb-object engineering intent and should remain understandable when surfaced outside their physical context. The context namespace may remove redundancy only when the remaining name stays unambiguous.
