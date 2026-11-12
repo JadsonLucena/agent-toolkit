@@ -18,6 +18,7 @@ Carry a change toward the explicitly authorized target stage, selecting only the
 * Input/output contract: `contracts/test-basis.md` when available
 * Input/output contract: `contracts/test-evidence.md` when available
 * Input/output contract: `contracts/review-evidence.md` when available
+* Optional output contract: `contracts/outcome-evidence.md`
 
 ## Working State
 
@@ -54,7 +55,7 @@ This explicit cross-context workflow permits **routing** existing specialist cap
 
 ## Output
 
-Report the actual reached stage, per-slice completed and blocked work, applicable source and code identities, specialist evidence, checks, Review verdict where performed, pending authorizations, recovery risks, next owners and unresolved outcome observations.
+Report the actual reached stage, per-slice completed and blocked work, applicable source and code identities, specialist evidence, checks, Review verdict where performed, pending authorizations, recovery risks, next owners and unresolved outcome observations. When supplied, report an optional `contracts/outcome-evidence.md`-compatible observation handoff; never fabricate deployment or results.
 
 ## Boundary
 

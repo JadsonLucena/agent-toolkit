@@ -23,6 +23,8 @@
 
 ## Outcome Handoff
 
+Use the optional `contracts/outcome-evidence.md` semantics to preserve actual post-delivery observations separately from technical completion. Delivery must not create an operations capability or assume business outcome authority.
+
 * A successful technical review or PR-ready state is not proof that deployment occurred or the original business problem was resolved. Preserve the original objective, expected measurement and responsible observer when supplied.
 * Post-delivery effectiveness and PDCA feedback require real operational observations and their authority; absent observations remain pending or unknown. Do not fabricate metrics or mandate a deployment/observability integration.
 * Scope changes, requirements contradictions, unverified guarantees, material side effects and unresolved cross-context decisions route back to their actual owners, not to an unbounded coordinator loop.

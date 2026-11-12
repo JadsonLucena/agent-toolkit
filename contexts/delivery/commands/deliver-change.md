@@ -19,6 +19,7 @@ Select the Delivery Coordinator and its cross-context workflow. If `target_stage
 * Optional input contract: `contracts/test-basis.md`
 * Optional input contract: `contracts/test-evidence.md`
 * Optional input contract: `contracts/review-evidence.md`
+* Optional output contract: `contracts/outcome-evidence.md`
 
 ## Inputs
 
