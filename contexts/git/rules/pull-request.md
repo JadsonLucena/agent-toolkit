@@ -17,6 +17,15 @@ These labels describe **scope and traceability**, not new canonical artifact typ
 
 Neither term overrides a Requirements Change Boundary, a project's established slice vocabulary, or the rule that each PR must stand as one coherent, verifiable review unit.
 
+## Pre-Implementation PR Strategy
+
+* When a request or known roadmap contains multiple material outcomes, independently reviewable increments, or dependencies that make multiple PRs plausible, **assess the PR strategy before the first implementation mutation**. Use the read-only `plan` mode of `manage-pull-request` (or an equivalent scoped PR plan) before implementing a composite change. This assessment is conditional, not mandatory ceremony for every change.
+* Compare a **single coherent PR**, **independent PRs**, and **stacked PRs** using actual dependencies, reviewability, integration safety, traceability, and the cost of intermediate states. Do not split merely by roadmap stage or count of tasks. Prefer independent bases when no actual dependency exists.
+* For stacked PRs, record each intended base/head, prerequisite, review scope, and expected safe intermediate state. Do not make a later PR appear independent when it depends on unmerged work.
+* An explicit request for **one increment** does not authorize implementing the entire roadmap. Record remaining stages and the proposed delivery strategy without silently broadening the current authorization; clarify only when ambiguity materially changes what may be implemented.
+* If implementation already exists without prior planning, assess decomposition during `prepare`; report scope or split findings without claiming pre-implementation planning took place.
+* The assessment itself is **read-only**. It does not authorize implementation, branch creation, commits, push, PR publication, merge, or release. For an evidently single coherent review unit, proceed without a separate formal plan; preserve rationale when material.
+
 ## PR Boundary
 
 Before preparing or creating a PR, establish a PR Boundary containing, when relevant:
