@@ -129,7 +129,7 @@ def main():
     try:
         catalog = load_catalog(args.catalog)
         if args.observations is None:
-            print(f"VALID catalog: {len(catalog['cases'])} Requirements cases; "
+            print(f"VALID catalog: {len(catalog['cases'])} cases; "
                   "no agent behavior has been evaluated.")
             return 0
         observations = json.loads(args.observations.read_text(encoding="utf-8"))
