@@ -23,7 +23,8 @@ Use to transform sufficiently understood needs and evidence into precise, verifi
 stateDiagram-v2
     [*] --> InspectEvidence
     InspectEvidence --> DetermineApplicableSemantics
-    DetermineApplicableSemantics --> DeriveRequirements
+    DetermineApplicableSemantics --> AssessTemporalProperties
+    AssessTemporalProperties --> DeriveRequirements
     DeriveRequirements --> DefineRequirements
     DefineRequirements --> VerifyDefinition
 
@@ -44,13 +45,13 @@ stateDiagram-v2
 
 Follow the State Model.
 
-Apply Requirement Quality and the applicable semantics sections in `contexts/requirements/rules/requirements.md`. Apply `contexts/requirements/rules/tailoring.md` when rigor is unset. When scenarios need dedicated exploration, use `contexts/requirements/skills/example-discovery/SKILL.md`. Do not restate those sources.
+Apply Requirement Quality and the applicable semantics sections in `contexts/requirements/rules/requirements.md`. When time, state, or event ordering can change expected behavior, AssessTemporalProperties applies **Temporal Behavior and Formal Assurance** in that same rule; surface missing boundaries instead of assuming them. Apply `contexts/requirements/rules/tailoring.md` when rigor is unset. When scenarios need dedicated exploration, use `contexts/requirements/skills/example-discovery/SKILL.md`. Do not restate those sources.
 
 ## Output
 
 Produce a `contracts/requirements.md`-compatible specification containing the applicable strategic traceability, Change Boundary and supported boundary revisions when used, requirements, rules, constraints, acceptance/fit evidence, scenarios, assumptions, options, dependencies, conflicts, local representation convention when applicable, and unresolved questions. When a portable Scenario Set is useful for downstream behavioral verification, expose it through `contracts/test-basis.md` while preserving the same scenario identities.
 
-Do not create fields merely to satisfy a schema when the corresponding knowledge is not relevant.
+Do not create fields merely to satisfy a schema when the corresponding knowledge is not relevant. Preserve optional temporal-property semantics and any genuinely executed formal-analysis evidence through `contracts/requirements.md`; a structured wording is not proof of verification.
 
 ## Stop Conditions
 

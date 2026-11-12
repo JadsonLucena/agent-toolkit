@@ -52,13 +52,14 @@ flowchart TD
     Inspect["Source behavior and open questions"] --> Reuse["Reuse a scenario that already represents the behavior"]
     Reuse --> Situations["Keep the scenario distinct from the examples that illustrate it"]
     Situations --> Semantics["Functional Behavior, Use Cases, and Scenarios in requirements.md"]
-    Semantics --> Examples["Domain language, counterexamples, and boundaries when they clarify the rule"]
+    Semantics --> Temporal["Temporal Behavior and Formal Assurance when applicable: event traces and boundary instants"]
+    Temporal --> Examples["Domain language, counterexamples, and boundaries when they clarify the rule"]
     Examples --> Expose["Surface contradictions; do not invent an answer"]
     Expose --> Trace["Trace each scenario to its source"]
     Trace --> Handoff["Hand off contracts/test-basis.md when automation will follow"]
 ```
 
-The diagram is the procedure. Apply `contexts/requirements/rules/requirements.md` and `contexts/requirements/rules/tailoring.md`. The handoff shape is `contracts/test-basis.md`.
+The diagram is the procedure. Apply `contexts/requirements/rules/requirements.md` and `contexts/requirements/rules/tailoring.md`. For temporal behaviors, compare supported event traces **before, at, and after** material boundaries; investigate in-flight actions, reordering, duplicates, and concurrency only when they affect the intended guarantee. Examples are illustrative evidence, not a formal proof or invented business policy. The handoff shape is `contracts/test-basis.md`.
 
 ## Output
 
