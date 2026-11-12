@@ -63,7 +63,8 @@ flowchart TD
     Frame --> Semantics["Requirement Quality and applicable semantics: requirements.md"]
     Semantics --> UseCases["Functional Behavior, Use Cases, and Scenarios when Use Cases exist"]
     UseCases --> Consistency["Requirements Architecture and Traceability"]
-    Consistency --> Uncertainty["Ambiguity, Assumptions, Unknowns, and Options"]
+    Consistency --> Reconcile["Requirement Change and Impact when prior semantics exist"]
+    Reconcile --> Uncertainty["Ambiguity, Assumptions, Unknowns, and Options"]
     Uncertainty --> Classify["Classify findings; do not mutate the specification"]
     Classify --> Ready["Completion-State Semantics for the actual readiness_for target"]
 ```
@@ -79,6 +80,7 @@ Produce a concise validation report containing:
 * applicable concerns evaluated;
 * findings with type, severity, affected identifiers, evidence, impact, and remediation;
 * cross-artifact contradictions, drift, duplication, orphan relationships, and material Change Boundary mismatches when present;
+* for known semantic changes, baseline comparison, authorization state, confirmed/possible/unaffected/uninspectable dependent references, and the specific owner or evidence needed for reconciliation;
 * missing **knowledge**, not merely missing documents;
 * premature solution decisions and implicit assumptions when present;
 * evidence-backed revision recommendations;
@@ -87,7 +89,7 @@ Produce a concise validation report containing:
 
 ## Boundary
 
-Validation is read-only unless a separate command or explicit authorization permits modifying the specification or another artifact. This skill may describe an evidence-backed revision but must not apply it silently.
+Validation is read-only unless a separate command or explicit authorization permits modifying the specification or another artifact. Reconcile only from observed old/new semantics and known links; lack of an authoritative baseline or access to downstream consumers cannot be reported as a successful impact audit. This skill may describe an evidence-backed revision but must not apply it silently.
 
 ## Stop Conditions
 

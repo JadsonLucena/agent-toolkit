@@ -13,6 +13,7 @@ A testing handoff may include, when material and known:
 * `context_id` — initiative or change context that relates the evidence to other artifacts;
 * `subject` — feature, behavior, change, component, defect, slice, or work item under test;
 * `source_refs` — requirement, specification, work-item, rule, use-case, decision, defect, code, or other evidence references;
+* optional `source_baseline_ref` — known authoritative requirement version/baseline used to derive this test basis, when revision-sensitive traceability is material;
 * `intended_behavior` — supported observable behavior to verify;
 * `acceptance_conditions` — observable evidence of satisfaction;
 * `business_rules` and `invariants` — domain constraints that tests may need to protect;

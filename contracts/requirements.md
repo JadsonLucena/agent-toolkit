@@ -16,7 +16,10 @@ A requirements handoff should make the surrounding change or initiative context 
 * `conflicts` — unresolved contradictions between sources, requirements, rules, or decisions;
 * `status` — semantic state such as `sufficient`, `needs-revision`, `needs-clarification`, or `blocked`;
 * `readiness_for` — optional downstream target for which the status was evaluated, such as backlog planning or design;
-* `stage_claims` — optional explicit lifecycle claims such as elicitation sufficient, requirements specified, requirements validated, or planning ready, each with its evidence/target when material.
+* `stage_claims` — optional explicit lifecycle claims such as elicitation sufficient, requirements specified, requirements validated, or planning ready, each with its evidence/target when material;
+* `baseline_ref` — optional identity of the prior accepted/authoritative requirement state against which a proposed revision is assessed; unknown or unavailable is not a generated baseline;
+* `semantic_changes` — optional evidence-backed change set with stable affected requirement/rule identifiers, prior and proposed meaning, change type, source, authorization state/authority, and rationale;
+* `impact_assessment` — optional scoped traversal of known dependent references, impact classification, evidence, responsible next action, and unresolved or inaccessible relationships.
 
 Do not encode the downstream target into `status`, and do not use numeric confidence scores as a substitute for evidence. A stage claim must not imply a later stage such as implementation, acceptance, deployment, release, or outcome achievement.
 
@@ -115,6 +118,8 @@ For material business rules, the handoff may preserve:
 * Downstream consumers may select a relevant subset but must preserve requirement identity and semantics.
 * A material semantic change creates a requirements concern and must not be hidden as a downstream transformation.
 * When requirement semantics change, consumers should be able to identify downstream artifacts that require re-evaluation.
+* A proposed semantic change must remain distinguishable from an approved baseline revision; downstream artifacts must not silently treat a proposal as current authority.
+* Where consumer evidence is missing or stale, classify its status as unknown/needs inspection rather than declaring the traceability graph fully reconciled.
 * A proposed technical solution does not become a requirement unless evidence supports it as intent, constraint, or decision.
 * Stable scenario identifiers must survive downstream transformations when supplied; adapters and Testing must not replace semantic scenario identity with framework-specific test names.
 * Local templates or schemas may shape representation but must not replace or silently alter these semantics.

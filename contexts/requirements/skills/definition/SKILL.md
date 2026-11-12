@@ -22,7 +22,8 @@ Use to transform sufficiently understood needs and evidence into precise, verifi
 ```mermaid
 stateDiagram-v2
     [*] --> InspectEvidence
-    InspectEvidence --> DetermineApplicableSemantics
+    InspectEvidence --> ComparePriorSemantics
+    ComparePriorSemantics --> DetermineApplicableSemantics
     DetermineApplicableSemantics --> DeriveRequirements
     DeriveRequirements --> DefineRequirements
     DefineRequirements --> VerifyDefinition
@@ -44,13 +45,13 @@ stateDiagram-v2
 
 Follow the State Model.
 
-Apply Requirement Quality and the applicable semantics sections in `contexts/requirements/rules/requirements.md`. Apply `contexts/requirements/rules/tailoring.md` when rigor is unset. When scenarios need dedicated exploration, use `contexts/requirements/skills/example-discovery/SKILL.md`. Do not restate those sources.
+ComparePriorSemantics applies **Requirement Change and Impact** when a previous authoritative specification is available: retain old/new meaning and governing scope decisions, and do not overwrite the baseline for a proposed change. Apply Requirement Quality and the applicable semantics sections in `contexts/requirements/rules/requirements.md`. Apply `contexts/requirements/rules/tailoring.md` when rigor is unset. When scenarios need dedicated exploration, use `contexts/requirements/skills/example-discovery/SKILL.md`. Do not restate those sources.
 
 ## Output
 
 Produce a `contracts/requirements.md`-compatible specification containing the applicable strategic traceability, Change Boundary and supported boundary revisions when used, requirements, rules, constraints, acceptance/fit evidence, scenarios, assumptions, options, dependencies, conflicts, local representation convention when applicable, and unresolved questions. When a portable Scenario Set is useful for downstream behavioral verification, expose it through `contracts/test-basis.md` while preserving the same scenario identities.
 
-Do not create fields merely to satisfy a schema when the corresponding knowledge is not relevant.
+Do not create fields merely to satisfy a schema when the corresponding knowledge is not relevant. When revisions are material, include the known baseline reference, proposed/authorized semantic changes and impacted references from `contracts/requirements.md`; unknown downstream effects remain explicit.
 
 ## Stop Conditions
 

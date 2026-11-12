@@ -60,7 +60,7 @@ flowchart TD
     Recheck -->|another decision remains| Inspect
 ```
 
-Batch size follows `contexts/requirements/rules/tailoring.md`. Preserve identifiers, provenance, Change Boundary, and lifecycle claims across handoffs. Do not repair a specification under validation authority. A material Change Boundary change needs an explicit scope decision.
+Batch size follows `contexts/requirements/rules/tailoring.md`. Preserve identifiers, provenance, Change Boundary, lifecycle claims, and any known baseline/semantic-change/impact evidence across handoffs. Do not treat a proposed requirement revision as an accepted baseline or mark unknown downstream consumers current. Do not repair a specification under validation authority. A material Change Boundary change needs an explicit scope decision.
 
 ## Output
 
