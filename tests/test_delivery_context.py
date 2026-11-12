@@ -13,7 +13,7 @@ def doc(path):
 class DeliveryContextTests(unittest.TestCase):
     def test_default_read_only_and_stages_are_explicit(self):
         command = doc("contexts/delivery/commands/deliver-change.md")
-        for token in ("target_stage", "read-only", "does not", "PR publication", "authorization"):
+        for token in ("target_stage", "read-only", "No implicit", "PR publication", "authorization"):
             self.assertIn(token.lower(), command.lower())
 
     def test_composes_specialists_without_second_review_verdict(self):
@@ -26,7 +26,7 @@ class DeliveryContextTests(unittest.TestCase):
 
     def test_recovery_and_result_are_not_fabricated(self):
         rules = doc("contexts/delivery/rules/delivery.md")
-        for token in ("Checkpoints cannot undo", "unproductive", "business problem", "source baseline"):
+        for token in ("Checkpoints cannot undo", "no material progress", "business problem", "source baseline"):
             self.assertIn(token.lower(), rules.lower())
 
     def test_context_registered(self):
