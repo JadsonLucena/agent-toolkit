@@ -57,8 +57,16 @@ class RequirementsEvalTests(unittest.TestCase):
 
     def test_catalog_in_repository_is_valid(self):
         catalog = load_catalog(ROOT / "evals/requirements/cases.json")
-        self.assertGreaterEqual(len(catalog["cases"]), 10)
-        self.assertIn("SC-01", {c["id"] for c in catalog["cases"]})
+        self.assertGreaterEqual(len(catalog["cases"]), 11)
+        self.assertTrue({"SC-01A", "SC-01B"}.issubset({c["id"] for c in catalog["cases"]}))
+
+    def test_composite_cases_have_complementary_evidence_sufficiency(self):
+        cases = {c["id"]: c for c in load_catalog(ROOT / "evals/requirements/cases.json")["cases"]}
+        self.assertIn("Authorized product decision S1", cases["SC-01A"]["input"])
+        self.assertIn("StatusId=7", cases["SC-01A"]["input"])
+        self.assertIn("RefundedDate", cases["SC-01A"]["input"])
+        self.assertIn("No authorized policy establishes", cases["SC-01B"]["input"])
+        self.assertIn("needs-clarification or blocked", cases["SC-01B"]["checks"][1]["criterion"])
 
     def test_supported_review_is_passed_without_claiming_llm_execution(self):
         result = evaluate(self.catalog, self._assessment(), self.root)
@@ -95,6 +103,24 @@ class RequirementsEvalTests(unittest.TestCase):
         data["assessments"][0]["checks"][1]["rationale"] = ""
         with self.assertRaisesRegex(ValueError, "rationale required"):
             evaluate(self.catalog, data, self.root)
+
+    def test_invalid_rationale_types_are_rejected_for_pass_and_fail(self):
+        invalid = [None, False, [], {}, 0, "", "  \t  "]
+        for verdict in ("pass", "fail"):
+            for value in invalid:
+                with self.subTest(verdict=verdict, rationale=value):
+                    data = self._assessment()
+                    check = data["assessments"][0]["checks"][1]
+                    check["verdict"] = verdict
+                    check["rationale"] = value
+                    with self.assertRaisesRegex(ValueError, "rationale required"):
+                        evaluate(self.catalog, data, self.root)
+
+    def test_nonempty_string_rationale_is_accepted(self):
+        data = self._assessment()
+        data["assessments"][0]["checks"][1]["rationale"] = "  Reviewed the full trace.  "
+        result = evaluate(self.catalog, data, self.root)
+        self.assertEqual("PASSED", result["status"])
 
     def test_unsafe_transcript_path_is_rejected(self):
         data = self._assessment()

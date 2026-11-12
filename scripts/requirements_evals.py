@@ -91,7 +91,10 @@ def evaluate(catalog, observations, base_dir):
             verdict = check.get("verdict")
             if verdict not in VALID_RESULTS:
                 raise ValueError(f"{cid}/{key}: invalid verdict {verdict!r}")
-            if verdict != "uncertain" and not str(check.get("rationale", "")).strip():
+            rationale = check.get("rationale")
+            if verdict != "uncertain" and (
+                not isinstance(rationale, str) or not rationale.strip()
+            ):
                 raise ValueError(f"{cid}/{key}: rationale required for {verdict}")
             quote = check.get("quote")
             if quote is not None and (not isinstance(quote, str) or not quote.strip() or quote not in text):

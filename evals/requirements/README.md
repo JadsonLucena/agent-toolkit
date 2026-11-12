@@ -16,8 +16,11 @@ The cases in [cases.json](cases.json) sample the existing commands:
 - Example Discovery: stable scenario identity, negative cases, and concurrency.
 - Validation: contradictory authority and read-only behavior.
 - Backlog: critical financial guarantees during slicing.
-- Composite `shape-change`: justified planning granularity without
-  inventing technical tasks or authorizing implementation.
+- Composite `shape-change`: two complementary cases: `SC-01A` supplies the
+  full authorized refund-count policy for validated planning; `SC-01B`
+  deliberately leaves business semantics unresolved and checks that the
+  agent asks for clarification instead of manufacturing requirements.
+  Neither case authorizes implementation, code tasks, or test generation.
 
 Cases are a deliberately small initial baseline, not comprehensive coverage.
 Each case defines an invocation and observable review criteria, including
@@ -29,11 +32,16 @@ negative criteria that cannot be proven by a single keyword match.
    only the stated sources/context. Record the **complete actual conversation
    or output**, including questions and tool observations, as a UTF-8 text
    transcript. Do not fabricate an agent response or silently fill the gaps.
+   Treat each case's input as the complete supplied business evidence; do not
+   infer unstated policy from neighboring cases, external project memory, or
+   subsequent evaluations.
 2. Independently review that complete transcript against each case's checks.
    Mark every check `pass`, `fail`, or `uncertain`, with a rationale.
    Positive (`presence`) passes also require a verbatim `quote` from the
    transcript. Negative (`absence`) passes require a reviewer to inspect the
    full trace; the script cannot prove absence by itself.
+   For every pass/fail, `rationale` must be a nonempty text string;
+   `null`, booleans, arrays, objects and whitespace-only values are invalid.
 3. Write an observations file beside the transcripts. Do not commit real
    stakeholder/customer transcripts or confidential requirements to Git.
    An example envelope for one case is below; the **quote and assessment are
