@@ -24,6 +24,11 @@ agent-toolkit/
 │   │   ├── skills/
 │   │   ├── commands/
 │   │   └── agents/
+│   ├── delivery/
+│   │   ├── rules/
+│   │   ├── skills/
+│   │   ├── commands/
+│   │   └── agents/
 │   ├── testing/
 │   │   ├── rules/
 │   │   ├── skills/
@@ -123,6 +128,18 @@ contexts/implementation/
 ```
 
 Implementation changes production and related test code only for an authorized bounded slice, reuses Testing quality standards and Git's atomic commit capability, and records observed verification without treating local checks as independent Review.
+
+### Delivery
+
+```text
+contexts/delivery/
+├── rules/delivery.md
+├── skills/coordinate-delivery/SKILL.md
+├── commands/deliver-change.md
+└── agents/delivery-coordinator.md
+```
+
+`/delivery/deliver-change` conditionally routes the existing specialist contexts toward a requested stage while preserving evidence and authorization boundaries. It defaults to read-only assessment without explicit mutation scope, does not implement or review code itself, and does not create PRs without separately authorized Git operations. The Markdown workflow is not a host execution engine.
 
 ### Testing
 
@@ -242,6 +259,8 @@ Commands express engineering intent rather than low-level tool aliases:
 /design/design-solution
 
 /implementation/implement-slice
+
+/delivery/deliver-change
 
 /testing/generate-tests
 

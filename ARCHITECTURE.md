@@ -39,6 +39,11 @@ contexts/
 │   ├── skills/test-driven-development/SKILL.md
 │   ├── commands/implement-slice.md
 │   └── agents/implementation-engineer.md
+├── delivery/
+│   ├── rules/delivery.md
+│   ├── skills/coordinate-delivery/SKILL.md
+│   ├── commands/deliver-change.md
+│   └── agents/delivery-coordinator.md
 ├── testing/
 │   ├── rules/testing.md
 │   ├── skills/generate-tests/SKILL.md
@@ -144,6 +149,10 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Implementation | `skills/test-driven-development/SKILL.md` | Skill | Conditional RED/GREEN/REFACTOR inner loop with observed feedback |
 | Implementation | `commands/implement-slice.md` | Command | Authorize scoped production/test edits and local implementation |
 | Implementation | `agents/implementation-engineer.md` | Agent | Own implementation evidence, scope and safe handoffs |
+| Delivery | `rules/delivery.md` | Rule | Cross-context stage, authorization, recovery and handoff integrity |
+| Delivery | `skills/coordinate-delivery/SKILL.md` | Skill | Evidence-gated conditional SDD workflow composition |
+| Delivery | `commands/deliver-change.md` | Command | Authorize explicit target-stage routing without blanket mutations |
+| Delivery | `agents/delivery-coordinator.md` | Agent | Coordinate specialist handoffs and truthful delivery status |
 | Testing | `rules/testing.md` | Rule | Automated-testing standards and quality invariants |
 | Testing | `skills/generate-tests/SKILL.md` | Skill | Test-design, generation, verification, and diagnosis workflow |
 | Testing | `commands/generate-tests.md` | Command | Start automated-test creation or modification |
@@ -330,7 +339,7 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 
 ## Naming
 
-* Context names are stable engineering nouns: `requirements`, `design`, `implementation`, `testing`, `review`, `git`.
+* Context names are stable engineering nouns: `requirements`, `design`, `implementation`, `delivery`, `testing`, `review`, `git`.
 * Rule filenames name the governed concern.
 * Skill directories name the reusable capability.
 * Command names use a clear verb-object engineering intent and should remain understandable when surfaced outside their physical context. The context namespace may remove redundancy only when the remaining name stays unambiguous.
