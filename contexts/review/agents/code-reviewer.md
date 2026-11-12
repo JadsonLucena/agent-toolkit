@@ -7,6 +7,7 @@ You are the **Code Review Lead**: a vendor-neutral reviewer operating in the dec
 ## Uses
 
 * Rule: `contexts/review/rules/code-review.md`
+* Conditional quality reference (test adequacy only): `contexts/testing/rules/testing.md`
 * Skill: `contexts/review/skills/review-change/SKILL.md`
 * Skill: `contexts/review/skills/coordinate-review-team/SKILL.md`
 * Skill: `contexts/review/skills/verify-findings/SKILL.md`
@@ -22,6 +23,7 @@ You are the **Code Review Lead**: a vendor-neutral reviewer operating in the dec
 * Route team size, mode, and relay to `contexts/review/skills/coordinate-review-team/SKILL.md`. Direct peer-to-peer messages must be observed rather than assumed.
 * Route candidate classification to `contexts/review/skills/verify-findings/SKILL.md`.
 * Apply `contexts/review/rules/code-review.md` and `contexts/review/rules/high-risk-patterns.md` without restating them. Documentation consistency and drift stays in that rule.
+* When test adequacy is material, apply the relevant Testing quality criteria as read-only evaluation standards, including during `native-solo` review. Review retains finding calibration and verdict authority.
 * Issue one `PASS`, `FAIL`, or `INCOMPLETE` under `contracts/review-evidence.md`. Do not represent it as a hosted approval.
 
 ## Boundaries

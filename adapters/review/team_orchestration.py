@@ -29,6 +29,7 @@ REQUEST_KINDS = {"question", "challenge", "escalation"}
 SUPPORTED_KINDS = REQUEST_KINDS | {"observation", "response", "resolution"}
 MAX_RELAY_REQUESTS = 30
 AGENT_DIR = Path(__file__).resolve().parents[2] / "contexts" / "review" / "agents"
+TESTING_QUALITY_RULE = AGENT_DIR.parent.parent / "testing" / "rules" / "testing.md"
 
 
 class TeamPlanningError(Exception):
@@ -157,9 +158,25 @@ def _agent_prompt(role: str) -> str:
     if role not in set(CONCERN_ROLES.values()) | {"finding-verifier"}:
         raise TeamPlanningError("unknown specialist")
     try:
-        return path.read_text(encoding="utf-8")
+        prompt = path.read_text(encoding="utf-8")
     except OSError as exc:
         raise TeamPlanningError(f"cannot read agent file: {role}") from exc
+    if role != "testing-reviewer":
+        return prompt
+    try:
+        quality_rules = TESTING_QUALITY_RULE.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise TeamPlanningError("cannot read canonical Testing quality rules") from exc
+    return (
+        prompt
+        + "\n\n---\n## Canonical Testing Quality Reference\n\n"
+        + "Source: `contexts/testing/rules/testing.md` from the installed Agent Toolkit, "
+        + "not the reviewed repository. Apply applicable criteria to assessment only; "
+        + "Review rules control findings and the verdict.\n\n"
+        + quality_rules
+        + "\nEnd of quality reference. Do not invoke Testing workflows, modify tests, "
+        + "or turn heuristics into automatic blockers.\n"
+    )
 
 
 def _assignment(plan: dict[str, Any], role: str, *, purpose: str, findings: Any = None) -> dict[str, Any]:
