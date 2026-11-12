@@ -124,6 +124,30 @@ class ToolkitLintTests(unittest.TestCase):
         target.write_text(text.split("---\n", 2)[-1], encoding="utf-8")
         self.assert_error("name and description frontmatter")
 
+    def test_preimplementation_pr_strategy_rule_cannot_be_removed(self):
+        self.change(
+            "contexts/git/rules/pull-request.md",
+            "before the first implementation mutation",
+            "after all implementation is complete",
+        )
+        self.assert_error("missing pre-implementation PR strategy")
+
+    def test_pr_skill_must_assess_strategy_before_mode(self):
+        self.change(
+            "contexts/git/skills/manage-pull-request/SKILL.md",
+            "AssessStrategy[\"Pre-Implementation PR Strategy in pull-request.md\"]",
+            "UnplannedShortcut[\"Skip PR strategy\"]",
+        )
+        self.assert_error("missing PR strategy assessment before mode selection")
+
+    def test_git_agent_must_route_composite_pr_planning(self):
+        self.change(
+            "contexts/git/agents/git-engineer.md",
+            "Apply **Pre-Implementation PR Strategy**",
+            "Ignore **Pre-Implementation PR Strategy**",
+        )
+        self.assert_error("missing composite PR planning handoff")
+
     def test_ready_pr_does_not_require_signed_gate(self):
         self.change(
             "contexts/git/rules/pull-request.md",

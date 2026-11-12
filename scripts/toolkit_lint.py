@@ -216,6 +216,11 @@ def lint_toolkit(root: Path) -> list[str]:
                 errors.append(f"{rel}: review must bootstrap context before analysis")
         # Narrow policy-drift guards, not proof that a runtime actually runs checks.
         if rel == "contexts/git/rules/pull-request.md":
+            strategy = section(content, "Pre-Implementation PR Strategy").lower()
+            for phrase in ("before the first implementation mutation", "single coherent pr",
+                           "independent prs", "stacked prs", "one increment", "read-only"):
+                if phrase not in strategy:
+                    errors.append(f"{rel}: missing pre-implementation PR strategy: {phrase}")
             lowered = content.lower()
             if "review_profile=advisory" not in lowered:
                 errors.append(f"{rel}: ready review record must accept advisory")
@@ -237,11 +242,20 @@ def lint_toolkit(root: Path) -> list[str]:
                 errors.append(f"{rel}: pre-commit must reuse shared quality-gate policy")
         if rel == "contexts/git/skills/manage-pull-request/SKILL.md":
             workflow = section(content, "Workflow").lower()
+            if ("assessstrategy" not in workflow or "pre-implementation pr strategy" not in workflow
+                    or workflow.index("assessstrategy") > workflow.index("selectmode")):
+                errors.append(f"{rel}: missing PR strategy assessment before mode selection")
             for phrase in ("pre-creation quality gate", "shared quality-gate discovery and evidence"):
                 if phrase not in workflow:
                     errors.append(f"{rel}: missing pre-PR check discovery or execution: {phrase}")
             if "contexts/git/rules/git.md" not in content or "contexts/git/rules/pull-request.md" not in content:
                 errors.append(f"{rel}: missing pre-PR check discovery or execution: rule reference")
+        if rel == "contexts/git/agents/git-engineer.md":
+            responsibilities = section(content, "Responsibilities").lower()
+            if ("pre-implementation pr strategy" not in responsibilities or
+                    "manage-pull-request" not in responsibilities or
+                    "plan" not in responsibilities):
+                errors.append(f"{rel}: missing composite PR planning handoff")
         if rel == "contexts/git/commands/plan-pull-requests.md" and "read-only" not in authority:
             errors.append(f"{rel}: planning must remain read-only")
         if rel == "contexts/requirements/commands/validate-requirements.md" and (
