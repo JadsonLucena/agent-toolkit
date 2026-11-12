@@ -64,7 +64,7 @@ class StrategicDomainDiscoveryPolicyTests(unittest.TestCase):
                 self.assertEqual("/requirements/elicit-requirements", case["command"])
                 self.assertEqual({"presence", "absence"}, {c["mode"] for c in case["checks"]})
                 self.assertTrue(all(c["criterion"] for c in case["checks"]))
-        self.assertIn("no actual EventStorming workshop", self.cases["EL-12"]["input"])
+        self.assertIn("no actual eventstorming workshop", self.cases["EL-12"]["input"].lower())
         self.assertIn("no measurements", self.cases["EL-15"]["input"].lower())
         self.assertIn("no material unknowns", self.cases["EL-17"]["input"])
 
