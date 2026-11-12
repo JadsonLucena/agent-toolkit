@@ -252,7 +252,7 @@ def lint_toolkit(root: Path) -> list[str]:
                 errors.append(f"{rel}: missing pre-PR check discovery or execution: rule reference")
         if rel == "contexts/git/agents/git-engineer.md":
             responsibilities = section(content, "Responsibilities").lower()
-            if ("pre-implementation pr strategy" not in responsibilities or
+            if ("apply **pre-implementation pr strategy**" not in responsibilities or
                     "manage-pull-request" not in responsibilities or
                     "plan" not in responsibilities):
                 errors.append(f"{rel}: missing composite PR planning handoff")
