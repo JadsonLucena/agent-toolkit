@@ -19,7 +19,7 @@ A testing handoff may include, when material and known:
 * `states`, `boundaries`, and `failure_conditions` — material behavioral partitions;
 * `constraints` — relevant business, technical, security, performance, compatibility, data, or operational constraints;
 * `failure_model` — expected failures, partial failures, timeout/retry, duplicate/replay, dependency outage, concurrency, or other reliability assumptions when material;
-* `quality_fit_criteria` — observable quality conditions and justified thresholds when supplied;
+* `quality_fit_criteria` — observable quality conditions, metric or property, justified thresholds or qualitative acceptance boundaries, and any supplied verification approach, evaluation conditions, and expected evidence; preserve these as semantic constraints, not mandated executable tests or tools;
 * `security_obligations` — supported authorization, information, purpose, delegation, organizational, or misuse constraints when supplied;
 * `risk_notes` — evidenced risk areas, failure consequences, or verification priorities;
 * `known_gaps` — unresolved or intentionally unspecified behavior that must not be silently converted into expected behavior;

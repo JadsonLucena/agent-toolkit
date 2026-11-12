@@ -70,6 +70,8 @@ flowchart TD
 
 The diagram is the procedure. Apply the named section of `contexts/requirements/rules/requirements.md` or `contexts/requirements/rules/tailoring.md`. Do not restate it.
 
+For the `Quality Requirements` pass, check whether each **material** fit criterion has a supported verification approach, necessary evaluation conditions, and expected acceptance evidence as defined by the canonical rule. Where their absence affects `readiness_for`, report a `gap` or `needs-clarification` with its consequence; do not invent the missing method, demand an arbitrary testing tool, or block unrelated decisions.
+
 ## Output
 
 Produce a concise validation report containing:

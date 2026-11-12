@@ -89,6 +89,7 @@ A requirement specification must make the following available when material and 
 * stable scenario identities and scenario-to-requirement/rule/use-case relationships when scenarios are treated as first-class behavioral knowledge;
 * data semantics such as ownership, temporal meaning, integrity, lifecycle, lineage, or consumer guarantees when relevant;
 * quality context, metric/observable property, justified thresholds, failure assumptions, and trade-offs when relevant;
+* quality verification approach, necessary evaluation conditions and measurement boundaries, and expected evidence for acceptance when material and known; unresolved verification knowledge must remain explicit;
 * security actors, information, operations, purposes, delegations, obligations, and misuse concerns when relevant;
 * dependencies and conflicts;
 * explicit assumptions, unknowns, and options;
