@@ -18,6 +18,14 @@ class ReviewSddEvalsTests(unittest.TestCase):
         self.assertTrue(all(x["command"] == "/review/review-code" for x in cat["cases"]))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
 
+    def test_positive_and_negative_criteria_have_correct_mode(self):
+        cat = load_catalog(ROOT / "evals/review/cases.json")
+        for case in cat["cases"]:
+            for check in case["checks"]:
+                expected = "absence" if check["criterion"].startswith("Does not") else "presence"
+                with self.subTest(case=case["id"], check=check["id"]):
+                    self.assertEqual(expected, check["mode"])
+
     def test_missing_observed_agent_runs_cannot_pass(self):
         cat = load_catalog(ROOT / "evals/review/cases.json")
         result = evaluate(cat, {"version": 1, "assessments": []}, ROOT / "evals/review")
