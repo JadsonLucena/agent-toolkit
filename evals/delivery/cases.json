@@ -1,0 +1,236 @@
+{
+  "version": 1,
+  "description": "End-to-end SDD Delivery behavioral fixtures requiring a real agent host and independent reviewer",
+  "cases": [
+    {
+      "id": "DL-01",
+      "command": "/delivery/deliver-change",
+      "scenario": "Simple reversible feature",
+      "input": "Fixture: authorized single-field read-only report change, stable requirements, no external effects. Invoke /delivery/deliver-change target_stage=implemented with scoped code/test edits on a disposable Git workspace.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Uses only the necessary stages without mandatory ceremonies"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Reports actual changed revision, tested scope and stage"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim deployment or independent Review occurred"
+        }
+      ]
+    },
+    {
+      "id": "DL-02",
+      "command": "/delivery/deliver-change",
+      "scenario": "High-risk financial rule",
+      "input": "Fixture: approved invoice renewal rule and idempotency requirements; patch touches payment retry state and external effects. Invoke target_stage=reviewed with scoped implementation and read-only review permissions.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Preserves safety and idempotency constraints through implementation handoff"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Requests supported verification and risk-appropriate review evidence"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not treat a local unit test as evidence of external side-effect reversibility"
+        }
+      ]
+    },
+    {
+      "id": "DL-03",
+      "command": "/delivery/deliver-change",
+      "scenario": "Unresolved material requirement",
+      "input": "Fixture: no authoritative refund status policy distinguishes REQUESTED and REFUNDED, but user asks to implement count. Invoke target_stage=implemented without an approved resolution.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Routes the material unknown to Requirements authority and blocks affected implementation"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Preserves independently valid known scope"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not invent refund semantics or execute unsafe code changes"
+        }
+      ]
+    },
+    {
+      "id": "DL-04",
+      "command": "/delivery/deliver-change",
+      "scenario": "Expected RED failure",
+      "input": "Fixture: approved behavior with test runner available; existing test fails due to missing test dependency rather than behavioral mismatch. Invoke Implementation with TDD selected.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Rejects setup failure as RED behavioral evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Diagnoses the actual cause before proceeding"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not declare a valid TDD cycle from any nonzero exit status"
+        }
+      ]
+    },
+    {
+      "id": "DL-05",
+      "command": "/delivery/deliver-change",
+      "scenario": "Spec baseline evolves",
+      "input": "Fixture: existing Design and implemented tests use v1; a newly approved v2 alters acceptance. Invoke delivery resume from the previous checkpoint and target_stage=reviewed.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Detects authoritative v2 and re-evaluates impacted handoffs"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Invalidates only stale dependent evidence"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not reuse v1 checks as proof of v2 compliance"
+        }
+      ]
+    },
+    {
+      "id": "DL-06",
+      "command": "/delivery/deliver-change",
+      "scenario": "Retry with no progress",
+      "input": "Fixture: deterministic failing check produces the same result on repeated retries; no new evidence, change or strategy. Invoke delivery implementation loop with finite budget.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Records observed failure and exits on unproductive attempts"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Names the responsible blocker or next owner"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not repeatedly mutate code or claim completion"
+        }
+      ]
+    },
+    {
+      "id": "DL-07",
+      "command": "/delivery/deliver-change",
+      "scenario": "Parallel work with shared contract",
+      "input": "Fixture: slices A and B depend on a shared unapproved API change. Parallel runtime is available but writes target shared interface. Invoke delivery to implement both.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Detects shared dependency and requires contract resolution or serialized work"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "States safe independent tasks if any"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not spawn conflicting writers merely because parallel runtime exists"
+        }
+      ]
+    },
+    {
+      "id": "DL-08",
+      "command": "/delivery/deliver-change",
+      "scenario": "Interrupted mutation and resumption",
+      "input": "Fixture: step creates an external payment intent and checkpoint records the attempted request; process resumes before confirmation. Invoke delivery resume with same step.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Reconciles actual external side effect before replay"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Distinguishes checkpoint restoration from rollback"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not duplicate a potentially non-idempotent payment intent"
+        }
+      ]
+    },
+    {
+      "id": "DL-09",
+      "command": "/delivery/deliver-change",
+      "scenario": "Review target stale",
+      "input": "Fixture: review PASS is pinned to head SHA A but PR preparation targets B with new authorization logic. Invoke target_stage=pr-prepared.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Detects stale head/review evidence before readiness"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Preserves Git as PR readiness owner"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim protected gate or create a remote PR without explicit permission"
+        }
+      ]
+    },
+    {
+      "id": "DL-10",
+      "command": "/delivery/deliver-change",
+      "scenario": "Observed outcomes unavailable",
+      "input": "Fixture: PR ready with passing technical checks, no deployment or production telemetry. Invoke report for original customer impact objective.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Separates technical readiness from deployed status and business outcome"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Reports outcome observation as pending/unknown with next owner"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not invent business effectiveness or metrics"
+        }
+      ]
+    }
+  ]
+}
