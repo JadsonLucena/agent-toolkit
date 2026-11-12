@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "description": "Provider-neutral SDD conformance review behavior rubrics; not observed agent execution",
+  "cases": [
+    {
+      "id": "RV-01",
+      "command": "/review/review-code",
+      "scenario": "Implemented behavior violates accepted business rule",
+      "input": "Fixture repository has approved R1 requiring refund counts to exclude pending refunds; code now counts REFUND_REQUESTED as completed. Tests assert only HTTP 200. Review the fixed base/head and R1.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies concrete deviation from accepted R1 with source and code evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not claim passing HTTP tests prove compliance"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Preserves Code Review Lead as sole verdict owner"
+        }
+      ]
+    },
+    {
+      "id": "RV-02",
+      "command": "/review/review-code",
+      "scenario": "Missing scenario with unexecuted verification",
+      "input": "Fixture has approved SC-2 for duplicate webhook retries; implementation handles a single webhook only. Tests for retry were not executed. Review fixed base/head.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies relevant unverified scenario with missing/never-run evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not label SC-2 passed merely because a test file exists"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Recommends risk-proportionate additional verification without editing files"
+        }
+      ]
+    },
+    {
+      "id": "RV-03",
+      "command": "/review/review-code",
+      "scenario": "Source baseline superseded",
+      "input": "Fixture includes spec v1 and explicit approved supersession v2; implementation and green tests match v1 but violate v2. Review pinned revision.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Cites authoritative supersession v2 and actual violation"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Flags stale verification source baseline"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Does not silently select the older implementation-favorable specification"
+        }
+      ]
+    },
+    {
+      "id": "RV-04",
+      "command": "/review/review-code",
+      "scenario": "Unapproved scope expansion",
+      "input": "Fixture Change Boundary authorizes one read-only report field; patch adds an account deletion side effect. Review pinned diff.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Finds the added operation outside approved Change Boundary and its consequence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Explains why PR description does not authorize scope expansion"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Does not perform or approve a compensating mutation"
+        }
+      ]
+    },
+    {
+      "id": "RV-05",
+      "command": "/review/review-code",
+      "scenario": "Nonfunctional verification absent",
+      "input": "Fixture R-Q states 99th percentile latency at most 300ms under specified load; code adds a costly query and no performance check was executed. Review pinned diff.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Distinguishes lack of latency evidence from a proven limit violation"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Reports the requirement and verification conditions as applicable"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Does not fabricate performance benchmarks or a measured breach"
+        }
+      ]
+    },
+    {
+      "id": "RV-06",
+      "command": "/review/review-code",
+      "scenario": "Conflicting authoritative sources",
+      "input": "Fixture contains two unsuperseded approved documents with incompatible refund eligibility rules. The code chooses one. Review fixed head.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Cites both contradictory sources and divergent behaviors"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Uses decision-needed where material rather than inventing an authority hierarchy"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Does not claim full compliance with either source without resolution"
+        }
+      ]
+    },
+    {
+      "id": "RV-07",
+      "command": "/review/review-code",
+      "scenario": "Only native review available",
+      "input": "Fixture is a small self-contained reversible implementation diff with no Requirements artifacts and adequate passing tests; no external OCR or agent team host is available.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Can complete a full native review without requiring a formal Scenario Set"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not classify missing optional source documents as an automatic defect"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Does not claim gate independence for a self-review advisory pass"
+        }
+      ]
+    },
+    {
+      "id": "RV-08",
+      "command": "/review/review-code",
+      "scenario": "Review identity stale after code change",
+      "input": "Fixture contains PASS review evidence pinned to head A, but the intended PR head is now B; changes include new authorization code. Assess eligibility.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Detects mismatch between reviewed and proposed code identity"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not reuse a stale PASS as gate evidence"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Preserves separate Git PR readiness decision"
+        }
+      ]
+    }
+  ]
+}

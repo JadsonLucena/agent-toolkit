@@ -17,5 +17,7 @@ jobs:
         run: python3 scripts/toolkit_lint.py
       - name: Requirements evaluation catalog
         run: python3 scripts/requirements_evals.py
+      - name: Review SDD evaluation catalog
+        run: python3 scripts/requirements_evals.py --catalog evals/review/cases.json
       - name: Linter regression tests
         run: python3 -m unittest discover -s tests -v
