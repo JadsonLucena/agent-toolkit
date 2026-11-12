@@ -60,7 +60,7 @@ Evaluate applicable concerns, with evidence and reachable consequences:
 * **Data and reliability:** persistence invariants, migrations/backfills, transactions, consistency, duplicate effects, retries, idempotency, ordering, partial failure, cancellation, timeouts, recovery, and rollback.
 * **Quality attributes:** performance, availability, scalability, observability, accessibility, and measurable nonfunctional requirements when material.
 * **Architecture and maintainability:** actual dependency constraints, modularity, coupling, cohesion, complexity, duplication, testability and declared repository conventions. Do not impose SOLID, DDD, CQRS, Hexagonal Architecture, DRY, Object Calisthenics or other patterns by default; see Project Conventions below.
-* **Test adequacy:** verify what regressions existing assertions would catch; identify missing, stale, skipped, flaky, or ineffective tests. Use coverage, CRAP, mutation testing, and complexity as contextual signals, not universal merge blockers.
+* **Test adequacy:** verify what regressions existing assertions would catch; identify missing, stale, skipped, flaky, or ineffective tests. Use coverage, CRAP, mutation testing, and complexity as contextual signals, not universal merge blockers. In native and specialist review, apply relevant test-quality standards as evaluation criteria, without invoking test-generation workflows or granting authorization to edit tests. Review alone owns finding calibration and the verdict.
 * **Delivery safety:** reviewability, impact radius, rollout, feature flags, compatibility windows, deployment dependencies, and recovery when applicable.
 
 ## Requirement Authority and Project Conventions
