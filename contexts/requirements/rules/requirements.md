@@ -276,6 +276,11 @@ Use semantic `status` values such as `sufficient`, `needs-revision`, `needs-clar
 * Re-evaluate affected acceptance criteria, dependent requirements, planning items, design decisions, implementation references, examples, and test evidence after a material requirement change.
 * Do not preserve an obsolete interpretation merely because downstream artifacts already depend on it.
 * Impact analysis should identify what remains valid independently and what requires revision, clarification, re-planning, re-design, or re-verification.
+* When a previous authoritative specification or baseline exists, compare the **old and proposed meanings** by stable identities, not just textual diffs. Classify additions, removals, meaning changes, and unchanged semantics; retain original source and explicit governing decision. A formatting-only edit is not automatically a new requirement.
+* Distinguish **proposed**, **authorized/accepted**, **rejected**, and **deferred** semantic changes when those states matter. A proposal cannot silently replace an accepted baseline; missing authority remains unresolved.
+* Follow known inbound and outbound links to requirements, rules, scenarios, acceptance/fit criteria, work items and downstream evidence. For each material relationship, distinguish **confirmed impact**, **possible impact needing inspection**, **unaffected with rationale**, and **unavailable evidence**. An uninspected consumer is not confirmed current merely because another test passed.
+* Identify the next responsible owner and needed re-evaluation for each material impact without performing unauthorized edits to downstream contexts. Preserve existing identifiers; do not force a new ID merely because wording changed.
+* If no comparable baseline or consumer evidence exists, say so explicitly. Do not invent revisions, external IDs, a complete graph, or an approval to make traceability appear closed.
 
 ## Requirements Architecture and Traceability
 
@@ -304,6 +309,7 @@ Outcome Evidence
 * Detect material orphan relationships, such as a requirement with no supported need/rationale, a work item with no source, a test with no behavior, or a design decision with no evidenced driver.
 * Downstream artifacts may summarize a requirement but must not silently change its semantics.
 * When a downstream artifact exposes a material ambiguity or contradiction, return the issue to the requirement source rather than resolving it by invention.
+* Traceability closure is scoped to the **known evidence and intended downstream decision**; do not claim complete impact coverage for inaccessible or absent consumers.
 
 ## Quality Guardrails
 
