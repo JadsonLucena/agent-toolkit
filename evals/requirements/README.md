@@ -12,7 +12,10 @@ The cases in [cases.json](cases.json) sample the existing commands:
 - Elicitation: solution-first framing, dependent decisions, known evidence,
   unauthorized Change Boundary expansion, and contextual investigation selection
   (causal uncertainty, assumption scrutiny, option comparison, prospective risks,
-  hypothesis-driven learning, overlap, and avoiding needless technique ceremony).
+  hypothesis-driven learning, overlap, and avoiding needless technique ceremony),
+  plus outcome-to-actor impacts, event/policy reconstruction, evidence-backed
+  opportunities, stakeholder worldviews, goal-linked measurement, safety-critical
+  hazard questions, and non-mandatory investigation routing.
 - Definition: unsupported non-functional thresholds and ambiguous temporal
   boundaries.
 - Example Discovery: stable scenario identity, negative cases, and concurrency.
