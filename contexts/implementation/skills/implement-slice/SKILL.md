@@ -12,6 +12,7 @@ Implement one supported, independently verifiable code slice without silently mo
 ## Uses
 
 * Rule: `contexts/implementation/rules/implementation.md`
+* Skill: `contexts/implementation/skills/test-driven-development/SKILL.md`
 * Optional input contract: `contracts/design-evidence.md`
 * Optional input contract: `contracts/requirements.md`
 * Optional input contract: `contracts/work-item.md`
@@ -43,7 +44,7 @@ flowchart TD
     Gate -->|Missing authority or unsafe effect| Block
 ```
 
-Apply the named sections of `contexts/implementation/rules/implementation.md`. When a separate TDD capability is selected, delegate its inner RED/GREEN/REFACTOR loop rather than rewriting it here. Git owns semantic commit execution; Implementation supplies the completed in-scope intention.
+Apply the named sections of `contexts/implementation/rules/implementation.md`. When TDD is selected, delegate its inner RED/GREEN/REFACTOR loop to `contexts/implementation/skills/test-driven-development/SKILL.md` rather than rewriting it here. Git owns semantic commit execution; Implementation supplies the completed in-scope intention.
 
 ## Output
 
