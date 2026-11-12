@@ -94,7 +94,9 @@ flowchart TD
     VerifyRemoteContext --> ExistingPR
 
     ExistingPR -->|equivalent PR exists| ReportExisting
-    ExistingPR -->|none| CreationGate["Remote Creation Safety in pull-request.md"]
+    ExistingPR -->|none| CreationEvidence["Pre-Creation Quality Gate in pull-request.md"]
+    CreationEvidence -->|ready or explicitly authorized draft| CreationGate["Remote Creation Safety in pull-request.md"]
+    CreationEvidence -->|blocked| Blocked
 
     CreationGate -->|blocked| Blocked
     CreationGate -->|authorized and publishable| CreateRemotePR
