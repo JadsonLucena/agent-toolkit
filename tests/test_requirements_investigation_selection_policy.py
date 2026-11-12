@@ -38,6 +38,8 @@ class InvestigationSelectionPolicyTests(unittest.TestCase):
                 self.assertIn(term, selection)
         self.assertIn("not a checklist", selection)
         self.assertIn("does not authorize execution", selection)
+        self.assertIn("Fishbone (Ishikawa) or five whys", selection)
+        self.assertIn("Decision matrix or cost-benefit reasoning", selection)
         self.assertIn("using no named technique is a valid default", self.tailoring)
         self.assertIn("conditional techniques", self.agent)
 
