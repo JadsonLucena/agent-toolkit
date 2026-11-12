@@ -10,7 +10,9 @@ findings. It does not infer whether an agent was correct from keywords.
 The cases in [cases.json](cases.json) sample the existing commands:
 
 - Elicitation: solution-first framing, dependent decisions, known evidence,
-  and unauthorized Change Boundary expansion.
+  unauthorized Change Boundary expansion, and contextual investigation selection
+  (causal uncertainty, assumption scrutiny, option comparison, prospective risks,
+  hypothesis-driven learning, overlap, and avoiding needless technique ceremony).
 - Definition: unsupported non-functional thresholds and ambiguous temporal
   boundaries.
 - Example Discovery: stable scenario identity, negative cases, and concurrency.

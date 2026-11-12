@@ -21,7 +21,8 @@ Use to discover and structure the knowledge needed to understand a change before
 stateDiagram-v2
     [*] --> AssessContext
     AssessContext --> Discover
-    Discover --> Investigate
+    Discover --> SelectInvestigation
+    SelectInvestigation --> Investigate
     Investigate --> MapDecisionDependencies
     MapDecisionDependencies --> ResolveFacts
     ResolveFacts --> SelectQuestionFrontier
@@ -72,8 +73,24 @@ Follow the State Model.
 
 * AssessContext applies `contexts/requirements/rules/tailoring.md`.
 * Discover through Consolidate apply Strategic Framing, Scope and Solution Boundary, Change Boundary and Scope Drift, and Business Knowledge and Rules in `contexts/requirements/rules/requirements.md`.
+* SelectInvestigation applies Problem Investigation and Decision Evidence from that rule and the conditional technique selection below. Investigate may proceed without a named technique.
 * Do not restate those sections.
 * MapDecisionDependencies through SelectQuestionFrontier apply the protocol below; it is an elicitation procedure, not a second source of business rules.
+
+### Contextual investigation selection
+
+Select only an approach that can change a material interpretation, evidence need, option comparison, risk, or next question. These are optional techniques, not a checklist or a mandatory sequence.
+
+| Decision-relevant signal | Useful technique | Investigative result |
+| --- | --- | --- |
+| A symptom has an uncertain or contested cause | Fishbone (Ishikawa), then five whys where a causal chain is plausible | Competing causal hypotheses, counterevidence, and facts still needed; no asserted root cause without evidence |
+| A proposed solution rests on hidden assumptions, or the problem breakdown may be incomplete | First principles; MECE as a coverage/overlap diagnostic | Supported constraints versus assumptions, meaningful gaps and overlaps without forcing false exclusivity |
+| Several viable solutions or learning approaches require comparison | Decision matrix and cost-benefit reasoning | Sourced criteria, known trade-offs, uncertain costs/benefits, and the decision authority; no invented weights or ranking |
+| Failure could be consequential or hard to reverse | Pre-mortem | Plausible failure paths, critical guarantees, and verification or mitigation questions |
+| A high-impact claim is uncertain but can be investigated | Hypothesis testing | Falsifiable claim, observable signal, proposed learning method, and decision it would inform; no claim that an experiment ran |
+| Evidence already supports the next decision at the selected rigor | No specialized technique | Proceed to the decision frontier without analysis ceremony |
+
+Use techniques in combination only when each resolves a distinct material uncertainty. After investigation, re-evaluate what remains unknown and stop when further analysis cannot change the next decision without new evidence or authority. Preserve proposed tests or experiments as learning options; elicitation alone does not authorize execution.
 
 ### Decision-frontier interview protocol
 
