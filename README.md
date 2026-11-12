@@ -219,6 +219,8 @@ A command's invocation defines its authorization boundary. For example, determin
 
 ## Development Pipeline
 
+The pipeline follows lifecycle-coverage, controlled iteration, recovery, and safe-parallel-work invariants defined in [ARCHITECTURE.md](ARCHITECTURE.md); it is neither a mandatory sequential SDLC nor an authorization for downstream effects. Outcome observation remains distinct from code verification and PR readiness.
+
 The intended delivery flow is **test-first**: supported behavior is specified before implementation, and executable tests can guide implementation incrementally when a TDD workflow is selected.
 
 ```text
