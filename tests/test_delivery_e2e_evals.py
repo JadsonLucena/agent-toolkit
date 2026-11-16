@@ -19,6 +19,17 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
         self.assertEqual(len(cat["cases"]), len(set(x["id"] for x in cat["cases"])))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
 
+    def test_git_handoff_cases_are_actionable_and_modes_are_correct(self):
+        cat = load_catalog(ROOT / "evals/delivery/cases.json")
+        cases = {item["id"]: item for item in cat["cases"]}
+        for index in range(11, 16):
+            case = cases[f"DL-{index:02d}"]
+            self.assertEqual(3, len(case["checks"]))
+            for check in case["checks"]:
+                expected = "absence" if check["criterion"].startswith("Does not") else "presence"
+                with self.subTest(case=case["id"], check=check["id"]):
+                    self.assertEqual(expected, check["mode"])
+
     def test_no_invented_pass_without_agent_execution(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         summary = evaluate(cat, {"version": 1, "assessments": []}, ROOT / "evals/delivery")
