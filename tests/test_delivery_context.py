@@ -29,6 +29,22 @@ class DeliveryContextTests(unittest.TestCase):
         for token in ("Checkpoints cannot undo", "no material progress", "business problem", "source baseline"):
             self.assertIn(token.lower(), rules.lower())
 
+    def test_git_planning_happens_before_implementation(self):
+        skill = doc("contexts/delivery/skills/coordinate-delivery/SKILL.md")
+        self.assertIn("Auth --> Strategy", skill)
+        self.assertIn("GitPlan --> PlanReady", skill)
+        self.assertIn("PlanReady -->|No| Block", skill)
+        self.assertIn("PR Boundary", skill)
+        self.assertIn("read-only `plan`", skill)
+
+    def test_commit_result_and_remote_actions_are_separate(self):
+        skill = doc("contexts/delivery/skills/coordinate-delivery/SKILL.md")
+        rule = doc("contexts/delivery/rules/delivery.md")
+        self.assertIn("missing required commit or unproductive", skill)
+        self.assertIn("actual verified commit SHA or explicit blocked/uncommitted state", skill)
+        self.assertIn("create-semantic-commits/SKILL.md", rule)
+        self.assertIn("separate authorization", rule)
+
     def test_context_registered(self):
         self.assertIn("| Delivery | `rules/delivery.md` | Rule |", doc("ARCHITECTURE.md"))
         self.assertIn('"Delivery"', doc("scripts/toolkit_lint.py"))

@@ -14,6 +14,14 @@
 * Review is the **single technical review verdict**. Apply the existing review profile and Git PR readiness policies. Local verification, independent review and remote PR creation remain distinct actions with distinct evidence and authority.
 * Freeze and revalidate applicable source baseline, changed-file state, tests, review target and approvals before consuming evidence. Invalidate only affected downstream claims when authoritative inputs change.
 
+## Pre-Implementation PR Strategy and Git Handoffs
+
+* On a composite initiative with plausible independent or stacked PRs, route the Git Engineer's read-only `contexts/git/skills/manage-pull-request/SKILL.md` `plan` mode **before the first implementation mutation**, following `contexts/git/rules/pull-request.md`. Reuse a current plan when valid; do not impose ceremony on a single coherent PR.
+* Give Implementation the PR Boundary, authorized slice, intended base, dependencies, checks and permission restrictions as **evidence inputs**. Git's plan does not authorize implementing every proposed PR or any remote publication.
+* When code already exists without a prior PR plan, ask Git to assess the actual diff during `prepare`; never claim that planning happened before mutation.
+* Implementation detects each completed atomic intention; Git executes `contexts/git/skills/create-semantic-commits/SKILL.md` and returns a verified commit SHA or blocker. Delivery must not schedule dependent work from a merely requested, failed, stale or unverified commit handoff.
+* Planning, local commits, pushing, creating PRs and merging remain separate operations with separate authorization and evidence.
+
 ## Controlled Coordination and Recovery
 
 * Preserve the current Change Boundary, target stage, authoritative source IDs, decisions, observed checks, side effects, blockers, completed stages and next owner when material. A host may persist these facts; no vendor-specific checkpoint format is canonical.
