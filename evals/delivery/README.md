@@ -1,6 +1,6 @@
 # SDD Delivery end-to-end behavioral evaluations
 
-The [catalog](cases.json) lists ten high-value pilot behaviors for the future native SDD workflow: simple feature, financial risk, unresolved source meaning, TDD RED integrity, changed baseline, unproductive retries, unsafe parallelism, side-effect replay, stale review, and missing operational observations.
+The [catalog](cases.json) lists fifteen high-value pilot behaviors for the future native SDD workflow: simple feature, financial risk, unresolved source meaning, TDD RED integrity, changed baseline, unproductive retries, unsafe parallelism, side-effect replay, stale review, missing operational observations, and explicit Git handoffs for commits and PR planning. The final case invokes Implementation directly to verify policy outside Delivery.
 
 **These are specifications of tests, not tests that have been run.** A passing structural CI is not evidence of an agent executing a software change.
 

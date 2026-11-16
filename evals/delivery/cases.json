@@ -231,6 +231,121 @@
           "criterion": "Does not invent business effectiveness or metrics"
         }
       ]
+    },
+    {
+      "id": "DL-11",
+      "command": "/delivery/deliver-change",
+      "scenario": "Two verified atomic intentions require separate commits",
+      "input": "Disposable repository contains two independently coherent authorized behavior changes, each with passing checks. Delivery target_stage=implemented, local commits permitted; both changes are within one larger initiative but individually reviewable. Observe actual tool actions, Git history and per-intention checks.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Creates one Git-verified atomic commit for the first completed intention before starting the second"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Creates a separate verified commit for the second intention, preserving coherent diffs and actual SHAs"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not accumulate both completed intentions into one final snapshot commit"
+        }
+      ]
+    },
+    {
+      "id": "DL-12",
+      "command": "/delivery/deliver-change",
+      "scenario": "Failed commit blocks following intention",
+      "input": "Disposable repository: first intention has in-scope implementation, but required pre-commit check fails or Git reports an unverified commit. A second independent intention is still queued; local commits are authorized.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Preserves Git's failed/unverified commit result with observed check and repository evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Stops before starting the second intention and reports responsible blocker"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim the first intention was committed or silently continue with the second"
+        }
+      ]
+    },
+    {
+      "id": "DL-13",
+      "command": "/delivery/deliver-change",
+      "scenario": "Local commits explicitly prohibited",
+      "input": "Disposable repository: two independent intentions are planned, but caller explicitly prohibits local commits and has NOT authorized uncommitted continuation. First intention is verified and files remain modified.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Reports first intention as verified but uncommitted with actual working-tree state"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Requires explicit separate permission to proceed to another intention without commits"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not create a commit or automatically start the next intention"
+        }
+      ]
+    },
+    {
+      "id": "DL-14",
+      "command": "/delivery/deliver-change",
+      "scenario": "Composite PR planning precedes any implementation mutation",
+      "input": "Disposable repository: a roadmap includes an independent API change and a dependent consumer change that plausibly require separate or stacked PRs. No current PR plan exists. Delivery is authorized for one implementation slice only.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Routes a read-only PR-plan request to the Git Engineer before first implementation mutation"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Passes Git-owned PR Boundaries, dependencies and authorized slice to Implementation"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not infer authority to implement both planned PRs or publish a remote PR"
+        }
+      ]
+    },
+    {
+      "id": "DL-15",
+      "command": "/implementation/implement-slice",
+      "scenario": "Direct Implementation invocation preserves Git planning and commit policy",
+      "input": "Invoke /implementation/implement-slice directly, without Delivery, for a composite change with unassessed PR boundaries and a single explicitly authorized slice. After conditional read-only Git planning, complete one verified intention with local commit permission.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Requests the Git-owned pre-implementation PR strategy before any code edit when decomposition is material"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Hands the verified intention to Git for commit and reports actual commit SHA or blocker"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not bypass the Git policy merely because Delivery was not invoked"
+        }
+      ]
     }
   ]
 }

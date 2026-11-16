@@ -12,8 +12,10 @@ from requirements_evals import load_catalog, evaluate  # noqa: E402
 class DeliveryE2EEvalsTests(unittest.TestCase):
     def test_cases_are_valid_and_target_delivery(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
-        self.assertEqual(10, len(cat["cases"]))
-        self.assertTrue(all(x["command"] == "/delivery/deliver-change" for x in cat["cases"]))
+        self.assertEqual(15, len(cat["cases"]))
+        self.assertTrue(all(x["command"] in {"/delivery/deliver-change", "/implementation/implement-slice"} for x in cat["cases"]))
+        self.assertEqual({f"DL-{i:02d}" for i in range(11, 16)},
+                         {x["id"] for x in cat["cases"] if int(x["id"].split("-")[1]) >= 11})
         self.assertEqual(len(cat["cases"]), len(set(x["id"] for x in cat["cases"])))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
 
@@ -21,7 +23,7 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         summary = evaluate(cat, {"version": 1, "assessments": []}, ROOT / "evals/delivery")
         self.assertEqual("INCOMPLETE", summary["status"])
-        self.assertEqual(10, summary["incomplete"])
+        self.assertEqual(15, summary["incomplete"])
 
 
 if __name__ == "__main__":
