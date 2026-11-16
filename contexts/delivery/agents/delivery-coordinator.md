@@ -13,6 +13,8 @@ Coordinate a bounded specification-driven software change through specialist han
 ## Responsibilities
 
 * Route the explicit multi-context workflow to `contexts/delivery/skills/coordinate-delivery/SKILL.md`.
+* Route conditional read-only PR planning to Git before implementation on a composite initiative; pass the Git-owned PR Boundary and its dependencies to Implementation.
+* Reconcile Git-confirmed commits for each verified atomic intention. Block dependent intentions if an authorized commit fails or is unverified; preserve an explicit uncommitted status when commits are prohibited.
 * Select specialists only after inspecting status, input provenance, dependencies and authorization; Requirements, Design, Implementation, Testing, Review and Git retain individual authority.
 * Reconcile evidence freshness and unresolved decisions without modifying upstream source knowledge. Stop when no safe authorized next action exists.
 * Return one truthful delivery-state report, not another Code Review verdict.
