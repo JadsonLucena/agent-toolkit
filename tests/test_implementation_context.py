@@ -28,6 +28,27 @@ class ImplementationContextTests(unittest.TestCase):
         self.assertIn("Git revert does not reverse external outcomes", rule)
         self.assertIn("Review remains read-only and independently owned", rule)
 
+    def test_composite_pr_plan_precedes_mutation(self):
+        skill = doc("contexts/implementation/skills/implement-slice/SKILL.md")
+        self.assertLess(skill.index('PlanPR["Git Engineer'), skill.index('Change["Apply minimal'))
+        self.assertIn("read-only `plan` mode", skill)
+        self.assertIn("PR Boundary", skill)
+
+    def test_commit_handoff_requires_confirmation_before_next_intention(self):
+        skill = doc("contexts/implementation/skills/implement-slice/SKILL.md")
+        agent = doc("contexts/implementation/agents/implementation-engineer.md")
+        self.assertIn('Commit --> CommitVerified', skill)
+        self.assertIn('CommitVerified -->|Yes| More', skill)
+        self.assertIn('CommitVerified -->|No, failed or unavailable| Block', skill)
+        self.assertIn("create-semantic-commits/SKILL.md", skill)
+        self.assertIn("observed commit SHA", agent)
+
+    def test_uncommitted_work_does_not_advance_silently(self):
+        skill = doc("contexts/implementation/skills/implement-slice/SKILL.md")
+        self.assertIn('CommitAuthority -->|No| Uncommitted', skill)
+        self.assertIn('Continuation -->|No| DoneUncommitted', skill)
+        self.assertIn("explicit safe-continuation authorization", skill)
+
     def test_context_registered_in_linter_and_matrix(self):
         self.assertIn("| Implementation | `rules/implementation.md` | Rule |", doc("ARCHITECTURE.md"))
         self.assertIn('"Implementation"', doc("scripts/toolkit_lint.py"))

@@ -21,6 +21,14 @@
 * A failing check is evidence to diagnose, not permission to rewrite expected business behavior. Repetition requires new evidence or a changed hypothesis. Stop when an attempt is unproductive, unsafe or out of authorized scope.
 * A passing local check does not imply independent Code Review, deployment, acceptance, or measured outcomes. Review remains read-only and independently owned.
 
+## Git Handoff Integrity
+
+* Git owns commit atomicity, timing, staging and verification through `contexts/git/rules/semantic-commit.md`, `contexts/git/rules/git.md` and `contexts/git/skills/create-semantic-commits/SKILL.md`. Implementation owns the completed code intention and the handoff, not Git's internal procedure.
+* Before the first code mutation of a plausibly multi-PR change, consume an existing valid PR strategy or request the Git Engineer's **read-only** PR-plan capability. A direct Implementation invocation must not silently bypass this condition merely because Delivery was not invoked. Use the Git-owned `contexts/git/rules/pull-request.md` policy; the resulting PR plan is evidence, not authorization to implement additional slices.
+* For each verified atomic intention, provide the Git capability with the exact authorized change scope, actual repository/workspace identity, relevant verification results and local-commit permission. A completed code change is not a verified commit.
+* Do not advance automatically to another atomic intention when an authorized Git commit is blocked, failed, unverified, or lacks a confirmed matching commit identity. When commits are prohibited, preserve the uncommitted state and stop before the next intention unless the caller separately authorizes a safe uncommitted continuation.
+* A PR strategy, a successful commit and an implemented slice are distinct results. Planning, preparing and creating PRs remain Git-owned operations with separate authorization; local commits do not imply push, remote PR publication or merge.
+
 ## Atomic Delivery and Recovery
 
 * Close completed, verified atomic intentions using the Git context's existing commit capability and policy when the invocation authorizes local commits; do not duplicate staging, message derivation or hook procedures here.
