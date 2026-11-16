@@ -6,7 +6,7 @@ Implement one bounded, coherent, verifiable software change under the accepted s
 
 ## Invocation
 
-Select the Implementation Engineer and implement-slice procedure. Authorizes in-scope production and related test edits and local checks; completed verified atomic intentions may be locally committed under the existing Git rules unless explicitly prohibited. No permission to publish or deploy is inferred.
+Select the Implementation Engineer and implement-slice procedure. Authorizes in-scope production and related test edits and local checks; completed verified atomic intentions may be locally committed under the existing Git rules unless explicitly prohibited. When necessary, a read-only Git PR-plan handoff precedes the first mutation; each authorized completed atomic intention is handed to Git for commit verification before further intentions. No permission to publish or deploy is inferred.
 
 ## Uses
 
@@ -22,11 +22,12 @@ Select the Implementation Engineer and implement-slice procedure. Authorizes in-
 * Authorized slice, Change Boundary and intended acceptance/verification criteria.
 * Applicable specification, design and risk constraints when available.
 * Repository state, existing work and project verification conventions.
+* Existing PR strategy or PR Boundary (when applicable), or the evidence needed for a conditional read-only Git PR plan.
 * Explicit mutation exclusions, credentials/external-effect approvals and local-commit restrictions if any.
 
 ## Output
 
-Implemented scope and file inventory, observed tests/checks and revision, coherent local commit references if permitted, unresolved questions, residual risks, and explicit implemented/blocked/incomplete status.
+Implemented scope and file inventory, observed tests/checks and revision, verified Git commit references and actual resulting state if permitted (otherwise explicit uncommitted status), relevant PR-plan status, unresolved questions, residual risks, and explicit implemented/blocked/incomplete status.
 
 ## Boundary
 
