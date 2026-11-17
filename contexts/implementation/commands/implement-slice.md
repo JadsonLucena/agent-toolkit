@@ -27,7 +27,7 @@ Select the Implementation Engineer and implement-slice procedure. Authorizes in-
 
 ## Output
 
-Implemented scope and file inventory, observed tests/checks and revision, verified Git commit references and actual resulting state if permitted (otherwise explicit uncommitted status), relevant PR-plan status, unresolved questions, residual risks, and explicit implemented/blocked/incomplete status.
+The result describes completed Implementation only; independent Review and PR preparation/publication are subsequent Integration-stage operations. Implemented scope and file inventory, observed tests/checks and revision, verified Git commit references and actual resulting state if permitted (otherwise explicit uncommitted status), relevant PR-plan status, unresolved questions, residual risks, and explicit implemented/blocked/incomplete status.
 
 ## Boundary
 

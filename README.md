@@ -127,7 +127,7 @@ contexts/implementation/
 └── agents/implementation-engineer.md
 ```
 
-Implementation changes production and related test code only for an authorized bounded slice, reuses Testing quality standards and Git's atomic commit capability, and records observed verification without treating local checks as independent Review.
+Implementation changes production and related test code only for an authorized bounded slice, reuses Testing quality standards and Git's atomic commit capability, and records observed verification. It hands off an implemented slice; independent Review, PR publication and merge belong to the subsequent Integration stage.
 
 ### Delivery
 
@@ -139,7 +139,7 @@ contexts/delivery/
 └── agents/delivery-coordinator.md
 ```
 
-`/delivery/deliver-change` conditionally routes the existing specialist contexts toward a requested stage while preserving evidence and authorization boundaries. It defaults to read-only assessment without explicit mutation scope, does not implement or review code itself, and does not create PRs without separately authorized Git operations. The Markdown workflow is not a host execution engine.
+`/delivery/deliver-change` conditionally routes the existing specialist contexts toward a requested stage while preserving evidence and authorization boundaries. Integration coordinates final verification, independent Code Review, Git PR preparation, separately authorized PR creation, post-PR checks/approvals, and separately authorized merge. A ready PR needs applicable tests/lint and current advisory Review PASS; an explicitly authorized Draft may disclose incomplete evidence without claiming readiness. The command defaults to read-only assessment without mutation permission. The Markdown workflow is not a host execution engine.
 
 ### Testing
 
@@ -295,7 +295,11 @@ Elicitation ↔ Specification ↔ Validation ↔ Backlog / Plan
                     └───────────────────┘
                             │
                             ▼
-                     Verification → Independent Review → PR gate
+              Integration: final verification → Independent Review
+                            → Git PR preparation
+                            → Authorized PR publication
+                            → Post-PR checks / approvals
+                            → Authorized merge
 
 Cross-cutting: Git, security, conventions, …
 ```

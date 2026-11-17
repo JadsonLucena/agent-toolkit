@@ -49,6 +49,15 @@ class ImplementationContextTests(unittest.TestCase):
         self.assertIn('Continuation -->|No| DoneUncommitted', skill)
         self.assertIn("explicit safe-continuation authorization", skill)
 
+    def test_implementation_ends_before_review_and_pr_publication(self):
+        skill = doc("contexts/implementation/skills/implement-slice/SKILL.md")
+        agent = doc("contexts/implementation/agents/implementation-engineer.md")
+        command = doc("contexts/implementation/commands/implement-slice.md")
+        self.assertIn("separate Integration stage", skill)
+        self.assertIn("do not initiate independent Code Review", skill)
+        self.assertIn("do not perform independent review, PR publication or merge", agent)
+        self.assertIn("subsequent Integration-stage operations", command)
+
     def test_context_registered_in_linter_and_matrix(self):
         self.assertIn("| Implementation | `rules/implementation.md` | Rule |", doc("ARCHITECTURE.md"))
         self.assertIn('"Implementation"', doc("scripts/toolkit_lint.py"))
