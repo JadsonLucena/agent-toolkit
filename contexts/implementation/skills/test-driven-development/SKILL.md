@@ -12,6 +12,8 @@ Guide implementation through one small executable behavior at a time with verifi
 ## Uses
 
 * Rule: `contexts/implementation/rules/implementation.md`
+* Test-quality reference: `contexts/testing/rules/testing.md`
+* Optional specialized test-authoring capability: `contexts/testing/skills/generate-tests/SKILL.md`
 * Optional input contract: `contracts/test-basis.md`
 * Optional output contract: `contracts/test-evidence.md`
 * Optional input contract: `contracts/design-evidence.md`
@@ -24,7 +26,11 @@ Preserve the authorized slice, selected behavior and scenario identity when pres
 
 ```mermaid
 flowchart TD
-    Select["Test-Driven Execution: choose supported small behavior"] --> Red["RED: author and run focused failing test"]
+    Select["Test-Driven Execution: choose supported small behavior"] --> Standards["RED: apply Testing test-quality rule to scenario and assertions"]
+    Standards --> NeedHelp{"Specialized test authoring needed and authorized?"}
+    NeedHelp -->|Yes| Delegate["Testing: optional generate-tests test-authoring handoff"]
+    NeedHelp -->|No| Red
+    Delegate --> Red["RED: author or adapt and execute focused test"]
     Red --> Why{"Failed for expected behavioral reason?"}
     Why -->|No| Diagnose["Diagnose setup, assumption or mismatch"]
     Diagnose --> Decision{"Valid correction remains in scope?"}
@@ -44,7 +50,15 @@ flowchart TD
     More -->|No| Done["Return to implement-slice for integrated verification"]
 ```
 
-The workflow implements `contexts/implementation/rules/implementation.md` sections **Test-Driven Execution** and **Verification and Feedback**; the rule is the single source for invariants. Return control to the owning Implementation workflow for holistic verification and atomic commit handoff. Do not make the RED test pass by redefining a governing specification.
+The workflow implements `contexts/implementation/rules/implementation.md` sections **Test-Driven Execution** and **Verification and Feedback**; the rule owns TDD phase invariants. Apply `contexts/testing/rules/testing.md` as the **canonical test-quality reference** in RED, including relevant observable assertions, test isolation, determinism, scenario traceability and test-level selection, without copying its procedure here.
+
+## RED Test-Authoring Handoff
+
+* **Default:** Implementation authors the smallest supported behavioral test under the Testing rule and executes it. A legitimate RED is an **observed failure for the expected behavioral reason**; an already-passing test, an environmental/setup failure or a weakened assertion is not valid RED evidence.
+* **Conditional composition:** when specialized test design or authoring materially helps and the caller's authorized scope and host permit cross-context routing, request `contexts/testing/skills/generate-tests/SKILL.md` through the Testing specialist for **test-artifact design/authoring only**, using `contracts/test-basis.md` or equivalent accepted behavior, scenario IDs, risk boundaries and applicable rules. This is not a mandatory delegation for every TDD cycle.
+* **Handoff boundary:** Testing may propose or author **only authorized test files** and report traceability, uncertainty, executed checks and their actual outcomes. The requested behavior is deliberately not implemented yet; communicate that a focused, expected RED is not a defect to fix by relaxing assertions or changing behavior. A standalone Testing workflow may report incomplete/failing verification; do not reinterpret that as a GREEN success or suppress it to satisfy its ordinary completion criteria.
+* **Implementation owns the loop:** after optional handoff, Implementation inspects the test against authoritative behavior and Testing quality rules, **executes or verifies RED** and diagnoses the failure before any GREEN production edit. Testing does not own GREEN, REFACTOR, production edits, TDD phase advancement, independent Review or Git actions. If routing is unavailable or would conflict with the intentional RED, follow the native rule-driven path without inventing a specialist invocation.
+* Return control to the owning `implement-slice` workflow for integrated verification and atomic Git commit handoff. Do not make RED pass by redefining an accepted specification or inventing missing acceptance semantics.
 
 ## Output
 
