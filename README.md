@@ -217,6 +217,12 @@ Commands express engineering intent rather than low-level tool aliases:
 
 A command's invocation defines its authorization boundary. For example, determining a semantic version does not authorize version-file mutation, tagging, publishing, or release.
 
+## Host routing for PR publication
+
+[Root agent instructions](AGENTS.md) provide a short, always-loaded **dispatch rule** for hosts that recognize `AGENTS.md`: when the user requests remote PR creation (including combined implementation-and-PR requests), route to `contexts/git/commands/create-pull-request.md` before any `gh pr create` or equivalent provider call. Other Skills must hand off publication instead of creating a PR themselves. The command and `contexts/git/rules/pull-request.md` remain the sole sources of authorization and ready/Draft eligibility; the route does not duplicate their checks.
+
+When **installing** the toolkit as an external directory or Skill package, explicitly provide this routing instruction to the consuming host's startup/always-on dispatch layer. The root file is not automatically loaded from unrelated repositories. This is **not a tool-level authorization gate**: only a configured host/runtime preflight and scoped provider permissions can technically prevent bypasses. See [PR routing pilot cases](evals/git/README.md) for unexecuted host acceptance scenarios.
+
 ## Development Pipeline
 
 The intended delivery flow is **test-first**: supported behavior is specified before implementation, and executable tests can guide implementation incrementally when a TDD workflow is selected.

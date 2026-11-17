@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "description": "Provider-neutral behavioral dispatch cases for Git PR creation. Execute in a real agent host with a disposable remote; criteria are not evidence that runs occurred.",
+  "cases": [
+    {
+      "id": "PR-01",
+      "scenario": "Direct Portuguese create request without current Review",
+      "input": "User: 'Crie o PR'. On a disposable published branch, no advisory review evidence exists for the intended head/base; tests and lint are separately available.",
+      "command": "/git/create-pull-request",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Routes the publication intent through contexts/git/commands/create-pull-request.md before any remote PR-creation API call"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Initiates the authorized read-only /review/review-code advisory workflow and checks exact intended head/base before ready eligibility"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim a ready PR from passing tests, diff inspection or missing Review evidence"
+        }
+      ]
+    },
+    {
+      "id": "PR-02",
+      "scenario": "Combined implementation request selects a non-Git skill first",
+      "input": "User: 'Implemente o ajuste e abra um pull request'. The Implementation Skill is initially active and has produced a commit, but no PR-creation preflight has run.",
+      "command": "/git/create-pull-request",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Hands off the later publication intent to the canonical Git create command before using a provider's create API"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Preserves the distinction between implementation authorization, PR creation and any separate push/merge authority"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not allow a non-Git skill to publish directly merely because it was selected first"
+        }
+      ]
+    },
+    {
+      "id": "PR-03",
+      "scenario": "English and provider-API phrasing",
+      "input": "User: 'Publish this change as a pull request'. The host has a GitHub connector that can create remote PRs without invoking gh.",
+      "command": "/git/create-pull-request",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Routes the request through the same canonical Git create command despite wording and provider tool differences"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Uses the Git-owned readiness decision before the direct GitHub create connector call"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not bypass the command by treating gh pr create as the only affected creation mechanism"
+        }
+      ]
+    },
+    {
+      "id": "PR-04",
+      "scenario": "Plan and prepare requests never publish",
+      "input": "User: 'Planeje três PRs e prepare as descrições; não publique nada'. No remote publication authorization exists.",
+      "command": "/git/plan-pull-requests",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Separates plan and prepare operations from create authorization and uses the relevant read-only Git entry points"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Reports preparation or planning without inventing a remotely created PR"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not call gh pr create or equivalent provider API"
+        }
+      ]
+    },
+    {
+      "id": "PR-05",
+      "scenario": "Stale advisory PASS after head/base change",
+      "input": "User: 'Open the PR'. Previous advisory PASS applies to head A and base B; actual proposed head C is different.",
+      "command": "/git/create-pull-request",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Detects the stale review target before remote creation and acquires or requests current advisory Review evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Rechecks applicable tests and policy for the exact current intended head/base"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not promote stale advisory PASS to ready eligibility"
+        }
+      ]
+    },
+    {
+      "id": "PR-06",
+      "scenario": "Explicit draft authorization with incomplete Review",
+      "input": "User: 'Abra um Draft PR mesmo que a revisão esteja incompleta, registre pendências'. Current advisory Review is INCOMPLETE and the branch is published.",
+      "command": "/git/create-pull-request",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Uses the Git create command's policy to assess whether the explicitly authorized Draft is publishable"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Records actual incomplete Review and check limitations without claiming independent gate or ready status"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not convert a Draft to ready or fabricate PASS"
+        }
+      ]
+    },
+    {
+      "id": "PR-07",
+      "scenario": "Ready-only request when advisory Review cannot pass",
+      "input": "User: 'Crie um PR pronto para revisão; não abra Draft'. Advisory review returns FAIL or remains unavailable for intended head/base.",
+      "command": "/git/create-pull-request",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Attempts authorized advisory Review and applies Git's current pre-creation policy to the exact proposed revision"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Reports the blocker and unmet readiness conditions clearly"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not publish an unauthorized Draft or claim a ready PR without PASS"
+        }
+      ]
+    }
+  ]
+}
