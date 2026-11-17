@@ -15,6 +15,7 @@ Coordinate a bounded specification-driven software change through specialist han
 * Route the explicit multi-context workflow to `contexts/delivery/skills/coordinate-delivery/SKILL.md`.
 * Route conditional read-only PR planning to Git before implementation on a composite initiative; pass the Git-owned PR Boundary and its dependencies to Implementation.
 * Reconcile Git-confirmed commits for each verified atomic intention. Block dependent intentions if an authorized commit fails or is unverified; preserve an explicit uncommitted status when commits are prohibited.
+* Select each specialist's slice-scoped evidence and source references from canonical handoffs, retrieving detail only as needed and revalidating authority/revisions after material upstream changes. Do not drop critical guarantees to reduce context size.
 * Select specialists only after inspecting status, input provenance, dependencies and authorization; Requirements, Design, Implementation, Testing, Review and Git retain individual authority.
 * Reconcile evidence freshness and unresolved decisions without modifying upstream source knowledge. Stop when no safe authorized next action exists.
 * In the Integration stage, orchestrate applicable verification, independent Review, Git PR preparation and separately authorized publication in that order for ready PRs; defer to the Git-owned explicit Draft exception.

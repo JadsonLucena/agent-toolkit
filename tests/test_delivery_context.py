@@ -97,6 +97,20 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn("Product Slice technical verification status", skill)
         self.assertIn("a merged PR", agent.lower())
 
+    def test_slice_context_selection_is_selective_but_preserves_guarantees(self):
+        rule = doc("contexts/delivery/rules/delivery.md")
+        skill = doc("contexts/delivery/skills/coordinate-delivery/SKILL.md")
+        agent = doc("contexts/delivery/agents/delivery-coordinator.md")
+        for token in ("Slice-Scoped Context Integrity", "progressive, authorized retrieval",
+                      "critical source is missing", "Invalidate only affected"):
+            self.assertIn(token.lower(), rule.lower())
+        for token in ("Slice-Scoped Context Handoffs", "context_id", "change_boundary_ref",
+                      "scenario_refs", "source_baseline_ref", "on demand",
+                      "referenced, actually retrieved, and verified"):
+            self.assertIn(token.lower(), skill.lower())
+        self.assertIn("Do not drop critical guarantees", agent)
+        self.assertIn("does **not** define a new context-packet contract", skill)
+
     def test_context_registered(self):
         self.assertIn("| Delivery | `rules/delivery.md` | Rule |", doc("ARCHITECTURE.md"))
         self.assertIn('"Delivery"', doc("scripts/toolkit_lint.py"))
