@@ -383,14 +383,14 @@ def guard_advisory_ready(
     repo, base, head = state["repo"], state["base"], state["head"]
     reviewer_command = state["policy"].get("advisory_reviewer_command")
     if (not isinstance(reviewer_command, list) or not reviewer_command
-            or any(not isinstance(part, str) or not part or "\\x00" in part
+            or any(not isinstance(part, str) or not part or "\x00" in part
                    for part in reviewer_command)):
         raise GateError("protected policy has no approved advisory_reviewer_command")
 
     body = read_bytes(body_path).decode("utf-8", "replace")
     # Advisory readiness is explicitly not a signed gate assertion.
     if _GATE_PROFILE.search(body) or re.search(
-        r"\\b(?:signed[ -]+)?gate(?:[ -]+review)?\\s*[:= -]\\s*PASS\\b", body,
+        r"\b(?:signed[ -]+)?gate(?:[ -]+review)?\s*[:= -]\s*PASS\b", body,
         re.IGNORECASE,
     ):
         raise GateError("advisory PR body claims an independent gate PASS")
