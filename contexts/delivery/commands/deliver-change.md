@@ -23,14 +23,14 @@ Select the Delivery Coordinator and its cross-context workflow. If `target_stage
 ## Inputs
 
 * Change objective, approved scope and current artifacts or source references.
-* Explicit `target_stage`: `planned`, `designed`, `implemented`, `reviewed`, or `pr-prepared`, plus applicable operation-level permissions.
+* Explicit `target_stage`: `planned`, `designed`, `implemented`, `reviewed`, `pr-prepared`, `pr-created`, or `integrated`, plus applicable operation-level permissions. `pr-created` requires explicit PR-creation authority; `integrated` additionally requires merge authority and all repository prerequisites.
 * Existing repository snapshot, stage evidence, Git-owned PR plan/Boundary when available, local-commit restrictions and blockers when known.
-* Runtime capabilities and resource/approval limits when known.
+* Runtime capabilities, intended PR base/head and PR publication state, review/check/approval evidence, repository branch protections, and resource/approval limits when known.
 
 ## Output
 
-Actual completed stage and source/revision identity, next safe required capability, routed specialist results, PR-plan evidence where material, verified commit identities or explicit uncommitted/blocked state, checks, review status where performed, blockers, pending decisions, and evidence of operations actually executed.
+Actual completed stage and source/revision identity, next safe required capability, routed specialist results, PR-plan evidence where material, verified commit identities or explicit uncommitted/blocked state, current verification and independent Review evidence, prepared/published PR identity when observed, post-PR checks and approvals, verified merge target only when integration actually occurred, blockers, pending decisions, and evidence of operations actually executed.
 
 ## Boundary
 
-Default is read-only assessment. No implicit code mutation, commit, push, PR publication, merge, release, deployment, third-party transmission or acceptance of a business outcome. A target stage expresses intent, not blanket tool authorization; escalate missing permission before effects.
+Default is read-only assessment. No implicit code mutation, commit, push, PR publication, merge, release, deployment, third-party transmission or acceptance of a business outcome. A PR ready for review requires current applicable tests/lint and independent advisory Review PASS under Git policy; an explicitly authorized Draft can disclose gaps without claiming ready. A target stage expresses intent, not blanket tool authorization; escalate missing permission before effects.
