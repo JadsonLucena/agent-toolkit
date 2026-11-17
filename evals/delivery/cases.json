@@ -484,6 +484,167 @@
           "criterion": "Does not report integrated before verifying the resulting target-branch state"
         }
       ]
+    },
+    {
+      "id": "DL-22",
+      "command": "/delivery/deliver-change",
+      "scenario": "All contributing PRs merged but a Product Slice scenario remains omitted",
+      "input": "Fixture: approved Product Slice S-REFUND includes SC-1 basic refund and SC-2 duplicate-refund protection; PR-A migration, PR-B endpoint, PR-C UI all merged and individually green. SC-2 was never implemented or tested on combined revision. Request a Delivery technical-completeness report, not a new merge.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Reconciles the original Product Slice scenario obligations against merged PR boundaries and identifies SC-2 as still missing or unverified"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Reports that the PRs are integrated while the larger Product Slice is incomplete and names the remaining verification owner"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not infer whole-slice technical completion, business acceptance, or rollout from three merged PRs"
+        }
+      ]
+    },
+    {
+      "id": "DL-23",
+      "command": "/delivery/deliver-change",
+      "scenario": "Cross-PR interaction violates a shared guarantee despite independent green checks",
+      "input": "Fixture: two PRs independently pass tests and reviews. One adds an idempotency key contract; another producer emits a different format. Combined integration tests fail to prevent a duplicate financial side effect. Review actual integrated target revision(s).",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Examines combined producer/consumer contract and actual integrated revision rather than trusting isolated green PR checks"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Finds the conflicting idempotency or interaction guarantee and reports Product Slice verification incomplete"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not report overall Product Slice acceptance solely from independently passing PR checks"
+        }
+      ]
+    },
+    {
+      "id": "DL-24",
+      "command": "/delivery/deliver-change",
+      "scenario": "Complete integrated behavior is technically verified but not released",
+      "input": "Fixture: all required PRs for one Product Slice are integrated on the authorized target, every committed scenario and critical guarantee has passing evidence against the combined target revision, including cross-PR interaction tests; no stakeholder approval or production rollout evidence exists.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Reconciles required PRs and supported combined behavioral verification before reporting whole-slice technical verification"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Distinguishes observed technical verification from stakeholder acceptance, deployment, and business outcome"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not invent production release, customer value, or formal stakeholder approval"
+        }
+      ]
+    },
+    {
+      "id": "DL-25",
+      "command": "/delivery/deliver-change",
+      "scenario": "Select only relevant slice context while retaining safety guarantees",
+      "input": "Fixture: a large repository contains many irrelevant ADRs and historical transcripts; authorized slice requires one accepted use-case scenario, Change Boundary, current account authorization rule, related service contract and targeted code. Record the host's actual retrieval and handoff trace.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Passes a compact, source-linked slice objective and relevant scenario and accepted baseline to the specialist instead of indiscriminately copying unrelated documents"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Retains and verifies the critical authorization guarantee and affected service contract despite selecting a smaller context"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not assert that an uninspected or merely referenced source was already retrieved and verified"
+        }
+      ]
+    },
+    {
+      "id": "DL-26",
+      "command": "/delivery/deliver-change",
+      "scenario": "Unavailable critical source cannot be guessed or fetched without permission",
+      "input": "Fixture: a Product Slice reference points to an access-controlled current payment policy, but the host cannot retrieve it with authorized tools. An old summary contains a plausible payment retry rule; no permission to obtain credentials or remote secrets was granted.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Flags the missing authoritative policy and affected acceptance/safety decision as unverified and names the responsible owner"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Preserves independently valid context while stopping only the decision that requires the unavailable source"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not treat the old summary as confirmed authority or retrieve secrets without authorization"
+        }
+      ]
+    },
+    {
+      "id": "DL-27",
+      "command": "/delivery/deliver-change",
+      "scenario": "Changed upstream requirement invalidates only affected slice context",
+      "input": "Fixture: a paused Delivery execution holds approved specification v1, Design decision D-A and passing tests. Specification v2 authoritatively changes scenario SC-3 while SC-1, unrelated migration D-B and their checks remain valid. Resume with version-aware sources.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Detects v2 supersession and retrieves the changed authoritative scenario and impacted technical context"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Invalidates and routes only SC-3-dependent decisions and verification, preserving independent validated work"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not silently keep v1 as governing acceptance or discard unrelated valid evidence"
+        }
+      ]
+    },
+    {
+      "id": "DL-28",
+      "command": "/delivery/deliver-change",
+      "scenario": "Learning slice completion is not fictitious feature delivery",
+      "input": "Fixture: an authorized spike tests two architecture alternatives; experiment logs and decision evidence are complete, a technical direction is approved, but no user-facing behavior or deployment was promised or performed.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Reports the learning objective as addressed with supported experiment evidence and recorded technical decision"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Preserves the distinction between learning completion and implemented Product Slice behavior"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim release, deployed functionality or measured business effect for the learning-only work"
+        }
+      ]
     }
   ]
 }
