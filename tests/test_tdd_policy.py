@@ -22,6 +22,8 @@ class TddPolicyTests(unittest.TestCase):
 
     def test_red_uses_testing_quality_without_reimplementing_testing(self):
         skill = read("contexts/implementation/skills/test-driven-development/SKILL.md")
+        uses = skill.split("## Uses", 1)[1].split("## Working State", 1)[0]
+        self.assertNotIn("contexts/testing/", uses)  # cross-context quality guidance is not a Skill dependency
         self.assertIn("contexts/testing/rules/testing.md", skill)
         self.assertIn("canonical test-quality reference", skill)
         self.assertIn("observable assertions", skill)
