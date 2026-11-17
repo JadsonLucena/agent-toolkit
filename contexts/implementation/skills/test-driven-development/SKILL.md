@@ -12,8 +12,6 @@ Guide implementation through one small executable behavior at a time with verifi
 ## Uses
 
 * Rule: `contexts/implementation/rules/implementation.md`
-* Test-quality reference: `contexts/testing/rules/testing.md`
-* Optional specialized test-authoring capability: `contexts/testing/skills/generate-tests/SKILL.md`
 * Optional input contract: `contracts/test-basis.md`
 * Optional output contract: `contracts/test-evidence.md`
 * Optional input contract: `contracts/design-evidence.md`
