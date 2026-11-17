@@ -1,10 +1,12 @@
 # Guarded GitHub PR Creation
 
-\`adapters/github/guarded_pr.py\` is an optional **GitHub-specific, executable
-pre-creation gate** for the portable Review → Git evidence contract.
+`adapters/github/guarded_pr.py` is an optional **GitHub-specific, executable
+pre-creation guard** for the portable Review → Git evidence contract. It offers
+a **native advisory-ready** path, the original **signed gate** path, and
+an explicitly authorized **Draft** path. The modes are never interchangeable.
 
-The adapter verifies an **SSH-signed review attestation** from an authorized
-reviewer and executes all checks specified in a **deployment-protected policy**.
+The signed-gate mode verifies an **SSH-signed review attestation** from an authorized
+independent reviewer. The advisory-ready mode instead invokes a **trusted configured reviewer** and requires a complete current advisory PASS. Both use the mandatory checks from a **deployment-protected policy**.
 Only after success, and only with explicit \`--create\`, does it invoke
 \`gh pr create\`. It then queries the created PR through \`gh api\` and checks
 the returned repository, base/head refs **and SHAs**, title, and Draft state.
@@ -57,6 +59,12 @@ publication tool** (a protected wrapper/service exposing this script) and not
 unrestricted direct `gh pr create`, GitHub MCP creation, or equivalent API
 credentials. Without runtime/tool permissions that prevent bypass, no
 repository file or wrapper can guarantee global PR-publication enforcement.
+
+## Host publication boundary — required for bypass prevention
+
+For reliable enforcement, install this adapter in a trusted tool/service context with its own **GitHub PR-write credential**. Remove direct PR-creation API/CLI tools and PR-write credentials from the coding agent, including any GitHub MCP connector that can create PRs. Route every authorized publication through the adapter. The trust policy, reviewer executable, working copy and credential scope must be controlled outside the untrusted implementation workspace.
+
+The toolkit intentionally does **not** claim to enforce this automatically on Cursor, Claude, Codex or other hosts. The owner of each host must configure its tool registry, credential delegation and approval boundary; there is no repository-wide control that can revoke a separately provisioned GitHub credential. Host instruction routing in root `AGENTS.md` improves selection but is not the security boundary.
 
 ## Trust model and setup
 
@@ -157,7 +165,7 @@ python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
   --trust-policy /protected/review-policy.json
 
 # Only the explicit --create authorizes remote PR creation.
-# A ready PR requires the signed gate evidence:
+# A signed-gate ready PR requires independently attested gate evidence:
 python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
   --repo . --base main --head feature/example \
   --evidence /protected/review-evidence.json \
