@@ -85,6 +85,18 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn("merge authority", command)
         self.assertIn("separately authorized Git integration", skill)
 
+    def test_product_slice_completion_is_distinct_from_pr_merge(self):
+        rule = doc("contexts/delivery/rules/delivery.md")
+        skill = doc("contexts/delivery/skills/coordinate-delivery/SKILL.md")
+        agent = doc("contexts/delivery/agents/delivery-coordinator.md")
+        for token in ("integrated target revision", "cross-PR", "Product Slice still incomplete"):
+            self.assertIn(token.lower(), rule.lower())
+        self.assertIn('Confirm -->|Verified| SliceReconcile', skill)
+        self.assertIn('SliceComplete -->|No, pending or unverified| SlicePending', skill)
+        self.assertIn("PR integration status", skill)
+        self.assertIn("Product Slice technical verification status", skill)
+        self.assertIn("a merged PR", agent.lower())
+
     def test_context_registered(self):
         self.assertIn("| Delivery | `rules/delivery.md` | Rule |", doc("ARCHITECTURE.md"))
         self.assertIn('"Delivery"', doc("scripts/toolkit_lint.py"))

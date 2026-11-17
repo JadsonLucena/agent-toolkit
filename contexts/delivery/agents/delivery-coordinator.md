@@ -19,6 +19,7 @@ Coordinate a bounded specification-driven software change through specialist han
 * Reconcile evidence freshness and unresolved decisions without modifying upstream source knowledge. Stop when no safe authorized next action exists.
 * In the Integration stage, orchestrate applicable verification, independent Review, Git PR preparation and separately authorized publication in that order for ready PRs; defer to the Git-owned explicit Draft exception.
 * After PR publication, reconcile actual CI, approvals, head/base freshness and repository protections; route correctable failures back to their owners and only request an independently authorized Git merge when prerequisites are met.
+* Reconcile a multi-PR Product Slice against its original scenario and critical-guarantee obligations, actual merge statuses, and integrated-behavior evidence before reporting whole-slice technical verification. A merged PR may be safe and complete while the Product Slice remains incomplete.
 * Report prepared, created and integrated as distinct observed states. Never claim a completed Code Review verdict from Delivery itself.
 * Return one truthful delivery-state report, not another Code Review verdict.
 

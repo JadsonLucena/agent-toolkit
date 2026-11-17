@@ -33,6 +33,14 @@
 * A merge requires separately authorized Git integration, all applicable repository protections and readiness evidence, and verification of the observed target state. Route the operation to Git's established branch/integration capability; do not make Delivery a new merge engine. When checks are unavailable or failed, or approval is missing, report the blocking status instead of merging.
 * The target stage `reviewed`, `pr-prepared`, `pr-created`, or `integrated` reports only that specific observed milestone. Stop on the requested stage instead of automatically publishing or merging. Post-PR review/checks do not create a second Code Review owner or automatic merge authorization.
 
+## Product Slice Continuity and Completion Evidence
+
+* A Product Slice or use-case slice remains the supported behavioral or learning objective across its work items, Architectural Slices, implementation intentions, commits, and one or more PR Boundaries. These units have different completion and authorization semantics; one-to-one identity or size is not required.
+* Where multiple PRs contribute to one Product Slice, preserve the original objective and the applicable scenario, acceptance, rule, quality, and critical-guarantee references. Determine which PRs are required for the currently authorized slice, which are integrated, still pending, intentionally deferred, or superseded; a PR merged alone never proves the overall slice is complete.
+* For a material technical slice-completeness claim, reconcile the **integrated target revision(s)**, coverage of every committed obligation, and relevant cross-PR or cross-component interaction verification. Independent PR-level tests and Review verdicts do not prove the combined behavior. Report omitted scenarios, conflicting interfaces, inaccessible repositories, or missing integrated verification as incomplete or unverified—not as satisfied.
+* Technical verification of the whole slice is distinct from stakeholder acceptance, activation, release, deployment, and observed business value. A learning slice may be complete through a supported experiment and recorded decision even without a new deployed feature; do not invent behavioral acceptance for learning work.
+* An authorized merge need not be blocked merely because the larger Product Slice is unfinished, provided the PR independently satisfies integration safety and repository gates. Report **PR integrated / Product Slice still incomplete or unverified** and keep remaining obligations visible. Do not silently change the approved Change Boundary or drop guarantees to manufacture completion.
+
 ## Controlled Coordination and Recovery
 
 * Preserve the current Change Boundary, target stage, authoritative source IDs, decisions, observed checks, side effects, blockers, completed stages and next owner when material. A host may persist these facts; no vendor-specific checkpoint format is canonical.
