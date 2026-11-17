@@ -19,8 +19,10 @@ class DeliveryContextTests(unittest.TestCase):
     def test_composes_specialists_without_second_review_verdict(self):
         skill = doc("contexts/delivery/skills/coordinate-delivery/SKILL.md")
         for token in ("Requirements owner", "Design owner", "Implementation owner",
-                      "Review owner", "Git owner", "sole technical verdict"):
+                      "Review owner", "sole technical verdict"):
             self.assertIn(token, skill)
+        self.assertIn("Git: prepare ready PR", skill)
+        self.assertIn("Git: create PR", skill)
         agent = doc("contexts/delivery/agents/delivery-coordinator.md")
         self.assertIn("not another Code Review verdict", agent)
 
