@@ -38,7 +38,9 @@ flowchart TD
     Need -->|Design| Design["Route to Design owner"]
     Need -->|Implementation| Implementation["Pass PR Boundary and commit policy to Implementation owner"]
     Need -->|Integration after Implementation| Preflight["Integration: inspect final head/base and applicable tests/lint"]
-    Need -->|Existing published PR requires integration| PostTarget
+    Need -->|Existing published PR requires integration| ExistingPR{"PR head/base or pre-PR evidence stale?"}
+    ExistingPR -->|Yes| Preflight
+    ExistingPR -->|No, current| PostTarget
     Need -->|Reached authorized target| Done["Outcome Handoff: report actual stage"]
     Need -->|Unapproved operation| Block
     Requirements --> Reconcile
