@@ -22,6 +22,17 @@
 * Implementation detects each completed atomic intention; Git executes `contexts/git/skills/create-semantic-commits/SKILL.md` and returns a verified commit SHA or blocker. Delivery must not schedule dependent work from a merely requested, failed, stale or unverified commit handoff.
 * Planning, local commits, pushing, creating PRs and merging remain separate operations with separate authorization and evidence.
 
+## Integration Readiness and PR Lifecycle
+
+* After a bounded Implementation result, Integration verifies the actual intended head/base and applicable tests, lint, independent Code Review, PR readiness, remote PR state, and eventual merge eligibility as **distinct evidence claims**. Implementation completion, a PR created and a change integrated into the target branch are not interchangeable.
+* The independent Review owner issues the **single Code Review verdict**. For a **ready** PR, use the Git-owned `contexts/git/rules/pull-request.md` pre-creation floor: current applicable tests/lint and complete `review_profile=advisory` `PASS` evidence on the intended head/base. An advisory PASS is not a signed `gate` attestation.
+* After a failed or incomplete independent Review or verification, return the affected defect or decision to its actual owner (Implementation, Design or Requirements). Reverify the resulting code and revalidate the Review evidence for the changed scope and final revision before claiming readiness. Do not silently modify a requirement merely to satisfy Review.
+* An **explicitly authorized Draft PR** may still be published with failed, missing, stale or incomplete evidence when the Git-owned pre-creation policy allows it. State those gaps truthfully; do not label the Draft ready or gate-approved. This exception is not a bypass for a ready PR.
+* Git owns `manage-pull-request` `prepare` and authorized `create` operations; Delivery sequences them **after** code implementation and applicable readiness investigation, without copying their internal verification or template procedure. A prepared PR is not a created PR, and a created PR is not merged.
+* After remote PR creation, recheck required post-publication CI/checks, repository branch protections, independent approvals where required, and evidence freshness for the actual PR head/base. A changed head or relevant base requires proportionate revalidation; upstream checks are reusable only if still equivalent for the integration target.
+* A merge requires separately authorized Git integration, all applicable repository protections and readiness evidence, and verification of the observed target state. Route the operation to Git's established branch/integration capability; do not make Delivery a new merge engine. When checks are unavailable or failed, or approval is missing, report the blocking status instead of merging.
+* The target stage `reviewed`, `pr-prepared`, `pr-created`, or `integrated` reports only that specific observed milestone. Stop on the requested stage instead of automatically publishing or merging. Post-PR review/checks do not create a second Code Review owner or automatic merge authorization.
+
 ## Controlled Coordination and Recovery
 
 * Preserve the current Change Boundary, target stage, authoritative source IDs, decisions, observed checks, side effects, blockers, completed stages and next owner when material. A host may persist these facts; no vendor-specific checkpoint format is canonical.

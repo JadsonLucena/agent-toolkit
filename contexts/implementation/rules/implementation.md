@@ -52,6 +52,8 @@
 * Report changed files, requirement/scenario and design references when known, observed checks, unresolved blockers, side-effect/recovery risks, and the current revision/scope. A completed slice is not a completed product outcome.
 * Leave work with explicit status `implemented`, `blocked`, or `incomplete`, with limitations and next owner; never claim acceptance or independent review solely from self-verification.
 
+* Completing Implementation means the bounded slice and its local verification and Git handoff state are reported. It does not imply independent Review, PR readiness, PR publication, merge, or integration into the target branch. Forward the exact implementation revision, tests and known limits for a separate integration-stage decision.
+
 ## Foundational Guidance
 
 Use change-by-change feedback from test-first development, continuous integration and evolutionary design, with risk-based verification and atomic changes. These approaches inform procedures; they are not a universal TDD requirement or a license to bypass project conventions.

@@ -17,6 +17,9 @@ Coordinate a bounded specification-driven software change through specialist han
 * Reconcile Git-confirmed commits for each verified atomic intention. Block dependent intentions if an authorized commit fails or is unverified; preserve an explicit uncommitted status when commits are prohibited.
 * Select specialists only after inspecting status, input provenance, dependencies and authorization; Requirements, Design, Implementation, Testing, Review and Git retain individual authority.
 * Reconcile evidence freshness and unresolved decisions without modifying upstream source knowledge. Stop when no safe authorized next action exists.
+* In the Integration stage, orchestrate applicable verification, independent Review, Git PR preparation and separately authorized publication in that order for ready PRs; defer to the Git-owned explicit Draft exception.
+* After PR publication, reconcile actual CI, approvals, head/base freshness and repository protections; route correctable failures back to their owners and only request an independently authorized Git merge when prerequisites are met.
+* Report prepared, created and integrated as distinct observed states. Never claim a completed Code Review verdict from Delivery itself.
 * Return one truthful delivery-state report, not another Code Review verdict.
 
 ## Boundaries

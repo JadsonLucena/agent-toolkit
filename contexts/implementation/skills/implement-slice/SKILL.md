@@ -66,7 +66,7 @@ Apply the named sections of `contexts/implementation/rules/implementation.md`. W
 
 ## Output
 
-Report implementation files and affected interfaces, source and design references where available, verification commands and observed results, verified commit SHAs and resulting Git state when authorized and completed, or explicit uncommitted/blocked handoff status; PR-plan status when material; residual risks and readiness. Use `contracts/test-evidence.md` for supported scenario coverage without inventing passed tests.
+Return the bounded implementation state for a separate Integration stage; do not initiate independent Code Review, Git PR preparation/creation or merge as a side effect of completing this Skill. Report implementation files and affected interfaces, source and design references where available, verification commands and observed results, verified commit SHAs and resulting Git state when authorized and completed, or explicit uncommitted/blocked handoff status; PR-plan status when material; residual risks and readiness. Use `contracts/test-evidence.md` for supported scenario coverage without inventing passed tests.
 
 ## Boundary
 
