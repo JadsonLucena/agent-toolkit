@@ -38,6 +38,7 @@ flowchart TD
     Need -->|Design| Design["Route to Design owner"]
     Need -->|Implementation| Implementation["Pass PR Boundary and commit policy to Implementation owner"]
     Need -->|Integration after Implementation| Preflight["Integration: inspect final head/base and applicable tests/lint"]
+    Need -->|Existing published PR requires integration| PostTarget
     Need -->|Reached authorized target| Done["Outcome Handoff: report actual stage"]
     Need -->|Unapproved operation| Block
     Requirements --> Reconcile
@@ -51,7 +52,8 @@ flowchart TD
     ChecksResult -->|No, explicit draft intent| DraftPrepare["Git: prepare truthful draft with stated gaps"]
     Checks -->|Yes| Review
     Review --> ReviewResult{"Advisory PASS for final head/base?"}
-    ReviewResult -->|Yes| ReadyPrepare["Git: prepare ready PR under existing Git floor"]
+    ReviewResult -->|PASS, reviewed stage reached| DoneReviewed["Report independent Review evidence; stop before PR preparation"]
+    ReviewResult -->|PASS, PR stage authorized| ReadyPrepare["Git: prepare ready PR under existing Git floor"]
     ReviewResult -->|No, correctable| Fix
     ReviewResult -->|No, explicitly authorized draft| DraftPrepare
     ReviewResult -->|No, cannot proceed| Block
@@ -60,7 +62,7 @@ flowchart TD
     DraftPrepare --> PublishDecision
     PublishDecision -->|Only prepare requested or no creation authority| Prepared["Report pr-prepared status and limits"]
     PublishDecision -->|Blocked by Git policy| Block
-    PublishDecision -->|Ready or explicitly authorized draft creation| GitCreate["Git: create PR with separate remote authorization"]
+    PublishDecision -->|Ready and separately authorized creation, or explicitly authorized draft| GitCreate["Git: create PR under Git readiness policy"]
     GitCreate --> Created["Verify published PR identity, head/base and draft/ready state"]
     Created --> PostTarget{"PR-created is target stage?"}
     PostTarget -->|Yes| Done
