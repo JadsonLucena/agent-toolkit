@@ -20,6 +20,29 @@ class TddPolicyTests(unittest.TestCase):
                       "Record phase results", "RED", "GREEN", "REFACTOR"):
             self.assertIn(token, skill)
 
+    def test_red_uses_testing_quality_without_reimplementing_testing(self):
+        skill = read("contexts/implementation/skills/test-driven-development/SKILL.md")
+        self.assertIn("contexts/testing/rules/testing.md", skill)
+        self.assertIn("canonical test-quality reference", skill)
+        self.assertIn("observable assertions", skill)
+        self.assertIn("test isolation", skill)
+        self.assertIn("scenario traceability", skill)
+        self.assertIn("without copying its procedure", skill)
+        self.assertIn("Standards --> NeedHelp", skill)
+        self.assertIn("NeedHelp -->|No| Red", skill)
+
+    def test_optional_test_authoring_handoff_respects_red(self):
+        skill = read("contexts/implementation/skills/test-driven-development/SKILL.md")
+        self.assertIn("contexts/testing/skills/generate-tests/SKILL.md", skill)
+        self.assertIn("NeedHelp -->|Yes| Delegate", skill)
+        self.assertIn("Delegate --> Red", skill)
+        self.assertIn("test-artifact design/authoring only", skill)
+        self.assertIn("observed failure for the expected behavioral reason", skill)
+        self.assertIn("standalone Testing workflow may report incomplete/failing verification", skill)
+        self.assertIn("Testing does not own GREEN, REFACTOR", skill)
+        self.assertIn("follow the native rule-driven path", skill)
+        self.assertIn("only authorized test files", skill)
+
     def test_tdd_remains_implementation_owned(self):
         self.assertIn("| Implementation | `skills/test-driven-development/SKILL.md` | Skill |", read("ARCHITECTURE.md"))
         self.assertIn("test-driven-development/SKILL.md", read("contexts/implementation/agents/implementation-engineer.md"))
