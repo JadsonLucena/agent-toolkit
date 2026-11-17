@@ -95,7 +95,7 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn('SliceComplete -->|No, pending or unverified| SlicePending', skill)
         self.assertIn("PR integration status", skill)
         self.assertIn("Product Slice technical verification status", skill)
-        self.assertIn("a merged PR", agent.lower())
+        self.assertIn("a merged pr", agent.lower())
 
     def test_slice_context_selection_is_selective_but_preserves_guarantees(self):
         rule = doc("contexts/delivery/rules/delivery.md")
