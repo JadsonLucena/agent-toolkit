@@ -42,7 +42,7 @@ class DeliveryContextTests(unittest.TestCase):
     def test_commit_result_and_remote_actions_are_separate(self):
         skill = doc("contexts/delivery/skills/coordinate-delivery/SKILL.md")
         rule = doc("contexts/delivery/rules/delivery.md")
-        self.assertIn("missing required commit or unproductive", skill)
+        self.assertIn("unverified commit, or no progress", skill)
         self.assertIn("actual verified commit SHA or explicit blocked/uncommitted state", skill)
         self.assertIn("create-semantic-commits/SKILL.md", rule)
         self.assertIn("separate authorization", rule)
@@ -88,7 +88,7 @@ class DeliveryContextTests(unittest.TestCase):
             self.assertIn(marker, skill)
         self.assertIn("explicit PR-creation authority", command)
         self.assertIn("merge authority", command)
-        self.assertIn("separately authorized Git integration", skill)
+        self.assertIn("Separate merge authorization", skill)
 
     def test_product_slice_completion_is_distinct_from_pr_merge(self):
         rule = doc("contexts/delivery/rules/delivery.md")
@@ -99,7 +99,7 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn('Confirm -->|Verified| SliceNeeded', skill)
         self.assertIn('SliceNeeded -->|Yes| SliceReconcile', skill)
         self.assertIn('SliceNeeded -->|No, PR integration only| Done', skill)
-        self.assertIn('SliceComplete -->|No, pending or unverified| SlicePending', skill)
+        self.assertIn('SliceComplete -->|No, incomplete or unverified| SlicePending', skill)
         self.assertIn("PR integration status", skill)
         self.assertIn("Product Slice technical verification status", skill)
         self.assertIn("a merged pr", agent.lower())
