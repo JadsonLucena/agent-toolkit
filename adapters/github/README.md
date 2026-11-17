@@ -11,6 +11,53 @@ the returned repository, base/head refs **and SHAs**, title, and Draft state.
 A mismatch returns \`created_unverified\` with the remote URL and a nonzero exit
 code; it never claims success based only on the creation command's stdout.
 
+## Canonical ready PR using a protected advisory reviewer
+
+The `--advisory` mode is an **executable pre-creation path** for the canonical
+`review_profile=advisory` ready-for-review policy. It differs from the
+pre-existing, stricter signed `gate` mode, which is unchanged.
+
+An authorized host configures `advisory_reviewer_command` as a list of argv
+in its deployment-protected trust policy, alongside existing trusted checks:
+
+```json
+{
+  "advisory_reviewer_command": ["/protected/approved-advisory-reviewer"]
+}
+```
+
+The reviewer receives the **frozen, complete native Review context as JSON on
+stdin**, and returns `contracts/review-evidence.md`-compatible JSON.
+The adapter invokes the real Review workflow using
+`adapters/review/run_review.py`'s validator: a missing, incomplete, failed,
+partial, stale, or unapproved reviewer **blocks ready creation before** any
+`gh pr create`. A host-supplied reviewer must actually perform the review;
+emitting synthetic PASS evidence violates that contract.
+
+```bash
+python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
+  --repo . --base main --head feature/example \
+  --trust-policy /protected/review-policy.json --advisory \
+  --create --title "feat: example" --body-file /tmp/pr-description.md
+```
+
+For this mode, the PR body must clearly label the review `advisory` and
+state that the external signed gate is `not attested` (or `not-applicable`).
+The output distinguishes `advisory_review_verified=true` from
+`signed_review_verified=false`. No untrusted CLI reviewer command override
+is supported; the trusted policy selects the executable.
+
+A generic "create PR" request grants permission to initiate this read-only
+advisory Review without another user prompt. If it fails, a ready PR is
+blocked. Publishing a Draft still requires **explicit Draft authorization**,
+and the separate existing `--draft` mode remains available.
+
+**Crucial deployment boundary:** the agent must have only the **approved
+publication tool** (a protected wrapper/service exposing this script) and not
+unrestricted direct `gh pr create`, GitHub MCP creation, or equivalent API
+credentials. Without runtime/tool permissions that prevent bypass, no
+repository file or wrapper can guarantee global PR-publication enforcement.
+
 ## Trust model and setup
 
 An invoking **trusted runtime/operator** must own the following, outside the

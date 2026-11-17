@@ -12,4 +12,13 @@ These are **host-facing routing instructions** for an agent whose runtime loads 
 
 ## Host Integration Boundary
 
+For a GitHub host that requires technical publication control, expose the
+approved `adapters/github/guarded_pr.py` entry point with a protected reviewer
+command and check policy. Give the coding agent **no direct remote PR-creation
+capability or credentials**. In advisory-ready mode the adapter invokes the
+approved read-only reviewer and validates its actual result before creating
+the PR. The signed `gate` path stays independent and stricter; a Draft still
+requires explicit authorization. See `adapters/github/README.md`.
+
+
 This file is effective only in hosts that actually ingest it. A consuming project or agent platform must expose this route at its always-loaded instruction/dispatch layer; installing only an optional Skill is insufficient. For a technical guarantee, configure the host/tool boundary to disallow direct PR-creation calls outside the Command's authorized preflight. Repository Markdown alone cannot intercept unrestricted `gh` or API calls.

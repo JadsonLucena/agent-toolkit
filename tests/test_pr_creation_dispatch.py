@@ -43,6 +43,12 @@ class PullRequestCreationDispatchTests(unittest.TestCase):
         self.assertIn("exact head/base", policy)
         self.assertIn("explicitly authorized", policy)
         self.assertIn("cannot intercept unrestricted", route)
+        gate = read("adapters/github/guarded_pr.py")
+        self.assertIn("def guard_advisory_ready(", gate)
+        self.assertIn("advisory_reviewer_command", gate)
+        self.assertIn("dispatch(", gate)
+        self.assertIn("review_profile=\"advisory\"", gate)
+        self.assertIn("recheck_checkout(", gate)
 
     def test_nonpublication_intents_and_host_limit_are_explicit(self):
         route = read("AGENTS.md")

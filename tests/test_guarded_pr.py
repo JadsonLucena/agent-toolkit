@@ -120,6 +120,120 @@ class GuardedPRTests(unittest.TestCase):
     def preflight(self):
         return gate.guard(self.repo, "main", "feature", self.evidence, self.signature, self.check_policy)
 
+    def advisory_reviewer(self, *, status="PASS", partial=False, bad_target=False):
+        """Synthetic reviewer process: only verifies the protected dispatch path."""
+        script = """
+import json, sys
+ctx = json.load(sys.stdin)
+files = ctx["changed_files"]
+verdict = %r
+result = {
+  "review_profile": "advisory", "review_status": verdict,
+  "target": dict(ctx["target"]), "changed_files": files,
+  "reviewed_files": files[:-1] if %r else files,
+  "unreviewed_files": files[-1:] if %r else [],
+  "coverage_status": "partial" if %r else "complete",
+  "blocking_findings": [] if verdict != "FAIL" else [{"lead_confirmed": True}],
+  "unresolved_questions": [] if verdict != "INCOMPLETE" else [{"material": True}],
+}
+if %r:
+    result["target"]["head_sha"] = "0" * 40
+print(json.dumps(result))
+""" % (status, partial, partial, partial, bad_target)
+        self.write_policy(advisory_reviewer_command=[sys.executable, "-c", script])
+        self.body.write_text(
+            "## Review\nProfile: advisory; gate: not attested\n"
+        )
+
+    def advisory_cli(self, *extra):
+        return [
+            "--repo", str(self.repo), "--base", "main", "--head", "feature",
+            "--trust-policy", str(self.check_policy), "--advisory", *extra,
+        ]
+
+    def test_advisory_ready_executes_review_then_checks_and_verifies_remote(self):
+        self.advisory_reviewer()
+        calls = []
+        seen, fake_gh = self.gh_mock(commands=calls)
+        with patch.object(gate, "invoke", side_effect=fake_gh):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = gate.main(self.advisory_cli(
+                    "--create", "--title", "Add feature", "--body-file", str(self.body)))
+        self.assertEqual(0, code)
+        self.assertEqual(["create", "verify"], seen)
+        result = json.loads(out.getvalue())
+        self.assertTrue(result["advisory_review_verified"])
+        self.assertFalse(result["signed_review_verified"])
+        self.assertEqual("not-applicable", result["gate_attestation"])
+
+    def test_advisory_ready_without_approved_reviewer_never_creates_pr(self):
+        self.body.write_text("Profile: advisory; gate: not attested\n")
+        seen, fake_gh = self.gh_mock()
+        with patch.object(gate, "invoke", side_effect=fake_gh):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = gate.main(self.advisory_cli(
+                    "--create", "--title", "Add feature", "--body-file", str(self.body)))
+        self.assertEqual(2, code)
+        self.assertEqual([], seen)
+        self.assertIn("advisory_reviewer_command", out.getvalue())
+
+    def test_advisory_ready_blocks_bad_review_and_stale_evidence(self):
+        for status, partial, bad_target in [
+            ("FAIL", False, False), ("INCOMPLETE", False, False),
+            ("PASS", True, False), ("PASS", False, True),
+        ]:
+            with self.subTest(status=status, partial=partial, bad_target=bad_target):
+                self.advisory_reviewer(
+                    status=status, partial=partial, bad_target=bad_target,
+                )
+                seen, fake_gh = self.gh_mock()
+                with patch.object(gate, "invoke", side_effect=fake_gh):
+                    out = io.StringIO()
+                    with contextlib.redirect_stdout(out):
+                        code = gate.main(self.advisory_cli(
+                            "--create", "--title", "Add feature", "--body-file", str(self.body)))
+                self.assertEqual(2, code)
+                self.assertEqual([], seen)
+
+    def test_advisory_ready_blocks_failed_checks(self):
+        self.advisory_reviewer()
+        self.write_policy(
+            fail="tests",
+            advisory_reviewer_command=gate.load_json(self.check_policy)["advisory_reviewer_command"],
+        )
+        seen, fake_gh = self.gh_mock()
+        with patch.object(gate, "invoke", side_effect=fake_gh):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = gate.main(self.advisory_cli(
+                    "--create", "--title", "Add feature", "--body-file", str(self.body)))
+        self.assertEqual(2, code)
+        self.assertEqual([], seen)
+
+    def test_advisory_ready_rejects_draft_or_gate_claims(self):
+        self.advisory_reviewer()
+        seen, fake_gh = self.gh_mock()
+        self.body.write_text("Profile: advisory; gate: PASS\n")
+        with patch.object(gate, "invoke", side_effect=fake_gh):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = gate.main(self.advisory_cli(
+                    "--create", "--title", "Add feature", "--body-file", str(self.body)))
+        self.assertEqual(2, code)
+        self.assertEqual([], seen)
+        self.assertIn("gate PASS", out.getvalue())
+        self.body.write_text("Profile: advisory; gate: not attested\n")
+        with patch.object(gate, "invoke", side_effect=fake_gh):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = gate.main(self.advisory_cli(
+                    "--draft", "--create", "--title", "Add feature",
+                    "--body-file", str(self.body)))
+        self.assertEqual(2, code)
+        self.assertEqual([], seen)
+
     def test_repository_check_manifest_matches_ci_commands(self):
         checks = gate.read_checks(gate.load_json(ROOT / ".github" / "toolkit-pr-checks.json"))
         workflow = (ROOT / ".github" / "workflows" / "toolkit-validation.yml").read_text()

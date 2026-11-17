@@ -18,6 +18,14 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# The protected GitHub adapter reuses the native Review preparation and
+# evidence validator. It does not implement or manufacture a review verdict.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "review"))
+from prepare_context import prepare_context  # noqa: E402
+from run_review import ReviewInvocationError, dispatch  # noqa: E402
+from evidence_validation import EvidenceError  # noqa: E402
+from git_scope import GitScopeError  # noqa: E402
+
 REQUIRED_CHECKS = {"lint", "tests"}
 MAX_EVIDENCE_BYTES = 2_000_000
 SIGNATURE_NAMESPACE = "agent-toolkit-code-review"
@@ -362,6 +370,70 @@ def guard(
     }
 
 
+def guard_advisory_ready(
+    repo: Path, base_ref: str, head_ref: str, body_path: Path, trust_policy_path: Path,
+    *, remote: str = "origin", timeout: int = 300,
+) -> dict[str, Any]:
+    """Run an approved native advisory Review before a ready GitHub PR.
+
+    The reviewer command comes only from the protected runtime policy; a
+    caller cannot provide an alternate executable to forge a PASS.
+    """
+    state = require_checkout(repo, base_ref, head_ref, trust_policy_path, remote)
+    repo, base, head = state["repo"], state["base"], state["head"]
+    reviewer_command = state["policy"].get("advisory_reviewer_command")
+    if (not isinstance(reviewer_command, list) or not reviewer_command
+            or any(not isinstance(part, str) or not part or "\\x00" in part
+                   for part in reviewer_command)):
+        raise GateError("protected policy has no approved advisory_reviewer_command")
+
+    body = read_bytes(body_path).decode("utf-8", "replace")
+    # Advisory readiness is explicitly not a signed gate assertion.
+    if _GATE_PROFILE.search(body) or re.search(
+        r"\\b(?:signed[ -]+)?gate(?:[ -]+review)?\\s*[:= -]\\s*PASS\\b", body,
+        re.IGNORECASE,
+    ):
+        raise GateError("advisory PR body claims an independent gate PASS")
+    if "advisory" not in body.lower() or not re.search(
+        r"gate.{0,50}(?:not-applicable|not applicable|not attested|absent|unavailable)",
+        body, re.IGNORECASE | re.DOTALL,
+    ):
+        raise GateError("advisory ready PR body must state advisory and gate not attested")
+
+    changed = changed_paths(repo, base, head)
+    try:
+        frozen = prepare_context(
+            repo, base=base_ref, head=head_ref, review_profile="advisory",
+            allow_ocr=False,
+        )
+        if (frozen["target"].get("base_sha") != base
+                or frozen["target"].get("head_sha") != head
+                or set(frozen["changed_files"]) != changed):
+            raise GateError("review context does not match intended PR head/base and diff")
+        result = dispatch(
+            frozen, repo=repo, reviewer_command=reviewer_command, timeout=timeout,
+        )
+    except (ReviewInvocationError, EvidenceError, GitScopeError, ValueError, OSError) as exc:
+        raise GateError(f"advisory Code Review failed or incomplete: {exc}") from exc
+    if (result.get("review_status") != "PASS"
+            or result.get("review_profile") != "advisory"
+            or result.get("native_full_scope") != sorted(changed)):
+        raise GateError("advisory Code Review did not PASS with complete current coverage")
+
+    completed = run_checks(state, timeout)
+    recheck_checkout(state, base_ref, head_ref, remote, trust_policy_path)
+    if read_bytes(body_path).decode("utf-8", "replace") != body:
+        raise GateError("PR body changed during verification")
+    return {
+        "repository": state["policy"]["github_repository"],
+        "base_sha": base, "head_sha": head, "changed_files": sorted(changed),
+        "checks_passed": completed, "review_profile": "advisory",
+        "review_status": "PASS", "advisory_review_verified": True,
+        "signed_review_verified": False, "gate_attestation": "not-applicable",
+        "review_source": "protected advisory_reviewer_command",
+    }
+
+
 def guard_unsigned_draft(
     repo: Path, base_ref: str, head_ref: str, body_path: Path, trust_policy_path: Path,
     *, remote: str = "origin", timeout: int = 300,
@@ -422,13 +494,24 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--title")
     ap.add_argument("--body-file", type=Path)
     ap.add_argument("--draft", action="store_true")
+    ap.add_argument("--advisory", action="store_true",
+                    help="ready PR using a protected native advisory reviewer, not a signed gate")
     args = ap.parse_args(argv)
     if args.timeout < 1 or args.timeout > 3600:
         ap.error("timeout must be between 1 and 3600 seconds")
     if args.create and (not args.title or args.body_file is None):
         ap.error("--create requires --title and --body-file")
     try:
-        if args.draft and args.signature is None:
+        if args.advisory:
+            if args.draft or args.evidence is not None or args.signature is not None:
+                raise GateError("--advisory is exclusive with --draft and signed evidence")
+            if args.body_file is None:
+                raise GateError("--advisory requires --body-file")
+            info = guard_advisory_ready(
+                args.repo, args.base, args.head, args.body_file, args.trust_policy,
+                remote=args.remote, timeout=args.timeout,
+            )
+        elif args.draft and args.signature is None:
             if args.evidence is not None:
                 raise GateError("unsigned draft does not accept review evidence")
             if args.body_file is None:
