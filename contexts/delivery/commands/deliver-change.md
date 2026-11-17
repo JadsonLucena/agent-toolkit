@@ -25,7 +25,7 @@ Select the Delivery Coordinator and its cross-context workflow. If `target_stage
 
 * Change objective, approved scope and current artifacts or source references.
 * Explicit `target_stage`: `planned`, `designed`, `implemented`, `reviewed`, `pr-prepared`, `pr-created`, or `integrated`, plus applicable operation-level permissions. `pr-created` requires explicit PR-creation authority; `integrated` additionally requires merge authority and all repository prerequisites.
-* Existing repository snapshot, stage evidence, Git-owned PR plan/Boundary when available, local-commit restrictions and blockers when known.
+* Existing repository snapshot, stage evidence, accepted source and scenario references with revision identity, Git-owned PR plan/Boundary when available, local-commit restrictions and blockers when known. Missing source material is retrieved only when relevant and authorized.
 * Runtime capabilities, intended PR base/head and PR publication state, review/check/approval evidence, repository branch protections, and resource/approval limits when known.
 
 ## Output

@@ -141,6 +141,10 @@ contexts/delivery/
 
 `/delivery/deliver-change` conditionally routes the existing specialist contexts toward a requested stage while preserving evidence and authorization boundaries. Integration coordinates final verification, independent Code Review, Git PR preparation, separately authorized PR creation, post-PR checks/approvals, and separately authorized merge. A ready PR needs applicable tests/lint and current advisory Review PASS; an explicitly authorized Draft may disclose incomplete evidence without claiming readiness. The command defaults to read-only assessment without mutation permission. The Markdown workflow is not a host execution engine.
 
+For a Product Slice spanning multiple PRs, Delivery tracks which required increments are integrated and reconciles the combined scenarios, guarantees, and integrated-revision evidence **before** asserting whole-slice technical verification. Merging one safe PR does not prove the entire Product Slice is complete, accepted, released, or valuable.
+
+Delivery also selects context **per slice and specialist handoff** from existing source, work-item, design and test evidence references. It retrieves further authorized detail only when needed, retains critical guarantees, and revalidates source/code revisions when upstream knowledge changes. No universal context packet, storage backend, or compulsory retrieval engine is introduced.
+
 ### Testing
 
 ```text

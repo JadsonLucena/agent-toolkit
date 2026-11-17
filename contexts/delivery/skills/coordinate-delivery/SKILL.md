@@ -22,6 +22,10 @@ Carry a change toward the explicitly authorized target stage, selecting only the
 
 ## Working State
 
+Preserve a small slice-scoped context selection: source and baseline references, accepted Change Boundary, applicable scenarios and critical guarantees, needed design/code/test references, checked revision/freshness, missing sources and the current owner. Keep references separate from verified retrieved content.
+
+Track the governing Product Slice or learning objective, source obligation/scenario identities, contributing PR Boundaries and their actual integration status, integrated target revisions and cross-PR verification evidence when material, alongside the next step.
+
 Track `target_stage`, authorized operations and restrictions, Change Boundary, existing or planned Git PR Boundary, available accepted baselines, per-slice dependencies/readiness, intended and actual PR head/base, local verification and independent Review evidence identity, review profile and verdict, preparation state, published PR status, post-publication checks/approvals, merge authorization and observed target state, commit authorization and observed SHA or uncommitted/blocked state, owned specialist outputs, external effects, pending decisions, and current outcome status. Never invent checkpoint persistence.
 
 ## Workflow
@@ -75,7 +79,10 @@ flowchart TD
     PostGate -->|Missing approval or permission| Block
     PostGate -->|Yes and explicit merge authorization| GitMerge["Git: authorized branch integration under repository policy"]
     GitMerge --> Confirm["Verify merged target revision and resulting integration state"]
-    Confirm -->|Verified| Done
+    Confirm -->|Verified| SliceReconcile["Product Slice: reconcile integrated revisions, scenarios and critical guarantees"]
+    SliceReconcile --> SliceComplete{"Whole-slice technical verification supported?"}
+    SliceComplete -->|Yes| Done
+    SliceComplete -->|No, pending or unverified| SlicePending["Report PR integrated; Product Slice incomplete or unverified"]
     Confirm -->|Failed or unknown| Block
     Reconcile["Controlled Coordination and Recovery: validate current evidence and Git status"] --> Decision{"Valid progress, commits and permission?"}
     Decision -->|Yes| Need
@@ -99,9 +106,25 @@ This explicit cross-context workflow permits **routing** existing specialist cap
 * Git owns PR `prepare` and separately authorized `create`. A request for `pr-prepared` stops before publication; a request for `pr-created` stops after verifying the remote PR. Do not infer push from create authorization or merge from a created PR.
 * After creation, collect actual post-PR checks and required approvals for the current PR head/base. If code changes, return affected work to Implementation and revalidate necessary checks and independent Review. Merge only through separately authorized Git integration when repository protections are satisfied, and verify the resulting target branch before reporting `integrated`.
 
+## Slice-Scoped Context Handoffs
+
+1. Identify the next authorized slice, target decision and intended specialist. Reuse its `context_id`, `change_boundary_ref`, `scenario_refs`, `source_baseline_ref`, `slice_ref` and other existing contract references when available; do not invent IDs or require a new file.
+2. Assemble only the material goal, accepted scope, expected observable result or learning, relevant constraints and **critical guarantees**, versioned source references, unresolved decisions, and evidence needed for that specialist. Retain dependency and parent-goal references when omitting detail would mislead.
+3. For details not yet needed, pass an actionable source reference rather than copying entire histories, transcripts or unrelated files. Retrieve additional code, rules, examples or test evidence **on demand** using authorized tools; distinguish referenced, actually retrieved, and verified information.
+4. Reconcile the source baseline, material decisions, shared contract and actual code/PR revision at the receiving handoff, resumption and pre-gate use. If new evidence invalidates an assumption, reselect the affected context and request updated specialist evidence instead of silently preserving an obsolete summary.
+5. If a relevant source, authority or critical guarantee cannot be verified, report the gap and next owner; block only the dependent decision. Never solve a context limit by dropping safety or acceptance obligations or by requesting unauthorized secrets/remote data.
+
+This procedure reuses `contracts/work-item.md`, `contracts/design-evidence.md`, `contracts/test-basis.md` and existing source identifiers; it does **not** define a new context-packet contract or mandate a retrieval engine.
+
+## Product Slice Completion Handoff
+
+* For a Product Slice spanning multiple PRs, reconcile each required PR's actual merge status and target revision with the original Work Item, Change Boundary, and accepted scenario or learning objective. Explicitly account for pending, deferred, removed, and superseded obligations based on authorized decisions.
+* Verify the combined result when cross-PR interfaces, behavior, migration, or guarantees can interact. Use real integrated-snapshot test evidence or an appropriately scoped verification source; green PR checks alone do not establish combined correctness. When the overall slice is not complete or its evidence is unavailable, report the exact remaining scenarios and next responsible owner.
+* Return separately the **PR integration status**, **Product Slice technical verification status**, **business/stakeholder acceptance**, and **outcome observation**. Never infer acceptance, rollout, or value from merged PRs. A learning slice can instead close with an evidence-backed learning result and a recorded decision, not a fictional feature delivery.
+
 ## Output
 
-Report the actual reached stage, per-slice completed and blocked work, applicable source, implementation and PR head/base identities, PR Boundary, Git-verified commits or explicit uncommitted/blocked state, specialist evidence, independent Review profile/verdict and tested scope where performed, readiness and remote PR status when available, post-PR checks/approvals, merge verification only when observed, pending authorizations, recovery risks, next owners and unresolved outcome observations. When supplied, report an optional `contracts/outcome-evidence.md`-compatible observation handoff; never fabricate deployment or results.
+Report the actual reached stage, per-slice completed and blocked work, applicable source, implementation and PR head/base identities, PR Boundary, Git-verified commits or explicit uncommitted/blocked state, specialist evidence, independent Review profile/verdict and tested scope where performed, readiness and remote PR status when available, post-PR checks/approvals, merge verification only when observed, Product Slice coverage and integrated-behavior evidence or explicit incompleteness when applicable, pending authorizations, recovery risks, next owners and unresolved outcome observations. When supplied, report an optional `contracts/outcome-evidence.md`-compatible observation handoff; never fabricate deployment or results.
 
 ## Boundary
 
