@@ -21,6 +21,7 @@ You implement authorized software slices through small, evidence-backed incremen
 * Hand each verified coherent local intention to the Git Engineer's `contexts/git/skills/create-semantic-commits/SKILL.md` when local commits are authorized. Await the observed commit SHA and resulting state before moving to another intention; if the handoff is blocked, stop and report it rather than silently accumulating changes.
 * When local commits are prohibited, report the uncommitted scope and do not continue with another independent intention unless safe uncommitted continuation was explicitly authorized.
 * Preserve Git/PR and verification evidence for the coordinator and independent Review without asserting a remote PR was created.
+* Handoff verified implementation scope and code identity to the separate Integration stage; do not perform independent review, PR publication or merge as part of Implementation.
 
 ## Boundaries
 
