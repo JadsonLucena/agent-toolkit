@@ -32,66 +32,83 @@ Track `target_stage`, authorized operations and restrictions, Change Boundary, e
 
 ```mermaid
 flowchart TD
-    Start["Composition and Ownership: inspect scope, stage, evidence"] --> Auth["Authorization and Gate Integrity: determine allowed steps"]
-    Auth --> Strategy{"Composite PR strategy unresolved before implementation?"}
-    Strategy -->|Yes| GitPlan["Git Engineer: read-only manage-pull-request plan"]
-    GitPlan --> PlanReady{"PR Boundary and authorized slice reconciled?"}
-    PlanReady -->|No| Block["Stop with blocker and owner"]
-    PlanReady -->|Yes| Need{"Next missing applicable stage?"}
-    Strategy -->|No, or already planned| Need
-    Need -->|Requirements| Requirements["Route to Requirements owner"]
-    Need -->|Design| Design["Route to Design owner"]
-    Need -->|Implementation| Implementation["Pass PR Boundary and commit policy to Implementation owner"]
-    Need -->|Integration after Implementation| Preflight["Integration: inspect final head/base and applicable tests/lint"]
-    Need -->|Existing published PR requires integration| ExistingPR{"PR head/base or pre-PR evidence stale?"}
-    ExistingPR -->|Yes| Preflight
-    ExistingPR -->|No, current| PostTarget
-    Need -->|Reached authorized target| Done["Outcome Handoff: report actual stage"]
-    Need -->|Unapproved operation| Block
+    Start["Inspect objective, target stage, sources and evidence"] --> Auth["Determine operation-specific authorizations"]
+    Auth --> Need{"Next missing authorized stage?"}
+    Need -->|Requirements| Requirements["Requirements owner: elicit, specify, validate and plan"]
+    Need -->|Design| Design["Design owner: contracts, boundaries and decisions"]
+    Need -->|Implementation| Strategy{"Composite PR strategy needed before first code mutation?"}
+    Strategy -->|Yes, not yet planned| GitPlan["Git: read-only PR Boundary plan"]
+    GitPlan --> PlanReady{"Plan and authorized implementation slice reconciled?"}
+    PlanReady -->|No| Block["Stop: report blocker, evidence and next owner"]
+    PlanReady -->|Yes| Implementation["Implementation owner: optional TDD, verification, Git atomic commit handoffs"]
+    Strategy -->|No or current plan| Implementation
+
+    Need -->|New integration after Implementation| Preflight["Verify intended head/base and applicable local checks"]
+    Need -->|Existing published PR| ExistingPR["Git: inspect existing PR identity, head/base and evidence"]
+    ExistingPR --> ExistingFresh{"Pre-PR checks and review evidence still current?"}
+    ExistingFresh -->|Yes| PostTarget{"Requested stage already reached?"}
+    ExistingFresh -->|No, stale or changed| Preflight
+    Need -->|Target stage reached| Done["Report actual stage and pending outcome evidence"]
+    Need -->|Operation not authorized| Block
+
     Requirements --> Reconcile
     Design --> Reconcile
     Implementation --> Reconcile
-    Preflight --> Checks{"Applicable local checks current and passing?"}
-    Checks -->|Missing or stale| Testing["Testing owner or authorized checks: collect actual evidence"]
+    Reconcile["Reconcile source baseline, context, actual commits and permissions"] --> Progress{"Verified progress and valid authority?"}
+    Progress -->|Yes| Need
+    Progress -->|Upstream decision changed| Source["Return decision to responsible owner"]
+    Progress -->|Unsafe, unverified commit, or no progress| Block
+    Source --> Block
+
+    Preflight --> Checks{"Applicable tests/lint current and passing?"}
+    Checks -->|Yes| Review["Review owner: obtain advisory verdict on exact head/base"]
+    Checks -->|Missing, failed or stale| Testing["Testing owner or authorized checks: obtain real results"]
     Testing --> ChecksResult{"Required checks now pass?"}
-    ChecksResult -->|Yes| Review["Review owner: independent Code Review"]
-    ChecksResult -->|No, correctable| Fix["Route defect to Implementation or responsible owner"]
-    ChecksResult -->|No, explicit draft intent| DraftPrepare["Git: prepare truthful draft with stated gaps"]
-    Checks -->|Yes| Review
-    Review --> ReviewResult{"Advisory PASS for final head/base?"}
-    ReviewResult -->|PASS, reviewed stage reached| DoneReviewed["Report independent Review evidence; stop before PR preparation"]
-    ReviewResult -->|PASS, PR stage authorized| ReadyPrepare["Git: prepare ready PR under existing Git floor"]
+    ChecksResult -->|Yes| Review
+    ChecksResult -->|No, correctable| Fix["Return defect to Implementation or responsible owner"]
+    ChecksResult -->|No, expressly authorized Draft| DraftRoute{"Equivalent remote PR exists?"}
+    ChecksResult -->|No, cannot proceed| Block
+
+    Review --> ReviewResult{"Current complete advisory PASS?"}
+    ReviewResult -->|PASS, reviewed target| DoneReviewed["Report reviewed stage; do not prepare or publish"]
+    ReviewResult -->|PASS, PR progression authorized| PublishRoute{"Equivalent remote PR already exists?"}
     ReviewResult -->|No, correctable| Fix
-    ReviewResult -->|No, explicitly authorized draft| DraftPrepare
+    ReviewResult -->|No, expressly authorized Draft| DraftRoute
     ReviewResult -->|No, cannot proceed| Block
     Fix --> Reconcile
-    ReadyPrepare --> PublishDecision{"Prepared state permits target action?"}
+
+    PublishRoute -->|Yes| ExistingContinue["Git: reconcile existing PR; never create duplicate or auto-promote Draft"]
+    ExistingContinue --> PostTarget
+    PublishRoute -->|No| ReadyPrepare["Git: prepare ready PR under existing Git floor"]
+    DraftRoute -->|Yes| ExistingPending["Report existing PR with unmet readiness; do not republish"]
+    ExistingPending --> Block
+    DraftRoute -->|No| DraftPrepare["Git: prepare authorized Draft with explicit gaps"]
+    ReadyPrepare --> PublishDecision{"Authorized target and publication state?"}
     DraftPrepare --> PublishDecision
-    PublishDecision -->|Only prepare requested or no creation authority| Prepared["Report pr-prepared status and limits"]
+    PublishDecision -->|Prepare only or creation not authorized| Prepared["Report pr-prepared only"]
     PublishDecision -->|Blocked by Git policy| Block
-    PublishDecision -->|Ready and separately authorized creation, or explicitly authorized draft| GitCreate["Git: create PR under Git readiness policy"]
-    GitCreate --> Created["Verify published PR identity, head/base and draft/ready state"]
-    Created --> PostTarget{"PR-created is target stage?"}
-    PostTarget -->|Yes| Done
-    PostTarget -->|No, integration requested| PostChecks["Check actual post-PR CI, approvals, branch protection, evidence freshness"]
-    PostChecks --> PostGate{"All merge prerequisites valid for current PR head/base?"}
-    PostGate -->|Changed code or correctable failure| Fix
-    PostGate -->|Missing approval or permission| Block
-    PostGate -->|Yes and explicit merge authorization| GitMerge["Git: authorized branch integration under repository policy"]
-    GitMerge --> Confirm["Verify merged target revision and resulting integration state"]
-    Confirm -->|Verified| SliceReconcile["Product Slice: reconcile integrated revisions, scenarios and critical guarantees"]
+    PublishDecision -->|Create authorized, Git eligibility satisfied| GitCreate["Git: create PR via canonical create-pull-request command"]
+    GitCreate --> Created["Verify new remote PR, exact head/base and Draft/ready state"]
+    Created --> PostTarget
+    PostTarget -->|Yes, including pr-created| Done
+    PostTarget -->|No, integrated requested| PostChecks["Verify post-PR CI, required approvals, protections and freshness"]
+    PostChecks --> PostGate{"Merge prerequisites current and satisfied?"}
+    PostGate -->|No, correctable or changed revision| Fix
+    PostGate -->|No, blocked or missing approval| Block
+    PostGate -->|Yes| MergeAuth{"Separate merge authorization granted?"}
+    MergeAuth -->|No| Block
+    MergeAuth -->|Yes| GitMerge["Git owner: merge using repository policy"]
+    GitMerge --> Confirm["Verify resulting target revision and integration state"]
+    Confirm -->|Failed or unknown| Block
+    Confirm -->|Verified| SliceNeeded{"Whole Product Slice assessment applicable?"}
+    SliceNeeded -->|No, PR integration only| Done
+    SliceNeeded -->|Yes| SliceReconcile["Reconcile all required PRs, scenarios and combined verification"]
     SliceReconcile --> SliceComplete{"Whole-slice technical verification supported?"}
     SliceComplete -->|Yes| Done
-    SliceComplete -->|No, pending or unverified| SlicePending["Report PR integrated; Product Slice incomplete or unverified"]
-    Confirm -->|Failed or unknown| Block
-    Reconcile["Controlled Coordination and Recovery: validate current evidence and Git status"] --> Decision{"Valid progress, commits and permission?"}
-    Decision -->|Yes| Need
-    Decision -->|Stale or source conflict| Source["Return to responsible owner"]
-    Decision -->|Unsafe, missing required commit or unproductive| Block
-    Source --> Block
+    SliceComplete -->|No, incomplete or unverified| SlicePending["Report PR integrated; Product Slice incomplete or unverified"]
 ```
 
-This explicit cross-context workflow permits **routing** existing specialist capabilities; they continue to own their procedures and authorization gates. `/requirements/specify-and-plan-change` (where available; legacy hosts may still expose `shape-change`) performs Requirements-only composition, not the full delivery sequence. Review keeps the sole technical verdict. No tool execution is implied merely by this Markdown procedure.
+This explicit cross-context workflow permits **routing** existing specialist capabilities; they continue to own their procedures and authorization gates. Requirements owns its internal elicitation/validation/backlog loop, Implementation owns its optional TDD and atomic Git commit handoffs, Review owns its verdict and Git owns PR planning, preparation, creation and merge. The diagram intentionally does not duplicate those internal workflows. `/requirements/specify-and-plan-change` (where available; legacy hosts may still expose `shape-change`) performs Requirements-only composition, not the full delivery sequence. Review keeps the sole technical verdict. No tool execution is implied merely by this Markdown procedure.
 
 ## Git Planning and Commit Handoffs
 
@@ -104,7 +121,9 @@ This explicit cross-context workflow permits **routing** existing specialist cap
 * After Implementation, route final code/commit identity and verification evidence into Integration; collect missing authorized tests/lint with their actual execution scope, then request independent Code Review through Review's existing capability. Review owns the single verdict; the Git PR readiness rule decides which evidence permits a ready PR.
 * An advisory `PASS` on the current intended head/base permits Git `prepare` for ready status when other checks pass. On `FAIL`, `INCOMPLETE`, or stale evidence, route correctable work to its owner and reverify affected outputs, or prepare/publish **only an explicitly authorized Draft** with truthful limitations under the Git rule.
 * Git owns PR `prepare` and separately authorized `create`. A request for `pr-prepared` stops before publication; a request for `pr-created` stops after verifying the remote PR. Do not infer push from create authorization or merge from a created PR.
-* After creation, collect actual post-PR checks and required approvals for the current PR head/base. If code changes, return affected work to Implementation and revalidate necessary checks and independent Review. Merge only through separately authorized Git integration when repository protections are satisfied, and verify the resulting target branch before reporting `integrated`.
+* For an **existing published PR**, check its current remote head/base and pre-PR review/check evidence. If stale, revalidate through the same verification and Review owners, but **resume the existing PR** instead of routing to another `create`. Never implicitly convert an existing Draft to ready, and do not claim that a fresh Review authorizes its remote status change. A correctable defect returns to its owner; unverified readiness remains explicitly pending.
+* After creation or resumption of an existing PR, collect actual post-PR checks and required approvals for the current PR head/base. If code changes, return affected work to Implementation and revalidate necessary checks and independent Review. Confirm **separate merge authorization** after technical prerequisites, then merge only through the Git owner when repository protections are satisfied and verify the resulting target branch before reporting `integrated`.
+* Evaluate Product Slice-wide technical completeness after an observed merge **only when applicable**. A safe merged Architectural Slice/PR is still a valid integration result even when a broader Product Slice is incomplete or cannot yet be verified.
 
 ## Slice-Scoped Context Handoffs
 
