@@ -41,6 +41,47 @@ python3 scripts/requirements_evals.py --catalog evals/delivery/cases.json --obse
 The first command validates the catalog; **no behavior is evaluated**.
 Missing, unavailable or unobserved host executions remain INCOMPLETE.
 
+## Machine-readable comparison
+
+After independently inspecting actual host traces, collect one assessed
+run per strategy, fixture and iteration in a private JSON file:
+
+```json
+{
+  "version": 1,
+  "runs": [
+    {
+      "case_id": "CX-01",
+      "strategy": "native",
+      "iteration": 1,
+      "model": "actual-model-id",
+      "harness": "actual-harness-id",
+      "repository_sha": "full-commit-sha",
+      "source_baseline_ref": "approved-R-1",
+      "authority_ref": "authorized-read-only-run",
+      "cache_state": "cold",
+      "verdict": "incomplete",
+      "tokens": null,
+      "elapsed_ms": null
+    }
+  ]
+}
+```
+
+Use pass or fail only after adding a named independent reviewer and a trace
+reference. An incomplete record is not a pass. Optional numeric metrics may
+remain absent or null when the host cannot measure them.
+
+```sh
+python3 scripts/context_compare.py --runs /secure/path/assessed-runs.json
+```
+
+The report pairs only identical case/model/harness/revision/authority/cache
+conditions and iteration. It reports descriptive per-pair metrics and
+limitations, not significance testing or independently executed agent
+behavior. Missing metrics stay null. The example above is an *incomplete
+schema illustration*, not a real benchmark result.
+
 ## Comparison record
 
 For each task and host run, record the execution ID, task ID, model/harness,
