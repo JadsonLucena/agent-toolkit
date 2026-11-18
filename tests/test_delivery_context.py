@@ -120,7 +120,6 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn("checkpoint persisted", agent)
         self.assertIn("does **not** define a new context-packet contract", skill)
 
-
     def test_transition_contract_has_complete_conditional_outcomes(self):
         skill = doc(SKILL)
         section = re.search(r"(?ms)^## Transition Contract\n(.*?)(?=^## |\Z)", skill)

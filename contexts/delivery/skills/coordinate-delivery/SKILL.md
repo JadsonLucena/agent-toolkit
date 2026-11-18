@@ -18,6 +18,7 @@ Carry a change toward the explicitly authorized target stage, selecting only the
 * Input/output contract: `contracts/test-basis.md` when available
 * Input/output contract: `contracts/test-evidence.md` when available
 * Input/output contract: `contracts/review-evidence.md` when available
+* Optional output contract: `contracts/outcome-evidence.md`
 
 ## Working State
 
@@ -105,7 +106,7 @@ This procedure reuses `contracts/work-item.md`, `contracts/design-evidence.md`, 
 
 ## Output
 
-Report the actual reached stage, per-slice completed and blocked work, applicable source, implementation and PR head/base identities, PR Boundary, Git-verified commits or explicit uncommitted/blocked state, specialist evidence, independent Review profile/verdict and tested scope where performed, readiness and remote PR status when available, post-PR checks/approvals, merge verification only when observed, Product Slice coverage and integrated-behavior evidence or explicit incompleteness when applicable, pending authorizations, recovery risks, next owners and unresolved outcome observations.
+Report the actual reached stage, per-slice completed and blocked work, applicable source, implementation and PR head/base identities, PR Boundary, Git-verified commits or explicit uncommitted/blocked state, specialist evidence, independent Review profile/verdict and tested scope where performed, readiness and remote PR status when available, post-PR checks/approvals, merge verification only when observed, Product Slice coverage and integrated-behavior evidence or explicit incompleteness when applicable, pending authorizations, recovery risks, next owners and unresolved outcome observations. When supplied, report an optional `contracts/outcome-evidence.md`-compatible observation handoff; never fabricate deployment or results.
 
 ## Boundary
 

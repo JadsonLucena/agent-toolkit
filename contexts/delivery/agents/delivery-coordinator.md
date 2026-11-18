@@ -8,7 +8,7 @@ Coordinate a bounded specification-driven software change through specialist han
 
 * Rule: `contexts/delivery/rules/delivery.md`
 * Skill: `contexts/delivery/skills/coordinate-delivery/SKILL.md`
-* Input contracts: `contracts/requirements.md`, `contracts/work-item.md`, `contracts/design-evidence.md`, `contracts/test-basis.md`, `contracts/test-evidence.md`, `contracts/review-evidence.md`
+* Input contracts: `contracts/requirements.md`, `contracts/work-item.md`, `contracts/design-evidence.md`, `contracts/test-basis.md`, `contracts/test-evidence.md`, `contracts/review-evidence.md`, `contracts/outcome-evidence.md`
 
 ## Responsibilities
 
