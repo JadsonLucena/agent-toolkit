@@ -250,6 +250,31 @@ Iterative or mutating skills should state explicit preconditions and stop condit
 
 A workflow may diagnose an out-of-scope defect without gaining authority to mutate the affected artifact. Mutation authority comes from the invoked command or separate explicit authorization.
 
+## SDLC Coverage, Reversibility, and Outcome Evidence
+
+Use the software development lifecycle (SDLC) as a **coverage model**, not a mandatory sequential ceremony or a replacement for context ownership. Requirements owns business and specification knowledge; Design and Implementation own their respective future engineering responsibilities; Testing owns test engineering; Review owns independent assessment; Git owns repository integration. Deployment, operations, and business-outcome evidence require explicit owners and authorization when those capabilities exist.
+
+Specification validated, design ready, slice implemented, verification passed, review passed, PR ready, deployed, accepted, and outcome demonstrated are **distinct evidence claims**. Do not infer deployment, acceptance, or outcome from a commit, test, review verdict, or PR. An unavailable operational result is pending or unknown, not a successful outcome.
+
+Prefer small, coherent, independently verifiable changes with a feasible reversal strategy. Evaluate reversibility against **runtime effects**, not merely the ability to revert a Git commit. For material effects on external systems, durable data, migrations, financial state, or irreversible actions, identify safe rollback, forward fix, compensation, reconciliation, or recovery as appropriate. Never claim that rewinding code undoes effects already performed. Preserve integration safety after each increment and identify residual risk when direct reversal is impossible.
+
+## Controlled Iteration and Recovery
+
+Apply these invariants only to workflows with meaningful iteration, retries, mutations, or resumability; simple read-only operations do not require artificial loops:
+
+* Every iteration has an authorized objective, observable evidence of progress, an applicable verification criterion, and an explicit stop condition. An attempt count alone is not proof of progress.
+* Repeated attempts require a plausible transient failure, new evidence, or a changed strategy. Stop or escalate when retries are unproductive, safety is uncertain, resources are exhausted, or a material decision is missing.
+* Checkpoints identify the source revision or workspace fingerprint, relevant authoritative baseline, current decision state, observed results, and already performed side effects when material. Restore only after revalidating those references and authorization.
+* A checkpoint or state-graph replay is **not** a transactional rollback. Before repeating a mutating step, reconcile its externally observable effects; use idempotency, compensation, or explicit human intervention as required by risk.
+* Avoid automatic self-approval, speculative requirement edits to make checks pass, and unbounded review/fix/review loops. Independent review remains independently owned and must examine the final relevant revision.
+* Rules own these invariants, Skills own their concrete iteration/recovery procedures, Agents own specialist routing, Commands own invocation authorization, and runtimes enforce tool permissions where supported.
+
+## Safe Parallel Work
+
+Parallelize only activities whose required inputs and decisions are sufficiently stable and whose outputs can be reconciled without violating shared contracts, authorization, repository state, or external effects. Prefer serial execution when the coordination cost or interference risk is greater than the expected benefit.
+
+Parallel investigators may share immutable, versioned evidence; mutating workers require suitable isolation (for example separate worktrees or environments), unambiguous ownership, and an explicit integration point. Revalidate evidence after upstream changes; stale branch, test, or review results cannot support a later gate without reconciliation. Synchronization and final verdicts belong to the responsible workflow owner, not to a new universal parallelism context.
+
 ## Change Boundary and Knowledge Batches
 
 Requirements distinguishes three related boundaries:
