@@ -216,6 +216,9 @@ def search_sources(
         ["git", "ls-files", "-z"], cwd=root, stdout=subprocess.PIPE,
         stderr=subprocess.PIPE, timeout=10, check=True,
     ).stdout
+    if len(listing) > 2 * 1024 * 1024:
+        return {"status": "incomplete", "results": [],
+                "reason": "tracked-path listing exceeds scan budget"}
     paths = [p for p in listing.split(b"\x00") if p]
     if len(paths) > MAX_SCAN_FILES:
         return {"status": "incomplete", "results": [],
@@ -226,7 +229,8 @@ def search_sources(
             path = _safe_path(root, os.fsdecode(raw))
             if not any(path.is_relative_to(scope) for scope in allowed):
                 continue
-            if path.stat().st_size > MAX_FILE_BYTES or not _tracked(root, path):
+            # git ls-files already restricts this scan to tracked paths.
+            if path.stat().st_size > MAX_FILE_BYTES:
                 continue
             with path.open("rb") as stream:
                 body = stream.read(MAX_FILE_BYTES + 1)
