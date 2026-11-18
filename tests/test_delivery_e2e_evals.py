@@ -12,9 +12,9 @@ from requirements_evals import load_catalog, evaluate  # noqa: E402
 class DeliveryE2EEvalsTests(unittest.TestCase):
     def test_cases_are_valid_and_target_delivery(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
-        self.assertEqual(29, len(cat["cases"]))
+        self.assertEqual(34, len(cat["cases"]))
         self.assertTrue(all(x["command"] in {"/delivery/deliver-change", "/implementation/implement-slice"} for x in cat["cases"]))
-        self.assertEqual({f"DL-{i:02d}" for i in range(11, 30)},
+        self.assertEqual({f"DL-{i:02d}" for i in range(11, 35)},
                          {x["id"] for x in cat["cases"] if int(x["id"].split("-")[1]) >= 11})
         self.assertEqual(len(cat["cases"]), len(set(x["id"] for x in cat["cases"])))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
@@ -64,11 +64,32 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
         self.assertEqual("absence", case["checks"][2]["mode"])
         self.assertIn("Does not push the branch, invoke PR creation", case["checks"][2]["criterion"])
 
+    def test_responsibility_boundaries_and_pdca_feedback_cases(self):
+        cat = load_catalog(ROOT / "evals/delivery/cases.json")
+        cases = {item["id"]: item for item in cat["cases"]}
+        expected = {
+            "DL-30": ("Design", "Requirements"),
+            "DL-31": ("Testing", "Implementation"),
+            "DL-32": ("Delivery", "read-only"),
+            "DL-33": ("PDCA", "business decision owner"),
+            "DL-34": ("self-review", "independent"),
+        }
+        for case_id, (subject, owner) in expected.items():
+            with self.subTest(case=case_id):
+                case = cases[case_id]
+                self.assertIn(subject.lower(), (case["scenario"] + " " + case["input"]).lower())
+                checks = case["checks"]
+                self.assertEqual(3, len(checks))
+                self.assertEqual(["presence", "presence", "absence"],
+                                 [check["mode"] for check in checks])
+                self.assertTrue(checks[-1]["criterion"].startswith("Does not"))
+                self.assertIn(owner.lower(), " ".join(check["criterion"] for check in checks).lower())
+
     def test_no_invented_pass_without_agent_execution(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         summary = evaluate(cat, {"version": 1, "assessments": []}, ROOT / "evals/delivery")
         self.assertEqual("INCOMPLETE", summary["status"])
-        self.assertEqual(29, summary["incomplete"])
+        self.assertEqual(34, summary["incomplete"])
 
 
 if __name__ == "__main__":
