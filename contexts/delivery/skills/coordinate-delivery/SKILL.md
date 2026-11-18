@@ -44,7 +44,7 @@ flowchart TD
     Specialist --> Reconcile["4. Verify actual result, evidence freshness and external effects"]
     Reconcile --> Decide{"5. Supported next decision?"}
     Decide -->|Verified progress; more work| Inspect
-    Decide -->|Correctable or changed upstream input| Select
+    Decide -->|Correctable or changed upstream input| Inspect
     Decide -->|Unsafe, unverified or no progress| Block
     Decide -->|Requested stage evidenced| Done
 ```

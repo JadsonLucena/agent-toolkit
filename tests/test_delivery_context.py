@@ -48,7 +48,7 @@ class DeliveryContextTests(unittest.TestCase):
             self.assertIn(step, diagram)
         for edge in ("Reached -->|Yes| Done", "Specialist --> Reconcile",
                      "Decide -->|Verified progress; more work| Inspect",
-                     "Decide -->|Correctable or changed upstream input| Select",
+                     "Decide -->|Correctable or changed upstream input| Inspect",
                      "Decide -->|Unsafe, unverified or no progress| Block"):
             self.assertIn(edge, diagram)
         for label in ("**Inspect:**", "**Select:**", "**Handoff:**", "**Reconcile:**", "**Decide:**"):
