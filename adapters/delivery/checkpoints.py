@@ -138,6 +138,7 @@ class CheckpointStore:
                 os.close(fd)
             elif os.name == "posix" and (stat.S_IMODE(path.stat().st_mode) & 0o077):
                 raise CheckpointError("existing database must be owner-only (0600)")
+            self.path = path
             self.db = sqlite3.connect(path, isolation_level=None, timeout=3.0)
             self.db.row_factory = sqlite3.Row
             self.db.execute("PRAGMA foreign_keys = ON")
@@ -181,6 +182,8 @@ class CheckpointStore:
 
     def save(self, snapshot: dict, *, expected_generation: int = 0) -> int:
         record = _snapshot(snapshot)
+        if self.path.is_relative_to(Path(record["repository"])):
+            raise CheckpointError("checkpoint database must be outside the source repository")
         _verify_recorded_sources(record)
         if type(expected_generation) is not int or expected_generation < 0:
             raise CheckpointError("invalid expected_generation")
@@ -281,6 +284,8 @@ class CheckpointStore:
 
     def resume(self, execution_id: str, repo: Path) -> dict:
         snapshot, generation = self.load(execution_id)
+        if Path(repo).resolve() != Path(snapshot["repository"]).resolve():
+            raise CheckpointError("checkpoint belongs to a different repository")
         root, _ = _repository(Path(repo))
         if snapshot["repository"] != str(root):
             raise CheckpointError("checkpoint belongs to a different repository")
