@@ -32,11 +32,11 @@ or recovery in a real agent host.
 
 ## Run
 
-\`\`\`sh
+```sh
 python3 scripts/requirements_evals.py --catalog evals/context/cases.json
 python3 scripts/requirements_evals.py --catalog evals/context/cases.json --observations /path/to/context-observations.json
 python3 scripts/requirements_evals.py --catalog evals/delivery/cases.json --observations /path/to/delivery-observations.json
-\`\`\`
+```
 
 The first command validates the catalog; **no behavior is evaluated**.
 Missing, unavailable or unobserved host executions remain INCOMPLETE.
