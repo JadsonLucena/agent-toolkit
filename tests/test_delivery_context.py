@@ -86,7 +86,7 @@ class DeliveryContextTests(unittest.TestCase):
 
     def test_review_publication_and_draft_gates_survive(self):
         skill = doc(SKILL)
-        for marker in ("applicable tests/lint", "independent Code Review",
+        for marker in ("authorized tests/lint", "independent Code Review",
                        "advisory ", "only an explicitly authorized Draft",
                        "pr-prepared", "pr-created", "post-PR checks"):
             self.assertIn(marker, skill)
