@@ -11,13 +11,13 @@ The governing source remains the repository and the existing contracts.
 
 Example from a Git worktree root:
 
-\`\`\`sh
+```sh
 python3 -m adapters.context.native --repo . \
   --critical contexts/delivery/rules/delivery.md#L1-L10 \
   --source contexts/delivery/skills/coordinate-delivery/SKILL.md#L1-L14
 python3 -m adapters.context.native --repo . \
   --search "Change Boundary" --scope contracts --scope contexts
-\`\`\`
+```
 
 Source selectors use repository-relative tracked paths, optionally
 path#LSTART-LEND. Critical source text is loaded first and never truncated.
@@ -34,9 +34,9 @@ cover other transitive dependencies. Revalidate on every material handoff.
 
 To verify a pack saved externally after an interruption:
 
-\`\`\`sh
+```sh
 python3 -m adapters.context.native --repo . --verify /path/to/pack.json
-\`\`\`
+```
 
 A moved Git HEAD returns revalidate even if the selected file bytes match.
 A changed critical or requested file returns blocked. No external mutation
