@@ -15,11 +15,33 @@ Turn material observations into an evidence-based decision or an explicit unreso
 * Optional outcome contract: `contracts/outcome-evidence.md` for actual product or business outcomes
 * Optional source evidence: relevant approved requirements, design, test, review, Git, runtime or agent-evaluation records
 
+## State Model
+
+```mermaid
+stateDiagram-v2
+    [*] --> Capture
+    Capture --> Assess: observation and source context available
+    Capture --> Pending: essential evidence unavailable
+    Assess --> Reflect: material signal
+    Assess --> Complete: not applicable or duplicate with rationale
+    Assess --> Pending: unsafe or unresolved uncertainty
+    Reflect --> DecideAndRoute
+    DecideAndRoute --> ValidateLearning: authorized change and real follow-up observed
+    DecideAndRoute --> Complete: assessment and owner handoff recorded
+    DecideAndRoute --> Pending: owner decision or observation outstanding
+    ValidateLearning --> Complete: corroborated or refuted by evidence
+    ValidateLearning --> Pending: follow-up inconclusive
+    Complete --> [*]
+    Pending --> [*]
+```
+
 ## Working State
 
 For the affected issue retain only material: the accepted objective/expectation, actual observation, source and version or execution identity, evidence provenance, risk/impact, competing explanations, contradictory or missing evidence, accountable decision owner, authorization constraints and any follow-up reference. An observation need not create a new artifact or persistent store.
 
 ## Workflow
+
+Follow the State Model. The steps below describe each state; the diagram owns the transitions, explicit pending exits and stopping decisions.
 
 1. **Scope and capture.** Identify whether the request concerns operational feedback (agent behavior, tools, prompts, workflow) or product outcome feedback, or both. Keep the two assessments distinct. Establish the expected behavior from an authoritative source where available; record the actual observation and the source revision, execution trace, time window or cohort needed to interpret it. If evidence is merely reported rather than inspected, label it as such. Do not fetch restricted data or mutate anything to obtain evidence.
 2. **Assess signal.** Check relevance, impact, repetition, duplicates, safety, evidence freshness, sample/measurement limitations and plausible counterexamples. Consolidate equivalent observations without losing source identities. Distinguish `observed`, `inconclusive`, `pending` and justified `not-applicable`; avoid interpreting an absent measurement as success or failure. Escalate urgent risks to the responsible owner instead of continuing an unsafe iteration.

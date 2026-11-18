@@ -24,6 +24,25 @@ class FeedbackLearningStructureTests(unittest.TestCase):
         self.assertIn("contexts/delivery/skills/assess-feedback/SKILL.md", read("contexts/delivery/agents/delivery-coordinator.md"))
         self.assertIn("contexts/delivery/skills/assess-feedback/SKILL.md", read("contexts/delivery/skills/coordinate-delivery/SKILL.md"))
 
+    def test_feedback_workflow_has_a_real_state_model(self):
+        skill = read("contexts/delivery/skills/assess-feedback/SKILL.md")
+        state = skill.split("## State Model", 1)[1].split("## Working State", 1)[0]
+        workflow = skill.split("## Workflow", 1)[1].split("## Output", 1)[0]
+        self.assertEqual(state.count("```mermaid"), 1)
+        self.assertIn("stateDiagram-v2", state)
+        self.assertIn("Follow the State Model", workflow)
+        for transition in (
+            "Capture --> Assess",
+            "Assess --> Reflect",
+            "Reflect --> DecideAndRoute",
+            "DecideAndRoute --> ValidateLearning",
+            "DecideAndRoute --> Pending",
+            "ValidateLearning --> Complete",
+            "ValidateLearning --> Pending",
+        ):
+            with self.subTest(transition=transition):
+                self.assertIn(transition, state)
+
     def test_read_only_feedback_does_not_create_delivery_stage_or_permission(self):
         command = read("contexts/delivery/commands/deliver-change.md")
         rule = read("contexts/delivery/rules/delivery.md")
