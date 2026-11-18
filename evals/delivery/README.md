@@ -1,8 +1,10 @@
 # SDD Delivery end-to-end behavioral evaluations
 
-The [catalog](cases.json) lists twenty-eight high-value pilot behaviors for the future native SDD workflow: simple feature, financial risk, unresolved source meaning, TDD RED integrity, changed baseline, unproductive retries, unsafe parallelism, side-effect replay, stale review, missing operational observations, and explicit Git handoffs for commits and PR planning. The direct Implementation case verifies Git policy outside Delivery. Additional Integration cases cover Review failure and revision freshness, the distinction between preparation and publication, authorized Drafts with gaps, post-PR CI failures, and separately authorized merge with target-state verification.
+The [catalog](cases.json) lists twenty-nine high-value pilot behaviors for the future native SDD workflow: simple feature, financial risk, unresolved source meaning, TDD RED integrity, changed baseline, unproductive retries, unsafe parallelism, side-effect replay, stale review, missing operational observations, and explicit Git handoffs for commits and PR planning. The direct Implementation case verifies Git policy outside Delivery. Additional Integration cases cover Review failure and revision freshness, the distinction between preparation and publication, authorized Drafts with gaps, post-PR CI failures, and separately authorized merge with target-state verification.
 
 **Additional DL-22–DL-28 cases distinguish PR integration from complete Product Slice behavior, check cross-PR interaction guarantees, verify selective context loading without dropping critical obligations, detect inaccessible or superseded sources, and permit evidence-backed learning slices without invented feature delivery.
+
+DL-29 explicitly checks the blocked remote-publication path when a branch exists only locally and the caller did not authorize a push.
 
 These are specifications of tests, not tests that have been run.** A passing structural CI is not evidence of an agent executing a software change.
 

@@ -12,9 +12,9 @@ from requirements_evals import load_catalog, evaluate  # noqa: E402
 class DeliveryE2EEvalsTests(unittest.TestCase):
     def test_cases_are_valid_and_target_delivery(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
-        self.assertEqual(28, len(cat["cases"]))
+        self.assertEqual(29, len(cat["cases"]))
         self.assertTrue(all(x["command"] in {"/delivery/deliver-change", "/implementation/implement-slice"} for x in cat["cases"]))
-        self.assertEqual({f"DL-{i:02d}" for i in range(11, 29)},
+        self.assertEqual({f"DL-{i:02d}" for i in range(11, 30)},
                          {x["id"] for x in cat["cases"] if int(x["id"].split("-")[1]) >= 11})
         self.assertEqual(len(cat["cases"]), len(set(x["id"] for x in cat["cases"])))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
@@ -45,7 +45,7 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
     def test_slice_continuity_and_context_selection_case_modes(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         cases = {item["id"]: item for item in cat["cases"]}
-        for index in range(22, 29):
+        for index in range(22, 30):
             case = cases[f"DL-{index:02d}"]
             self.assertEqual("/delivery/deliver-change", case["command"])
             self.assertEqual(3, len(case["checks"]))
@@ -54,11 +54,21 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
                 with self.subTest(case=case["id"], check=check["id"]):
                     self.assertEqual(expected, check["mode"])
 
+    def test_unpublished_branch_case_protects_remote_creation(self):
+        cat = load_catalog(ROOT / "evals/delivery/cases.json")
+        case = next(x for x in cat["cases"] if x["id"] == "DL-29")
+        self.assertEqual("/delivery/deliver-change", case["command"])
+        self.assertIn("source branch", case["scenario"])
+        self.assertIn("does not authorize push", case["input"])
+        self.assertIn("not published", case["checks"][0]["criterion"])
+        self.assertEqual("absence", case["checks"][2]["mode"])
+        self.assertIn("Does not push the branch, invoke PR creation", case["checks"][2]["criterion"])
+
     def test_no_invented_pass_without_agent_execution(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         summary = evaluate(cat, {"version": 1, "assessments": []}, ROOT / "evals/delivery")
         self.assertEqual("INCOMPLETE", summary["status"])
-        self.assertEqual(28, summary["incomplete"])
+        self.assertEqual(29, summary["incomplete"])
 
 
 if __name__ == "__main__":
