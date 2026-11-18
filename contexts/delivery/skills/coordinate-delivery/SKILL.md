@@ -29,90 +29,26 @@ Track `target_stage`, authorized operations and restrictions, Change Boundary, e
 
 ## Workflow
 
+The five Delivery decisions below form the **coordination loop**, not replacement procedures for specialist capabilities. Select only the next necessary authorized stage; the selected owner applies its canonical rules, checks and operation-specific gates.
+
 ```mermaid
 flowchart TD
-    Start["Inspect objective, target stage, sources and evidence"] --> Auth["Determine operation-specific authorizations"]
-    Auth --> Need{"Next missing authorized stage?"}
-    Need -->|Requirements| Requirements["Requirements owner: elicit, specify, validate and plan"]
-    Need -->|Design| Design["Design owner: contracts, boundaries and decisions"]
-    Need -->|Implementation| Strategy{"Composite PR strategy needed before first code mutation?"}
-    Strategy -->|Yes, not yet planned| GitPlan["Git: read-only PR Boundary plan"]
-    GitPlan --> PlanReady{"Plan and authorized implementation slice reconciled?"}
-    PlanReady -->|No| Block["Stop: report blocker, evidence and next owner"]
-    PlanReady -->|Yes| Implementation["Implementation owner: optional TDD, verification, Git atomic commit handoffs"]
-    Strategy -->|No or current plan| Implementation
-
-    Need -->|New integration after Implementation| Preflight["Verify intended head/base and applicable local checks"]
-    Need -->|Existing published PR| ExistingPR["Git: inspect existing PR identity, head/base and evidence"]
-    ExistingPR --> ExistingFresh{"Pre-PR checks and review evidence still current?"}
-    ExistingFresh -->|Yes| PostTarget{"Requested stage already reached?"}
-    ExistingFresh -->|No, stale or changed| Preflight
-    Need -->|Target stage reached| Done["Report actual stage and pending outcome evidence"]
-    Need -->|Operation not authorized| Block
-
-    Requirements --> Reconcile
-    Design --> Reconcile
-    Implementation --> Reconcile
-    Reconcile["Reconcile source baseline, context, actual commits and permissions"] --> Progress{"Verified progress and valid authority?"}
-    Progress -->|Yes| Need
-    Progress -->|Upstream decision changed| Source["Return decision to responsible owner"]
-    Progress -->|Unsafe, unverified commit, or no progress| Block
-    Source --> Block
-
-    Preflight --> Checks{"Applicable tests/lint current and passing?"}
-    Checks -->|Yes| Review["Review owner: obtain advisory verdict on exact head/base"]
-    Checks -->|Missing, failed or stale| Testing["Testing owner or authorized checks: obtain real results"]
-    Testing --> ChecksResult{"Required checks now pass?"}
-    ChecksResult -->|Yes| Review
-    ChecksResult -->|No, correctable| Fix["Return defect to Implementation or responsible owner"]
-    ChecksResult -->|No, expressly authorized Draft| DraftRoute{"Equivalent remote PR exists?"}
-    ChecksResult -->|No, cannot proceed| Block
-
-    Review --> ReviewResult{"Current complete advisory PASS?"}
-    ReviewResult -->|PASS, reviewed target| DoneReviewed["Report reviewed stage; do not prepare or publish"]
-    ReviewResult -->|PASS, PR progression authorized| PublishRoute{"Equivalent remote PR already exists?"}
-    ReviewResult -->|No, correctable| Fix
-    ReviewResult -->|No, expressly authorized Draft| DraftRoute
-    ReviewResult -->|No, cannot proceed| Block
-    Fix --> Reconcile
-
-    PublishRoute -->|Yes| ExistingContinue["Git: reconcile existing PR; never create duplicate or auto-promote Draft"]
-    ExistingContinue --> PostTarget
-    PublishRoute -->|No| ReadyPrepare["Git: prepare ready PR under existing Git floor"]
-    DraftRoute -->|Yes| ExistingPending["Report existing PR with unmet readiness; do not republish"]
-    ExistingPending --> Block
-    DraftRoute -->|No| DraftPrepare["Git: prepare authorized Draft with explicit gaps"]
-    ReadyPrepare --> PublishDecision{"Authorized target and publication state?"}
-    DraftPrepare --> PublishDecision
-    PublishDecision -->|Prepare only or creation not authorized| Prepared["Report pr-prepared only"]
-    PublishDecision -->|Blocked by Git policy| Block
-    PublishDecision -->|Create authorized, Git eligibility satisfied| RemoteBranch["Git: verify exact intended head/base and published source branch"]
-    RemoteBranch --> BranchStatus{"Source branch published on intended remote?"}
-    BranchStatus -->|Yes| GitCreate["Git: create PR via canonical create-pull-request command"]
-    BranchStatus -->|No, separate push authorized| GitPush["Git: perform separately authorized push and verify remote refs"]
-    GitPush --> PushResult{"Exact head/base published and verified?"}
-    PushResult -->|Yes| GitCreate
-    PushResult -->|No, failed or unknown| Block
-    BranchStatus -->|No, push unavailable or unauthorized| Block
-    GitCreate --> Created["Verify new remote PR, exact head/base and Draft/ready state"]
-    Created --> PostTarget
-    PostTarget -->|Yes, including pr-created| Done
-    PostTarget -->|No, integrated requested| PostChecks["Verify post-PR CI, required approvals, protections and freshness"]
-    PostChecks --> PostGate{"Merge prerequisites current and satisfied?"}
-    PostGate -->|No, correctable or changed revision| Fix
-    PostGate -->|No, blocked or missing approval| Block
-    PostGate -->|Yes| MergeAuth{"Separate merge authorization granted?"}
-    MergeAuth -->|No| Block
-    MergeAuth -->|Yes| GitMerge["Git owner: merge using repository policy"]
-    GitMerge --> Confirm["Verify resulting target revision and integration state"]
-    Confirm -->|Failed or unknown| Block
-    Confirm -->|Verified| SliceNeeded{"Whole Product Slice assessment applicable?"}
-    SliceNeeded -->|No, PR integration only| Done
-    SliceNeeded -->|Yes| SliceReconcile["Reconcile all required PRs, scenarios and combined verification"]
-    SliceReconcile --> SliceComplete{"Whole-slice technical verification supported?"}
-    SliceComplete -->|Yes| Done
-    SliceComplete -->|No, incomplete or unverified| SlicePending["Report PR integrated; Product Slice incomplete or unverified"]
+    Inspect["1. Inspect objective, target stage, authority and current evidence"] --> Reached{"Requested stage supported by current evidence?"}
+    Reached -->|Yes| Done["Report observed stage and separately pending outcomes"]
+    Reached -->|No| Select["2. Select next necessary specialist and authorized operation"]
+    Select --> Allowed{"Required source, capability and authority available?"}
+    Allowed -->|No| Block["Stop affected path; report blocker and next owner"]
+    Allowed -->|Yes| Handoff["3. Pass relevant slice context, source revisions and critical guarantees"]
+    Handoff --> Specialist["Specialist executes canonical workflow and gates"]
+    Specialist --> Reconcile["4. Verify actual result, evidence freshness and external effects"]
+    Reconcile --> Decide{"5. Supported next decision?"}
+    Decide -->|Verified progress; more work| Inspect
+    Decide -->|Correctable or changed upstream input| Select
+    Decide -->|Unsafe, unverified or no progress| Block
+    Decide -->|Requested stage evidenced| Done
 ```
+
+The main diagram deliberately omits specialist-internal transitions. Route planned to Requirements, designed to Design, implemented to Implementation, reviewed to independent Review after applicable verification, and pr-prepared, pr-created or integrated through Git-owned preparation, publication and integration handoffs below. These routes do **not** grant additional permissions or allow a later-stage claim without its own evidence.
 
 This explicit cross-context workflow permits **routing** existing specialist capabilities; they continue to own their procedures and authorization gates. Requirements owns its internal elicitation/validation/backlog loop, Implementation owns its optional TDD and atomic Git commit handoffs, Review owns its verdict and Git owns PR planning, preparation, creation and merge. The diagram intentionally does not duplicate those internal workflows. Resolve Requirements composition against the **actually installed command**: use `/requirements/specify-and-plan-change` when the renamed command is present (independent PR #31), or `/requirements/shape-change` when the current installation still provides the original command. Verify the entry point exists before routing; do not assume an uninstalled command or a host alias. Both are Requirements-only and do not authorize the full delivery sequence. Review keeps the sole technical verdict. No tool execution is implied merely by this Markdown procedure.
 
