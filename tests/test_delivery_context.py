@@ -120,6 +120,53 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn("checkpoint persisted", agent)
         self.assertIn("does **not** define a new context-packet contract", skill)
 
+    def test_transition_contract_has_complete_conditional_outcomes(self):
+        skill = doc(SKILL)
+        section = re.search(r"(?ms)^## Transition Contract\n(.*?)(?=^## |\Z)", skill)
+        self.assertIsNotNone(section)
+        lines = [line for line in section.group(1).splitlines()
+                 if line.startswith("| T") and line.count("|") == 7]
+        rows = {}
+        for line in lines:
+            fields = [field.strip() for field in line.strip().strip("|").split("|")]
+            self.assertEqual(6, len(fields), line)
+            identifier, condition, owner, evidence, success, failure = fields
+            self.assertNotIn(identifier, rows, "duplicate transition id")
+            self.assertTrue(all((condition, owner, evidence, success, failure)))
+            self.assertGreaterEqual(len(evidence.split()), 6)
+            self.assertGreaterEqual(len(failure.split()), 6)
+            rows[identifier] = {
+                "condition": condition, "owner": owner,
+                "evidence": evidence, "success": success, "failure": failure,
+            }
+        self.assertEqual({f"T{i:02d}" for i in range(1, 14)}, set(rows))
+        self.assertIn("do not run every row as a mandatory sequence", section.group(1).lower())
+        self.assertIn("not a second implementation", section.group(1))
+
+    def test_transitions_retain_review_publication_and_merge_order(self):
+        skill = doc(SKILL)
+        section = re.search(r"(?ms)^## Transition Contract\n(.*?)(?=^## |\Z)", skill).group(1)
+        rows = {
+            parts[0]: parts[1:]
+            for line in section.splitlines() if line.startswith("| T")
+            for parts in [[x.strip() for x in line.strip().strip("|").split("|")]]
+        }
+        # A row's columns are: condition, owner, evidence, success, failure.
+        for ident, fields in {
+            "T04": ("before first code mutation", "Git", "PR Boundary", "Implementation", "Block"),
+            "T05": ("authorized bounded intention", "Implementation", "commit SHA", "implemented", "failed/unverified"),
+            "T06": ("reviewed stage", "independent Review", "tests/lint", "reviewed", "self-review"),
+            "T07": ("pr-prepared", "Git", "T06", "pr-prepared", "Draft"),
+            "T08": ("after T07", "Git", "create authorization", "pr-created", "push"),
+            "T09": ("already exists", "Git", "head/base", "existing PR", "Draft"),
+            "T10": ("integrated stage", "Git", "merge authorization", "integrated", "block"),
+            "T11": ("Whole Product Slice", "Delivery", "cross-PR", "business acceptance", "incomplete"),
+            "T12": ("uncertain side effect", "specialist", "external effect", "reconciliation", "unsafe replay"),
+        }.items():
+            for column, expected in enumerate(fields):
+                with self.subTest(transition=ident, column=column):
+                    self.assertIn(expected.lower(), rows[ident][column].lower())
+
     def test_context_is_registered(self):
         self.assertIn("| Delivery | "+chr(96)+"rules/delivery.md"+chr(96)+" | Rule |", doc("ARCHITECTURE.md"))
         self.assertIn('"Delivery"', doc("scripts/toolkit_lint.py"))
