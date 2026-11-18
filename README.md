@@ -135,6 +135,7 @@ Implementation changes production and related test code only for an authorized b
 contexts/delivery/
 ├── rules/delivery.md
 ├── skills/coordinate-delivery/SKILL.md
+├── skills/assess-feedback/SKILL.md
 ├── commands/deliver-change.md
 └── agents/delivery-coordinator.md
 ```
@@ -144,6 +145,8 @@ contexts/delivery/
 For a Product Slice spanning multiple PRs, Delivery tracks which required increments are integrated and reconciles the combined scenarios, guarantees, and integrated-revision evidence **before** asserting whole-slice technical verification. Merging one safe PR does not prove the entire Product Slice is complete, accepted, released, or valuable.
 
 Delivery also selects context **per slice and specialist handoff** from existing source, work-item, design and test evidence references. It retrieves further authorized detail only when needed, retains critical guarantees, and revalidates source/code revisions when upstream knowledge changes. No universal context packet, storage backend, or compulsory retrieval engine is introduced.
+
+Delivery's optional `assess-feedback` Skill assesses operational observations (agent/tool/workflow behavior) separately from observed product outcomes. It can run read-only after any stage, including with no requested delivery target; it records expectations, source-versioned evidence, competing hypotheses, accountable decision owners and follow-up verification. It does not mutate instructions, requirements, code, Git or external systems. `contracts/outcome-evidence.md` remains the sole optional post-delivery outcome handoff; no new memory store, feedback schema or automatic self-improvement is required.
 
 ### Testing
 
