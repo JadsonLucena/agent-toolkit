@@ -70,6 +70,19 @@ Evaluate applicable concerns, with evidence and reachable consequences:
 * Discover **repository-owned, versioned conventions** from existing project instructions or contribution documents (`AGENTS.md`, `CONTRIBUTING.md`, ADRs, a documented project policy file or another declared equivalent). Record the actual source path/revision and applicability; do not require a particular vendor file, IDE-specific rules format, issue tracker or a new default file. A locally enforceable convention becomes a review criterion when explicitly declared and does not override safety or external contracts. Convention-only violations are normally low/medium and nonblocking unless a repository-owned policy **explicitly** makes them gating and the impact is justified.
 * If no project convention is declared, architectural preferences remain recommendations and are not independent defects. Whether teams should adopt mandatory SOLID/DDD/Object Calisthenics/Clean Architecture conventions is a **team policy decision**, not a toolkit default.
 
+## Specification-Driven Conformance
+
+When an accepted specification, Change Boundary, Scenario Set, design decision, or testing evidence is supplied and applicable, perform a **bounded conformance investigation** as part of this single review—not as another gate or an independent authority over Requirements:
+
+* Establish the actual applicable authoritative baseline and its revision. Distinguish proposed, authorized, superseded and unknown semantics; do not promote a PR description, implementation, or passing test into accepted business policy.
+* Trace materially relevant requirement, rule, scenario, interface and fit-criterion identities to changed behavior and inspected consumers. Distinguish demonstrated satisfaction, demonstrated deviation, and **unverified** obligations; a matching test name, green build or coverage percentage does not establish correctness.
+* Investigate behavior introduced outside the authorized Change Boundary and material obligations omitted from the implementation. Do not classify an unstated or unapproved desire as a confirmed defect.
+* Check that supplied test/verification evidence corresponds to the authoritative baseline, expected scenario and actual reviewed code revision. Report stale, inaccessible or never-executed evidence as such; do not run tests by assertion.
+* Consider non-functional constraints with their stated conditions, measures, limits and verification method, without inventing a pass when actual verification is absent.
+* If authoritative sources materially contradict without valid supersession, use Requirement Authority and Project Conventions and record `decision-needed`; the review cannot silently reconcile source ownership.
+* Record scoped conformance evidence via the optional `specification_conformance` record in `contracts/review-evidence.md` when useful. `not-applicable` is legitimate when no governing specification exists for the reviewed change; absence of a Requirements document alone does not invalidate native review.
+* Only the Code Review Lead issues the review verdict after appropriate source falsification. A material unresolved obligation may produce `INCOMPLETE`; an observed, verified violation with applicable blocking impact may produce `FAIL`. Do not automatically fail solely because a traceability template is incomplete.
+
 ## Documentation Consistency and Drift
 
 **Documentation is a review concern whenever the change affects observable
