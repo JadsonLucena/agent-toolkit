@@ -395,6 +395,8 @@ Simple transformations → lightweight model when sufficient
 
 ## Context Management
 
+The experimental [Context Engineering evaluation baseline](evals/context/README.md) compares native retrieval with optional alternatives. It reuses Delivery behavioral cases and does not claim that structural CI runs a real coding agent.
+
 Long-running collaboration should preserve decisions, constraints, assumptions, unresolved issues, and relevant implementation context without forcing every agent to inherit the complete conversation history.
 
 Stable or repeatedly used project information may be cached when the execution platform supports it, but stale cached context must not override newer project state.
