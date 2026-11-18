@@ -65,6 +65,17 @@ Use the optional `contracts/outcome-evidence.md` semantics to preserve actual po
 * Post-delivery effectiveness and PDCA feedback require real operational observations and their authority; absent observations remain pending or unknown. Do not fabricate metrics or mandate a deployment/observability integration.
 * Scope changes, requirements contradictions, unverified guarantees, material side effects and unresolved cross-context decisions route back to their actual owners, not to an unbounded coordinator loop.
 
+## Feedback and Learning Integrity
+
+* Feedback may arise during any SDLC stage or from later operational observation. Assess it only when it can inform a material decision; do not impose mandatory post-task retrospectives, a second Review verdict, or a new delivery-completion stage.
+* Keep observations, expected behavior, source and revision identities, provenance, relevant safeguards, hypotheses, decisions and post-change validation distinct. An agent's self-report, a passing check and an outcome metric have different evidentiary meanings.
+* Separate **operational feedback** about agents, tools, instructions and workflow from **outcome feedback** about product/organizational effects. Preserve `contracts/outcome-evidence.md` as the optional source-linked outcome handoff; no duplicate contract or provider-dependent memory store is required.
+* Do not treat a recurring symptom as a proven root cause or a before/after correlation as causal proof. Assess representativeness, confounders, stale baselines, duplicate incidents and counterevidence at rigor proportionate to risk.
+* Single-loop correction (execution under current rules) and double-loop inquiry (reconsidering governing assumptions, objectives or responsibility boundaries) are competing lines of investigation, not automatic reasons to rewrite canonical policy.
+* A feedback hypothesis or proposed lesson has no normative authority. Route requirement meaning to Requirements/stakeholders, design to Design, code to Implementation, tests to Testing, review findings to Review, Git actions to Git, and business outcomes to the accountable observer/decision owner. Changing source, instructions, policy, tooling, remote state or external effects requires the separately applicable authorization and verification.
+* Label an observed issue, an inferred cause, an authorized decision, an executed corrective action and an **independently observed effect** separately. A change without follow-up evidence is a hypothesis under test, not a proven improvement; missing or inconclusive evidence must remain explicitly unresolved.
+* Reuse evidence IDs and source references; keep feedback records concise, avoid unnecessary retention of private transcripts and secrets, and do not promote unverified memories or agent self-reflections over authoritative sources.
+
 ## Foundational Guidance
 
 Use the SDLC as a coverage model, SDD as a conformance discipline, PDCA as an outcome feedback loop, and dependency-aware flow as a scheduling strategy. None creates an extra canonical source of requirements or a mandatory full-document waterfall.

@@ -6,7 +6,7 @@ Coordinate a bounded change from its current evidence state toward one explicitl
 
 ## Invocation
 
-Select the Delivery Coordinator and its cross-context workflow. If `target_stage` or authorized mutation scope is absent, operate read-only to assess readiness and next actions. Explicit stage/operation authorization is required for implementation, source/test edits and local commits; independently authorize remote PR creation, push, merge, release or deployment. Routing never grants permissions owned by the invoked specialty.
+Select the Delivery Coordinator and its cross-context workflow. If `target_stage` or authorized mutation scope is absent, operate read-only to assess readiness and next actions. An explicit feedback-assessment request without a delivery target routes only the read-only `assess-feedback` capability; it does not imply a new delivery stage. Explicit stage/operation authorization is required for implementation, source/test edits and local commits; independently authorize remote PR creation, push, merge, release or deployment. Routing never grants permissions owned by the invoked specialty.
 
 ## Uses
 
@@ -24,6 +24,7 @@ Select the Delivery Coordinator and its cross-context workflow. If `target_stage
 ## Inputs
 
 * Change objective, approved scope and current artifacts or source references.
+* Optional operational feedback or observed outcome references, with expected/actual behavior and source/revision identity when known; feedback assessment alone is read-only.
 * Explicit `target_stage`: `planned`, `designed`, `implemented`, `reviewed`, `pr-prepared`, `pr-created`, or `integrated`, plus applicable operation-level permissions. `pr-created` requires explicit PR-creation authority; `integrated` additionally requires merge authority and all repository prerequisites.
 * Existing repository snapshot, stage evidence, accepted source and scenario references with revision identity, Git-owned PR plan/Boundary when available, local-commit restrictions and blockers when known. Missing source material is retrieved only when relevant and authorized.
 * Runtime capabilities, intended PR base/head and PR publication state, review/check/approval evidence, repository branch protections, and resource/approval limits when known.

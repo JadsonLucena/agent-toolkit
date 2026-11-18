@@ -12,6 +12,7 @@ Carry a change toward the explicitly authorized target stage, selecting only the
 ## Uses
 
 * Rule: `contexts/delivery/rules/delivery.md`
+* Optional Skill: `contexts/delivery/skills/assess-feedback/SKILL.md`
 * Input contract: `contracts/requirements.md` when available
 * Input contract: `contracts/work-item.md` when available
 * Input contract: `contracts/design-evidence.md` when available
@@ -97,6 +98,10 @@ This is the **Delivery-owned map of cross-context transitions**, not a second im
 5. If a relevant source, authority or critical guarantee cannot be verified, report the gap and next owner; block only the dependent decision. Never solve a context limit by dropping safety or acceptance obligations or by requesting unauthorized secrets/remote data.
 
 This procedure reuses `contracts/work-item.md`, `contracts/design-evidence.md`, `contracts/test-basis.md` and existing source identifiers; it does **not** define a new context-packet contract or mandate a retrieval engine.
+
+## Optional Feedback Handoff
+
+When an observation about agent/tool/workflow execution or an actual product outcome is supplied, or when material new evidence arises at a specialist handoff, use `contexts/delivery/skills/assess-feedback/SKILL.md` if feedback assessment would inform the next decision. This is an optional read-only side path, not a mandatory stage, extra Code Review verdict or license to repeat the Delivery pipeline. After assessment, route proposed work to its canonical owner; resume an affected stage only with fresh evidence and appropriate authorization. Do not treat a feedback record as an accepted source baseline or claim that downstream fixes have happened.
 
 ## Product Slice Completion Handoff
 

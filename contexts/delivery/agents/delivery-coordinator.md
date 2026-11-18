@@ -8,6 +8,7 @@ Coordinate a bounded specification-driven software change through specialist han
 
 * Rule: `contexts/delivery/rules/delivery.md`
 * Skill: `contexts/delivery/skills/coordinate-delivery/SKILL.md`
+* Skill: `contexts/delivery/skills/assess-feedback/SKILL.md`
 * Input contracts: `contracts/requirements.md`, `contracts/work-item.md`, `contracts/design-evidence.md`, `contracts/test-basis.md`, `contracts/test-evidence.md`, `contracts/review-evidence.md`, `contracts/outcome-evidence.md`
 
 ## Responsibilities
@@ -17,6 +18,7 @@ Coordinate a bounded specification-driven software change through specialist han
 * **Handoff:** supply concise, versioned slice context, source and scenario references, dependencies and critical guarantees; retrieve detail only when needed and authorized.
 * **Reconcile:** verify actual specialist outputs, Git commit/PR identities, evidence freshness, unresolved decisions and external effects. Preserve cross-PR Product Slice obligations, combined verification and distinct business outcomes.
 * **Decide:** advance on evidenced progress and valid authority, return correctable work to its owner, or stop on missing evidence, unsafe effects or no progress. Report the observed stage, not a substitute Review verdict.
+* **Learn:** route optional operational or outcome feedback through `assess-feedback`, retaining provenance, uncertainty and owner-routed proposals. Never turn a reflection into policy or independently approve its own improvement.
 
 ## Boundaries
 

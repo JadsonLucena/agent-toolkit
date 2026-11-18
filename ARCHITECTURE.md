@@ -151,6 +151,7 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Implementation | `agents/implementation-engineer.md` | Agent | Own implementation evidence, scope and safe handoffs |
 | Delivery | `rules/delivery.md` | Rule | Cross-context stage, authorization, recovery and handoff integrity |
 | Delivery | `skills/coordinate-delivery/SKILL.md` | Skill | Evidence-gated conditional SDD workflow composition |
+| Delivery | `skills/assess-feedback/SKILL.md` | Skill | Read-only assessment of operational feedback and observed outcome evidence with owner-routed learning |
 | Delivery | `commands/deliver-change.md` | Command | Authorize explicit target-stage routing without blanket mutations |
 | Delivery | `agents/delivery-coordinator.md` | Agent | Coordinate specialist handoffs and truthful delivery status |
 | Testing | `rules/testing.md` | Rule | Automated-testing standards and quality invariants |
