@@ -1,0 +1,116 @@
+---
+name: coordinate-delivery
+description: "Coordinate an authorized SDD change across existing contexts, with evidence-gated handoffs and safe stopping or resumption."
+---
+
+# Coordinate Delivery
+
+## Purpose
+
+Carry a change toward the explicitly authorized target stage, selecting only the required specialist capabilities and preserving decisions and evidence across handoffs.
+
+## Uses
+
+* Rule: `contexts/delivery/rules/delivery.md`
+* Input contract: `contracts/requirements.md` when available
+* Input contract: `contracts/work-item.md` when available
+* Input contract: `contracts/design-evidence.md` when available
+* Input/output contract: `contracts/test-basis.md` when available
+* Input/output contract: `contracts/test-evidence.md` when available
+* Input/output contract: `contracts/review-evidence.md` when available
+
+## Working State
+
+Preserve a small slice-scoped context selection: source and baseline references, accepted Change Boundary, applicable scenarios and critical guarantees, needed design/code/test references, checked revision/freshness, missing sources and the current owner. Keep references separate from verified retrieved content.
+
+Track the governing Product Slice or learning objective, source obligation/scenario identities, contributing PR Boundaries and their actual integration status, integrated target revisions and cross-PR verification evidence when material, alongside the next step.
+
+Track `target_stage`, authorized operations and restrictions, Change Boundary, existing or planned Git PR Boundary, available accepted baselines, per-slice dependencies/readiness, intended and actual PR head/base, local verification and independent Review evidence identity, review profile and verdict, preparation state, published PR status, post-publication checks/approvals, merge authorization and observed target state, commit authorization and observed SHA or uncommitted/blocked state, owned specialist outputs, external effects, pending decisions, and current outcome status. Never invent checkpoint persistence.
+
+## Workflow
+
+The five Delivery decisions below form the **coordination loop**, not replacement procedures for specialist capabilities. Select only the next necessary authorized stage; the selected owner applies its canonical rules, checks and operation-specific gates.
+
+```mermaid
+flowchart TD
+    Inspect["1. Inspect objective, target stage, authority and current evidence"] --> Reached{"Requested stage supported by current evidence?"}
+    Reached -->|Yes| Done["Report observed stage and separately pending outcomes"]
+    Reached -->|No| Select["2. Select next necessary specialist and authorized operation"]
+    Select --> Allowed{"Required source, capability and authority available?"}
+    Allowed -->|No| Block["Stop affected path; report blocker and next owner"]
+    Allowed -->|Yes| Handoff["3. Pass relevant slice context, source revisions and critical guarantees"]
+    Handoff --> Specialist["Specialist executes canonical workflow and gates"]
+    Specialist --> Reconcile["4. Verify actual result, evidence freshness and external effects"]
+    Reconcile --> Decide{"5. Supported next decision?"}
+    Decide -->|Verified progress; more work| Inspect
+    Decide -->|Correctable or changed upstream input| Inspect
+    Decide -->|Unsafe, unverified or no progress| Block
+    Decide -->|Requested stage evidenced| Done
+```
+
+The main diagram deliberately omits specialist-internal transitions. Route planned to Requirements, designed to Design, implemented to Implementation, reviewed to independent Review after applicable verification through Testing or authorized checks, and pr-prepared, pr-created or integrated through Git-owned preparation, publication and integration handoffs below. These routes do **not** grant additional permissions or allow a later-stage claim without its own evidence.
+
+This explicit cross-context workflow permits **routing** existing specialist capabilities; they continue to own their procedures and authorization gates. Requirements owns its internal elicitation/validation/backlog loop, Implementation owns its optional TDD and atomic Git commit handoffs, Review owns its verdict and Git owns PR planning, preparation, creation and merge. The diagram intentionally does not duplicate those internal workflows. Resolve Requirements composition against the **actually installed command**: use `/requirements/specify-and-plan-change` when the renamed command is present (independent PR #31), or `/requirements/shape-change` when the current installation still provides the original command. Verify the entry point exists before routing; do not assume an uninstalled command or a host alias. Both are Requirements-only and do not authorize the full delivery sequence. Review keeps the sole technical verdict. No tool execution is implied merely by this Markdown procedure.
+
+## Transition Contract
+
+This is the **Delivery-owned map of cross-context transitions**, not a second implementation of specialist procedures or an executable state machine. Each row is conditional on the requested stage and the evidence already available: **do not run every row as a mandatory sequence**. A valid earlier result may be reused only while its scope, source baseline and revisions remain current. The specialist's canonical Rule, Skill and Command define the detailed gates; Delivery checks the returned claim before choosing another transition. A verified milestone never grants the next operation's permission.
+
+| ID | Condition before handoff | Owner and operation | Evidence required to advance | Permitted next result | If missing, stale or failed |
+|---|---|---|---|---|---|
+| T01 | At entry, resumption or any material decision change | Delivery: inspect scope and authority | Requested target or read-only intent; accepted source revision, current stage, blockers and operation-specific authorizations | Report already evidenced target or select only the next necessary authorized owner | Remain read-only or block the affected mutation; never infer permission from target stage |
+| T02 | A material requirement or acceptance question blocks the requested work | Requirements: resolve and validate meaning | Accepted Change Boundary and applicable scenario/decision with authoritative version | Claim planned only when supported; route remaining Design or Implementation needs | Return undecided meaning to Requirements/stakeholders and block dependent work, not unrelated slices |
+| T03 | An architectural decision is necessary for the next slice | Design: supply bounded technical decision | Source-aligned design evidence, affected contracts, dependencies and applicable guarantees | Claim designed for the verified slice or route authorized implementation | Return unresolved design or business-semantic conflict to its owner; do not rewrite accepted requirements |
+| T04 | A composite change may require independent or stacked PRs before first code mutation | Git: read-only PR plan | Current PR Boundary, intended bases, dependencies and separately authorized implementation slice | Pass current Git plan to Implementation; skip formal planning for a clearly single coherent PR | Block affected implementation until the necessary boundary is resolved; planning grants no mutation authority |
+| T05 | Implementation of an authorized bounded intention | Implementation with Git-owned commit handoff | Actual scoped code/tests and checks; Git-confirmed commit SHA, or explicit permitted uncommitted state | Claim implemented for verified scope; start dependent intentions only after confirmed commit or authorized continuation | Correct the defect or block on failed/unverified commit; never silently combine atomic intentions |
+| T06 | Requested reviewed stage or ready-PR verification | Testing or authorized checks, then independent Review | Applicable observed tests/lint and one complete advisory Review PASS tied to the final intended head/base | Claim reviewed, or offer ready preparation when separately requested and authorized | Route failing checks/findings to their owner and reverify affected evidence; do not claim independent PASS from self-review |
+| T07 | Requested pr-prepared stage, with ready or expressly authorized Draft intent | Git: prepare and assess PR readiness | Final PR Boundary/diff; current T06 ready evidence, or Git-permitted Draft with missing evidence disclosed | Report pr-prepared only, labeling ready versus Draft truthfully | Block ready preparation or disclose gaps in authorized Draft; never treat Draft as verified ready |
+| T08 | Requested creation of a new remote PR after T07 preparation | Git: discover and publish under separate authority | Explicit create authorization; equivalent-PR discovery; published exact source head/base and valid ready or Draft state; verified remote PR result | Claim pr-created only after observing matching remote PR; reuse existing PR instead of duplicate | If branch is absent, require separately authorized Git push and recheck remote refs or block; no implicit push/create |
+| T09 | Requested continuation when a PR already exists remotely | Git: inspect existing PR and revalidate changed evidence | Existing PR identity and actual head/base; current relevant check/Review status and Draft/ready status | Resume the existing PR or reverify only affected gates before later operations | Preserve existing PR and unresolved readiness; never recreate or automatically promote Draft |
+| T10 | Requested integrated stage after a published PR | Git: check post-PR integration and separately authorized merge | Fresh post-PR CI, required approvals/protections, explicit merge authorization, then observed target revision | Claim integrated only after confirming target revision and repository state | Return correctable failure to its owner or block; pre-PR PASS and creation do not authorize merge |
+| T11 | Whole Product Slice technical completion is claimed across PRs | Delivery: reconcile original obligations and combined verification | Required PRs and integrated revisions, accepted scenarios/guarantees and relevant cross-PR verification | Report technical slice verification separately from PR integration, business acceptance and outcomes | Report PR integrated but Product Slice incomplete/unverified; do not invent combined coverage |
+| T12 | Retry, interruption, changed baseline or uncertain side effect | Responsible specialist with Delivery reconciliation | Actual source/repository/external effect state, freshness and a safe new strategy with progress evidence | Resume only the still-authorized affected work after reconciliation | Block unsafe replay, stale evidence and no-progress loops; keep independently valid work |
+| T13 | Post-delivery observation or learning result is requested | Delivery: optional outcome handoff to accountable observer | Original objective plus actual observation provenance and measurement when available | Report observed result or explicitly pending/inconclusive outcome separately from technical status | Do not infer deployment, stakeholder acceptance, causality or business success from checks or merge |
+
+## Git Planning and Commit Handoffs
+
+* Before any implementation mutation of a composite initiative, request Git's read-only `plan` via `contexts/git/skills/manage-pull-request/SKILL.md` unless the PR Boundary is already current. Pass the resulting scope, base and dependencies to Implementation without expanding authorization.
+* During Implementation, pass the caller's local-commit permission and await the Git Engineer's actual verified commit SHA or explicit blocked/uncommitted state. A requested commit or passing check alone never establishes commit success.
+* After Implementation, use independent Review and the Git `prepare` operation as separate stages. `create`, push, merge, release and deployment require separate permissions.
+
+## Integration Handoffs
+
+* After Implementation, route final code/commit identity and verification evidence into Integration; collect missing authorized tests/lint with their actual execution scope, then request independent Code Review through Review's existing capability. Review owns the single verdict; the Git PR readiness rule decides which evidence permits a ready PR.
+* An advisory `PASS` on the current intended head/base permits Git `prepare` for ready status when other checks pass. On `FAIL`, `INCOMPLETE`, or stale evidence, route correctable work to its owner and reverify affected outputs, or prepare/publish **only an explicitly authorized Draft** with truthful limitations under the Git rule.
+* Git owns PR `prepare` and separately authorized `create`. A request for `pr-prepared` stops before publication; a request for `pr-created` stops after verifying the remote PR. **Before `create`, Git verifies the intended source branch exists on the correct remote at the exact reviewed head and confirms the intended base.** If unpublished, stop and report the blocker unless push was **separately authorized**; only Git may perform that push, and remote identity must be reverified before creation. Never infer push from create authorization or merge from a created PR.
+* For an **existing published PR**, check its current remote head/base and pre-PR review/check evidence. If stale, revalidate through the same verification and Review owners, but **resume the existing PR** instead of routing to another `create`. Never implicitly convert an existing Draft to ready, and do not claim that a fresh Review authorizes its remote status change. A correctable defect returns to its owner; unverified readiness remains explicitly pending.
+* After creation or resumption of an existing PR, collect actual post-PR checks and required approvals for the current PR head/base. If code changes, return affected work to Implementation and revalidate necessary checks and independent Review. Confirm **separate merge authorization** after technical prerequisites, then merge only through the Git owner when repository protections are satisfied and verify the resulting target branch before reporting `integrated`.
+* Evaluate Product Slice-wide technical completeness after an observed merge **only when applicable**. A safe merged Architectural Slice/PR is still a valid integration result even when a broader Product Slice is incomplete or cannot yet be verified.
+
+## Slice-Scoped Context Handoffs
+
+1. Identify the next authorized slice, target decision and intended specialist. Reuse its `context_id`, `change_boundary_ref`, `scenario_refs`, `source_baseline_ref`, `slice_ref` and other existing contract references when available; do not invent IDs or require a new file.
+2. Assemble only the material goal, accepted scope, expected observable result or learning, relevant constraints and **critical guarantees**, versioned source references, unresolved decisions, and evidence needed for that specialist. Retain dependency and parent-goal references when omitting detail would mislead.
+3. For details not yet needed, pass an actionable source reference rather than copying entire histories, transcripts or unrelated files. Retrieve additional code, rules, examples or test evidence **on demand** using authorized tools; distinguish referenced, actually retrieved, and verified information.
+4. Reconcile the source baseline, material decisions, shared contract and actual code/PR revision at the receiving handoff, resumption and pre-gate use. If new evidence invalidates an assumption, reselect the affected context and request updated specialist evidence instead of silently preserving an obsolete summary.
+5. If a relevant source, authority or critical guarantee cannot be verified, report the gap and next owner; block only the dependent decision. Never solve a context limit by dropping safety or acceptance obligations or by requesting unauthorized secrets/remote data.
+
+This procedure reuses `contracts/work-item.md`, `contracts/design-evidence.md`, `contracts/test-basis.md` and existing source identifiers; it does **not** define a new context-packet contract or mandate a retrieval engine.
+
+## Product Slice Completion Handoff
+
+* For a Product Slice spanning multiple PRs, reconcile each required PR's actual merge status and target revision with the original Work Item, Change Boundary, and accepted scenario or learning objective. Explicitly account for pending, deferred, removed, and superseded obligations based on authorized decisions.
+* Verify the combined result when cross-PR interfaces, behavior, migration, or guarantees can interact. Use real integrated-snapshot test evidence or an appropriately scoped verification source; green PR checks alone do not establish combined correctness. When the overall slice is not complete or its evidence is unavailable, report the exact remaining scenarios and next responsible owner.
+* Return separately the **PR integration status**, **Product Slice technical verification status**, **business/stakeholder acceptance**, and **outcome observation**. Never infer acceptance, rollout, or value from merged PRs. A learning slice can instead close with an evidence-backed learning result and a recorded decision, not a fictional feature delivery.
+
+## Output
+
+Report the actual reached stage, per-slice completed and blocked work, applicable source, implementation and PR head/base identities, PR Boundary, Git-verified commits or explicit uncommitted/blocked state, specialist evidence, independent Review profile/verdict and tested scope where performed, readiness and remote PR status when available, post-PR checks/approvals, merge verification only when observed, Product Slice coverage and integrated-behavior evidence or explicit incompleteness when applicable, pending authorizations, recovery risks, next owners and unresolved outcome observations.
+
+## Boundary
+
+Never silently expand scope, execute an unapproved mutation, promote self-review to independent gate, replay unsafe side effects, push, create/merge PRs, deploy, release or claim operational effectiveness without corresponding explicit authorization/evidence.
+
+## Stop Conditions
+
+Stop the affected path on missing material authority or source meaning, stale evidence that cannot be refreshed, unsafe shared writes, unknown side effects, repeated non-progress, or mandatory checks that cannot run. Preserve completed independent work.

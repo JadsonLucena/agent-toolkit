@@ -24,6 +24,11 @@ agent-toolkit/
 │   │   ├── skills/
 │   │   ├── commands/
 │   │   └── agents/
+│   ├── delivery/
+│   │   ├── rules/
+│   │   ├── skills/
+│   │   ├── commands/
+│   │   └── agents/
 │   ├── testing/
 │   │   ├── rules/
 │   │   ├── skills/
@@ -122,7 +127,23 @@ contexts/implementation/
 └── agents/implementation-engineer.md
 ```
 
-Implementation changes production and related test code only for an authorized bounded slice, reuses Testing quality standards and Git's atomic commit capability, and records observed verification without treating local checks as independent Review.
+Implementation changes production and related test code only for an authorized bounded slice, reuses Testing quality standards and Git's atomic commit capability, and records observed verification. It hands off an implemented slice; independent Review, PR publication and merge belong to the subsequent Integration stage.
+
+### Delivery
+
+```text
+contexts/delivery/
+├── rules/delivery.md
+├── skills/coordinate-delivery/SKILL.md
+├── commands/deliver-change.md
+└── agents/delivery-coordinator.md
+```
+
+`/delivery/deliver-change` conditionally routes the existing specialist contexts toward a requested stage while preserving evidence and authorization boundaries. Integration coordinates final verification, independent Code Review, Git PR preparation, separately authorized PR creation, post-PR checks/approvals, and separately authorized merge. A ready PR needs applicable tests/lint and current advisory Review PASS; an explicitly authorized Draft may disclose incomplete evidence without claiming readiness. The command defaults to read-only assessment without mutation permission. The Markdown workflow is not a host execution engine.
+
+For a Product Slice spanning multiple PRs, Delivery tracks which required increments are integrated and reconciles the combined scenarios, guarantees, and integrated-revision evidence **before** asserting whole-slice technical verification. Merging one safe PR does not prove the entire Product Slice is complete, accepted, released, or valuable.
+
+Delivery also selects context **per slice and specialist handoff** from existing source, work-item, design and test evidence references. It retrieves further authorized detail only when needed, retains critical guarantees, and revalidates source/code revisions when upstream knowledge changes. No universal context packet, storage backend, or compulsory retrieval engine is introduced.
 
 ### Testing
 
@@ -243,6 +264,8 @@ Commands express engineering intent rather than low-level tool aliases:
 
 /implementation/implement-slice
 
+/delivery/deliver-change
+
 /testing/generate-tests
 
 /review/review-code
@@ -277,7 +300,11 @@ Elicitation ↔ Specification ↔ Validation ↔ Backlog / Plan
                     └───────────────────┘
                             │
                             ▼
-                     Verification → Independent Review → PR gate
+              Integration: final verification → Independent Review
+                            → Git PR preparation
+                            → Authorized PR publication
+                            → Post-PR checks / approvals
+                            → Authorized merge
 
 Cross-cutting: Git, security, conventions, …
 ```
