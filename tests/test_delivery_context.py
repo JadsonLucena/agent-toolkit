@@ -123,7 +123,7 @@ class DeliveryContextTests(unittest.TestCase):
 
     def test_transition_contract_has_complete_conditional_outcomes(self):
         skill = doc(SKILL)
-        section = re.search(r"(?ms)^## Transition Contract\\n(.*?)(?=^## |\\Z)", skill)
+        section = re.search(r"(?ms)^## Transition Contract\n(.*?)(?=^## |\Z)", skill)
         self.assertIsNotNone(section)
         lines = [line for line in section.group(1).splitlines()
                  if line.startswith("| T") and line.count("|") == 7]
@@ -142,11 +142,11 @@ class DeliveryContextTests(unittest.TestCase):
             }
         self.assertEqual({f"T{i:02d}" for i in range(1, 14)}, set(rows))
         self.assertIn("do not run every row as a mandatory sequence", section.group(1).lower())
-        self.assertIn("not an executable state machine", section.group(1))
+        self.assertIn("not a second implementation", section.group(1))
 
     def test_transitions_retain_review_publication_and_merge_order(self):
         skill = doc(SKILL)
-        section = re.search(r"(?ms)^## Transition Contract\\n(.*?)(?=^## |\\Z)", skill).group(1)
+        section = re.search(r"(?ms)^## Transition Contract\n(.*?)(?=^## |\Z)", skill).group(1)
         rows = {
             parts[0]: parts[1:]
             for line in section.splitlines() if line.startswith("| T")
