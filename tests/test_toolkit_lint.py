@@ -54,7 +54,7 @@ class ToolkitLintTests(unittest.TestCase):
         self.change(
             "contexts/requirements/skills/definition/SKILL.md",
             "## Uses\n",
-            "## Uses\n\n* Command: \x60contexts/requirements/commands/shape-change.md\x60\n",
+            "## Uses\n\n* Command: \x60contexts/requirements/commands/specify-and-plan-change.md\x60\n",
         )
         self.assert_error("forbidden dependency Skill -> Command")
 

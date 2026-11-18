@@ -80,7 +80,7 @@ contexts/requirements/
 │   ├── validation/SKILL.md
 │   └── backlog-planning/SKILL.md
 ├── commands/
-│   ├── shape-change.md
+│   ├── specify-and-plan-change.md
 │   ├── elicit-requirements.md
 │   ├── specify-requirements.md
 │   ├── validate-requirements.md
@@ -102,7 +102,7 @@ Requirements also favors the smallest coherent **knowledge batch** that safely s
 
 Elicitation and specification share `contracts/requirements.md` so Need/Goal context, source evidence, decisions, assumptions, conflicts, applicable concerns, and traceability survive the transformation without coupling their workflows. Example Discovery can define stable Scenario Sets, refine rules/examples/boundaries before automation, and hand optional evidence to Testing through `contracts/test-basis.md`.
 
-`/requirements/shape-change` is an optional composite entry point that routes the existing elicitation, definition, read-only validation, and backlog-planning capabilities according to the evidence already available. It works toward the next material decision using the smallest coherent knowledge batch, preserves/reconciles the Change Boundary when present, and remains neutral to feature, defect, migration, regulatory, and other change types. It does not authorize design, implementation, testing, or Git mutation.
+`/requirements/specify-and-plan-change` is an optional composite entry point that routes the existing elicitation, definition, read-only validation, and backlog-planning capabilities according to the evidence already available. It works toward the next material decision using the smallest coherent knowledge batch, preserves/reconciles the Change Boundary when present, and remains neutral to feature, defect, migration, regulatory, and other change types. It does not authorize design, implementation, testing, or Git mutation.
 
 ### Design
 
@@ -254,7 +254,7 @@ Executable runtime integration examples (not additional canonical owners):
 Commands express engineering intent rather than low-level tool aliases:
 
 ```text
-/requirements/shape-change
+/requirements/specify-and-plan-change
 /requirements/elicit-requirements
 /requirements/specify-requirements
 /requirements/validate-requirements
@@ -282,6 +282,8 @@ Commands express engineering intent rather than low-level tool aliases:
 A command's invocation defines its authorization boundary. For example, determining a semantic version does not authorize version-file mutation, tagging, publishing, or release.
 
 ## Development Pipeline
+
+The pipeline follows lifecycle-coverage, controlled iteration, recovery, and safe-parallel-work invariants defined in [ARCHITECTURE.md](ARCHITECTURE.md); it is neither a mandatory sequential SDLC nor an authorization for downstream effects. Outcome observation remains distinct from code verification and PR readiness.
 
 The intended delivery flow is **test-first**: supported behavior is specified before implementation, and executable tests can guide implementation incrementally when a TDD workflow is selected.
 
@@ -412,7 +414,7 @@ Stable or repeatedly used project information may be cached when the execution p
 
 The initial [Requirements evaluation corpus](evals/requirements/README.md)
 covers elicitation, definition, examples, validation, backlog, and composite
-`shape-change` behavior. The provider-neutral evidence checker at
+`specify-and-plan-change` behavior. The provider-neutral evidence checker at
 `scripts/requirements_evals.py` validates catalog structure and documented
 review observations against complete agent transcripts. It does not execute
 an AI agent or automatically judge its semantic correctness.
@@ -421,7 +423,7 @@ CI validates the corpus and the checker with stdlib-only regression tests.
 Actual agent behavior must still be exercised in a host and reviewed against
 the rubrics before claiming behavioral readiness.
 
-`/requirements/shape-change` already routes elicitation through planning.
+`/requirements/specify-and-plan-change` already routes elicitation through planning.
 It may yield supported granular backlog slices, but not speculative
 architecture-specific implementation tasks. Cross-context technical task
 generation belongs to a later SDD delivery workflow.

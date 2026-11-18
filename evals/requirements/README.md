@@ -21,7 +21,7 @@ The cases in [cases.json](cases.json) sample the existing commands:
 - Example Discovery: stable scenario identity, negative cases, and concurrency.
 - Validation: contradictory authority and read-only behavior.
 - Backlog: critical financial guarantees during slicing.
-- Composite `shape-change`: two complementary cases: `SC-01A` supplies the
+- Composite `specify-and-plan-change`: two complementary cases: `SC-01A` supplies the
   full authorized refund-count policy for validated planning; `SC-01B`
   deliberately leaves business semantics unresolved and checks that the
   agent asks for clarification instead of manufacturing requirements.
@@ -105,10 +105,10 @@ and the owning Requirements rules as the semantic sources of truth. These
 evaluation envelopes are test fixtures and verification records, not a new
 Requirements contract or a mandatory output format for agents.
 
-**Granular tasks:** `/requirements/shape-change` already orchestrates
+**Granular tasks:** `/requirements/specify-and-plan-change` already orchestrates
 elicitation through backlog planning. It may produce vertical slices and
 planning tasks supported by validated source semantics. Detailed
 architecture-specific engineering tasks belong to later Design/Implementation
 work and should not be invented by Requirements. An eventual cross-context
 SDD delivery command can orchestrate those later stages without duplicating
-`shape-change`.
+`specify-and-plan-change`.

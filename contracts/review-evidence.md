@@ -51,6 +51,20 @@ Record the original changed-file inventory separately from selection and executi
 
 A completed tool run does not imply complete coverage. Partial or unknown required coverage cannot support a clean pre-PR gate. Excluded files must not be silently subtracted from the denominator.
 
+## Optional Specification Conformance Evidence
+
+When authoritative specification or other source behavior is applicable, `specification_conformance` may record a **scoped investigation** without becoming a second gate:
+
+* `status` — `checked`, `not-applicable`, or `blocked`, with reason for non-applicability or blocked inspection;
+* `source_baseline_ref` — accepted authoritative baseline/revision when known, without inventing an ID;
+* `change_boundary_ref` and `source_refs` — accepted Change Boundary and applicable requirement, scenario, quality-criterion, interface or decision identifiers when supplied;
+* `obligations` — known relevant source identities, evidence checked, and assessment `satisfied`, `violated`, or `unverified`; include contrary evidence or a genuine no-evidence limitation;
+* `test_evidence_refs` — relevant verification references with source baseline and actual reviewed revision as available, distinguishing executed results from unexecuted assertions;
+* `out_of_scope_behavior` — observed behavior outside authorized scope and its concrete effect or unresolved authority;
+* `findings_refs`, `limitations` — related reviewed findings, material unknowns, inaccessible consumers and unresolved contradictions.
+
+This record supplements the usual Review findings and coverage; it does not redefine test evidence, source requirements, the review profiles, or Git preflight. Do not automatically reject a change because a formal Scenario Set is absent. A `checked` label does not imply every business outcome was observed, and a `PASS` still depends on the one existing Review verdict policy.
+
 ## Findings
 
 Each finding should include:

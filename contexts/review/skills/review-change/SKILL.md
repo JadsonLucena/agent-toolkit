@@ -22,7 +22,7 @@ Perform a complete read-only review in `advisory` or `gate` profile with portabl
 
 ## Working State
 
-Track target and base/head identity; change boundary and stated claims; changed/selected/reviewed/excluded/unreviewed files; applicable requirements/contract evidence; documentation_assessment and affected documents; risk profile and affected consumers; deterministic check results and provenance; raw and verified findings; selected collaborative team mode/roles, peer questions and resolutions when applicable; limitations and review verdict.
+Track target and base/head identity; change boundary and stated claims; changed/selected/reviewed/excluded/unreviewed files; applicable requirements/contract evidence; documentation_assessment and affected documents; applicable specification_conformance and authoritative baseline; risk profile and affected consumers; deterministic check results and provenance; raw and verified findings; selected collaborative team mode/roles, peer questions and resolutions when applicable; limitations and review verdict.
 
 ## Workflow
 
@@ -43,7 +43,8 @@ flowchart TD
     TeamCoordination --> PeerChallenges
     PeerChallenges --> NativeReview
     NativeReview --> DocumentationAssessment[Documentation consistency and drift]
-    DocumentationAssessment --> VerifyFindings
+    DocumentationAssessment --> Conformance["Specification-Driven Conformance when sources apply"]
+    Conformance --> VerifyFindings
     VerifyFindings --> CoverageAndEvidence
     CoverageAndEvidence -->|complete, no blockers| Pass
     CoverageAndEvidence -->|verified blockers| Fail
@@ -51,7 +52,7 @@ flowchart TD
 ```
 
 The diagram is the procedure. Mandatory host-neutral preparation is Preflight.
-Apply `contexts/review/rules/code-review.md` for findings, documentation drift, local checks, and the verdict.
+Apply `contexts/review/rules/code-review.md` for findings, Specification-Driven Conformance, documentation drift, local checks, and the verdict.
 Apply `contexts/review/skills/coordinate-review-team/SKILL.md` for team mode.
 Apply `contexts/review/skills/verify-findings/SKILL.md` before a candidate becomes a blocker.
 Apply `contexts/review/rules/high-risk-patterns.md` as falsification prompts. Do not restate those sources.

@@ -141,3 +141,9 @@ No vendor-specific adapter files are introduced by this migration.
 * Existing specification and architecture specialists reference the one
   Review Rule rather than maintaining separate documentation checklists.
   Reviewer independence, SSHSIG, and advisory/gate boundaries are unchanged.
+
+## 2026-11 — Requirements Composite Command Rename
+
+* Canonical entry point renamed from `/requirements/shape-change` to `/requirements/specify-and-plan-change` to make its specification-and-planning boundary explicit.
+* Invocation semantics and authorization are unchanged: Requirements-only routing; no design, tests, code, or Git mutation.
+* Update host command registrations and saved invocations to the new name. An alias is host-specific and is not a second canonical command.
