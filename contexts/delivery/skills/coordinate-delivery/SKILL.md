@@ -86,7 +86,14 @@ flowchart TD
     DraftPrepare --> PublishDecision
     PublishDecision -->|Prepare only or creation not authorized| Prepared["Report pr-prepared only"]
     PublishDecision -->|Blocked by Git policy| Block
-    PublishDecision -->|Create authorized, Git eligibility satisfied| GitCreate["Git: create PR via canonical create-pull-request command"]
+    PublishDecision -->|Create authorized, Git eligibility satisfied| RemoteBranch["Git: verify exact intended head/base and published source branch"]
+    RemoteBranch --> BranchStatus{"Source branch published on intended remote?"}
+    BranchStatus -->|Yes| GitCreate["Git: create PR via canonical create-pull-request command"]
+    BranchStatus -->|No, separate push authorized| GitPush["Git: perform separately authorized push and verify remote refs"]
+    GitPush --> PushResult{"Exact head/base published and verified?"}
+    PushResult -->|Yes| GitCreate
+    PushResult -->|No, failed or unknown| Block
+    BranchStatus -->|No, push unavailable or unauthorized| Block
     GitCreate --> Created["Verify new remote PR, exact head/base and Draft/ready state"]
     Created --> PostTarget
     PostTarget -->|Yes, including pr-created| Done
@@ -107,7 +114,7 @@ flowchart TD
     SliceComplete -->|No, incomplete or unverified| SlicePending["Report PR integrated; Product Slice incomplete or unverified"]
 ```
 
-This explicit cross-context workflow permits **routing** existing specialist capabilities; they continue to own their procedures and authorization gates. Requirements owns its internal elicitation/validation/backlog loop, Implementation owns its optional TDD and atomic Git commit handoffs, Review owns its verdict and Git owns PR planning, preparation, creation and merge. The diagram intentionally does not duplicate those internal workflows. `/requirements/specify-and-plan-change` (where available; legacy hosts may still expose `shape-change`) performs Requirements-only composition, not the full delivery sequence. Review keeps the sole technical verdict. No tool execution is implied merely by this Markdown procedure.
+This explicit cross-context workflow permits **routing** existing specialist capabilities; they continue to own their procedures and authorization gates. Requirements owns its internal elicitation/validation/backlog loop, Implementation owns its optional TDD and atomic Git commit handoffs, Review owns its verdict and Git owns PR planning, preparation, creation and merge. The diagram intentionally does not duplicate those internal workflows. Resolve Requirements composition against the **actually installed command**: use `/requirements/specify-and-plan-change` when the renamed command is present (independent PR #31), or `/requirements/shape-change` when the current installation still provides the original command. Verify the entry point exists before routing; do not assume an uninstalled command or a host alias. Both are Requirements-only and do not authorize the full delivery sequence. Review keeps the sole technical verdict. No tool execution is implied merely by this Markdown procedure.
 
 ## Git Planning and Commit Handoffs
 
@@ -119,7 +126,7 @@ This explicit cross-context workflow permits **routing** existing specialist cap
 
 * After Implementation, route final code/commit identity and verification evidence into Integration; collect missing authorized tests/lint with their actual execution scope, then request independent Code Review through Review's existing capability. Review owns the single verdict; the Git PR readiness rule decides which evidence permits a ready PR.
 * An advisory `PASS` on the current intended head/base permits Git `prepare` for ready status when other checks pass. On `FAIL`, `INCOMPLETE`, or stale evidence, route correctable work to its owner and reverify affected outputs, or prepare/publish **only an explicitly authorized Draft** with truthful limitations under the Git rule.
-* Git owns PR `prepare` and separately authorized `create`. A request for `pr-prepared` stops before publication; a request for `pr-created` stops after verifying the remote PR. Do not infer push from create authorization or merge from a created PR.
+* Git owns PR `prepare` and separately authorized `create`. A request for `pr-prepared` stops before publication; a request for `pr-created` stops after verifying the remote PR. **Before `create`, Git verifies the intended source branch exists on the correct remote at the exact reviewed head and confirms the intended base.** If unpublished, stop and report the blocker unless push was **separately authorized**; only Git may perform that push, and remote identity must be reverified before creation. Never infer push from create authorization or merge from a created PR.
 * For an **existing published PR**, check its current remote head/base and pre-PR review/check evidence. If stale, revalidate through the same verification and Review owners, but **resume the existing PR** instead of routing to another `create`. Never implicitly convert an existing Draft to ready, and do not claim that a fresh Review authorizes its remote status change. A correctable defect returns to its owner; unverified readiness remains explicitly pending.
 * After creation or resumption of an existing PR, collect actual post-PR checks and required approvals for the current PR head/base. If code changes, return affected work to Implementation and revalidate necessary checks and independent Review. Confirm **separate merge authorization** after technical prerequisites, then merge only through the Git owner when repository protections are satisfied and verify the resulting target branch before reporting `integrated`.
 * Evaluate Product Slice-wide technical completeness after an observed merge **only when applicable**. A safe merged Architectural Slice/PR is still a valid integration result even when a broader Product Slice is incomplete or cannot yet be verified.

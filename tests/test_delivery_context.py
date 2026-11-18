@@ -55,7 +55,12 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn('ReviewResult -->|PASS, PR progression authorized| PublishRoute', skill)
         self.assertIn('PublishRoute -->|No| ReadyPrepare', skill)
         self.assertIn('ReadyPrepare --> PublishDecision', skill)
-        self.assertIn('PublishDecision -->|Create authorized, Git eligibility satisfied| GitCreate', skill)
+        self.assertIn('PublishDecision -->|Create authorized, Git eligibility satisfied| RemoteBranch', skill)
+        self.assertIn('RemoteBranch --> BranchStatus', skill)
+        self.assertIn('BranchStatus -->|Yes| GitCreate', skill)
+        self.assertIn('BranchStatus -->|No, push unavailable or unauthorized| Block', skill)
+        self.assertIn('GitPush --> PushResult', skill)
+        self.assertIn('PushResult -->|No, failed or unknown| Block', skill)
         self.assertIn('Created --> PostTarget', skill)
         self.assertIn('Need -->|Existing published PR| ExistingPR', skill)
         self.assertIn('ExistingPR --> ExistingFresh', skill)
@@ -79,6 +84,25 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn("review_profile=advisory", rule)
         self.assertIn("PASS", rule)
         self.assertIn("explicitly authorized Draft PR", rule)
+
+    def test_requirements_command_is_resolved_from_installed_toolkit(self):
+        skill = doc("contexts/delivery/skills/coordinate-delivery/SKILL.md")
+        self.assertIn("/requirements/specify-and-plan-change", skill)
+        self.assertIn("/requirements/shape-change", skill)
+        self.assertIn("actually installed command", skill)
+        self.assertIn("Verify the entry point exists before routing", skill)
+        self.assertIn("do not assume an uninstalled command or a host alias", skill)
+
+    def test_pr_creation_requires_remote_publication_and_separate_push_authorization(self):
+        skill = doc("contexts/delivery/skills/coordinate-delivery/SKILL.md")
+        self.assertIn('PublishDecision -->|Create authorized, Git eligibility satisfied| RemoteBranch', skill)
+        self.assertIn('BranchStatus -->|No, separate push authorized| GitPush', skill)
+        self.assertIn('PushResult -->|Yes| GitCreate', skill)
+        self.assertIn('PushResult -->|No, failed or unknown| Block', skill)
+        self.assertIn('BranchStatus -->|No, push unavailable or unauthorized| Block', skill)
+        self.assertIn("Git verifies the intended source branch exists", skill)
+        self.assertIn("remote identity must be reverified before creation", skill)
+        self.assertNotIn("PublishDecision -->|Create authorized, Git eligibility satisfied| GitCreate", skill)
 
     def test_pr_state_and_authority_are_not_conflated(self):
         command = doc("contexts/delivery/commands/deliver-change.md")
