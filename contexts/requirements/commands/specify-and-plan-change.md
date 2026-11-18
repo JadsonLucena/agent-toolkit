@@ -1,8 +1,8 @@
-# Shape Change
+# Specify and Plan Change
 
 ## Intent
 
-Shape a feature, defect, correction, migration, regulatory change, operational improvement, or other change through the minimum Requirements work needed to reach a validated planning handoff.
+Specify and plan a feature, defect, correction, migration, regulatory change, operational improvement, or other bounded change using only the Requirements work needed for a validated planning handoff.
 
 ## Invocation
 

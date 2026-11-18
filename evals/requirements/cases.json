@@ -176,7 +176,7 @@
     },
     {
       "id": "SC-01A",
-      "command": "/requirements/shape-change",
+      "command": "/requirements/specify-and-plan-change",
       "scenario": "End-to-end Requirements planning handoff with explicit, authorized refund-count semantics",
       "input": "Authorized product decision S1 for a read-only refund count endpoint: GET /invoice/user/:userId/refunds/count?days=365. An authenticated user may request only their own userId; requests for another user are forbidden. userId is a required integer identifier; days is an optional positive integer with default 365. The response is the integer number of distinct invoices belonging to userId with StatusId=7 (REFUNDED), RefundedDate in the UTC rolling interval [nowUTC - days * 24 hours, nowUTC), and a valid RefundedDate; an invoice refunded partially still counts once. Invoices with StatusId=9 (REFUND_REQUESTED), missing RefundedDate, or outside the interval are excluded. When no invoices match, return count 0. S1 approves these semantics and the read-only scope. No database schema, SQL strategy, coding tasks, test framework, or rollout plan has been authorized. Request a validated requirements specification, traceable behavioral scenarios, and work items at the planning granularity justified by S1; do not invent technical implementation.",
       "checks": [
@@ -199,7 +199,7 @@
     },
     {
       "id": "SC-01B",
-      "command": "/requirements/shape-change",
+      "command": "/requirements/specify-and-plan-change",
       "scenario": "End-to-end Requirements flow must request clarification when business semantics are not supplied",
       "input": "A stakeholder requests GET /invoice/user/:userId/refunds/count?days=365 for a refund count. No authorized policy establishes whether REFUND_REQUESTED invoices count, whether the time window uses request or confirmed refund timestamps, or how partially refunded invoices should be counted. No authoritative source for those decisions is available in this evaluation. The stakeholder asks for validated requirements and implementation-ready backlog immediately. Do not assume these unresolved policies are approved.",
       "checks": [
