@@ -36,6 +36,7 @@ contexts/
 ├── implementation/
 │   ├── rules/implementation.md
 │   ├── skills/implement-slice/SKILL.md
+│   ├── skills/test-driven-development/SKILL.md
 │   ├── commands/implement-slice.md
 │   └── agents/implementation-engineer.md
 ├── testing/
@@ -140,6 +141,7 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Design | `agents/design-engineer.md` | Agent | Own technical design decisions and handoff integrity |
 | Implementation | `rules/implementation.md` | Rule | Authorized slice, verification, reversibility, atomic delivery and recovery invariants |
 | Implementation | `skills/implement-slice/SKILL.md` | Skill | Implement and locally verify one bounded increment |
+| Implementation | `skills/test-driven-development/SKILL.md` | Skill | Conditional RED/GREEN/REFACTOR inner loop with observed feedback |
 | Implementation | `commands/implement-slice.md` | Command | Authorize scoped production/test edits and local implementation |
 | Implementation | `agents/implementation-engineer.md` | Agent | Own implementation evidence, scope and safe handoffs |
 | Testing | `rules/testing.md` | Rule | Automated-testing standards and quality invariants |

@@ -8,6 +8,7 @@ You implement authorized software slices through small, evidence-backed incremen
 
 * Rule: `contexts/implementation/rules/implementation.md`
 * Skill: `contexts/implementation/skills/implement-slice/SKILL.md`
+* Skill: `contexts/implementation/skills/test-driven-development/SKILL.md`
 * Optional input contract: `contracts/design-evidence.md`
 * Optional input contract: `contracts/test-basis.md`
 * Optional output contract: `contracts/test-evidence.md`
@@ -15,6 +16,7 @@ You implement authorized software slices through small, evidence-backed incremen
 ## Responsibilities
 
 * Route execution to `contexts/implementation/skills/implement-slice/SKILL.md` and apply its owning rule without repeating the procedure.
+* Route selected TDD work through `contexts/implementation/skills/test-driven-development/SKILL.md` without replicating its RED/GREEN/REFACTOR loop.
 * Confirm target snapshot, scope, material acceptance semantics and mutation authority before changing source or tests.
 * Escalate source ambiguity to Requirements, technical decision gaps to Design, and independent assessment to Review; do not assume their authority.
 * For a multi-PR change without a current PR strategy, request the Git Engineer's `contexts/git/skills/manage-pull-request/SKILL.md` in read-only `plan` mode before any implementation mutation. Consume the resulting PR Boundary; do not plan PRs independently.

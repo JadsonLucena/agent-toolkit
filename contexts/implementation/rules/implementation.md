@@ -14,6 +14,17 @@
 * Evaluate rollback, forward-fix, compensation or reconciliation for material irreversible or durable effects. Git revert does not reverse external outcomes or schema/data changes automatically.
 * Do not run unapproved external services, deployments, destructive migrations, secret-dependent checks, network actions or data exposure. Use explicit host/runtime policy at the effect boundary.
 
+## Test-Driven Execution
+
+* Test-driven development is a conditional, authorized implementation strategy, not a prerequisite for all tasks. Select it where an executable small-behavior test can provide valuable feedback.
+* The selected behavior must come from a supported requirement, scenario, observable contract, or existing characterization target; never invent acceptance semantics to make a convenient test.
+* RED: write the smallest relevant failing test and execute it. Confirm failure is for the **expected behavioral reason**, not a setup error, unrelated regression or missing dependency. A test that already passes is not RED evidence.
+* GREEN: change only the in-scope production code necessary to satisfy the selected behavior, while retaining existing material guarantees. Run the focused test and applicable regression checks.
+* REFACTOR: improve structure without changing expected behavior; rerun relevant tests. A refactor with unverified preservation is not a completed TDD cycle.
+* Repeat for another small behavior only after the current cycle's evidence is established. Persist the failure/output, actual commands, revision and supported scenario mapping when material.
+* Repeated failures without a new actionable diagnosis, uncertainty in the expected behavior, a scope change or unsafe side effects stop the affected cycle and require the responsible decision owner. Automated test generation remains independently available in Testing.
+* TDD cycle completion is not integrated verification, independent Code Review, deployment or business acceptance.
+
 ## Verification and Feedback
 
 * Use supported tests and `contracts/test-basis.md`/`contracts/test-evidence.md` when supplied; scenarios remain semantic, not necessarily identical to test identifiers. Respect canonical `contexts/testing/rules/testing.md` as a quality reference without taking ownership of Testing's separate workflow.
