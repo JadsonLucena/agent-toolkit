@@ -167,6 +167,27 @@ print(json.dumps(result))
         self.assertFalse(result["signed_review_verified"])
         self.assertEqual("not-applicable", result["gate_attestation"])
 
+    def test_unpublished_head_blocks_advisory_and_draft_publication(self):
+        self.advisory_reviewer()
+        (self.repo / "app.py").write_text("value = 3\n")
+        git(self.repo, "add", "app.py")
+        git(self.repo, "commit", "-q", "-m", "local-only amendment")
+        for mode in ("advisory", "draft"):
+            with self.subTest(mode=mode):
+                seen, fake_gh = self.gh_mock()
+                args = (self.advisory_cli("--create", "--title", "Add feature",
+                                          "--body-file", str(self.body))
+                        if mode == "advisory" else
+                        self.cli("--draft", "--create", "--title", "Add feature",
+                                 "--body-file", str(self.body)))
+                with patch.object(gate, "invoke", side_effect=fake_gh):
+                    output = io.StringIO()
+                    with contextlib.redirect_stdout(output):
+                        code = gate.main(args)
+                self.assertEqual(2, code)
+                self.assertEqual([], seen)
+                self.assertIn("remote head", output.getvalue())
+
     def test_advisory_ready_without_approved_reviewer_never_creates_pr(self):
         self.body.write_text("Profile: advisory; gate: not attested\n")
         seen, fake_gh = self.gh_mock()
@@ -233,6 +254,16 @@ print(json.dumps(result))
                     "--body-file", str(self.body)))
         self.assertEqual(2, code)
         self.assertEqual([], seen)
+
+    def test_advisory_and_gate_modes_are_documented_distinctly(self):
+        doc = (ROOT / "adapters/github/README.md").read_text(encoding="utf-8")
+        script = (ROOT / "adapters/github/guarded_pr.py").read_text(encoding="utf-8")
+        self.assertIn("separate ready-for-review modes", script)
+        self.assertIn("The separate", doc)
+        self.assertIn("Host acceptance checklist", doc)
+        self.assertIn("cannot verify host tool restrictions", doc)
+        self.assertIn("signed gate mode", doc)
+        self.assertNotIn("but has no ready-PR authority", doc)
 
     def test_repository_check_manifest_matches_ci_commands(self):
         checks = gate.read_checks(gate.load_json(ROOT / ".github" / "toolkit-pr-checks.json"))

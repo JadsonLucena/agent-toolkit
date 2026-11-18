@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Explicit GitHub PR creation guarded by signed review evidence and trusted checks.
+"""Explicit GitHub PR creation guarded by review evidence and trusted checks.
 
-This is an optional GitHub runtime adapter. A ready PR requires an SSH-signed
-``review_profile=gate`` attestation. An explicitly authorized draft may be
-created without that attestation; the draft body must not affirm gate PASS.
-The invoking deployment MUST protect the external trust policy and reviewer
-signing keys. This adapter cannot regulate unrelated GitHub clients or
-establish isolation by itself.
+This optional GitHub runtime adapter has separate ready-for-review modes:
+an approved native advisory reviewer or an SSH-signed ``review_profile=gate``
+attestation. An explicitly authorized draft remains distinct and must not
+affirm gate PASS. The invoking deployment MUST protect its trust policy,
+reviewer command and signing keys, and must prevent direct GitHub publication
+outside the guard; this adapter cannot regulate unrelated GitHub clients.
 """
 from __future__ import annotations
 

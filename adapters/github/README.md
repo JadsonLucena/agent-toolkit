@@ -66,6 +66,34 @@ For reliable enforcement, install this adapter in a trusted tool/service context
 
 The toolkit intentionally does **not** claim to enforce this automatically on Cursor, Claude, Codex or other hosts. The owner of each host must configure its tool registry, credential delegation and approval boundary; there is no repository-wide control that can revoke a separately provisioned GitHub credential. Host instruction routing in root `AGENTS.md` improves selection but is not the security boundary.
 
+## Host acceptance checklist (operational, not automatically configured)
+
+Before claiming that PR publication is **enforced** in a particular host:
+
+1. A trusted administrator provisions a protected launcher/service for this
+   adapter, holds the repository PR-write credential exclusively on that
+   service, and pins the reviewer executable, trust policy, remote and checks
+   outside the coding agent's control.
+2. The host removes all **direct PR creation** capabilities and credentials
+   from the coding agent (including `gh pr create`, provider API calls and
+   GitHub MCP connectors with PR-create permission). An LLM instruction that
+   says not to use a tool does **not** satisfy this step.
+3. In a **disposable repository**, deliberately ask a non-Git Skill to publish
+   a PR directly. Inspect **actual tool permissions/denial traces**, not the
+   model's promise to avoid the operation. The direct call must be denied by
+   the runtime even if the model attempts it.
+4. Exercise the protected publisher with no approved reviewer, failed Review,
+   stale head/base, unpublished head and failed checks. Confirm a nonzero
+   preflight and **no remote PR creation**; separately exercise authorized
+   success with real independent review and verify the resulting PR identity.
+5. Record the host name/version, sanitized tool registry and credential scopes,
+   protected policy identity, commands and timestamps, PR/branch evidence,
+   reviewer identity and independently assessed outcome. Redact secrets.
+
+These are **deployment acceptance steps**, not evidence that any particular
+host has been configured. The repository's isolated tests exercise the adapter
+but cannot verify host tool restrictions or a live LLM reviewer.
+
 ## Trust model and setup
 
 An invoking **trusted runtime/operator** must own the following, outside the
@@ -213,8 +241,10 @@ The protected pre-PR validator accepts only SSHSIG-signed evidence explicitly
 declaring `review_profile: gate` for a ready PR. Signed `advisory` results,
 missing legacy profiles and independent-looking flags cannot bypass the gate.
 The profile is part of the **exact signed JSON bytes**; no adapter may
-retroactively promote an advisory finding. An advisory PASS may be useful in
-an IDE, but has no ready-PR authority. Explicitly nonmaterial questions with
+retroactively promote an advisory finding. An advisory PASS cannot satisfy **this signed gate mode**. The separate
+`--advisory` ready-publication mode has its own protected reviewer invocation,
+complete native review verification and trusted checks; it does not claim a
+signed gate attestation. Explicitly nonmaterial questions with
 `material:false` may remain without granting false certainty about
 material unresolved issues. The signer and protected runtime remain
 responsible for actual reviewer independence.
