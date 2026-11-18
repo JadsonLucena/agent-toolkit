@@ -133,7 +133,9 @@ class CheckpointStore:
         if path.is_symlink():
             raise CheckpointError("database must not be a symlink")
         try:
+            created = False
             if not path.exists():
+                created = True
                 fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
                 os.close(fd)
             elif os.name == "posix" and (stat.S_IMODE(path.stat().st_mode) & 0o077):
@@ -144,6 +146,9 @@ class CheckpointStore:
             self.db.execute("PRAGMA foreign_keys = ON")
             self.db.execute("PRAGMA busy_timeout = 3000")
             self.db.execute("PRAGMA journal_mode = WAL")
+            version = self.db.execute("PRAGMA user_version").fetchone()[0]
+            if version not in (0, 1) or (version == 0 and not created):
+                raise CheckpointError("unknown checkpoint database schema")
             self.db.executescript("""
                 CREATE TABLE IF NOT EXISTS checkpoints (
                     execution_id TEXT PRIMARY KEY,
@@ -168,6 +173,8 @@ class CheckpointStore:
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
             """)
+            if version == 0:
+                self.db.execute("PRAGMA user_version = 1")
         except OSError as exc:
             raise CheckpointError("cannot create private checkpoint database") from exc
 

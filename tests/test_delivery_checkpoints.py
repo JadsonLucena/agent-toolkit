@@ -119,6 +119,22 @@ class SQLiteCheckpointTests(unittest.TestCase):
             with self.assertRaises(CheckpointError):
                 store.resume("execution-1", other)
 
+
+    def test_reject_unrecognized_schema(self):
+        with sqlite3.connect(self.db) as db:
+            db.execute("PRAGMA user_version = 99")
+        self.db.chmod(0o600)
+        with self.assertRaises(CheckpointError):
+            CheckpointStore(self.db)
+
+    def test_delivery_skill_names_optional_runtime_adapters(self):
+        skill = (Path(__file__).resolve().parents[1] /
+                 "contexts/delivery/skills/coordinate-delivery/SKILL.md"
+                 ).read_text(encoding="utf-8")
+        self.assertIn("adapters/context/native.py", skill)
+        self.assertIn("adapters/delivery/checkpoints.py", skill)
+        self.assertIn("never grants execution", skill.lower())
+
     def test_reject_public_data_directory(self):
         insecure = Path(self.tmp.name) / "public"
         insecure.mkdir(mode=0o755)
