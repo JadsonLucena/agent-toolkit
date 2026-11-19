@@ -232,20 +232,26 @@ def search_sources(
         return {"status": "incomplete", "results": [],
                 "reason": "tracked file count exceeds scan limit"}
     matches = []
+    skipped = 0
     for raw in paths:
+        relative = os.fsdecode(raw)
+        # Only scoped paths contribute to completeness; irrelevant files do not.
+        if not any((root / relative).is_relative_to(scope) for scope in allowed):
+            continue
         try:
-            path = _safe_path(root, os.fsdecode(raw))
-            if not any(path.is_relative_to(scope) for scope in allowed):
-                continue
+            path = _safe_path(root, relative)
             # git ls-files already restricts this scan to tracked paths.
             if path.stat().st_size > MAX_FILE_BYTES:
+                skipped += 1
                 continue
             with path.open("rb") as stream:
                 body = stream.read(MAX_FILE_BYTES + 1)
             if len(body) > MAX_FILE_BYTES or b"\x00" in body:
+                skipped += 1
                 continue
             contents = body.decode("utf-8")
         except (ContextError, OSError, UnicodeDecodeError):
+            skipped += 1
             continue
         for num, line in enumerate(contents.splitlines(), 1):
             if query.casefold() in line.casefold():
@@ -255,9 +261,17 @@ def search_sources(
                 })
                 if len(matches) >= max_results:
                     return {"status": "truncated", "head_sha": head, "results": matches,
+                            "skipped_files": skipped,
                             "note": "Search hits are leads, not complete evidence."}
-    return {"status": "complete", "head_sha": head, "results": matches,
-            "note": "Search hits are leads, not complete evidence."}
+    result = {
+        "status": "incomplete" if skipped else "complete",
+        "head_sha": head, "results": matches,
+        "skipped_files": skipped,
+        "note": "Search hits are leads, not complete evidence.",
+    }
+    if skipped:
+        result["reason"] = "Scoped tracked files were skipped; search coverage is incomplete"
+    return result
 
 
 def main() -> int:
