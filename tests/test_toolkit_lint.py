@@ -24,6 +24,10 @@ class ToolkitLintTests(unittest.TestCase):
                             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         for name in ("ARCHITECTURE.md", "README.md", "AGENTS.md"):
             shutil.copy2(ROOT / name, self.root / name)
+        # Mirror the CI workflow referenced by AGENTS.md in the test repository.
+        workflow = Path(".github/workflows/toolkit-validation.yml")
+        (self.root / workflow).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / workflow, self.root / workflow)
 
     def change(self, path, old, new):
         target = self.root / path
@@ -41,6 +45,10 @@ class ToolkitLintTests(unittest.TestCase):
     def test_missing_repository_agent_instructions(self):
         (self.root / "AGENTS.md").unlink()
         self.assert_error("AGENTS.md: missing repository agent instructions")
+
+    def test_missing_ci_workflow_reference_is_reported(self):
+        (self.root / ".github/workflows/toolkit-validation.yml").unlink()
+        self.assert_error("broken Markdown link .github/workflows/toolkit-validation.yml")
 
     def test_missing_optional_adapter_documentation_is_reported(self):
         (self.root / "adapters" / "ocr" / "README.md").unlink()
