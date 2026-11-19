@@ -328,6 +328,28 @@ class OptionalFTS5Tests(unittest.TestCase):
         self.assertTrue(opened)
         self.assertTrue(all(conn.closed for conn in opened))
 
+
+    def test_indexed_physical_line_references_match_native(self):
+        (self.repo / "docs" / "unicode_lines.md").write_text(
+            "Intro\u2028other text\nAuthorization must remain.\n",
+            encoding="utf-8",
+        )
+        subprocess.run(["git", "add", "."], cwd=self.repo, check=True)
+        subprocess.run(
+            ["git", "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+             "commit", "-qm", "physical line fixture"], cwd=self.repo, check=True,
+        )
+        self._build()
+        found = fts5.search(self.repo, "Authorization", ["docs"],
+                            db=self.db, mode="indexed")
+        native_result = native.search_sources(self.repo, "Authorization", ["docs"])
+        self.assertEqual(found["results"], native_result["results"])
+        self.assertIn(
+            {"ref": "docs/unicode_lines.md#L2",
+             "preview": "Authorization must remain."},
+            found["results"],
+        )
+
     def test_literal_query_quote_is_not_executable_fts_syntax(self):
         self._build()
         result = fts5.search(self.repo, 'authorization" OR secret', ["docs"],

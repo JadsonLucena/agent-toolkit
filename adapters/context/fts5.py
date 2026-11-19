@@ -252,7 +252,7 @@ def _indexed_search(
                 source = root / relative
                 if not any(source.is_relative_to(q) for q in requested):
                     continue
-                for number, line in enumerate(content.splitlines(), 1):
+                for number, line in enumerate(content.split("\n"), 1):
                     if query.casefold() in line.casefold():
                         matches.append({"ref": f"{relative}#L{number}", "preview": line[:200]})
                         if len(matches) >= max_results:
