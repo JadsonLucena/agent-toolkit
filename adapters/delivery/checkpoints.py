@@ -121,7 +121,7 @@ def _verify_recorded_sources(snapshot: dict) -> dict:
         "repository": str(root), "head_sha": snapshot["head_sha"],
         "sources": snapshot.get("source_versions", []),
         "missing_critical": [],
-    })
+    }, require_content=False)
     if result["status"] != "unchanged":
         raise CheckpointError("checkpoint contains stale or unverified source versions")
     return result
@@ -349,7 +349,7 @@ class CheckpointStore:
             "repository": str(root), "head_sha": snapshot["head_sha"],
             "sources": snapshot.get("source_versions", []),
             "missing_critical": [],
-        })
+        }, require_content=False)
         effects = [
             dict(row) for row in self.db.execute(
                 "SELECT effect_id,operation,status,evidence_ref FROM effects "
