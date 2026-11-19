@@ -94,9 +94,16 @@ def evaluate_runs(payload: dict, known_cases: set[str]) -> dict:
                 "case_id": candidate["case_id"],
                 "strategy": strategy,
                 "iteration": candidate["iteration"],
+                "model": candidate["model"],
+                "harness": candidate["harness"],
+                "repository_sha": candidate["repository_sha"],
+                "source_baseline_ref": candidate["source_baseline_ref"],
+                "authority_ref": candidate["authority_ref"],
+                "cache_state": candidate["cache_state"],
                 "native_verdict": native["verdict"],
                 "candidate_verdict": candidate["verdict"],
-                "cache_state": candidate["cache_state"],
+                "native_trace_ref": native.get("trace_ref"),
+                "candidate_trace_ref": candidate.get("trace_ref"),
             }
             for metric in ("tokens", "elapsed_ms", "index_ms",
                            "verified_obligations"):
@@ -109,7 +116,9 @@ def evaluate_runs(payload: dict, known_cases: set[str]) -> dict:
         "runs": len(runs),
         "strategies": dict(sorted(totals.items())),
         "matched_pairs": sorted(pairs, key=lambda r: (
-            r["case_id"], r["iteration"], r["strategy"],
+            r["case_id"], r["iteration"], r["strategy"], r["model"],
+            r["harness"], r["repository_sha"], r["source_baseline_ref"],
+            r["authority_ref"], r["cache_state"],
         )),
         "unmatched_candidates": unmatched,
         "limitations": [
