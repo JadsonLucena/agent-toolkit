@@ -36,6 +36,11 @@ class CheckpointError(ValueError):
     """Unsafe persistence, invalid checkpoint, or conflicting generation."""
 
 
+CLI_ERRORS = (CheckpointError, ContextError, OSError, ValueError) + (
+    (sqlite3.Error,) if sqlite3 is not None else ()
+)
+
+
 def _id(value: object, name: str) -> str:
     if not isinstance(value, str) or not IDENTIFIER.fullmatch(value):
         raise CheckpointError("invalid " + name)
@@ -45,12 +50,15 @@ def _id(value: object, name: str) -> str:
 def _snapshot(value: dict) -> dict:
     if not isinstance(value, dict) or not REQUIRED.issubset(value):
         raise CheckpointError("checkpoint missing required fields")
+    value = dict(value)  # Never mutate the caller's snapshot.
     if set(value) - FIELDS:
         raise CheckpointError("unsupported checkpoint fields; raw transcripts are prohibited")
     for key in ("execution_id", "context_id", "stage", "target_stage"):
         _id(value[key], key)
     if not isinstance(value["repository"], str) or not Path(value["repository"]).is_absolute():
         raise CheckpointError("repository must be an absolute Git root")
+    # A symlink or .. alias must not become an unresumable persisted identity.
+    value["repository"] = str(Path(value["repository"]).resolve())
     if not isinstance(value["head_sha"], str) or not re.fullmatch(r"[0-9a-f]{40,64}", value["head_sha"]):
         raise CheckpointError("head_sha must be a complete Git commit")
     for key in ("slice_ref", "source_baseline_ref", "next_owner", "authorization_ref"):
@@ -300,8 +308,8 @@ class CheckpointStore:
                     raise CheckpointError("effect must be journaled as planned before execution")
                 self.db.execute("""
                     INSERT INTO effects(execution_id,effect_id,operation,status,evidence_ref)
-                    VALUES(?,?,?,?,NULL)
-                """, (execution_id, effect_id, operation, status))
+                    VALUES(?,?,?,?,?)
+                """, (execution_id, effect_id, operation, status, evidence_ref))
             else:
                 if row["operation"] != operation:
                     raise CheckpointError("effect identity reused for another operation")
@@ -405,7 +413,7 @@ def main() -> int:
                 outcome = store.resume(args.execution_id, args.repo)
         print(json.dumps(outcome, ensure_ascii=False, sort_keys=True))
         return 2 if outcome["status"] == "blocked" else 0
-    except (CheckpointError, ContextError, OSError, ValueError) as exc:
+    except CLI_ERRORS as exc:
         print(json.dumps({"status": "blocked", "error": str(exc)}))
         return 2
 

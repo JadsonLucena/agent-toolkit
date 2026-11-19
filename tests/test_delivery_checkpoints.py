@@ -194,6 +194,53 @@ class SQLiteCheckpointTests(unittest.TestCase):
         with self.assertRaises(CheckpointError):
             CheckpointStore(self.db)
 
+
+    def test_alias_repository_normalizes_and_resumes(self):
+        alias = Path(self.tmp.name) / "repo-link"
+        try:
+            alias.symlink_to(self.repo, target_is_directory=True)
+        except (NotImplementedError, OSError):
+            self.skipTest("directory symlinks unavailable")
+        altered = {**self.snapshot, "repository": str(alias)}
+        with CheckpointStore(self.db) as store:
+            store.save(altered)
+            saved, _ = store.load("execution-1")
+            self.assertEqual(saved["repository"], str(self.repo.resolve()))
+            self.assertEqual(store.resume("execution-1", alias)["status"],
+                             "inspect-only")
+            self.assertEqual(store.resume("execution-1", self.repo)["status"],
+                             "inspect-only")
+
+    def test_planned_effect_evidence_ref_is_retained_and_idempotent(self):
+        with CheckpointStore(self.db) as store:
+            store.save(self.snapshot)
+            for _ in range(2):
+                store.record_effect("execution-1", "effect-1", "create-payment",
+                                    "planned", "request-42")
+            result = store.resume("execution-1", self.repo)
+            self.assertEqual(result["status"], "blocked")
+            self.assertEqual(result["effects"][0]["evidence_ref"], "request-42")
+            self.assertEqual(store.db.execute(
+                "SELECT COUNT(*) FROM effect_history WHERE effect_id='effect-1'"
+            ).fetchone()[0], 1)
+
+    def test_cli_returns_structured_blocked_on_corrupt_sqlite(self):
+        import json
+        import sys
+        corrupted = self.state / "corrupted.sqlite3"
+        corrupted.write_bytes(b"not-a-sqlite-database")
+        corrupted.chmod(0o600)
+        process = subprocess.run(
+            [sys.executable, "-m", "adapters.delivery.checkpoints",
+             "--db", str(corrupted), "resume", "--execution-id", "execution-1",
+             "--repo", str(self.repo)],
+            cwd=Path(__file__).resolve().parents[1],
+            capture_output=True, text=True,
+        )
+        self.assertEqual(process.returncode, 2)
+        self.assertEqual(json.loads(process.stdout)["status"], "blocked")
+        self.assertNotIn("Traceback", process.stderr)
+
     def test_reject_public_data_directory(self):
         insecure = Path(self.tmp.name) / "public"
         insecure.mkdir(mode=0o755)
