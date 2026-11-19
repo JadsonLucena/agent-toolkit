@@ -34,7 +34,7 @@ def _sqlite():
         with sqlite3.connect(":memory:") as check:
             check.execute("CREATE VIRTUAL TABLE probe USING fts5(text, tokenize='trigram')")
         return sqlite3
-    except (ImportError, OSError, Exception):
+    except Exception:
         return None
 
 
@@ -199,6 +199,7 @@ def _indexed_search(
             skipped = int(values["skipped"])
             phrase = '"' + query.replace('"', '""') + '"'
             matches = []
+            truncated = False
             # FTS candidate retrieval; post-filter lines to retain native literal semantics.
             cursor = conn.execute(
                 "SELECT path,content FROM sources WHERE sources MATCH ? ORDER BY path",
@@ -212,16 +213,15 @@ def _indexed_search(
                     if query.casefold() in line.casefold():
                         matches.append({"ref": f"{relative}#L{number}", "preview": line[:200]})
                         if len(matches) >= max_results:
-                            return {
-                                "status": "truncated", "backend": "sqlite-fts5",
-                                "head_sha": head, "results": matches,
-                                "coverage": "partial" if skipped else "eligible-text",
-                                "note": "Search hits are leads, not complete evidence.",
-                            }
+                            truncated = True
+                            break
+                if truncated:
+                    break
+            # Even a truncated result must be checked against current source state.
             if native._repository(root)[1] != head or not _clean(root):
                 raise IndexError("source changed during index search")
             return {
-                "status": "incomplete" if skipped else "complete",
+                "status": "truncated" if truncated else "incomplete" if skipped else "complete",
                 "backend": "sqlite-fts5", "head_sha": head,
                 "results": matches, "coverage": "partial" if skipped else "eligible-text",
                 "note": "Search hits are leads, not complete evidence.",
