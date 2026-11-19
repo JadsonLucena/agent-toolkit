@@ -190,7 +190,7 @@ def prepare_context(
     }
 
 
-def verify_context(repo: Path, pack: dict) -> dict:
+def verify_context(repo: Path, pack: dict, *, require_content: bool = True) -> dict:
     root, head = _repository(Path(repo))
     if not isinstance(pack, dict):
         raise ContextError("context pack must be an object")
@@ -211,6 +211,13 @@ def verify_context(repo: Path, pack: dict) -> dict:
             ref = source["ref"]
             latest = _read(root, ref)
             matches = latest["sha256"] == source["sha256"]
+            if require_content:
+                # File freshness alone does not authenticate a persisted
+                # excerpt. Check the text and its physical-line provenance.
+                matches = matches and all(
+                    key in source and source[key] == latest[key]
+                    for key in ("path", "line_start", "line_end", "content")
+                )
             results.append({"ref": ref, "status": "unchanged" if matches else "stale"})
         except (KeyError, TypeError, ContextError, OSError):
             results.append({"ref": source["ref"], "status": "unavailable"})
