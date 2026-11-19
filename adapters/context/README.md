@@ -39,7 +39,12 @@ python3 -m adapters.context.native --repo . --verify /path/to/pack.json
 ```
 
 A moved Git HEAD returns revalidate even if the selected file bytes match.
-A changed critical or requested file returns blocked. No external mutation
+A changed critical or requested file returns blocked. Full Context Pack
+verification also compares saved excerpts and line provenance against the
+reread source; a matching file hash alone cannot validate altered pack text.
+Metadata-only checkpoint verification explicitly uses
+`verify_context(..., require_content=False)` for hashes, never an excerpt
+authentication claim. No external mutation
 is performed. The adapter is not a persistent execution checkpoint.
 
 Native search is a bounded literal scan of Git-tracked UTF-8 files under
