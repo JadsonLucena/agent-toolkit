@@ -172,6 +172,7 @@ class SQLiteCheckpointTests(unittest.TestCase):
     def test_interrupted_initialization_recovers_known_schema(self):
         with sqlite3.connect(self.db) as db:
             db.execute(SCHEMA_SQL[0])  # Simulate process killed after first table.
+        self.db.chmod(0o600)  # SQLite's direct test fixture uses process umask.
         with CheckpointStore(self.db) as store:
             self.assertEqual(store.save(self.snapshot), 1)
             self.assertEqual(store.resume("execution-1", self.repo)["status"],
@@ -189,6 +190,7 @@ class SQLiteCheckpointTests(unittest.TestCase):
     def test_unrelated_version_zero_schema_rejected(self):
         with sqlite3.connect(self.db) as db:
             db.execute("CREATE TABLE unrelated(id INTEGER PRIMARY KEY)")
+        self.db.chmod(0o600)
         with self.assertRaises(CheckpointError):
             CheckpointStore(self.db)
 
