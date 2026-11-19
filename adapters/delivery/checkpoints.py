@@ -63,9 +63,9 @@ def _snapshot(value: dict) -> dict:
                 not isinstance(v, str) or not v or len(v) > 256 for v in items
             ):
                 raise CheckpointError("invalid " + key)
-    versions = value.get("source_versions", [])
-    if not isinstance(versions, list) or len(versions) > 80:
-        raise CheckpointError("invalid source_versions")
+    versions = value.get("source_versions")
+    if not isinstance(versions, list) or not 1 <= len(versions) <= 80:
+        raise CheckpointError("source_versions must be a nonempty, bounded list")
     seen = set()
     for source in versions:
         if not isinstance(source, dict) or set(source) != {"ref", "sha256", "critical"}:
@@ -85,8 +85,9 @@ def snapshot_from_pack(
     pack: dict, execution_id: str, context_id: str,
     stage: str, target_stage: str, **metadata
 ) -> dict:
-    if pack.get("status") != "ready" or pack.get("missing_critical"):
-        raise CheckpointError("cannot checkpoint an incomplete critical context pack")
+    if (pack.get("status") != "ready" or pack.get("missing_critical")
+            or not pack.get("sources")):
+        raise CheckpointError("cannot checkpoint missing or incomplete source evidence")
     snapshot = {
         "execution_id": execution_id,
         "context_id": context_id,
@@ -118,6 +119,67 @@ def _verify_recorded_sources(snapshot: dict) -> dict:
     return result
 
 
+
+SCHEMA_SQL = (
+    """CREATE TABLE IF NOT EXISTS checkpoints (
+        execution_id TEXT PRIMARY KEY,
+        generation INTEGER NOT NULL CHECK(generation > 0),
+        snapshot_json TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )""",
+    """CREATE TABLE IF NOT EXISTS effects (
+        execution_id TEXT NOT NULL REFERENCES checkpoints(execution_id),
+        effect_id TEXT NOT NULL,
+        operation TEXT NOT NULL,
+        status TEXT NOT NULL CHECK(status IN ('planned','unknown','confirmed')),
+        evidence_ref TEXT,
+        PRIMARY KEY(execution_id, effect_id)
+    )""",
+    """CREATE TABLE IF NOT EXISTS effect_history (
+        event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        execution_id TEXT NOT NULL,
+        effect_id TEXT NOT NULL,
+        status TEXT NOT NULL,
+        evidence_ref TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )""",
+)
+
+
+def _schema_objects(connection) -> dict[str, str]:
+    return dict(connection.execute(
+        "SELECT name,sql FROM sqlite_master "
+        "WHERE type IN ('table','index','view','trigger') AND name NOT LIKE 'sqlite_%'"
+    ))
+
+
+def _initialize_schema(connection) -> None:
+    """Recover only exact partial first-time schemas; version change is atomic."""
+    with sqlite3.connect(":memory:") as reference:
+        for statement in SCHEMA_SQL:
+            reference.execute(statement)
+        expected = _schema_objects(reference)
+    connection.execute("BEGIN IMMEDIATE")
+    try:
+        version = connection.execute("PRAGMA user_version").fetchone()[0]
+        if version not in (0, 1):
+            raise CheckpointError("unknown checkpoint database schema")
+        existing = _schema_objects(connection)
+        if any(expected.get(name) != sql for name, sql in existing.items()):
+            raise CheckpointError("unrecognized or modified checkpoint schema")
+        if version == 1 and existing != expected:
+            raise CheckpointError("checkpoint schema is incomplete or modified")
+        if version == 0:
+            # A previous process may have stopped after any CREATE TABLE.
+            # Only the exact expected schema prefix can be completed.
+            for statement in SCHEMA_SQL:
+                connection.execute(statement)
+            connection.execute("PRAGMA user_version = 1")
+        connection.execute("COMMIT")
+    except BaseException:
+        connection.execute("ROLLBACK")
+        raise
+
 class CheckpointStore:
     def __init__(self, db_path: Path):
         if sqlite3 is None:
@@ -133,50 +195,28 @@ class CheckpointStore:
         if path.is_symlink():
             raise CheckpointError("database must not be a symlink")
         try:
-            created = False
             if not path.exists():
-                created = True
                 fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
                 os.close(fd)
             elif os.name == "posix" and (stat.S_IMODE(path.stat().st_mode) & 0o077):
                 raise CheckpointError("existing database must be owner-only (0600)")
-            self.path = path
-            self.db = sqlite3.connect(path, isolation_level=None, timeout=3.0)
+            # Resolve the entire parent chain, not only the immediate directory:
+            # aliases could otherwise place the DB inside the source tree.
+            self.path = path.resolve()
+            self.db = sqlite3.connect(self.path, isolation_level=None, timeout=3.0)
             self.db.row_factory = sqlite3.Row
             self.db.execute("PRAGMA foreign_keys = ON")
             self.db.execute("PRAGMA busy_timeout = 3000")
             self.db.execute("PRAGMA journal_mode = WAL")
-            version = self.db.execute("PRAGMA user_version").fetchone()[0]
-            if version not in (0, 1) or (version == 0 and not created):
-                raise CheckpointError("unknown checkpoint database schema")
-            self.db.executescript("""
-                CREATE TABLE IF NOT EXISTS checkpoints (
-                    execution_id TEXT PRIMARY KEY,
-                    generation INTEGER NOT NULL CHECK(generation > 0),
-                    snapshot_json TEXT NOT NULL,
-                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-                );
-                CREATE TABLE IF NOT EXISTS effects (
-                    execution_id TEXT NOT NULL REFERENCES checkpoints(execution_id),
-                    effect_id TEXT NOT NULL,
-                    operation TEXT NOT NULL,
-                    status TEXT NOT NULL CHECK(status IN ('planned','unknown','confirmed')),
-                    evidence_ref TEXT,
-                    PRIMARY KEY(execution_id, effect_id)
-                );
-                CREATE TABLE IF NOT EXISTS effect_history (
-                    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    execution_id TEXT NOT NULL,
-                    effect_id TEXT NOT NULL,
-                    status TEXT NOT NULL,
-                    evidence_ref TEXT,
-                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-                );
-            """)
-            if version == 0:
-                self.db.execute("PRAGMA user_version = 1")
+            _initialize_schema(self.db)
         except OSError as exc:
+            if hasattr(self, "db"):
+                self.db.close()
             raise CheckpointError("cannot create private checkpoint database") from exc
+        except BaseException:
+            if hasattr(self, "db"):
+                self.db.close()
+            raise
 
     def close(self) -> None:
         self.db.close()
@@ -189,7 +229,7 @@ class CheckpointStore:
 
     def save(self, snapshot: dict, *, expected_generation: int = 0) -> int:
         record = _snapshot(snapshot)
-        if self.path.is_relative_to(Path(record["repository"])):
+        if self.path.resolve().is_relative_to(Path(record["repository"]).resolve()):
             raise CheckpointError("checkpoint database must be outside the source repository")
         _verify_recorded_sources(record)
         if type(expected_generation) is not int or expected_generation < 0:
@@ -228,7 +268,7 @@ class CheckpointStore:
         ).fetchone()
         if row is None:
             raise CheckpointError("checkpoint not found")
-        return json.loads(row["snapshot_json"]), row["generation"]
+        return _snapshot(json.loads(row["snapshot_json"])), row["generation"]
 
     def record_effect(
         self, execution_id: str, effect_id: str, operation: str,

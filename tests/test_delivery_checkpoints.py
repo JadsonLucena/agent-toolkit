@@ -6,7 +6,7 @@ from pathlib import Path
 
 from adapters.context.native import prepare_context
 from adapters.delivery.checkpoints import (
-    CheckpointError, CheckpointStore, snapshot_from_pack, sqlite3,
+    CheckpointError, CheckpointStore, SCHEMA_SQL, snapshot_from_pack, sqlite3,
 )
 
 
@@ -134,6 +134,63 @@ class SQLiteCheckpointTests(unittest.TestCase):
         self.assertIn("adapters/context/native.py", skill)
         self.assertIn("adapters/delivery/checkpoints.py", skill)
         self.assertIn("never grants execution", skill.lower())
+
+
+    def test_empty_or_missing_source_versions_are_rejected_on_save(self):
+        for broken in ({k: v for k, v in self.snapshot.items()
+                        if k != "source_versions"},
+                       {**self.snapshot, "source_versions": []}):
+            with self.subTest(snapshot=broken):
+                with CheckpointStore(self.db) as store:
+                    with self.assertRaises(CheckpointError):
+                        store.save(broken)
+
+    def test_corrupt_legacy_snapshot_cannot_resume_without_source_versions(self):
+        with CheckpointStore(self.db) as store:
+            store.save(self.snapshot)
+            unsafe = {k: v for k, v in self.snapshot.items()
+                      if k != "source_versions"}
+            import json
+            store.db.execute("UPDATE checkpoints SET snapshot_json=? WHERE execution_id=?",
+                             (json.dumps(unsafe), "execution-1"))
+            with self.assertRaises(CheckpointError):
+                store.resume("execution-1", self.repo)
+
+    def test_nested_symlink_alias_cannot_place_db_inside_repository(self):
+        private = self.repo / "private"
+        private.mkdir(mode=0o700)
+        alias = self.root / "repo_alias" if hasattr(self, "root") else Path(self.tmp.name) / "repo_alias"
+        try:
+            alias.symlink_to(self.repo, target_is_directory=True)
+        except (NotImplementedError, OSError):
+            self.skipTest("directory symlinks unavailable")
+        aliased_db = alias / "private" / "checkpoint.sqlite3"
+        with CheckpointStore(aliased_db) as store:
+            with self.assertRaises(CheckpointError):
+                store.save(self.snapshot)
+
+    def test_interrupted_initialization_recovers_known_schema(self):
+        with sqlite3.connect(self.db) as db:
+            db.execute(SCHEMA_SQL[0])  # Simulate process killed after first table.
+        with CheckpointStore(self.db) as store:
+            self.assertEqual(store.save(self.snapshot), 1)
+            self.assertEqual(store.resume("execution-1", self.repo)["status"],
+                             "inspect-only")
+            self.assertEqual(store.db.execute("PRAGMA user_version").fetchone()[0], 1)
+
+    def test_existing_complete_version_zero_schema_recovers_without_losing_rows(self):
+        with CheckpointStore(self.db) as store:
+            store.save(self.snapshot)
+            store.db.execute("PRAGMA user_version = 0")
+        with CheckpointStore(self.db) as store:
+            self.assertEqual(store.load("execution-1")[1], 1)
+            self.assertEqual(store.db.execute("PRAGMA user_version").fetchone()[0], 1)
+
+    def test_unrelated_version_zero_schema_rejected(self):
+        with sqlite3.connect(self.db) as db:
+            db.execute("CREATE TABLE unrelated(id INTEGER PRIMARY KEY)")
+        with self.assertRaises(CheckpointError):
+            CheckpointStore(self.db)
 
     def test_reject_public_data_directory(self):
         insecure = Path(self.tmp.name) / "public"
