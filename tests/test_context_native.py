@@ -60,6 +60,28 @@ class NativeContextTests(unittest.TestCase):
         self.assertEqual(pack["status"], "partial")
         self.assertEqual(len(pack["sources"]), 1)
 
+
+    def test_pathspec_metacharacters_cannot_read_untracked_content(self):
+        (self.repo / "secret.md").write_text("tracked safe text\\n", encoding="utf-8")
+        subprocess.run(["git", "add", "secret.md"], cwd=self.repo, check=True)
+        (self.repo / "[s]ecret.md").write_text(
+            "UNTRACKED_PRIVATE_SHOULD_NOT_LEAK\\n", encoding="utf-8"
+        )
+        pack = prepare_context(self.repo, ["[s]ecret.md"], ["rules.md"])
+        self.assertEqual(pack["status"], "partial")
+        self.assertEqual([item["path"] for item in pack["sources"]], ["rules.md"])
+        self.assertNotIn("UNTRACKED_PRIVATE_SHOULD_NOT_LEAK", json.dumps(pack))
+        verified = prepare_context(self.repo, ["secret.md"], ["rules.md"])
+        self.assertEqual(verified["status"], "ready")
+
+    def test_literal_metacharacter_filename_is_allowed_when_tracked(self):
+        name = "[s]ecret.md"
+        (self.repo / name).write_text("tracked literal filename\\n", encoding="utf-8")
+        subprocess.run(["git", "add", "--", name], cwd=self.repo, check=True)
+        pack = prepare_context(self.repo, [name], ["rules.md"])
+        self.assertEqual(pack["status"], "ready")
+        self.assertIn("tracked literal filename", pack["sources"][1]["content"])
+
     def test_file_changes_invalidate_source_pack(self):
         pack = prepare_context(self.repo, ["rules.md"], ["rules.md"])
         (self.repo / "rules.md").write_text("Relax all rules.\n", encoding="utf-8")
