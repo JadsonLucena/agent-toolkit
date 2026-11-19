@@ -126,10 +126,18 @@ def _read(root: Path, ref: str) -> dict:
         full = data.decode("utf-8")
     except UnicodeDecodeError as exc:
         raise ContextError("source is not UTF-8") from exc
-    lines = full.splitlines(keepends=True)
+    # Only LF marks a source line in Git/editor references. Unicode separators,
+    # form feeds and vertical tabs are characters within that physical line.
+    lines = full.split("\n") if full else []
+    if lines and lines[-1] == "":
+        lines.pop()
     if start is not None and (start > len(lines) or end > len(lines)):
         raise ContextError("requested line range is unavailable")
-    excerpt = "".join(lines[start - 1:end]) if start is not None else full
+    excerpt = full
+    if start is not None:
+        excerpt = "\n".join(lines[start - 1:end])
+        if end < len(lines) or full.endswith("\n"):
+            excerpt += "\n"
     return {
         "ref": ref,
         "path": path.relative_to(root).as_posix(),
@@ -184,19 +192,28 @@ def prepare_context(
 
 def verify_context(repo: Path, pack: dict) -> dict:
     root, head = _repository(Path(repo))
+    if not isinstance(pack, dict):
+        raise ContextError("context pack must be an object")
     if pack.get("kind") != "context-pack" or pack.get("schema_version") != 1:
         raise ContextError("unsupported context pack")
     if pack.get("repository") != str(root):
         raise ContextError("context pack belongs to another repository")
+    records = pack.get("sources")
+    if not isinstance(records, list):
+        raise ContextError("context pack sources must be an array")
     results = []
-    for source in pack.get("sources", []):
+    for source in records:
+        if (not isinstance(source, dict)
+                or not isinstance(source.get("ref"), str)
+                or not isinstance(source.get("sha256"), str)):
+            raise ContextError("invalid context source record")
         try:
             ref = source["ref"]
             latest = _read(root, ref)
             matches = latest["sha256"] == source["sha256"]
             results.append({"ref": ref, "status": "unchanged" if matches else "stale"})
         except (KeyError, TypeError, ContextError, OSError):
-            results.append({"ref": source.get("ref"), "status": "unavailable"})
+            results.append({"ref": source["ref"], "status": "unavailable"})
     drift = pack.get("head_sha") != head
     return {
         "head_sha": head,
@@ -244,7 +261,8 @@ def search_sources(
             if path.stat().st_size > MAX_FILE_BYTES:
                 skipped += 1
                 continue
-            with path.open("rb") as stream:
+            fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+            with os.fdopen(fd, "rb") as stream:
                 body = stream.read(MAX_FILE_BYTES + 1)
             if len(body) > MAX_FILE_BYTES or b"\x00" in body:
                 skipped += 1
@@ -253,7 +271,7 @@ def search_sources(
         except (ContextError, OSError, UnicodeDecodeError):
             skipped += 1
             continue
-        for num, line in enumerate(contents.splitlines(), 1):
+        for num, line in enumerate(contents.split("\n"), 1):
             if query.casefold() in line.casefold():
                 matches.append({
                     "ref": f"{path.relative_to(root).as_posix()}#L{num}",
