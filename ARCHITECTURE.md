@@ -450,8 +450,6 @@ The following do not currently require first-class commands:
 
 Promote one to a command only when there is a clear user-facing invocation intent. Reusable internal procedures may remain skills without public command entry points.
 
-See `MIGRATION.md` for structural renames and responsibility movement.
-
 ### Portable Review Execution
 
 The canonical Rule/Skill/Agent/Command/Contract artifacts define the required
