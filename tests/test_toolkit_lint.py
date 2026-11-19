@@ -331,6 +331,14 @@ class ToolkitLintTests(unittest.TestCase):
         (self.root / ".cursor-plugin/marketplace.json").unlink()
         self.assert_error("required for folder marketplace import")
 
+    def test_cursor_marketplace_description_must_match_plugin(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["plugins"][0]["description"] = "Unrelated capability."
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("plugin description must match plugin.json")
+
     def test_cursor_marketplace_rejects_divergent_source(self):
         self.change(".cursor-plugin/marketplace.json",
                     '"source": "."', '"source": "./plugins/copied-toolkit"')

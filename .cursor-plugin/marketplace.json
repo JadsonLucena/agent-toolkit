@@ -1,13 +1,13 @@
 {
   "name": "agent-toolkit",
   "metadata": {
-    "description": "Local marketplace entry for the canonical Agent Toolkit Cursor Plugin."
+    "description": "Local marketplace for Agent Toolkit, offering traceable, risk-aware software engineering guidance for AI coding agents."
   },
   "plugins": [
     {
       "name": "agent-toolkit",
       "source": ".",
-      "description": "Guide AI coding agents from change requests to reviewable software increments through requirements analysis, design, implementation, testing, code review, and Git workflows—with clear responsibilities, traceable evidence, and risk-aware verification."
+      "description": "Guide AI coding agents from change requests to reviewable software increments with clear ownership, traceable evidence, and risk-aware verification."
     }
   ]
 }

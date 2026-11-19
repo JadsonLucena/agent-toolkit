@@ -1,8 +1,8 @@
 # Agent Toolkit
 
-**A vendor-neutral software engineering toolkit for AI coding agents.**
+**From change requests to reviewable software increments—with traceable evidence and clear engineering responsibilities.**
 
-Agent Toolkit organizes reusable engineering guidance into Rules, Skills, Commands, and specialist Agents. It helps teams move from requirements to delivery with explicit responsibility boundaries, traceable evidence, and risk-appropriate verification—without tying the engineering model to one IDE, model, or provider.
+Agent Toolkit provides vendor-neutral, reusable guidance for AI coding agents across requirements, design, implementation, testing, review, delivery, and Git. Its Rules, Skills, Commands, specialist Agents, and shared Contracts clarify ownership, preserve evidence across handoffs, and support verification proportionate to risk.
 
 The toolkit is a collection of portable, version-controlled Markdown artifacts, **not a standalone executable agent or an automatically installed CLI**. Agent runtimes can discover or integrate the relevant artifacts; optional adapters support specific environments.
 
@@ -14,8 +14,8 @@ The toolkit is a collection of portable, version-controlled Markdown artifacts, 
 | [Design](contexts/design/) | Define technical decisions for a bounded implementation slice. |
 | [Implementation](contexts/implementation/) | Implement and verify an authorized increment. |
 | [Delivery](contexts/delivery/) | Coordinate evidence-based handoffs across the lifecycle. |
-| [Testing](contexts/testing/) | Design and generate automated tests with traceable evidence. |
-| [Review](contexts/review/) | Independently assess changes, risks, and documentation consistency. |
+| [Testing](contexts/testing/) | Design, generate, and verify automated tests with traceable evidence. |
+| [Review](contexts/review/) | Assess code changes and risks, verify findings, and distinguish advisory review from independently attested gates. |
 | [Git](contexts/git/) | Manage repository changes, semantic commits, branches, and pull requests. |
 
 Within each context, **Rules** define durable constraints; **Skills** describe reusable procedures; **Commands** provide explicit invocation entry points; and **Agents** describe specialist roles. Shared [Contracts](contracts/) carry evidence between contexts without forcing them to depend on each other's internal workflows.

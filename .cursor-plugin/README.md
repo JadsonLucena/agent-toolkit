@@ -1,6 +1,8 @@
 # Cursor Plugin Integration
 
-This optional Cursor Plugin consumes the **original canonical sources** under `contexts/` and `contracts/`. The repository root is the plugin root; `.cursor-plugin/plugin.json` declares paths only. No generated bundles, duplicated sources, symlinks, hooks, MCP servers, or additional runtimes are needed.
+This optional Cursor Plugin exposes Agent Toolkit's engineering guidance across requirements, design, implementation, testing, review, delivery, and Git. It helps AI coding agents work toward reviewable changes with explicit responsibilities and traceable evidence.
+
+The plugin references the **original canonical sources** under `contexts/` and `contracts/`; the repository root is the plugin root. `.cursor-plugin/plugin.json` declares paths only. No generated bundles, duplicated sources, symlinks, hooks, MCP servers, or additional runtimes are needed.
 
 ## Metadata semantics
 

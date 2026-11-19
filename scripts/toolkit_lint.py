@@ -80,6 +80,7 @@ def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> li
 
     # Import from Disk reads a marketplace; source "." resolves to this
     # repository root containing the single canonical plugin manifest.
+    marketplace = None
     marketplace_file = root / ".cursor-plugin" / "marketplace.json"
     if not marketplace_file.is_file():
         errors.append(".cursor-plugin/marketplace.json: required for folder marketplace import")
@@ -97,6 +98,15 @@ def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> li
                     or marketplace["plugins"][0].get("name") != manifest["name"]
                     or marketplace["plugins"][0].get("source") != "."):
                 errors.append(".cursor-plugin/marketplace.json: expected one root plugin with source '.'")
+
+    # The marketplace and plugin are separate catalog surfaces for the same
+    # canonical capability. Keep their public descriptions consistent.
+    if (isinstance(marketplace, dict)
+            and isinstance(marketplace.get("plugins"), list)
+            and len(marketplace["plugins"]) == 1
+            and isinstance(marketplace["plugins"][0], dict)
+            and marketplace["plugins"][0].get("description") != manifest.get("description")):
+        errors.append(".cursor-plugin/marketplace.json: plugin description must match plugin.json")
 
     allowed = {"name", "description", *CURSOR_COMPONENTS}
     if set(manifest) - allowed:
