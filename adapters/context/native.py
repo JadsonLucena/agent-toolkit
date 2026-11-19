@@ -93,12 +93,20 @@ def _safe_path(root: Path, raw: str, *, directory: bool = False) -> Path:
 
 
 def _tracked(root: Path, path: Path) -> bool:
+    """Only an exact Git index entry qualifies; pathspec globbing must not."""
     relative = path.relative_to(root).as_posix()
     try:
-        _git(root, "ls-files", "--error-unmatch", "--", relative)
-        return True
-    except ContextError:
+        result = subprocess.run(
+            ["git", "ls-files", "-z", "--", f":(literal){relative}"],
+            cwd=root, stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            timeout=10, check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
         return False
+    if result.returncode or len(result.stdout) > 2 * 1024 * 1024:
+        return False
+    return os.fsencode(relative) in result.stdout.split(b"\x00")
 
 
 def _read(root: Path, ref: str) -> dict:
