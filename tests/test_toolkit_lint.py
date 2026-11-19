@@ -312,9 +312,22 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_cursor_plugin_rejects_missing_context(self):
         self.change(".cursor-plugin/plugin.json",
-                    "./contexts/review/commands", "./contexts/missing/commands")
+                    "./contexts/review/commands/review-code.md",
+                    "./contexts/missing/commands/review-code.md")
         self.assert_error("missing plugin path")
         self.assert_error("commands coverage mismatch")
+
+    def test_cursor_plugin_rejects_agent_directory_in_array(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/review/agents/code-reviewer.md",
+                    "./contexts/review/agents")
+        self.assert_error("agents requires explicit file paths")
+
+    def test_cursor_plugin_rejects_command_directory_in_array(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/review/commands/review-code.md",
+                    "./contexts/review/commands")
+        self.assert_error("commands requires explicit file paths")
 
     def test_cursor_agent_identity_must_match_file(self):
         self.change("contexts/review/agents/code-reviewer.md",

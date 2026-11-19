@@ -120,9 +120,13 @@ def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> li
                 errors.append(f".cursor-plugin/plugin.json: unsafe plugin path {raw!r}")
                 continue
             entry = root.joinpath(*relative.parts)
-            if entry.is_dir():
-                candidates = (list(entry.glob("*/SKILL.md")) if component == "skills"
-                              else list(entry.glob("*.md")))
+            if entry.is_dir() and component == "skills":
+                candidates = list(entry.glob("*/SKILL.md"))
+            elif entry.is_dir():
+                # Cursor 3.29.15 treats array elements for Agents/Commands
+                # as files; directory items are silently skipped by the host.
+                errors.append(f".cursor-plugin/plugin.json: {component} requires explicit file paths: {raw}")
+                continue
             elif entry.is_file():
                 candidates = [entry]
             else:
