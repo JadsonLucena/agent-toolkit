@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from adapters.context import native
 from adapters.context.native import ContextError, prepare_context, search_sources, verify_context
 
 
@@ -101,6 +102,43 @@ class NativeContextTests(unittest.TestCase):
         outcome = verify_context(self.repo, pack)
         self.assertEqual(outcome["status"], "revalidate")
         self.assertTrue(outcome["head_changed"])
+
+
+    def test_oversized_tracked_source_marks_search_incomplete(self):
+        (self.repo / "large.md").write_text(
+            "needle-hidden-by-budget\\n" + "z" * (native.MAX_FILE_BYTES + 1),
+            encoding="utf-8",
+        )
+        subprocess.run(["git", "add", "large.md"], cwd=self.repo, check=True)
+        outcome = search_sources(self.repo, "needle-hidden-by-budget", ["."])
+        self.assertEqual(outcome["status"], "incomplete")
+        self.assertEqual(outcome["skipped_files"], 1)
+        self.assertEqual(outcome["results"], [])
+        self.assertIn("coverage is incomplete", outcome["reason"])
+
+    def test_binary_tracked_source_marks_search_incomplete(self):
+        (self.repo / "binary.dat").write_bytes(b"needle" + b"\\x00" + b"rest")
+        subprocess.run(["git", "add", "binary.dat"], cwd=self.repo, check=True)
+        outcome = search_sources(self.repo, "needle", ["."])
+        self.assertEqual(outcome["status"], "incomplete")
+        self.assertEqual(outcome["skipped_files"], 1)
+
+    def test_out_of_scope_large_files_do_not_invalidate_scoped_search(self):
+        (self.repo / "docs").mkdir()
+        (self.repo / "docs" / "small.md").write_text(
+            "authorized scoped needle\\n", encoding="utf-8"
+        )
+        (self.repo / "large.md").write_text(
+            "out-of-scope needle\\n" + "z" * (native.MAX_FILE_BYTES + 1),
+            encoding="utf-8",
+        )
+        subprocess.run(["git", "add", "docs/small.md", "large.md"],
+                       cwd=self.repo, check=True)
+        outcome = search_sources(self.repo, "needle", ["docs"])
+        self.assertEqual(outcome["status"], "complete")
+        self.assertEqual(outcome["skipped_files"], 0)
+        self.assertEqual([r["ref"] for r in outcome["results"]],
+                         ["docs/small.md#L1"])
 
     def test_search_is_explicitly_scoped_and_non_authoritative(self):
         response = search_sources(self.repo, "authorization", ["."])
