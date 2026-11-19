@@ -140,6 +140,45 @@ class NativeContextTests(unittest.TestCase):
         self.assertEqual([r["ref"] for r in outcome["results"]],
                          ["docs/small.md#L1"])
 
+
+    def test_physical_line_selectors_ignore_unicode_separators(self):
+        for separator in ("\u2028", "\f", "\v"):
+            with self.subTest(separator=ascii(separator)):
+                (self.repo / "rules.md").write_text(
+                    "Intro" + separator + "more text\n"
+                    "Never publish without approval.\n", encoding="utf-8"
+                )
+                pack = prepare_context(self.repo, ["rules.md#L2"], ["rules.md#L2"])
+                self.assertEqual(pack["status"], "ready")
+                self.assertEqual(pack["sources"][0]["content"],
+                                 "Never publish without approval.\n")
+                hits = search_sources(self.repo, "Never publish", ["."])
+                self.assertEqual(hits["results"][0]["ref"], "rules.md#L2")
+
+    def test_invalid_verify_source_records_fail_with_structured_diagnostic(self):
+        import sys
+        for invalid in (None, "string", 42, [], {"ref": "rules.md"}):
+            with self.subTest(invalid=invalid):
+                import json
+                pack_path = self.repo / "pack.json"
+                pack_path.write_text(json.dumps({
+                    "kind": "context-pack",
+                    "schema_version": 1,
+                    "repository": str(self.repo),
+                    "head_sha": "a" * 40,
+                    "sources": [invalid],
+                }), encoding="utf-8")
+                process = subprocess.run(
+                    [sys.executable, "-m", "adapters.context.native",
+                     "--repo", str(self.repo), "--verify", str(pack_path)],
+                    cwd=Path(__file__).resolve().parents[1],
+                    capture_output=True, text=True,
+                )
+                self.assertEqual(process.returncode, 2)
+                self.assertEqual(json.loads(process.stdout)["status"], "blocked")
+                self.assertNotIn("Traceback", process.stderr)
+
+
     def test_search_is_explicitly_scoped_and_non_authoritative(self):
         response = search_sources(self.repo, "authorization", ["."])
         self.assertEqual(response["status"], "complete")
