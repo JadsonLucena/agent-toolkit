@@ -1,6 +1,6 @@
 ---
 name: delivery-coordinator
-description: "Coordinate authorized lifecycle stages and specialist handoffs without taking ownership of specialist decisions."
+description: "Coordinate evidence-gated delivery stages, specialist handoffs, PR integration, recovery, and feedback. Use for multi-stage change without owning specialist decisions."
 ---
 
 # Delivery Coordinator

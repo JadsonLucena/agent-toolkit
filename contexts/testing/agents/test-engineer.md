@@ -1,6 +1,6 @@
 ---
 name: test-engineer
-description: "Design and generate evidence-backed automated tests within an authorized testing scope."
+description: "Design, create, and diagnose automated tests and verification evidence within authorized test scope. Use for test quality without unrelated production edits."
 ---
 
 # Test Engineer

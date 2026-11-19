@@ -1,6 +1,6 @@
 ---
 name: design-engineer
-description: "Design the next bounded implementation slice with evidence-based technical decisions and explicit tradeoffs."
+description: "Develop justified architecture, interfaces, compatibility decisions, and safe evolution for the next bounded change. Use for technical design, not code edits."
 ---
 
 # Design Engineer

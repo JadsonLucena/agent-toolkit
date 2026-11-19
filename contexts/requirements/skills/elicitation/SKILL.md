@@ -1,6 +1,6 @@
 ---
 name: elicitation
-description: "Discover and structure the knowledge needed to understand a change before formal specification. Use when stakeholder needs and unknowns are not yet precise enough to specify."
+description: "Elicit stakeholder needs and investigate evidence, ambiguity, and decision dependencies before specification. Use when change intent or boundaries are not yet understood."
 ---
 
 # Requirements Elicitation

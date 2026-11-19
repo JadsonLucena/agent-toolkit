@@ -1,6 +1,6 @@
 ---
 name: backlog-planning
-description: "Turn defined requirements into a traceable backlog with proportional slicing. Use when planning items must preserve the semantics of their sources."
+description: "Build or refine traceable backlog items from supported requirements and other work sources. Use to slice work, preserve scope, analyze dependencies, and assess readiness."
 ---
 
 # Backlog Planning

@@ -1,6 +1,6 @@
 ---
 name: security-reviewer
-description: "Investigate security and privacy risks as a read-only Code Review specialist assigned by the Review Lead."
+description: "Review authentication, authorization, trust boundaries, privacy, secrets, and realistic misuse in a code change. Read-only specialist scoped by the Code Review Lead."
 ---
 
 # Security and Privacy Reviewer

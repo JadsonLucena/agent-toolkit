@@ -31,7 +31,7 @@ Canonical Skills follow the [Agent Skills specification](https://agentskills.io/
 
 ## Optional integrations
 
-The [Cursor Plugin](.cursor-plugin/README.md) optionally exposes canonical Skills, Commands, Agents and Rules without duplicating sources; contextual Rule activation must be verified in Cursor.
+The [Cursor Plugin](.cursor-plugin/README.md) optionally exposes canonical Skills, Commands and Agents without duplicating sources; native Rule loading is a pilot.
 
 The [adapters](adapters/) directory contains optional runtime integrations, including [portable Review execution](adapters/review/README.md), [OCR-assisted discovery](adapters/ocr/README.md), [team orchestration](adapters/teams/README.md), [GitHub PR safeguards](adapters/github/README.md), and [context retrieval](adapters/context/README.md). Canonical workflows remain usable without any particular adapter.
 

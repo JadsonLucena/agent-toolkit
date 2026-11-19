@@ -1,6 +1,6 @@
 {
   "name": "agent-toolkit",
-  "description": "Vendor-neutral engineering guidance for Cursor using canonical Skills, Commands, Agents and Rules.",
+  "description": "Vendor-neutral engineering guidance for Cursor using canonical Skills, Commands, Agents and a Rule pilot.",
   "skills": [
     "./contexts/requirements/skills",
     "./contexts/design/skills",
@@ -48,19 +48,6 @@
     "./contexts/testing/agents/test-engineer.md"
   ],
   "rules": [
-    "./contexts/delivery/rules/delivery.md",
-    "./contexts/design/rules/design.md",
-    "./contexts/git/rules/git.md",
-    "./contexts/git/rules/gitflow.md",
-    "./contexts/git/rules/pull-request.md",
-    "./contexts/git/rules/semantic-commit.md",
-    "./contexts/git/rules/semantic-version.md",
-    "./contexts/implementation/rules/implementation.md",
-    "./contexts/requirements/rules/backlog.md",
-    "./contexts/requirements/rules/requirements.md",
-    "./contexts/requirements/rules/tailoring.md",
-    "./contexts/review/rules/code-review.md",
-    "./contexts/review/rules/high-risk-patterns.md",
-    "./contexts/testing/rules/testing.md"
+    "./contexts/review/rules/code-review.md"
   ]
 }

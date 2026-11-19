@@ -1,5 +1,5 @@
 ---
-description: "Apply when inspecting or changing Git repository state, branches, commits, history, worktrees, or remote references; preserve Git safety and authorization."
+description: "Apply when inspecting or changing Git state, synchronization, history, branches, worktrees, remote refs, or pre-commit/PR checks; preserve repository safety and explicit authorization."
 alwaysApply: false
 ---
 

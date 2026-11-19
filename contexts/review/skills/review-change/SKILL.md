@@ -1,6 +1,6 @@
 ---
 name: review-change
-description: "Perform a complete read-only review in the advisory or gate profile and record portable findings. Use when a bounded diff needs review evidence before a readiness decision."
+description: "Review an explicit code diff read-only with risk-proportionate coverage, verified findings, and evidence. Use for advisory review or an independently attested gate."
 ---
 
 # Review Change

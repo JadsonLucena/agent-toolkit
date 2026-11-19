@@ -1,8 +1,3 @@
----
-description: "Apply when determining version changes or release compatibility for a project using Semantic Versioning; do not presume SemVer applies."
-alwaysApply: false
----
-
 # Semantic Version Rules
 
 ## Applicability

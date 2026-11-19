@@ -287,6 +287,37 @@ class ToolkitLintTests(unittest.TestCase):
         self.assert_error("cyclic Skill -> Skill")
 
 
+    def test_metadata_names_and_descriptions_are_unique(self):
+        self.assertEqual([], lint_toolkit(self.root))
+
+    def test_metadata_description_cannot_be_empty_or_vague(self):
+        path = "contexts/requirements/skills/definition/SKILL.md"
+        content = (self.root / path).read_text(encoding="utf-8")
+        original = next(line for line in content.splitlines()
+                        if line.startswith("description: "))
+        self.change(path, original, 'description: "Define requirements."')
+        self.assert_error("metadata description must have 50-260 meaningful characters")
+
+    def test_metadata_descriptions_must_not_be_copied_between_artifacts(self):
+        source = self.root / "contexts/review/agents/security-reviewer.md"
+        target = "contexts/review/agents/correctness-reviewer.md"
+        content = (self.root / target).read_text(encoding="utf-8")
+        old = next(line for line in content.splitlines()
+                   if line.startswith("description: "))
+        source_line = next(line for line in source.read_text(encoding="utf-8").splitlines()
+                           if line.startswith("description: "))
+        self.change(target, old, source_line)
+        self.assert_error("duplicate metadata description")
+
+    def test_public_skill_names_remain_unique_across_contexts(self):
+        # Preserve same file/directory names in this fixture; a duplicate
+        # public name in another context would collide in host skill discovery.
+        source = self.root / "contexts/design/skills/design-solution/SKILL.md"
+        destination = self.root / "contexts/requirements/skills/design-solution/SKILL.md"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        self.assert_error("duplicate Skill public name")
+
     def test_cursor_plugin_manifest_covers_canonical_sources(self):
         self.assertEqual([], lint_toolkit(self.root))
         self.assertTrue((self.root / ".cursor-plugin/plugin.json").is_file())

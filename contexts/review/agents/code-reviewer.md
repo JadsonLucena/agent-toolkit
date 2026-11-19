@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: "Lead read-only, evidence-based code review, coordinate scoped specialists, and issue a calibrated advisory or attested gate verdict."
+description: "Lead risk-proportionate read-only code review, select specialists, verify findings, and issue one advisory or independently attested gate verdict for an explicit change."
 ---
 
 # Code Reviewer

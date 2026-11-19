@@ -1,6 +1,6 @@
 ---
 name: specification-reviewer
-description: "Investigate contract and specification conformance as a read-only Code Review specialist assigned by the Review Lead."
+description: "Review requirement and contract conformance, accepted behavior, and documentation drift in a code change. Read-only specialist scoped by the Code Review Lead."
 ---
 
 # Specification and Contract Reviewer

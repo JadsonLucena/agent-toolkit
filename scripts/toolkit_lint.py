@@ -32,7 +32,7 @@ AGENT_FRONTMATTER = re.compile(
     r'description: "(?P<description>[^"\r\n]+)"\r?\n---\r?\n'
 )
 CURSOR_RULE_FRONTMATTER = re.compile(
-    r'\A---\r?\ndescription: "[^"\r\n]+"\r?\n'
+    r'\A---\r?\ndescription: "(?P<description>[^"\r\n]+)"\r?\n'
     r'alwaysApply: false\r?\n---\r?\n'
 )
 CURSOR_COMPONENTS = {"skills": "Skill", "commands": "Command", "agents": "Agent", "rules": "Rule"}
@@ -165,6 +165,39 @@ def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> li
                     errors.append(f"{rel}: duplicate Agent name {match.group('name')}")
                 else:
                     names.add(match.group("name"))
+
+    # Metadata is a discovery/routing contract, not authority or evidence
+    # that the Cursor host invoked the advertised procedure.
+    seen_descriptions: dict[str, str] = {}
+    seen_public_names: dict[tuple[str, str], str] = {}
+    for rel, (kind, _) in sorted(discovered.items()):
+        if kind not in {"Skill", "Agent", "Rule", "Command"}:
+            continue
+        if kind in {"Skill", "Agent", "Command"}:
+            public_name = (Path(rel).parent.name if kind == "Skill"
+                           else Path(rel).stem)
+            key = (kind, public_name)
+            if key in seen_public_names:
+                errors.append(f"{rel}: duplicate {kind} public name {public_name} "
+                              f"(also {seen_public_names[key]})")
+            seen_public_names[key] = rel
+        if kind == "Command":
+            # Commands use their filename and Intent; they have no frontmatter.
+            continue
+        content = (root / rel).read_text(encoding="utf-8")
+        pattern = {"Skill": SKILL_FRONTMATTER,
+                   "Agent": AGENT_FRONTMATTER,
+                   "Rule": CURSOR_RULE_FRONTMATTER}[kind]
+        match = pattern.match(content)
+        if match is None:
+            continue  # Shape errors are reported by the existing artifact checks.
+        description = match.group("description").strip()
+        if not 50 <= len(description) <= 260:
+            errors.append(f"{rel}: metadata description must have 50-260 meaningful characters")
+        normalized = re.sub(r"\s+", " ", description).casefold()
+        if normalized in seen_descriptions:
+            errors.append(f"{rel}: duplicate metadata description (also {seen_descriptions[normalized]})")
+        seen_descriptions[normalized] = rel
     return errors
 
 

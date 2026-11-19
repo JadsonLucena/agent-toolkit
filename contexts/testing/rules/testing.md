@@ -1,5 +1,5 @@
 ---
-description: "Apply when designing, implementing, evaluating, or maintaining automated tests and evidence of behavioral coverage."
+description: "Apply when designing, writing, reviewing, or diagnosing automated tests; evaluate behavioral assertions, scenario traceability, determinism, and regression evidence."
 alwaysApply: false
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: requirements-specifier
-description: "Define verifiable requirements from supported needs, preserving domain semantics, traceability, and evidence."
+description: "Define supported functional, quality, and temporal requirements with traceable acceptance semantics. Use for specification, not backlog planning or implementation."
 ---
 
 # Requirements Specifier

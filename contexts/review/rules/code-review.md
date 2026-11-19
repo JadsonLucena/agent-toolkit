@@ -1,5 +1,5 @@
 ---
-description: "Apply evidence-based code review constraints when the Review capability is invoked; read-only, with risk-proportionate coverage."
+description: "Apply when reviewing a specified code change or PR diff read-only; assess risk, scope, findings, contracts, documentation drift, and advisory/gate evidence."
 alwaysApply: false
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: implement-slice
-description: "Implement a bounded authorized software change with local verification, scope control, and safe atomic checkpoints."
+description: "Implement an authorized software slice with test feedback, scope control, safe atomic checkpoints, and verified Git handoff. Use for bounded production or test code changes."
 ---
 
 # Implement Slice

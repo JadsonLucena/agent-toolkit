@@ -1,6 +1,6 @@
 ---
 name: definition
-description: "Turn understood needs into precise, verifiable, traceable requirements. Use when the evidence is sufficient to specify without inventing stakeholder intent."
+description: "Specify verifiable functional, quality, temporal, and domain requirements from supported evidence. Use when needs are understood enough to define acceptance semantics."
 ---
 
 # Requirements Definition

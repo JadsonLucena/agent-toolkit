@@ -1,6 +1,6 @@
 ---
 name: correctness-reviewer
-description: "Investigate behavioral correctness and regression risks as a read-only Code Review specialist assigned by the Review Lead."
+description: "Review reachable behavior, state transitions, exception paths, and regressions in a code change. Read-only specialist scoped by the Code Review Lead."
 ---
 
 # Correctness Reviewer

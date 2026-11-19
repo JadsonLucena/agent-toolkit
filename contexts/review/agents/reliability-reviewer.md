@@ -1,6 +1,6 @@
 ---
 name: reliability-reviewer
-description: "Investigate reliability, data integrity, and concurrency as a read-only Code Review specialist assigned by the Review Lead."
+description: "Review data consistency, concurrency, retries, idempotency, migrations, and partial failures in a code change. Read-only specialist scoped by the Code Review Lead."
 ---
 
 # Data and Reliability Reviewer

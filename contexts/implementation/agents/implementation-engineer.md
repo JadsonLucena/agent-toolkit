@@ -1,6 +1,6 @@
 ---
 name: implementation-engineer
-description: "Implement an authorized, bounded software change and report observed tests, scope, and Git handoff."
+description: "Implement an explicitly authorized software slice with observed tests, scope control, and safe Git handoffs. Do not claim independent review or PR publication."
 ---
 
 # Implementation Engineer

@@ -1,6 +1,6 @@
 ---
 name: backlog-planner
-description: "Plan and refine traceable backlog items from accepted requirements without inventing scope or priorities."
+description: "Structure and refine traceable backlog slices from requirements, defects, and other supported work sources. Use for dependencies and readiness; do not invent priorities."
 ---
 
 # Backlog Planner

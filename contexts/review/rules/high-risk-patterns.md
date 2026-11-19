@@ -1,5 +1,5 @@
 ---
-description: "Apply during code review when investigating supported high-risk patterns and falsifying safety guarantees; not an automatic finding or blocker."
+description: "Apply as falsification heuristics during code review of reachable high-risk side effects, retries, concurrency, schema changes, or authorization; not automatic blockers."
 alwaysApply: false
 ---
 

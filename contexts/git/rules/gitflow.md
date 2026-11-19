@@ -1,8 +1,3 @@
----
-description: "Apply only when the repository explicitly uses Gitflow or a Gitflow-style release branch workflow; do not assume Gitflow elsewhere."
-alwaysApply: false
----
-
 # Gitflow Rules
 
 ## Applicability

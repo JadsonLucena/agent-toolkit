@@ -2,6 +2,14 @@
 
 This optional Cursor Plugin consumes the **original canonical sources** under `contexts/` and `contracts/`. The repository root is the plugin root; `.cursor-plugin/plugin.json` declares paths only. No generated bundles, duplicated sources, symlinks, hooks, MCP servers, or additional runtimes are needed.
 
+## Metadata semantics
+
+`name` on Skills and Agents is a **stable invocation identifier**; it is not a display-title rewrite. Changing a Skill directory or Agent filename requires a migration of canonical references, manifests, and callers. The audit retained the existing identifiers because their meanings still match their responsibilities.
+
+`description` is a **discovery and routing hint**: identify the supported operation, when it applies, and important scope/authorization limits. It must not promise runtime enforcement, isolation, or completed verification. Rules use their canonical filename as identity, a contextual description, and `alwaysApply: false`; Commands currently use their canonical filename plus the `## Intent` section, not independent YAML metadata.
+
+The structural linter guards identity uniqueness and description shape, but cannot establish routing relevance, Rule activation, or Agent dispatch; those require separate runtime evidence.
+
 ## Components and limitations
 
 - **Skills, Commands, Agents:** all seven contexts are covered without copying canonical files. Skills keep directory paths, which Cursor discovers as Skill directories. **Commands and Agents are declared as individual `.md` file paths** because Cursor 3.29.15 silently ignores directory entries inside manifest arrays for these two component types. Agents contain only portable `name` and `description` metadata. A host-discovered command is not proof of invocation, authorization or enforcement.

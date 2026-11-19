@@ -1,6 +1,6 @@
 ---
 name: validation
-description: "Run a read-only quality gate over requirements knowledge. Use before a downstream decision to check coherence, traceability, and verifiability."
+description: "Assess requirements read-only for ambiguity, conflicts, missing evidence, traceability, readiness, and disproportionate rigor. Use before downstream decisions."
 ---
 
 # Requirements Validation

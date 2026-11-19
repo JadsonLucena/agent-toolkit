@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "Run RED/GREEN/REFACTOR for the next small authorized behavior during an Implementation slice."
+description: "Apply an optional RED/GREEN/REFACTOR loop to a supported behavior within an authorized implementation slice. Use when TDD is selected and test outcomes can be verified."
 ---
 
 # Test-Driven Development

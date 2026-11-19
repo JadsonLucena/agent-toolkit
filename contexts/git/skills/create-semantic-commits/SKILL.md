@@ -1,6 +1,6 @@
 ---
 name: create-semantic-commits
-description: "Create verified atomic commits for completed intentions during authorized implementation or for explicitly requested changes. Use when the implementation task permits local commits or a commit is requested."
+description: "Create atomic Git commits for authorized completed intentions; verify staged scope, required checks, and message semantics. Use only with local-commit authority."
 ---
 
 # Create Semantic Commits

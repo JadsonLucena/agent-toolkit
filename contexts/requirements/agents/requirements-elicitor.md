@@ -1,6 +1,6 @@
 ---
 name: requirements-elicitor
-description: "Elicit stakeholder needs, supported facts, unknowns, and bounded requirements without inventing decisions."
+description: "Discover stakeholder needs, source evidence, material unknowns, and decision dependencies for a bounded change. Use for elicitation, not unsupported specification."
 ---
 
 # Requirements Elicitor

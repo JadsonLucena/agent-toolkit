@@ -1,6 +1,6 @@
 ---
 name: architecture-reviewer
-description: "Investigate architecture, compatibility, and operational constraints as a read-only Code Review specialist assigned by the Review Lead."
+description: "Review dependencies, interfaces, compatibility, scalability, operational safety, and documentation drift. Read-only specialist scoped by the Code Review Lead."
 ---
 
 # Architecture and Operations Reviewer

@@ -1,6 +1,6 @@
 ---
 name: generate-tests
-description: "Create, extend, or modify automated tests under the testing rules. Use when the authorized change is test code."
+description: "Design, create, modify, and verify automated tests for supported behaviors under explicit test-edit scope. Use for test evidence and coverage, not unrelated production changes."
 ---
 
 # Generate Automated Tests

@@ -1,5 +1,5 @@
 ---
-description: "Apply when eliciting, specifying, analyzing, or validating requirements and domain semantics with traceable evidence."
+description: "Apply when eliciting, defining, changing, or validating supported requirements, scenarios, business rules, quality constraints, and traceable domain evidence."
 alwaysApply: false
 ---
 

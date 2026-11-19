@@ -1,5 +1,5 @@
 ---
-description: "Apply when coordinating an explicitly authorized, multi-context engineering delivery or handoff; preserve stage gates and specialist ownership."
+description: "Apply when coordinating authorized multi-context delivery, evidence-gated PR handoffs, recovery, or post-delivery feedback; preserve stage authority and specialist ownership."
 alwaysApply: false
 ---
 

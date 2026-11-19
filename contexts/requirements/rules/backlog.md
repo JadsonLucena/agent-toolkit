@@ -1,5 +1,5 @@
 ---
-description: "Apply when building, refining, prioritizing, or slicing backlog items from supported requirements or other authorized work sources."
+description: "Apply when building, refining, slicing, or assessing readiness of traceable backlog items; preserve supported scope, dependencies, and acceptance semantics."
 alwaysApply: false
 ---
 
