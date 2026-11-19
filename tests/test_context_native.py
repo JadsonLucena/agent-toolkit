@@ -117,7 +117,7 @@ class NativeContextTests(unittest.TestCase):
         self.assertIn("coverage is incomplete", outcome["reason"])
 
     def test_binary_tracked_source_marks_search_incomplete(self):
-        (self.repo / "binary.dat").write_bytes(b"needle" + b"\\x00" + b"rest")
+        (self.repo / "binary.dat").write_bytes(b"needle" + b"\x00" + b"rest")
         subprocess.run(["git", "add", "binary.dat"], cwd=self.repo, check=True)
         outcome = search_sources(self.repo, "needle", ["."])
         self.assertEqual(outcome["status"], "incomplete")
