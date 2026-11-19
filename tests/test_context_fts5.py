@@ -150,6 +150,71 @@ class OptionalFTS5Tests(unittest.TestCase):
         self.assertFalse(result["index_used"])
         self.assertEqual(result["backend"], "native")
 
+
+    def test_casefold_expansion_matches_native_unicode_search(self):
+        (self.repo / "docs" / "unicode.md").write_text(
+            "Straße links to the security rule.\\n"
+            "Somebody STRASSE used another spelling.\\n",
+            encoding="utf-8",
+        )
+        subprocess.run(["git", "add", "."], cwd=self.repo, check=True)
+        subprocess.run(["git", "-c", "user.name=Test", "-c",
+                        "user.email=test@example.invalid", "commit",
+                        "-qm", "unicode fixture"], cwd=self.repo, check=True)
+        self._build()
+        for term in ("STRASSE", "Straße", "straße", "STRASSe"):
+            with self.subTest(term=term):
+                found = fts5.search(self.repo, term, ["docs"],
+                                    db=self.db, mode="indexed")
+                direct = native.search_sources(self.repo, term, ["docs"])
+                self.assertTrue(found["index_used"])
+                self.assertEqual(found["results"], direct["results"])
+
+    def test_wildcard_in_approved_directory_name_is_never_expanded(self):
+        literal = self.repo / "docs*"
+        literal.mkdir()
+        other = self.repo / "docs2"
+        other.mkdir()
+        (literal / "allowed.md").write_text(
+            "approved unusual scope\\n", encoding="utf-8"
+        )
+        (other / "outside.md").write_text(
+            "UNAPPROVED_SCOPE_CONTENT\\n", encoding="utf-8"
+        )
+        subprocess.run(["git", "add", "."], cwd=self.repo, check=True)
+        subprocess.run(["git", "-c", "user.name=Test", "-c",
+                        "user.email=test@example.invalid", "commit",
+                        "-qm", "literal pathspec fixtures"], cwd=self.repo, check=True)
+        if fts5._sqlite() is None:
+            self.skipTest("FTS5 unavailable")
+        outcome = fts5.build_index(self.repo, ["docs*"], self.db, approved=True)
+        self.assertEqual(outcome["indexed"], 1)
+        self.assertEqual(outcome["skipped"], 0)
+        result = fts5.search(self.repo, "approved", ["docs*"],
+                             db=self.db, mode="indexed")
+        self.assertEqual(result["results"][0]["ref"], "docs*/allowed.md#L1")
+        import sqlite3
+        with sqlite3.connect(self.db) as conn:
+            entries = [row[0] for row in conn.execute("SELECT path FROM sources")]
+        self.assertEqual(entries, ["docs*/allowed.md"])
+        self.assertNotIn("UNAPPROVED_SCOPE_CONTENT", str(result))
+
+    def test_glob_like_filename_does_not_expand_scoped_index(self):
+        if fts5._sqlite() is None:
+            self.skipTest("FTS5 unavailable")
+        folder = self.repo / "docs[1]"
+        folder.mkdir()
+        (folder / "literal.md").write_text("Scoped authorization.\\n", encoding="utf-8")
+        subprocess.run(["git", "add", "."], cwd=self.repo, check=True)
+        subprocess.run(["git", "-c", "user.name=Test", "-c",
+                        "user.email=test@example.invalid", "commit",
+                        "-qm", "bracket fixture"], cwd=self.repo, check=True)
+        outcome = fts5.build_index(self.repo, ["docs[1]"], self.db, approved=True)
+        self.assertEqual(outcome["indexed"], 1)
+        found = fts5.search(self.repo, "authorization", ["docs[1]"],
+                            db=self.db, mode="indexed")
+        self.assertEqual(found["results"][0]["ref"], "docs[1]/literal.md#L1")
+
     def test_literal_query_quote_is_not_executable_fts_syntax(self):
         self._build()
         result = fts5.search(self.repo, 'authorization" OR secret', ["docs"],

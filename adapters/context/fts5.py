@@ -20,7 +20,7 @@ from adapters.context import native
 MAX_INDEX_FILES = 8000
 MAX_INDEX_BYTES = 32 * 1024 * 1024
 MAX_DB_BYTES = 256 * 1024 * 1024
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 class IndexError(ValueError):
@@ -83,9 +83,12 @@ def _indexable(path: Path) -> bool:
 
 
 def _git_paths(root: Path, scopes: list[str]) -> list[str]:
+    """Enumerate only exact approved directories, never wildcard pathspecs."""
+    allowed = [native._safe_path(root, scope, directory=True) for scope in scopes]
+    pathspecs = [f":(literal){scope}" for scope in scopes]
     try:
         output = subprocess.run(
-            ["git", "ls-files", "-z", "--", *scopes], cwd=root,
+            ["git", "ls-files", "-z", "--", *pathspecs], cwd=root,
             stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, timeout=12, check=True,
         ).stdout
@@ -96,6 +99,10 @@ def _git_paths(root: Path, scopes: list[str]) -> list[str]:
     names = [os.fsdecode(p) for p in output.split(b"\x00") if p]
     if len(names) > MAX_INDEX_FILES:
         raise IndexError("too many scoped files; reduce index scope")
+    for name in names:
+        candidate = native._safe_path(root, name)
+        if not any(candidate.is_relative_to(scope) for scope in allowed):
+            raise IndexError("Git inventory includes a path outside the approved literal scopes")
     return names
 
 
@@ -121,7 +128,8 @@ def build_index(repo: Path, scopes: list[str], db: Path, *, approved: bool = Fal
         connection = sqlite3.connect(temp)
         connection.execute("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
         connection.execute(
-            "CREATE VIRTUAL TABLE sources USING fts5(path UNINDEXED, content, tokenize='trigram')"
+            "CREATE VIRTUAL TABLE sources USING fts5(" 
+            "path UNINDEXED, content UNINDEXED, folded, tokenize='trigram')"
         )
         for item in paths:
             try:
@@ -142,7 +150,10 @@ def build_index(repo: Path, scopes: list[str], db: Path, *, approved: bool = Fal
             size += len(raw)
             if size > MAX_INDEX_BYTES:
                 raise IndexError("source byte budget exceeded; reduce index scope")
-            connection.execute("INSERT INTO sources(path,content) VALUES(?,?)", (item, content))
+            connection.execute(
+                "INSERT INTO sources(path,content,folded) VALUES(?,?,?)",
+                (item, content, content.casefold()),
+            )
             indexed += 1
         if native._repository(root)[1] != head or not _clean(root):
             raise IndexError("source changed while building index")
@@ -197,12 +208,12 @@ def _indexed_search(
             if not all(any(q.is_relative_to(a) for a in allowed) for q in requested):
                 raise IndexError("requested search scope exceeds approved indexed scope")
             skipped = int(values["skipped"])
-            phrase = '"' + query.replace('"', '""') + '"'
+            phrase = '"' + query.casefold().replace('"', '""') + '"'
             matches = []
             truncated = False
             # FTS candidate retrieval; post-filter lines to retain native literal semantics.
             cursor = conn.execute(
-                "SELECT path,content FROM sources WHERE sources MATCH ? ORDER BY path",
+                "SELECT path,content FROM sources WHERE folded MATCH ? ORDER BY path",
                 (phrase,),
             )
             for relative, content in cursor:

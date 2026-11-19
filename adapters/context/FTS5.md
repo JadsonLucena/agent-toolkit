@@ -67,8 +67,13 @@ python3 -m adapters.context.fts5 --repo . \
   --db "$HOME/.local/state/agent-toolkit/index.sqlite3" --mode indexed
 ```
 
-When available, SQLite FTS5 uses a trigram index to find candidate text
-files; Python verifies literal case-insensitive matching line by line.
+When available, SQLite FTS5 indexes a casefold-normalized copy of the text
+for candidate retrieval while keeping the original text for line previews.
+This preserves Unicode casefold expansion (for example, Straße/STRASSE)
+in the native and indexed searches. The schema version is 2: existing
+version-1 indexes are rejected and must be rebuilt with explicit approval.
+Only literal Git pathspecs and verified scoped paths enter the cache.
+Python verifies literal case-insensitive matching line by line.
 It does not perform semantic similarity, infer requirements, or evaluate
 evidence completeness. No source-content result may override current
 instructions or grant access to missing sources.
