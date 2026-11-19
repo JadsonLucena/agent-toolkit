@@ -53,6 +53,8 @@ def section(content: str, name: str) -> str:
 def lint_toolkit(root: Path) -> list[str]:
     root = root.resolve()
     errors: list[str] = []
+    if not (root / "AGENTS.md").is_file():
+        errors.append("AGENTS.md: missing repository agent instructions")
     architecture = root / "ARCHITECTURE.md"
     if not architecture.is_file():
         return ["ARCHITECTURE.md: missing canonical artifact matrix"]
@@ -102,12 +104,9 @@ def lint_toolkit(root: Path) -> list[str]:
                 title_source = content[frontmatter.end():]
         if not title_source.lstrip().startswith("# "):
             errors.append(f"{rel}: expected a level-one title")
-        # MIGRATION.md intentionally records superseded paths: they are history,
-        # not active artifact references.
-        if path.name != "MIGRATION.md":
-            for ref in PATH_REF.findall(content):
-                if ".." in Path(ref).parts or not (root / ref).is_file():
-                    errors.append(f"{rel}: broken reference {ref}")
+        for ref in PATH_REF.findall(content):
+            if ".." in Path(ref).parts or not (root / ref).is_file():
+                errors.append(f"{rel}: broken reference {ref}")
         for link in MD_LINK.findall(content):
             if link.startswith(("http://", "https://", "mailto:", "#")):
                 continue
