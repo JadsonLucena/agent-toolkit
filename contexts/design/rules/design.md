@@ -1,3 +1,8 @@
+---
+description: "Apply when designing a bounded software change, evaluating architecture decisions and tradeoffs, or defining a technical solution from supported requirements."
+alwaysApply: false
+---
+
 # Design Rules
 
 ## Core Principles
