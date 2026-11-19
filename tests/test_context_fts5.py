@@ -215,6 +215,119 @@ class OptionalFTS5Tests(unittest.TestCase):
                             db=self.db, mode="indexed")
         self.assertEqual(found["results"][0]["ref"], "docs[1]/literal.md#L1")
 
+
+    def test_symlink_in_approved_scope_is_counted_as_skipped(self):
+        try:
+            (self.repo / "docs" / "linked.md").symlink_to("a.md")
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable")
+        subprocess.run(["git", "add", "docs/linked.md"], cwd=self.repo, check=True)
+        subprocess.run(
+            ["git", "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+             "commit", "-qm", "tracked symlink"], cwd=self.repo, check=True,
+        )
+        outcome = self._build()
+        self.assertEqual(outcome["indexed"], 2)
+        self.assertEqual(outcome["skipped"], 2)  # Existing .env plus symlink.
+        found = fts5.search(self.repo, "authorization", ["docs"],
+                            db=self.db, mode="indexed")
+        self.assertTrue(found["index_used"])
+        self.assertEqual(found["results"][0]["ref"], "docs/a.md#L1")
+        self.assertEqual(found["status"], "incomplete")
+
+    def test_assume_unchanged_flag_invalidates_existing_index(self):
+        self._build()
+        subprocess.run(
+            ["git", "update-index", "--assume-unchanged", "docs/a.md"],
+            cwd=self.repo, check=True,
+        )
+        (self.repo / "docs" / "a.md").write_text("No matching rule remains.\\n",
+                                                   encoding="utf-8")
+        result = fts5.search(self.repo, "authorization", ["docs"],
+                             db=self.db, mode="indexed")
+        self.assertEqual(result["backend"], "native")
+        self.assertFalse(result["index_used"])
+        self.assertIn("assume-unchanged", result["fallback_reason"])
+        self.assertEqual(result["results"], [])
+
+    def test_assume_unchanged_flag_blocks_index_creation(self):
+        if fts5._sqlite() is None:
+            self.skipTest("FTS5 unavailable")
+        subprocess.run(
+            ["git", "update-index", "--assume-unchanged", "docs/a.md"],
+            cwd=self.repo, check=True,
+        )
+        with self.assertRaisesRegex(fts5.IndexError, "assume-unchanged"):
+            fts5.build_index(self.repo, ["docs"], self.db, approved=True)
+        self.assertFalse(self.db.exists())
+
+    def test_skip_worktree_flag_invalidates_existing_index(self):
+        self._build()
+        subprocess.run(
+            ["git", "update-index", "--skip-worktree", "docs/a.md"],
+            cwd=self.repo, check=True,
+        )
+        result = fts5.search(self.repo, "authorization", ["docs"],
+                             db=self.db, mode="indexed")
+        self.assertEqual(result["backend"], "native")
+        self.assertIn("skip-worktree", result["fallback_reason"])
+
+    def test_probe_closes_temporary_sqlite_connection(self):
+        import sqlite3
+        actual_connect = sqlite3.connect
+        opened = []
+
+        class ConnectionSpy:
+            def __init__(self, *args, **kwargs):
+                self.actual = actual_connect(*args, **kwargs)
+                self.closed = False
+                opened.append(self)
+
+            def execute(self, *args, **kwargs):
+                return self.actual.execute(*args, **kwargs)
+
+            def close(self):
+                self.closed = True
+                self.actual.close()
+
+        with patch.object(sqlite3, "connect",
+                          side_effect=lambda *a, **kw: ConnectionSpy(*a, **kw)):
+            self.assertIs(fts5._sqlite(), sqlite3)
+        self.assertTrue(opened)
+        self.assertTrue(all(conn.closed for conn in opened))
+
+    def test_indexed_search_closes_file_connection(self):
+        self._build()
+        import sqlite3
+        actual_connect = sqlite3.connect
+        opened = []
+
+        class ConnectionSpy:
+            def __init__(self, *args, **kwargs):
+                self.actual = actual_connect(*args, **kwargs)
+                self.closed = False
+                opened.append(self)
+
+            def execute(self, *args, **kwargs):
+                return self.actual.execute(*args, **kwargs)
+
+            def close(self):
+                self.closed = True
+                self.actual.close()
+
+        class SQLiteProxy:
+            Error = sqlite3.Error
+            @staticmethod
+            def connect(*args, **kwargs):
+                return ConnectionSpy(*args, **kwargs)
+
+        with patch.object(fts5, "_sqlite", return_value=SQLiteProxy):
+            response = fts5.search(self.repo, "authorization", ["docs"],
+                                   db=self.db, mode="indexed")
+        self.assertTrue(response["index_used"])
+        self.assertTrue(opened)
+        self.assertTrue(all(conn.closed for conn in opened))
+
     def test_literal_query_quote_is_not_executable_fts_syntax(self):
         self._build()
         result = fts5.search(self.repo, 'authorization" OR secret', ["docs"],

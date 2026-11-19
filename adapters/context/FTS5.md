@@ -82,8 +82,11 @@ instructions or grant access to missing sources.
 
 Indexes are bound to one absolute Git root, exact HEAD and explicitly
 approved directory scopes. Dirty tracked sources, moved HEAD, mismatched
-scope, insufficient SQLite capability, incompatible schema or missing
-index all trigger native fallback with a diagnostic. A query never
+scope, assume-unchanged/skip-worktree flags, insufficient SQLite capability,
+incompatible schema or missing index all trigger native fallback with a
+diagnostic. Tracked symlinks and submodules are counted as skipped rather
+than indexed; such incomplete coverage is reported as partial. SQLite
+connections are closed after each indexed search or capability probe. A query never
 creates or modifies an index. The builder refuses dirty source state,
 writes into a temporary private file, and atomically replaces the index
 only after successful completion and source revalidation.

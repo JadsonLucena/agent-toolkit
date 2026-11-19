@@ -13,6 +13,7 @@ import os
 import stat
 import subprocess
 import tempfile
+from contextlib import closing
 from pathlib import Path
 
 from adapters.context import native
@@ -31,7 +32,7 @@ def _sqlite():
     """Import only on an explicitly needed indexed operation."""
     try:
         import sqlite3
-        with sqlite3.connect(":memory:") as check:
+        with closing(sqlite3.connect(":memory:")) as check:
             check.execute("CREATE VIRTUAL TABLE probe USING fts5(text, tokenize='trigram')")
         return sqlite3
     except Exception:
@@ -49,6 +50,29 @@ def _scope_paths(root: Path, scopes: list[str]) -> tuple[list[Path], list[str]]:
 def _clean(root: Path) -> bool:
     """Index never claims current coverage over uncommitted tracked changes."""
     return not native._git(root, "status", "--porcelain", "--untracked-files=no")
+
+
+def _check_index_flags(root: Path, scopes: list[str]) -> None:
+    """Refuse Git bits that hide modified tracked files from git status."""
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "-v", "-z", "--",
+             *[f":(literal){scope}" for scope in scopes]],
+            cwd=root, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, timeout=12, check=True,
+        )
+    except (subprocess.CalledProcessError, OSError, subprocess.TimeoutExpired) as exc:
+        raise IndexError("cannot verify Git tracked-file flags") from exc
+    if len(result.stdout) > 2 * 1024 * 1024:
+        raise IndexError("Git flag inventory exceeds index budget")
+    for entry in result.stdout.split(b"\x00"):
+        if entry and not entry.startswith(b"H "):
+            # 'h' = assume-unchanged, 'S' = skip-worktree.
+            # Unknown markers cannot establish reliable freshness either.
+            raise IndexError(
+                "Git assume-unchanged/skip-worktree or unsupported index flags "
+                "make indexed source freshness unverifiable"
+            )
 
 
 def _private_db(root: Path, db: Path, *, for_build: bool) -> Path:
@@ -100,7 +124,12 @@ def _git_paths(root: Path, scopes: list[str]) -> list[str]:
     if len(names) > MAX_INDEX_FILES:
         raise IndexError("too many scoped files; reduce index scope")
     for name in names:
-        candidate = native._safe_path(root, name)
+        relative = Path(name)
+        if relative.is_absolute() or ".." in relative.parts:
+            raise IndexError("Git returned an invalid relative source path")
+        # Membership is checked lexically here. The builder separately
+        # rejects and counts symlinks, submodules, and other ineligible files.
+        candidate = root / relative
         if not any(candidate.is_relative_to(scope) for scope in allowed):
             raise IndexError("Git inventory includes a path outside the approved literal scopes")
     return names
@@ -120,6 +149,7 @@ def build_index(repo: Path, scopes: list[str], db: Path, *, approved: bool = Fal
                 "reason": "SQLite with FTS5 trigram is not installed"}
     path = _private_db(root, db, for_build=True)
     paths = _git_paths(root, relative_scopes)
+    _check_index_flags(root, relative_scopes)
     fd, temp = tempfile.mkstemp(prefix=".fts5-", suffix=".sqlite3", dir=path.parent)
     os.close(fd)
     connection = None
@@ -157,6 +187,7 @@ def build_index(repo: Path, scopes: list[str], db: Path, *, approved: bool = Fal
             indexed += 1
         if native._repository(root)[1] != head or not _clean(root):
             raise IndexError("source changed while building index")
+        _check_index_flags(root, relative_scopes)
         values = {
             "repository": str(root), "head_sha": head,
             "scopes": json.dumps(relative_scopes), "indexed": str(indexed),
@@ -197,7 +228,7 @@ def _indexed_search(
         raise IndexError("SQLite FTS5 trigram is unavailable")
     path = _private_db(root, db, for_build=False)
     try:
-        with sqlite3.connect(path.as_uri() + "?mode=ro", uri=True, timeout=3.0) as conn:
+        with closing(sqlite3.connect(path.as_uri() + "?mode=ro", uri=True, timeout=3.0)) as conn:
             if conn.execute("PRAGMA user_version").fetchone()[0] != SCHEMA_VERSION:
                 raise IndexError("unknown or incompatible index schema")
             values = dict(conn.execute("SELECT key,value FROM meta"))
@@ -207,6 +238,7 @@ def _indexed_search(
             allowed = [native._safe_path(root, s, directory=True) for s in saved]
             if not all(any(q.is_relative_to(a) for a in allowed) for q in requested):
                 raise IndexError("requested search scope exceeds approved indexed scope")
+            _check_index_flags(root, saved)
             skipped = int(values["skipped"])
             phrase = '"' + query.casefold().replace('"', '""') + '"'
             matches = []
@@ -231,6 +263,7 @@ def _indexed_search(
             # Even a truncated result must be checked against current source state.
             if native._repository(root)[1] != head or not _clean(root):
                 raise IndexError("source changed during index search")
+            _check_index_flags(root, saved)
             return {
                 "status": "truncated" if truncated else "incomplete" if skipped else "complete",
                 "backend": "sqlite-fts5", "head_sha": head,
