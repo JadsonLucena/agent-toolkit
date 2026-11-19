@@ -22,7 +22,7 @@ class ToolkitLintTests(unittest.TestCase):
         if (ROOT / "adapters").is_dir():
             shutil.copytree(ROOT / "adapters", self.root / "adapters",
                             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-        for name in ("ARCHITECTURE.md", "README.md", "MIGRATION.md"):
+        for name in ("ARCHITECTURE.md", "README.md", "AGENTS.md"):
             shutil.copy2(ROOT / name, self.root / name)
 
     def change(self, path, old, new):
@@ -37,6 +37,10 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_current_canonical_repository_passes(self):
         self.assertEqual([], lint_toolkit(self.root))
+
+    def test_missing_repository_agent_instructions(self):
+        (self.root / "AGENTS.md").unlink()
+        self.assert_error("AGENTS.md: missing repository agent instructions")
 
     def test_missing_optional_adapter_documentation_is_reported(self):
         (self.root / "adapters" / "ocr" / "README.md").unlink()
