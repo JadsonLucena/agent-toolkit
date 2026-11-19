@@ -29,6 +29,22 @@ Track the governing Product Slice or learning objective, source obligation/scena
 
 Track `target_stage`, authorized operations and restrictions, Change Boundary, existing or planned Git PR Boundary, available accepted baselines, per-slice dependencies/readiness, intended and actual PR head/base, local verification and independent Review evidence identity, review profile and verdict, preparation state, published PR status, post-publication checks/approvals, merge authorization and observed target state, commit authorization and observed SHA or uncommitted/blocked state, owned specialist outputs, external effects, pending decisions, and current outcome status. Never invent checkpoint persistence.
 
+## Optional Runtime Integrations
+
+A host with authorized local source access may call
+`adapters/context/native.py` to prepare a bounded, source-linked pack for
+the already selected slice. These retrieved references are not authority,
+complete coverage or a second specialist workflow.
+
+If the host has explicitly authorized private local persistence and SQLite is
+available, `adapters/delivery/checkpoints.py` may persist and read
+execution metadata and uncertain external effects. A restored checkpoint
+**never grants execution** or approval: reconcile current Git/source versions,
+authorization, independent evidence and real external effects before any
+further mutation. Do not replay an unknown external effect. If unavailable,
+report that durable resumption is unavailable and continue the native
+procedural workflow only where safe.
+
 ## Workflow
 
 The five Delivery decisions below form the **coordination loop**, not replacement procedures for specialist capabilities. Select only the next necessary authorized stage; the selected owner applies its canonical rules, checks and operation-specific gates.
