@@ -291,6 +291,20 @@ class ToolkitLintTests(unittest.TestCase):
         self.assertEqual([], lint_toolkit(self.root))
         self.assertTrue((self.root / ".cursor-plugin/plugin.json").is_file())
 
+    def test_cursor_marketplace_targets_root_plugin_without_copy(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        marketplace = self.root / ".cursor-plugin/marketplace.json"
+        self.assertTrue(marketplace.is_file())
+
+    def test_cursor_marketplace_rejects_missing_manifest(self):
+        (self.root / ".cursor-plugin/marketplace.json").unlink()
+        self.assert_error("required for folder marketplace import")
+
+    def test_cursor_marketplace_rejects_divergent_source(self):
+        self.change(".cursor-plugin/marketplace.json",
+                    '"source": "."', '"source": "./plugins/copied-toolkit"')
+        self.assert_error("expected one root plugin with source '.'")
+
     def test_cursor_plugin_rejects_path_escape(self):
         self.change(".cursor-plugin/plugin.json",
                     "./contexts/review/skills", "../outside")

@@ -1,0 +1,13 @@
+{
+  "name": "agent-toolkit",
+  "metadata": {
+    "description": "Local marketplace entry for the canonical Agent Toolkit Cursor Plugin."
+  },
+  "plugins": [
+    {
+      "name": "agent-toolkit",
+      "source": ".",
+      "description": "Vendor-neutral software engineering guidance for AI coding agents."
+    }
+  ]
+}

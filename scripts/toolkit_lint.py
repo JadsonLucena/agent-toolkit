@@ -77,6 +77,27 @@ def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> li
         return [f".cursor-plugin/plugin.json: invalid JSON: {exc}"]
     if not isinstance(manifest, dict) or manifest.get("name") != "agent-toolkit":
         return [".cursor-plugin/plugin.json: invalid plugin name or structure"]
+
+    # Import from Disk reads a marketplace; source "." resolves to this
+    # repository root containing the single canonical plugin manifest.
+    marketplace_file = root / ".cursor-plugin" / "marketplace.json"
+    if not marketplace_file.is_file():
+        errors.append(".cursor-plugin/marketplace.json: required for folder marketplace import")
+    else:
+        try:
+            marketplace = json.loads(marketplace_file.read_text(encoding="utf-8"))
+        except (ValueError, OSError) as exc:
+            errors.append(f".cursor-plugin/marketplace.json: invalid JSON: {exc}")
+        else:
+            if (not isinstance(marketplace, dict)
+                    or marketplace.get("name") != "agent-toolkit"
+                    or not isinstance(marketplace.get("plugins"), list)
+                    or len(marketplace["plugins"]) != 1
+                    or not isinstance(marketplace["plugins"][0], dict)
+                    or marketplace["plugins"][0].get("name") != manifest["name"]
+                    or marketplace["plugins"][0].get("source") != "."):
+                errors.append(".cursor-plugin/marketplace.json: expected one root plugin with source '.'")
+
     allowed = {"name", "description", *CURSOR_COMPONENTS}
     if set(manifest) - allowed:
         errors.append(".cursor-plugin/plugin.json: unexpected plugin fields")

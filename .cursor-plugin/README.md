@@ -9,6 +9,21 @@ This optional Cursor Plugin consumes the **original canonical sources** under `c
 - **Contracts and references:** stay at their canonical paths. References to `contexts/...` and `contracts/...` must resolve against the **installed toolkit root**, not an unrelated consuming repository.
 - **Runtime behavior:** the manifest does not enforce permission boundaries, provide independent subagent isolation or attest `gate` review. Missing evidence means no claim of independent `gate` or completed review.
 
+## Importing through Cursor UI
+
+**Import from Disk** or **Add Plugins from Folder** expects a *marketplace*
+manifest (`.cursor-plugin/marketplace.json`), not only a single-plugin
+`.cursor-plugin/plugin.json`. Select the **repository root** as the marketplace
+folder (for example, `~/Documents/GitHub/agent-toolkit`). The marketplace
+contains exactly one entry, `source: "."`, which points to the same repository
+root and existing canonical plugin manifest. This adds **no copied artifacts**.
+
+Make sure the checkout includes the branch carrying this change before importing.
+Then install `agent-toolkit` from that local marketplace. If your Cursor build
+does not support a root-source marketplace entry, use the documented direct
+local plugin discovery below instead; the UI import remains unverified until
+observed in Cursor.
+
 ## Verify locally with Cursor
 
 1. Clone the **entire repository** as one checkout to `~/.cursor/plugins/local/agent-toolkit`, preserving `.cursor-plugin/`, `contexts/`, and `contracts/` together. This is the ordinary installed checkout, not copied/maintained canonical artifacts inside the source repository. Do not use an external symlink: local plugin symlinks are restricted to targets inside the local plugin folder.
