@@ -97,3 +97,9 @@ context. Compare actual tasks via the existing
 `evals/context/` behavioral corpus and
 `scripts/context_compare.py` (PR #43).
 Benchmark index creation separately from repeated warm searches.
+
+An optional indexed lookup never discards native matches from an incomplete
+scan. Auto mode combines and deduplicates native and indexed hits within the
+requested result budget, retaining an `incomplete` coverage status (or
+`truncated` if bounded). Indexed retrieval does not promote partial
+coverage to verified source completeness.

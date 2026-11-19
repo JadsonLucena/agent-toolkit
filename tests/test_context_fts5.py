@@ -350,6 +350,44 @@ class OptionalFTS5Tests(unittest.TestCase):
             found["results"],
         )
 
+
+    def test_auto_preserves_native_hits_excluded_by_partial_fts_index(self):
+        (self.repo / "docs" / "binary.dat").write_bytes(b"\x00" + b"ignored")
+        subprocess.run(["git", "add", "."], cwd=self.repo, check=True)
+        subprocess.run(
+            ["git", "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+             "commit", "-qm", "binary scanned incompletely"],
+            cwd=self.repo, check=True,
+        )
+        self._build()
+        direct = native.search_sources(self.repo, "API_TOKEN", ["docs"])
+        self.assertEqual(direct["status"], "incomplete")
+        self.assertIn("docs/.env#L1", [x["ref"] for x in direct["results"]])
+        joined = fts5.search(self.repo, "API_TOKEN", ["docs"],
+                             db=self.db, mode="auto", enable_optional=True)
+        self.assertTrue(joined["index_used"])
+        self.assertEqual(joined["backend"], "native+sqlite-fts5")
+        self.assertEqual(joined["status"], "incomplete")
+        self.assertEqual(joined["results"], direct["results"])
+        self.assertEqual(joined["native_hits_preserved"], 1)
+
+    def test_auto_deduplicates_overlapping_native_and_indexed_hits(self):
+        (self.repo / "docs" / "binary.dat").write_bytes(b"\x00" + b"ignored")
+        subprocess.run(["git", "add", "."], cwd=self.repo, check=True)
+        subprocess.run(
+            ["git", "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+             "commit", "-qm", "binary scanned incompletely"],
+            cwd=self.repo, check=True,
+        )
+        self._build()
+        direct = native.search_sources(self.repo, "authorization", ["docs"])
+        self.assertEqual(direct["status"], "incomplete")
+        joined = fts5.search(self.repo, "authorization", ["docs"],
+                             db=self.db, mode="auto", enable_optional=True)
+        self.assertEqual(joined["status"], "incomplete")
+        self.assertEqual(joined["results"], direct["results"])
+        self.assertEqual(len(joined["results"]), 1)
+
     def test_literal_query_quote_is_not_executable_fts_syntax(self):
         self._build()
         result = fts5.search(self.repo, 'authorization" OR secret', ["docs"],

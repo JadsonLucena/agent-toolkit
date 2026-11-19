@@ -276,6 +276,27 @@ def _indexed_search(
         raise IndexError("index cannot be safely read") from exc
 
 
+def _supplement_native(previous: dict, indexed: dict, max_results: int) -> dict:
+    """Never discard independently observed native hits for a partial scan."""
+    combined = []
+    seen = set()
+    for record in [*previous.get("results", []), *indexed.get("results", [])]:
+        if record["ref"] not in seen:
+            seen.add(record["ref"])
+            combined.append(record)
+    overflow = len(combined) > max_results or indexed["status"] == "truncated"
+    return {
+        **indexed,
+        "backend": "native+sqlite-fts5",
+        "status": "truncated" if overflow else "incomplete",
+        "results": combined[:max_results],
+        "coverage": "partial",
+        "native_hits_preserved": len(previous.get("results", [])),
+        "native_skipped_files": previous.get("skipped_files", 0),
+        "note": "Native and indexed hits are leads; incomplete scan coverage remains explicit.",
+    }
+
+
 def search(
     repo: Path, query: str, scopes: list[str], *,
     db: Path | None = None, mode: str = "auto", enable_optional: bool = False,
@@ -301,6 +322,8 @@ def search(
     else:
         try:
             result = _indexed_search(repo, query, scopes, db, max_results)
+            if previous is not None:
+                result = _supplement_native(previous, result, max_results)
             return {**result, "index_used": True,
                     "selection_reason": "explicit" if mode == "indexed" else "native_incomplete"}
         except (IndexError, native.ContextError, OSError) as exc:
