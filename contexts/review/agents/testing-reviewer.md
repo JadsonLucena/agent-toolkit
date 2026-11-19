@@ -1,3 +1,8 @@
+---
+name: testing-reviewer
+description: "Assess test adequacy and verification evidence as a read-only Code Review specialist assigned by the Review Lead."
+---
+
 # Test Adequacy Reviewer
 
 ## Role

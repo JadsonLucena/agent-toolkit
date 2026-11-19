@@ -1,3 +1,8 @@
+---
+name: finding-verifier
+description: "Independently challenge and verify candidate findings for the Code Review Lead; do not issue the final verdict."
+---
+
 # Finding Verifier
 
 ## Role

@@ -1,3 +1,8 @@
+---
+name: reliability-reviewer
+description: "Investigate reliability, data integrity, and concurrency as a read-only Code Review specialist assigned by the Review Lead."
+---
+
 # Data and Reliability Reviewer
 
 ## Role

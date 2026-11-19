@@ -1,3 +1,8 @@
+---
+name: git-engineer
+description: "Handle explicitly authorized version control, commit, branch, and pull-request operations with evidence-backed safeguards."
+---
+
 # Git Engineer
 
 ## Role

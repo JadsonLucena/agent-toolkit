@@ -1,3 +1,8 @@
+---
+name: backlog-planner
+description: "Plan and refine traceable backlog items from accepted requirements without inventing scope or priorities."
+---
+
 # Backlog Planner
 
 ## Role

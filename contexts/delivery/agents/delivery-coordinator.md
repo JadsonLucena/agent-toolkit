@@ -1,3 +1,8 @@
+---
+name: delivery-coordinator
+description: "Coordinate authorized lifecycle stages and specialist handoffs without taking ownership of specialist decisions."
+---
+
 # Delivery Coordinator
 
 ## Role

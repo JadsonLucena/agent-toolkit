@@ -22,6 +22,8 @@ class ToolkitLintTests(unittest.TestCase):
         if (ROOT / "adapters").is_dir():
             shutil.copytree(ROOT / "adapters", self.root / "adapters",
                             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        if (ROOT / ".cursor-plugin").is_dir():
+            shutil.copytree(ROOT / ".cursor-plugin", self.root / ".cursor-plugin")
         for name in ("ARCHITECTURE.md", "README.md", "AGENTS.md"):
             shutil.copy2(ROOT / name, self.root / name)
         # Mirror the CI workflow referenced by AGENTS.md in the test repository.
@@ -283,6 +285,37 @@ class ToolkitLintTests(unittest.TestCase):
             "## Uses\n\n* Skill: \x60contexts/requirements/skills/definition/SKILL.md\x60\n",
         )
         self.assert_error("cyclic Skill -> Skill")
+
+
+    def test_cursor_plugin_manifest_covers_canonical_sources(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        self.assertTrue((self.root / ".cursor-plugin/plugin.json").is_file())
+
+    def test_cursor_plugin_rejects_path_escape(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/review/skills", "../outside")
+        self.assert_error("unsafe plugin path")
+
+    def test_cursor_plugin_rejects_missing_context(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/review/commands", "./contexts/missing/commands")
+        self.assert_error("missing plugin path")
+        self.assert_error("commands coverage mismatch")
+
+    def test_cursor_agent_identity_must_match_file(self):
+        self.change("contexts/review/agents/code-reviewer.md",
+                    "name: code-reviewer", "name: not-code-reviewer")
+        self.assert_error("invalid portable Agent name/description frontmatter")
+
+    def test_cursor_agent_cannot_add_host_execution_metadata(self):
+        self.change("contexts/review/agents/code-reviewer.md",
+                    '---\n\n# Code Reviewer', 'model: cursor\n---\n\n# Code Reviewer')
+        self.assert_error("invalid portable Agent name/description frontmatter")
+
+    def test_cursor_rule_pilot_cannot_be_always_on(self):
+        self.change("contexts/review/rules/code-review.md",
+                    "alwaysApply: false", "alwaysApply: true")
+        self.assert_error("invalid Cursor Rule pilot frontmatter")
 
 
 if __name__ == "__main__":

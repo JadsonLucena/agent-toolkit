@@ -1,3 +1,8 @@
+---
+description: "Apply evidence-based code review constraints when the Review capability is invoked; read-only, with risk-proportionate coverage."
+alwaysApply: false
+---
+
 # Code Review Rules
 
 ## Core Principles

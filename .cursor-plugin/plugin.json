@@ -1,0 +1,34 @@
+{
+  "name": "agent-toolkit",
+  "description": "Vendor-neutral engineering guidance for Cursor using canonical Skills, Commands, Agents and a Rule pilot.",
+  "skills": [
+    "./contexts/requirements/skills",
+    "./contexts/design/skills",
+    "./contexts/implementation/skills",
+    "./contexts/testing/skills",
+    "./contexts/review/skills",
+    "./contexts/delivery/skills",
+    "./contexts/git/skills"
+  ],
+  "commands": [
+    "./contexts/requirements/commands",
+    "./contexts/design/commands",
+    "./contexts/implementation/commands",
+    "./contexts/testing/commands",
+    "./contexts/review/commands",
+    "./contexts/delivery/commands",
+    "./contexts/git/commands"
+  ],
+  "agents": [
+    "./contexts/requirements/agents",
+    "./contexts/design/agents",
+    "./contexts/implementation/agents",
+    "./contexts/testing/agents",
+    "./contexts/review/agents",
+    "./contexts/delivery/agents",
+    "./contexts/git/agents"
+  ],
+  "rules": [
+    "./contexts/review/rules/code-review.md"
+  ]
+}

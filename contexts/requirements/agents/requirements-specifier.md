@@ -1,3 +1,8 @@
+---
+name: requirements-specifier
+description: "Define verifiable requirements from supported needs, preserving domain semantics, traceability, and evidence."
+---
+
 # Requirements Specifier
 
 ## Role

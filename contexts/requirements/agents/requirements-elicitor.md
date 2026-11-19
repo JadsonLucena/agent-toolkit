@@ -1,3 +1,8 @@
+---
+name: requirements-elicitor
+description: "Elicit stakeholder needs, supported facts, unknowns, and bounded requirements without inventing decisions."
+---
+
 # Requirements Elicitor
 
 ## Role

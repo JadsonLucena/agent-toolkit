@@ -1,3 +1,8 @@
+---
+name: test-engineer
+description: "Design and generate evidence-backed automated tests within an authorized testing scope."
+---
+
 # Test Engineer
 
 ## Role

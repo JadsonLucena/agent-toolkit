@@ -1,3 +1,8 @@
+---
+name: design-engineer
+description: "Design the next bounded implementation slice with evidence-based technical decisions and explicit tradeoffs."
+---
+
 # Design Engineer
 
 ## Role

@@ -1,3 +1,8 @@
+---
+name: implementation-engineer
+description: "Implement an authorized, bounded software change and report observed tests, scope, and Git handoff."
+---
+
 # Implementation Engineer
 
 ## Role

@@ -7,8 +7,9 @@ or the safety of a real agent runtime.
 from __future__ import annotations
 
 import argparse
+import json
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
 PATH_REF = re.compile(r"\x60((?:contexts|contracts)/[A-Za-z0-9_./-]+\.md)\x60")
@@ -23,6 +24,18 @@ SKILL_FRONTMATTER = re.compile(
     r'\A---\r?\nname: (?P<name>[a-z0-9]+(?:-[a-z0-9]+)*)\r?\n'
     r'description: "(?P<description>[^"\n]+)"\r?\n---\r?\n',
 )
+
+# Portable frontmatter on Agents and the opt-in Cursor Rule pilot.
+FRONTMATTER = re.compile(r"\A---\r?\n.*?\r?\n---\r?\n", re.DOTALL)
+AGENT_FRONTMATTER = re.compile(
+    r'\A---\r?\nname: (?P<name>[a-z0-9]+(?:-[a-z0-9]+)*)\r?\n'
+    r'description: "(?P<description>[^"\r\n]+)"\r?\n---\r?\n'
+)
+CURSOR_RULE_FRONTMATTER = re.compile(
+    r'\A---\r?\ndescription: "[^"\r\n]+"\r?\n'
+    r'alwaysApply: false\r?\n---\r?\n'
+)
+CURSOR_COMPONENTS = {"skills": "Skill", "commands": "Command", "agents": "Agent", "rules": "Rule"}
 
 
 def classify(path: Path) -> tuple[str, str] | None:
@@ -48,6 +61,87 @@ def section(content: str, name: str) -> str:
         content,
     )
     return match.group(1) if match else ""
+
+
+
+
+def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> list[str]:
+    """Check optional Cursor component references; cannot validate host execution."""
+    manifest_path = root / ".cursor-plugin" / "plugin.json"
+    if not manifest_path.exists():
+        return []
+    errors: list[str] = []
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (ValueError, OSError) as exc:
+        return [f".cursor-plugin/plugin.json: invalid JSON: {exc}"]
+    if not isinstance(manifest, dict) or manifest.get("name") != "agent-toolkit":
+        return [".cursor-plugin/plugin.json: invalid plugin name or structure"]
+    allowed = {"name", "description", *CURSOR_COMPONENTS}
+    if set(manifest) - allowed:
+        errors.append(".cursor-plugin/plugin.json: unexpected plugin fields")
+    if not isinstance(manifest.get("description"), str) or not manifest["description"].strip():
+        errors.append(".cursor-plugin/plugin.json: missing description")
+
+    for component, kind in CURSOR_COMPONENTS.items():
+        paths = manifest.get(component)
+        if not isinstance(paths, list) or not paths:
+            errors.append(f".cursor-plugin/plugin.json: {component} requires a list of paths")
+            continue
+        resolved: set[str] = set()
+        for raw in paths:
+            if (not isinstance(raw, str) or not raw.startswith("./")
+                    or ".." in PurePosixPath(raw).parts or "\\" in raw):
+                errors.append(f".cursor-plugin/plugin.json: unsafe plugin path {raw!r}")
+                continue
+            relative = PurePosixPath(raw[2:])
+            if not relative.parts:
+                errors.append(f".cursor-plugin/plugin.json: unsafe plugin path {raw!r}")
+                continue
+            entry = root.joinpath(*relative.parts)
+            if entry.is_dir():
+                candidates = (list(entry.glob("*/SKILL.md")) if component == "skills"
+                              else list(entry.glob("*.md")))
+            elif entry.is_file():
+                candidates = [entry]
+            else:
+                errors.append(f".cursor-plugin/plugin.json: missing plugin path {raw}")
+                continue
+            if not candidates:
+                errors.append(f".cursor-plugin/plugin.json: empty plugin path {raw}")
+            for candidate in candidates:
+                rel = candidate.relative_to(root).as_posix()
+                if rel in resolved:
+                    errors.append(f".cursor-plugin/plugin.json: duplicate {component} artifact {rel}")
+                resolved.add(rel)
+                if discovered.get(rel, (None, None))[0] != kind:
+                    errors.append(f".cursor-plugin/plugin.json: noncanonical {component} artifact {rel}")
+        if component == "rules":
+            # Discoverable .md is documented; active Rule loading still needs Cursor E2E verification.
+            if resolved != {"contexts/review/rules/code-review.md"}:
+                errors.append(".cursor-plugin/plugin.json: expected the single Review Rule pilot")
+            rule = root / "contexts/review/rules/code-review.md"
+            if rule.is_file() and not CURSOR_RULE_FRONTMATTER.match(rule.read_text(encoding="utf-8")):
+                errors.append("contexts/review/rules/code-review.md: invalid Cursor Rule pilot frontmatter")
+        else:
+            expected = {p for p, (artifact_kind, _) in discovered.items() if artifact_kind == kind}
+            if resolved != expected:
+                errors.append(f".cursor-plugin/plugin.json: {component} coverage mismatch"
+                              f" (missing={sorted(expected - resolved)}, extra={sorted(resolved - expected)})")
+        if component == "agents":
+            names: set[str] = set()
+            for rel in sorted(resolved):
+                file = root / rel
+                if not file.is_file():
+                    continue
+                match = AGENT_FRONTMATTER.match(file.read_text(encoding="utf-8"))
+                if not match or match.group("name") != file.stem:
+                    errors.append(f"{rel}: invalid portable Agent name/description frontmatter")
+                elif match.group("name") in names:
+                    errors.append(f"{rel}: duplicate Agent name {match.group('name')}")
+                else:
+                    names.add(match.group("name"))
+    return errors
 
 
 def lint_toolkit(root: Path) -> list[str]:
@@ -97,11 +191,8 @@ def lint_toolkit(root: Path) -> list[str]:
     for path in docs:
         rel = path.relative_to(root).as_posix()
         content = path.read_text(encoding="utf-8")
-        title_source = content
-        if path.name == "SKILL.md":
-            frontmatter = SKILL_FRONTMATTER.match(content)
-            if frontmatter is not None:
-                title_source = content[frontmatter.end():]
+        frontmatter = FRONTMATTER.match(content)
+        title_source = content[frontmatter.end():] if frontmatter else content
         if not title_source.lstrip().startswith("# "):
             errors.append(f"{rel}: expected a level-one title")
         for ref in PATH_REF.findall(content):
@@ -279,6 +370,7 @@ def lint_toolkit(root: Path) -> list[str]:
 
     for skill in sorted(skill_graph):
         visit(skill)
+    errors.extend(lint_cursor_plugin(root, discovered))
     return sorted(set(errors))
 
 

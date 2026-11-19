@@ -1,3 +1,8 @@
+---
+name: correctness-reviewer
+description: "Investigate behavioral correctness and regression risks as a read-only Code Review specialist assigned by the Review Lead."
+---
+
 # Correctness Reviewer
 
 ## Role

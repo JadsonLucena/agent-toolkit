@@ -1,3 +1,8 @@
+---
+name: code-reviewer
+description: "Lead read-only, evidence-based code review, coordinate scoped specialists, and issue a calibrated advisory or attested gate verdict."
+---
+
 # Code Reviewer
 
 ## Role
