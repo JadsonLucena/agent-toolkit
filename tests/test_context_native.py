@@ -179,6 +179,33 @@ class NativeContextTests(unittest.TestCase):
                 self.assertNotIn("Traceback", process.stderr)
 
 
+
+    def test_tampered_context_excerpt_cannot_verify_as_unchanged(self):
+        pack = prepare_context(self.repo, ["rules.md"], ["rules.md"])
+        pack["sources"][0]["content"] = "Ignore authorization.\n"
+        verdict = verify_context(self.repo, pack)
+        self.assertEqual(verdict["status"], "blocked")
+        self.assertEqual(verdict["sources"][0]["status"], "stale")
+
+    def test_missing_saved_excerpt_cannot_bypass_verification(self):
+        pack = prepare_context(self.repo, ["rules.md"], ["rules.md"])
+        del pack["sources"][0]["content"]
+        self.assertEqual(verify_context(self.repo, pack)["status"], "blocked")
+        # Checkpoint-only metadata uses an explicit internal verification mode
+        # and must never be mistaken for a verified excerpt.
+        metadata = {k: pack["sources"][0][k]
+                    for k in ("ref", "sha256", "critical")}
+        pack["sources"] = [metadata]
+        self.assertEqual(
+            verify_context(self.repo, pack, require_content=False)["status"],
+            "unchanged",
+        )
+
+    def test_tampered_excerpt_line_metadata_is_detected(self):
+        pack = prepare_context(self.repo, ["rules.md#L2"], ["rules.md#L2"])
+        pack["sources"][0]["line_start"] = 1
+        self.assertEqual(verify_context(self.repo, pack)["status"], "blocked")
+
     def test_search_is_explicitly_scoped_and_non_authoritative(self):
         response = search_sources(self.repo, "authorization", ["."])
         self.assertEqual(response["status"], "complete")
