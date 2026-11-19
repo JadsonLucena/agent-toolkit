@@ -1,6 +1,6 @@
 {
   "name": "agent-toolkit",
-  "description": "Vendor-neutral engineering guidance for Cursor using canonical Skills, Commands, Agents and Rules.",
+  "description": "Guide AI coding agents from change requests to reviewable software increments through requirements analysis, design, implementation, testing, code review, and Git workflows—with clear responsibilities, traceable evidence, and risk-aware verification.",
   "skills": [
     "./contexts/requirements/skills",
     "./contexts/design/skills",

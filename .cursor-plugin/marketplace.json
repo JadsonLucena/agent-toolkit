@@ -7,7 +7,7 @@
     {
       "name": "agent-toolkit",
       "source": ".",
-      "description": "Vendor-neutral software engineering guidance for AI coding agents."
+      "description": "Guide AI coding agents from change requests to reviewable software increments through requirements analysis, design, implementation, testing, code review, and Git workflows—with clear responsibilities, traceable evidence, and risk-aware verification."
     }
   ]
 }
