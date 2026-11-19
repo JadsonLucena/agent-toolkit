@@ -52,4 +52,10 @@ explicit scopes. Search hits only suggest candidate sources; they are not
 complete evidence. The scan has fixed file and result ceilings, and reports
 incomplete/truncated results rather than asserting exhaustive coverage.
 
+The separate optional [SQLite FTS5 adapter](FTS5.md) is **not called by this
+native entrypoint**. Its default auto mode also stays native-only; it can use
+an explicitly approved, already-built local index only when the native scan
+reports `incomplete` and the host enables optional lookup, or under an
+explicit indexed request. SQLite presence by itself is never activation.
+
 No automatic installation or provider configuration takes place.
