@@ -25,7 +25,7 @@ SKILL_FRONTMATTER = re.compile(
     r'description: "(?P<description>[^"\n]+)"\r?\n---\r?\n',
 )
 
-# Portable frontmatter on Agents and the opt-in Cursor Rule pilot.
+# Portable frontmatter on Agents and canonical Rules exposed through the optional Cursor plugin.
 FRONTMATTER = re.compile(r"\A---\r?\n.*?\r?\n---\r?\n", re.DOTALL)
 AGENT_FRONTMATTER = re.compile(
     r'\A---\r?\nname: (?P<name>[a-z0-9]+(?:-[a-z0-9]+)*)\r?\n'
@@ -141,18 +141,17 @@ def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> li
                 resolved.add(rel)
                 if discovered.get(rel, (None, None))[0] != kind:
                     errors.append(f".cursor-plugin/plugin.json: noncanonical {component} artifact {rel}")
+        expected = {p for p, (artifact_kind, _) in discovered.items() if artifact_kind == kind}
+        if resolved != expected:
+            errors.append(f".cursor-plugin/plugin.json: {component} coverage mismatch"
+                          f" (missing={sorted(expected - resolved)}, extra={sorted(resolved - expected)})")
         if component == "rules":
-            # Discoverable .md is documented; active Rule loading still needs Cursor E2E verification.
-            if resolved != {"contexts/review/rules/code-review.md"}:
-                errors.append(".cursor-plugin/plugin.json: expected the single Review Rule pilot")
-            rule = root / "contexts/review/rules/code-review.md"
-            if rule.is_file() and not CURSOR_RULE_FRONTMATTER.match(rule.read_text(encoding="utf-8")):
-                errors.append("contexts/review/rules/code-review.md: invalid Cursor Rule pilot frontmatter")
-        else:
-            expected = {p for p, (artifact_kind, _) in discovered.items() if artifact_kind == kind}
-            if resolved != expected:
-                errors.append(f".cursor-plugin/plugin.json: {component} coverage mismatch"
-                              f" (missing={sorted(expected - resolved)}, extra={sorted(resolved - expected)})")
+            # Plugin rule discovery is observed; contextual activation still requires Cursor E2E evidence.
+            for rel in sorted(resolved):
+                rule = root / rel
+                if (rule.is_file() and not CURSOR_RULE_FRONTMATTER.match(
+                        rule.read_text(encoding="utf-8"))):
+                    errors.append(f"{rel}: invalid Cursor Rule frontmatter")
         if component == "agents":
             names: set[str] = set()
             for rel in sorted(resolved):

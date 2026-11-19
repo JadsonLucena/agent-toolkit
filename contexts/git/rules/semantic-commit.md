@@ -1,3 +1,8 @@
+---
+description: "Apply when planning, staging, composing, or verifying commits and their conventional messages; preserve atomic intent and repository conventions."
+alwaysApply: false
+---
+
 # Semantic Commit Rules
 
 ## Core Principles

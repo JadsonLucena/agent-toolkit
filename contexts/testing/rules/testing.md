@@ -1,3 +1,8 @@
+---
+description: "Apply when designing, implementing, evaluating, or maintaining automated tests and evidence of behavioral coverage."
+alwaysApply: false
+---
+
 # Automated Testing Rules
 
 ## Core Principles

@@ -1,3 +1,8 @@
+---
+description: "Apply when building, refining, prioritizing, or slicing backlog items from supported requirements or other authorized work sources."
+alwaysApply: false
+---
+
 # Backlog Rules
 
 Apply `contexts/requirements/rules/tailoring.md` when deciding how much decomposition, traceability, slicing, and planning detail are necessary.

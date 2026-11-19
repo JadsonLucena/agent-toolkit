@@ -1,3 +1,8 @@
+---
+description: "Apply when eliciting, specifying, analyzing, or validating requirements and domain semantics with traceable evidence."
+alwaysApply: false
+---
+
 # Requirements Rules
 
 Apply `contexts/requirements/rules/tailoring.md` when deciding how much rigor and representation are necessary.

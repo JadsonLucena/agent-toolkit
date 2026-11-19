@@ -1,3 +1,8 @@
+---
+description: "Apply during code review when investigating supported high-risk patterns and falsifying safety guarantees; not an automatic finding or blocker."
+alwaysApply: false
+---
+
 # High-Risk Review Patterns
 
 ## Purpose

@@ -1,3 +1,8 @@
+---
+description: "Apply when coordinating an explicitly authorized, multi-context engineering delivery or handoff; preserve stage gates and specialist ownership."
+alwaysApply: false
+---
+
 # Delivery Rules
 
 ## Composition and Ownership

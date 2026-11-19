@@ -339,10 +339,56 @@ class ToolkitLintTests(unittest.TestCase):
                     '---\n\n# Code Reviewer', 'model: cursor\n---\n\n# Code Reviewer')
         self.assert_error("invalid portable Agent name/description frontmatter")
 
+    def test_cursor_plugin_lists_every_canonical_rule_once(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        import json
+        manifest = json.loads(
+            (self.root / ".cursor-plugin/plugin.json").read_text(encoding="utf-8")
+        )
+        actual = set(manifest["rules"])
+        expected = {
+            "./" + path.relative_to(self.root).as_posix()
+            for path in (self.root / "contexts").glob("*/rules/*.md")
+        }
+        self.assertEqual(expected, actual)
+        self.assertEqual(14, len(actual))
+
+    def test_cursor_plugin_rejects_missing_canonical_rule(self):
+        target = self.root / ".cursor-plugin/plugin.json"
+        import json
+        manifest = json.loads(target.read_text(encoding="utf-8"))
+        manifest["rules"].remove("./contexts/git/rules/gitflow.md")
+        target.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("rules coverage mismatch")
+
+    def test_cursor_plugin_rejects_duplicate_rule(self):
+        target = self.root / ".cursor-plugin/plugin.json"
+        import json
+        manifest = json.loads(target.read_text(encoding="utf-8"))
+        manifest["rules"].append("./contexts/review/rules/code-review.md")
+        target.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("duplicate rules artifact")
+
+    def test_cursor_rule_requires_description(self):
+        self.change("contexts/requirements/rules/tailoring.md",
+                    "description: ", "undocumented: ")
+        self.assert_error("invalid Cursor Rule frontmatter")
+
+    def test_cursor_rules_remain_not_always_applied(self):
+        self.change("contexts/git/rules/gitflow.md",
+                    "alwaysApply: false", "alwaysApply: true")
+        self.assert_error("invalid Cursor Rule frontmatter")
+
+    def test_cursor_rejects_rule_directory_in_array(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/testing/rules/testing.md",
+                    "./contexts/testing/rules")
+        self.assert_error("rules requires explicit file paths")
+
     def test_cursor_rule_pilot_cannot_be_always_on(self):
         self.change("contexts/review/rules/code-review.md",
                     "alwaysApply: false", "alwaysApply: true")
-        self.assert_error("invalid Cursor Rule pilot frontmatter")
+        self.assert_error("invalid Cursor Rule frontmatter")
 
 
 if __name__ == "__main__":
