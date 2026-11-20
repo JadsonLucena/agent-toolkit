@@ -37,6 +37,7 @@ No host was executed automatically by this repository's CI. Differences in runti
 ```sh
 python3 scripts/routing_evals.py --kind skill \
   --template-host cursor --plugin-revision ACTUAL_INSTALLED_SHA \
+  --host-version ACTUAL_CURSOR_VERSION \
   > /tmp/cursor-skills-observations.json
 
 # Fill each scenario from fresh host event evidence before scoring:
@@ -50,6 +51,7 @@ A collected file has this shape:
 {
   "schema_version": 1,
   "host": "cursor",
+  "host_version": "3.29.15",
   "plugin_revision": "ACTUAL_INSTALLED_SHA",
   "results": [
     {

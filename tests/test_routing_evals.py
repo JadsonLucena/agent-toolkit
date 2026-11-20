@@ -34,6 +34,7 @@ class RoutingEvalsTests(unittest.TestCase):
         data = {
             "schema_version": 1,
             "host": "cursor",
+            "host_version": "3.29.15",
             "plugin_revision": "0123456789abcdef",
             "results": results,
         }
@@ -146,6 +147,24 @@ class RoutingEvalsTests(unittest.TestCase):
                 "id": "skill-example-positive", "status": "not-run",
                 "events": [self.event("requirements-validation")]
             }]))
+
+    def test_measured_route_requires_host_version(self):
+        case = self.case()
+        result = {
+            "id": case["id"], "status": "observed",
+            "events": [self.event("requirements-validation")],
+        }
+        with self.assertRaisesRegex(ValueError, "host_version"):
+            score_observations([case], self.observations([result], host_version="not-recorded"))
+
+    def test_report_includes_coverage_and_true_negatives(self):
+        case = self.case(expected=[], forbidden=["requirements-definition"])
+        report = score_observations([case], self.observations([{
+            "id": case["id"], "status": "observed", "events": []
+        }]))
+        self.assertEqual(1.0, report["coverage"])
+        self.assertEqual(1, report["true_negative_cases"])
+        self.assertEqual("3.29.15", report["host_version"])
 
     def test_template_is_not_run(self):
         case = self.case()

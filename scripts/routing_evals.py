@@ -100,6 +100,9 @@ def score_observations(cases: list[dict], observations: dict) -> dict:
             or not observations["plugin_revision"].strip()
             or observations["plugin_revision"] in {"not-installed", "ACTUAL_INSTALLED_SHA"}):
         raise ValueError("observations: record an actual installed plugin_revision")
+    host_version = observations.get("host_version", "not-recorded")
+    if not isinstance(host_version, str) or not host_version.strip():
+        raise ValueError("observations: invalid host_version")
     results = observations.get("results")
     if not isinstance(results, list):
         raise ValueError("observations: results must be an array")
@@ -117,7 +120,7 @@ def score_observations(cases: list[dict], observations: dict) -> dict:
     # Superset results are permitted when scoring a single capability kind.
 
     total_tp = total_fp = total_fn = forbidden_activations = 0
-    measured = unsupported = 0
+    measured = unsupported = true_negative_cases = 0
     failures: list[dict] = []
     pending: list[str] = []
     for case in cases:
@@ -137,6 +140,8 @@ def score_observations(cases: list[dict], observations: dict) -> dict:
             continue
         if status != "observed":
             raise ValueError(f"{identifier}: status must be observed, not-run, or unsupported")
+        if host_version in {"not-recorded", "unknown", "unverified"}:
+            raise ValueError("observations: measured cases require an actual host_version")
         events = result.get("events")
         if not isinstance(events, list):
             raise ValueError(f"{identifier}: observed status requires an events array")
@@ -151,6 +156,8 @@ def score_observations(cases: list[dict], observations: dict) -> dict:
             if event["kind"] == case["kind"]:
                 selected.add(event["name"])
         measured += 1
+        if not case["expected"] and not selected:
+            true_negative_cases += 1
         expected = set(case["expected"])
         forbidden = set(case["forbidden"])
         tp = len(selected & expected)
@@ -173,8 +180,11 @@ def score_observations(cases: list[dict], observations: dict) -> dict:
     return {
         "status": ("FAIL" if failures else "INCOMPLETE" if pending or unsupported else "PASS"),
         "host": observations["host"],
+        "host_version": host_version,
         "plugin_revision": observations["plugin_revision"],
         "total_cases": len(cases),
+        "coverage": measured / len(cases) if cases else None,
+        "true_negative_cases": true_negative_cases,
         "measured_cases": measured,
         "not_run_cases": len(pending),
         "unsupported_cases": unsupported,
@@ -189,10 +199,11 @@ def score_observations(cases: list[dict], observations: dict) -> dict:
     }
 
 
-def make_template(cases: list[dict], host: str, plugin_revision: str) -> dict:
+def make_template(cases: list[dict], host: str, plugin_revision: str, host_version: str = "not-recorded") -> dict:
     return {
         "schema_version": 1,
         "host": host,
+        "host_version": host_version,
         "plugin_revision": plugin_revision,
         "results": [
             {"id": case["id"], "status": "not-run", "events": []}
@@ -208,6 +219,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--kind", choices=KINDS, help="score one capability kind")
     parser.add_argument("--template-host", choices=HOSTS, help="print a not-run observation template; does not execute a host")
     parser.add_argument("--plugin-revision", default="not-installed", help="record the actual installed SHA for a template")
+    parser.add_argument("--host-version", default="not-recorded", help="record the exact host version used in this run")
     args = parser.parse_args(argv)
     try:
         catalog = json.loads(Path(args.catalog).read_text(encoding="utf-8"))
@@ -218,7 +230,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         cases = [case for case in catalog["cases"] if not args.kind or case["kind"] == args.kind]
         if args.template_host:
-            print(json.dumps(make_template(cases, args.template_host, args.plugin_revision), indent=2))
+            print(json.dumps(make_template(cases, args.template_host, args.plugin_revision, args.host_version), indent=2))
             return 0
         if not args.observations:
             print(f"STRUCTURAL_PASS; NOT_MEASURED: {len(cases)} routing scenarios validated; no host activation evidence supplied")
