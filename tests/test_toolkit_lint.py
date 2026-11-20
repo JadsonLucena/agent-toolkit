@@ -85,15 +85,17 @@ class ToolkitLintTests(unittest.TestCase):
         self.assert_error("duplicate canonical ownership")
 
     def test_read_only_boundary_regression(self):
+        # Do not mutate the new discovery frontmatter: only the canonical
+        # Invocation and Boundary sections define actual authorization.
         self.change(
             "contexts/git/commands/plan-pull-requests.md",
-            "read-only",
-            "non-mutating",
+            "Invocation authorizes read-only analysis",
+            "Invocation authorizes non-mutating analysis",
         )
         self.change(
             "contexts/git/commands/plan-pull-requests.md",
-            "read-only",
-            "non-mutating",
+            "This command is read-only.",
+            "This command is non-mutating.",
         )
         self.assert_error("planning must remain read-only")
 
