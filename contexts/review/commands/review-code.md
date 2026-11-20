@@ -1,3 +1,8 @@
+---
+name: review-code
+description: "Review an explicit code change read-only with risk-proportionate evidence and one verdict. Use for a requested Review gate, not ordinary implementation checks."
+---
+
 # Review Code
 
 ## Intent

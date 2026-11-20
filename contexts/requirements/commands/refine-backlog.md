@@ -1,3 +1,8 @@
+---
+name: refine-backlog
+description: "Improve existing backlog items, slicing, dependencies, and readiness while preserving source requirements. Use for backlog refinement, not new requirements."
+---
+
 # Refine Backlog
 
 ## Intent

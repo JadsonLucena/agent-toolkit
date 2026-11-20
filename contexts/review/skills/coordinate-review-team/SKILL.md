@@ -1,6 +1,6 @@
 ---
 name: coordinate-review-team
-description: "Select and coordinate risk-proportionate code-review specialists, peer challenges, and verification. Use observed isolated or relayed modes when supported, otherwise native fallback."
+description: "Coordinate scoped code-review specialists and finding verification when distinct risk concerns justify delegation. Use isolated or relayed teams only when observed; otherwise native review."
 ---
 
 # Coordinate Review Team

@@ -1,6 +1,6 @@
 ---
 name: verify-findings
-description: "Falsify, verify, classify, and deduplicate code-review findings against source and tests. Use for material candidates before triage, not only potential blockers."
+description: "Falsify, verify, and deduplicate candidate Code Review findings against actual source and tests. Use after findings arise, not for initial review or test generation."
 ---
 
 # Verify Review Findings

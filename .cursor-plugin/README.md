@@ -8,9 +8,9 @@ The plugin references the **original canonical sources** under `contexts/` and `
 
 `name` on Skills and Agents is a **stable invocation identifier**; it is not a display-title rewrite. Changing a Skill directory or Agent filename requires a migration of canonical references, manifests, and callers. The audit retained the existing identifiers because their meanings still match their responsibilities.
 
-`description` is a **discovery and routing hint**: identify the supported operation, when it applies, and important scope/authorization limits. It must not promise runtime enforcement, isolation, or completed verification. Rules use their canonical filename as identity, a contextual description, and `alwaysApply: false`; Commands currently use their canonical filename plus the `## Intent` section, not independent YAML metadata.
+`description` is a **discovery and routing hint**: identify the supported operation, when it applies, and important scope/authorization limits. It must not promise runtime enforcement, isolation, or completed verification. Rules use their canonical filename as identity, a contextual description, and `alwaysApply: false`; Commands now also expose portable `name` and `description` frontmatter for discovery, while their `## Intent`, `## Invocation`, and `## Boundary` sections remain the source of invocation semantics and authorization.
 
-The structural linter guards identity uniqueness and description shape, but cannot establish routing relevance, Rule activation, or Agent dispatch; those require separate runtime evidence.
+Structural checks guard names, description shape, and canonical coverage; they do not establish routing relevance, Rule activation, Command dispatch, or Agent isolation. The portable routing evaluation catalog and host-evidence protocol are documented in [`evals/routing/README.md`](../evals/routing/README.md).
 
 ## Components and limitations
 

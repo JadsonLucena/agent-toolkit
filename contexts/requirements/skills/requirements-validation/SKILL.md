@@ -1,6 +1,6 @@
 ---
-name: validation
-description: "Assess requirements read-only for ambiguity, conflicts, missing evidence, traceability, readiness, and disproportionate rigor. Use before downstream decisions."
+name: requirements-validation
+description: "Validate existing requirements read-only for ambiguity, conflicts, traceability, and downstream readiness. Use for quality assessment, not authoring or changing requirements."
 ---
 
 # Requirements Validation

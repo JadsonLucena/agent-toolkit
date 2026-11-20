@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: "Lead risk-proportionate read-only code review, select specialists, verify findings, and issue one advisory or independently attested gate verdict for an explicit change."
+description: "Lead an explicitly requested, read-only Code Review with risk-selected specialists and verified findings. Issue one advisory or independently attested gate verdict, never remediation."
 ---
 
 # Code Reviewer

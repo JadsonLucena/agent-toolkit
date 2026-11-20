@@ -31,6 +31,7 @@ AGENT_FRONTMATTER = re.compile(
     r'\A---\r?\nname: (?P<name>[a-z0-9]+(?:-[a-z0-9]+)*)\r?\n'
     r'description: "(?P<description>[^"\r\n]+)"\r?\n---\r?\n'
 )
+COMMAND_FRONTMATTER = AGENT_FRONTMATTER  # Same portable name/description shape; distinct invocation semantics.
 CURSOR_RULE_FRONTMATTER = re.compile(
     r'\A---\r?\ndescription: "(?P<description>[^"\r\n]+)"\r?\n'
     r'alwaysApply: false\r?\n---\r?\n'
@@ -191,16 +192,18 @@ def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> li
                 errors.append(f"{rel}: duplicate {kind} public name {public_name} "
                               f"(also {seen_public_names[key]})")
             seen_public_names[key] = rel
-        if kind == "Command":
-            # Commands use their filename and Intent; they have no frontmatter.
-            continue
         content = (root / rel).read_text(encoding="utf-8")
         pattern = {"Skill": SKILL_FRONTMATTER,
                    "Agent": AGENT_FRONTMATTER,
+                   "Command": COMMAND_FRONTMATTER,
                    "Rule": CURSOR_RULE_FRONTMATTER}[kind]
         match = pattern.match(content)
         if match is None:
-            continue  # Shape errors are reported by the existing artifact checks.
+            if kind == "Command":
+                errors.append(f"{rel}: missing portable Command name/description frontmatter")
+            continue  # Other shape errors are reported by existing artifact checks.
+        if kind == "Command" and match.group("name") != Path(rel).stem:
+            errors.append(f"{rel}: invalid portable Command name (must match filename)")
         description = match.group("description").strip()
         if not 50 <= len(description) <= 260:
             errors.append(f"{rel}: metadata description must have 50-260 meaningful characters")

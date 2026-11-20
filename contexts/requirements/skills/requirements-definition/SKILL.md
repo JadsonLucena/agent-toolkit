@@ -1,6 +1,6 @@
 ---
-name: definition
-description: "Specify verifiable functional, quality, temporal, and domain requirements from supported evidence. Use when needs are understood enough to define acceptance semantics."
+name: requirements-definition
+description: "Define traceable functional, quality, and temporal requirements from supported stakeholder evidence. Use after elicitation, not to validate existing specifications or plan backlog."
 ---
 
 # Requirements Definition

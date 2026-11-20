@@ -30,8 +30,8 @@ class TemporalRequirementsPolicyTests(unittest.TestCase):
             self.assertIn(token, rule)
 
     def test_lifecycle_routes_temporal_cases_without_requiring_fret(self):
-        definition = read("contexts/requirements/skills/definition/SKILL.md")
-        validation = read("contexts/requirements/skills/validation/SKILL.md")
+        definition = read("contexts/requirements/skills/requirements-definition/SKILL.md")
+        validation = read("contexts/requirements/skills/requirements-validation/SKILL.md")
         self.assertIn("DetermineApplicableSemantics --> AssessTemporalProperties", definition)
         self.assertIn("Temporal Behavior and Formal Assurance", definition)
         self.assertIn('Temporal["Temporal Behavior and Formal Assurance when applicable"]', validation)

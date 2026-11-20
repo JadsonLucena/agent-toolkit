@@ -1,3 +1,8 @@
+---
+name: determine-semantic-version
+description: "Assess API compatibility and repository release policy to recommend a SemVer increment. Use for version analysis without tagging or release mutations."
+---
+
 # Determine Semantic Version
 
 ## Intent

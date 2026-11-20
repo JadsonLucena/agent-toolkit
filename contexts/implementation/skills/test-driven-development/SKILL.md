@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "Apply an optional RED/GREEN/REFACTOR loop to a supported behavior within an authorized implementation slice. Use when TDD is selected and test outcomes can be verified."
+description: "Run a conditional RED/GREEN/REFACTOR loop for an authorized implementation behavior. Use only when TDD is selected, not for every test generation or code review."
 ---
 
 # Test-Driven Development

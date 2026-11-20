@@ -119,6 +119,20 @@ Contracts are supporting artifact kinds outside the four canonical behavioral ar
 
 Rules may include an optional `## Foundational Guidance` section when established standards, specifications, books, papers, or engineering practices materially shaped the rule. The section documents conceptual provenance and interpretation; it must not contain reusable procedure or silently override repository, organization, stakeholder, or domain-specific policy. Include only material references, and do not add the section merely for structural symmetry.
 
+## Discovery and Routing Metadata
+
+Metadata is a **discovery hint**, not a policy, procedure, permission grant, or runtime execution guarantee. Author the smallest unambiguous public identity and **front-load the matching task and trigger**, since hosts may expose only metadata or truncate descriptions.
+
+- **Skill:** `name` matches its directory and identifies one reusable operation; `description` states what it does, when it should activate, and a non-applicable adjacent task when ambiguity exists. Use explicit domain-qualified names when a generic term such as `validation` would collide in a shared catalog.
+- **Agent:** `name` matches the specialist filename; `description` identifies the delegated investigation or authority, the trigger, and its boundary with the lead or neighboring specialists. Never imply independent spawning solely because the file was registered.
+- **Command:** `name` matches the command filename; `description` identifies the explicit operation, required target, and meaningful authorization boundary. The existing `## Intent`, `## Invocation`, and `## Boundary` sections remain authoritative. Frontmatter must not confer additional permission.
+- **Rule:** `description` states the applicability condition and governed invariant, including exclusions such as Gitflow-only rules. The optional Cursor `alwaysApply: false` marks Rules as requestable, not as proven contextually loaded.
+- **Contract:** is selected by a canonical reference or handoff obligation; it does not acquire an Agent/Skill routing description.
+
+Stable names must be unique within their public capability kind. Renames update every reference, manifest, ownership entry and regression fixture atomically. Avoid keyword stuffing, unverifiable claims (for example \"guarantees correctness\"), duplicated normative instructions, and generic descriptions that fit unrelated tasks. Description length is an editorial heuristic; **correct trigger and exclusion semantics take precedence over a universal character count**.
+
+Host-specific discovery and invocation settings belong in optional integrations. Evaluate selection with positive, negative and adjacent prompts plus **observed host events**; structural lint alone cannot establish activation, correct delegation or permission enforcement.
+
 ## Artifact Matrix
 
 | Context | Artifact | Type | Authoritative responsibility |
@@ -127,9 +141,9 @@ Rules may include an optional `## Foundational Guidance` section when establishe
 | Requirements | `rules/requirements.md` | Rule | Strategic framing, requirement semantics, evidence, ambiguity, quality, acceptance, change impact, and traceability invariants |
 | Requirements | `rules/backlog.md` | Rule | Backlog integrity, decomposition, readiness, dependency, tracker compatibility, refinement, and closure invariants |
 | Requirements | `skills/elicitation/SKILL.md` | Skill | Discover and consolidate supported stakeholder needs and unknowns |
-| Requirements | `skills/definition/SKILL.md` | Skill | Transform supported needs into verifiable requirement definitions at the required rigor |
+| Requirements | `skills/requirements-definition/SKILL.md` | Skill | Transform supported needs into verifiable requirement definitions at the required rigor |
 | Requirements | `skills/example-discovery/SKILL.md` | Skill | Discover domain examples, counterexamples, boundaries, and questions before test automation |
-| Requirements | `skills/validation/SKILL.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
+| Requirements | `skills/requirements-validation/SKILL.md` | Skill | Read-only, risk-proportional validation and cross-artifact consistency analysis |
 | Requirements | `skills/backlog-planning/SKILL.md` | Skill | Build or refine traceable planning items while preserving source semantics |
 | Requirements | `commands/specify-and-plan-change.md` | Command | Route the minimum necessary Requirements capabilities toward validated planning; specialist orchestration remains with agents |
 | Requirements | `commands/elicit-requirements.md` | Command | Start requirements discovery |

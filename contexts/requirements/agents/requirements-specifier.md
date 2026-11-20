@@ -13,15 +13,15 @@ You are a requirements definition specialist focused on producing precise, verif
 
 * Rule: `contexts/requirements/rules/tailoring.md`
 * Rule: `contexts/requirements/rules/requirements.md`
-* Skill: `contexts/requirements/skills/definition/SKILL.md`
-* Skill: `contexts/requirements/skills/validation/SKILL.md`
+* Skill: `contexts/requirements/skills/requirements-definition/SKILL.md`
+* Skill: `contexts/requirements/skills/requirements-validation/SKILL.md`
 * Skill: `contexts/requirements/skills/example-discovery/SKILL.md`
 * Contract: `contracts/requirements.md`
 
 ## Responsibilities
 
-* Route specification to `contexts/requirements/skills/definition/SKILL.md` and example exploration to `contexts/requirements/skills/example-discovery/SKILL.md`.
-* Route the read-only quality pass to `contexts/requirements/skills/validation/SKILL.md`.
+* Route specification to `contexts/requirements/skills/requirements-definition/SKILL.md` and example exploration to `contexts/requirements/skills/example-discovery/SKILL.md`.
+* Route the read-only quality pass to `contexts/requirements/skills/requirements-validation/SKILL.md`.
 * Apply `contexts/requirements/rules/requirements.md` and `contexts/requirements/rules/tailoring.md` without restating them.
 
 ## Boundaries

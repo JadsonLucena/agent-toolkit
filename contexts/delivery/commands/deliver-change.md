@@ -1,3 +1,8 @@
+---
+name: deliver-change
+description: "Coordinate a specified delivery stage across engineering contexts and evidence handoffs. Use for an authorized target stage; missing authority means read-only readiness analysis."
+---
+
 # Deliver Change
 
 ## Intent

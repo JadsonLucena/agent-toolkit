@@ -1,3 +1,8 @@
+---
+name: implement-slice
+description: "Implement a specifically authorized, verifiable software slice with local tests and safe Git handoffs. Use for production changes, not standalone test generation."
+---
+
 # Implement Slice
 
 ## Intent

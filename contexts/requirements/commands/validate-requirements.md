@@ -1,3 +1,8 @@
+---
+name: validate-requirements
+description: "Assess an existing requirements specification read-only for quality, ambiguity, and readiness. Use before a downstream decision; do not edit requirements."
+---
+
 # Validate Requirements
 
 ## Intent
@@ -13,7 +18,7 @@ This command selects the Requirements Specifier and validation workflow. It auth
 * Rule: `contexts/requirements/rules/tailoring.md`
 
 * Agent: `contexts/requirements/agents/requirements-specifier.md`
-* Skill: `contexts/requirements/skills/validation/SKILL.md`
+* Skill: `contexts/requirements/skills/requirements-validation/SKILL.md`
 * Rule: `contexts/requirements/rules/requirements.md`
 * Contract: `contracts/requirements.md`
 

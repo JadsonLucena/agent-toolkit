@@ -1,3 +1,8 @@
+---
+name: commit
+description: "Create verified atomic commits for an explicitly authorized change set. Use for local commit creation, never implicit push, merge, release, or history rewrite."
+---
+
 # Commit
 
 ## Intent

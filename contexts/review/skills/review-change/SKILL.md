@@ -1,6 +1,6 @@
 ---
 name: review-change
-description: "Review an explicit code diff read-only with risk-proportionate coverage, verified findings, and evidence. Use for advisory review or an independently attested gate."
+description: "Review a bounded diff read-only with evidence-backed findings and risk-proportionate coverage. Use for an explicit Review request or authorized gate, not routine implementation checks."
 ---
 
 # Review Change

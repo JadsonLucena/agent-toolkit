@@ -58,7 +58,7 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_broken_canonical_reference(self):
         self.change(
-            "contexts/requirements/skills/definition/SKILL.md",
+            "contexts/requirements/skills/requirements-definition/SKILL.md",
             "contexts/requirements/skills/example-discovery/SKILL.md",
             "contexts/requirements/skills/never-existed/SKILL.md",
         )
@@ -66,7 +66,7 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_skill_cannot_depend_on_command(self):
         self.change(
-            "contexts/requirements/skills/definition/SKILL.md",
+            "contexts/requirements/skills/requirements-definition/SKILL.md",
             "## Uses\n",
             "## Uses\n\n* Command: \x60contexts/requirements/commands/specify-and-plan-change.md\x60\n",
         )
@@ -282,7 +282,7 @@ class ToolkitLintTests(unittest.TestCase):
         self.change(
             "contexts/requirements/skills/example-discovery/SKILL.md",
             "## Uses\n",
-            "## Uses\n\n* Skill: \x60contexts/requirements/skills/definition/SKILL.md\x60\n",
+            "## Uses\n\n* Skill: \x60contexts/requirements/skills/requirements-definition/SKILL.md\x60\n",
         )
         self.assert_error("cyclic Skill -> Skill")
 
@@ -291,7 +291,7 @@ class ToolkitLintTests(unittest.TestCase):
         self.assertEqual([], lint_toolkit(self.root))
 
     def test_metadata_description_cannot_be_empty_or_vague(self):
-        path = "contexts/requirements/skills/definition/SKILL.md"
+        path = "contexts/requirements/skills/requirements-definition/SKILL.md"
         content = (self.root / path).read_text(encoding="utf-8")
         original = next(line for line in content.splitlines()
                         if line.startswith("description: "))
@@ -317,6 +317,31 @@ class ToolkitLintTests(unittest.TestCase):
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
         self.assert_error("duplicate Skill public name")
+
+    def test_command_frontmatter_must_match_public_filename(self):
+        self.change("contexts/review/commands/review-code.md",
+                    "name: review-code", "name: unrelated-command")
+        self.assert_error("invalid portable Command name")
+
+    def test_command_frontmatter_is_required(self):
+        self.change("contexts/testing/commands/generate-tests.md",
+                    "name: generate-tests", "command: generate-tests")
+        self.assert_error("missing portable Command name/description frontmatter")
+
+    def test_command_description_is_discovery_metadata(self):
+        path = "contexts/git/commands/commit.md"
+        content = (self.root / path).read_text(encoding="utf-8")
+        description = next(line for line in content.splitlines()
+                           if line.startswith("description: "))
+        self.change(path, description, 'description: "Perform Git actions."')
+        self.assert_error("metadata description must have 50-260 meaningful characters")
+
+    def test_requirements_skills_have_domain_qualified_public_names(self):
+        for name in ("requirements-definition", "requirements-validation"):
+            path = self.root / "contexts/requirements/skills" / name / "SKILL.md"
+            self.assertTrue(path.is_file())
+            self.assertIn(f"name: {name}", path.read_text(encoding="utf-8"))
+        self.assertEqual([], lint_toolkit(self.root))
 
     def test_cursor_plugin_manifest_covers_canonical_sources(self):
         self.assertEqual([], lint_toolkit(self.root))
