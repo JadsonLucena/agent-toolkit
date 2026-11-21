@@ -1,3 +1,8 @@
+---
+name: prepare-pull-request
+description: "Inspect an implemented diff to prepare PR scope, title, description, checks, and readiness. Use for read-only preparation, not remote PR creation."
+---
+
 # Prepare Pull Request
 
 ## Intent

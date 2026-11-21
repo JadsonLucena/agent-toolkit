@@ -1,3 +1,8 @@
+---
+name: generate-tests
+description: "Design and write automated tests for a specified behavior or risk within test-edit scope. Use for test generation, not unrelated production implementation."
+---
+
 # Generate Tests
 
 ## Intent

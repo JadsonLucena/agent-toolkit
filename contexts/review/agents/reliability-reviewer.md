@@ -1,3 +1,8 @@
+---
+name: reliability-reviewer
+description: "Review data consistency, concurrency, retries, idempotency, migrations, and partial failures in a code change. Read-only specialist scoped by the Code Review Lead."
+---
+
 # Data and Reliability Reviewer
 
 ## Role

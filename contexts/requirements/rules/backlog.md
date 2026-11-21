@@ -1,3 +1,8 @@
+---
+description: "Apply when building, refining, slicing, or assessing readiness of traceable backlog items; preserve supported scope, dependencies, and acceptance semantics."
+alwaysApply: false
+---
+
 # Backlog Rules
 
 Apply `contexts/requirements/rules/tailoring.md` when deciding how much decomposition, traceability, slicing, and planning detail are necessary.

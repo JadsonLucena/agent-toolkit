@@ -1,3 +1,8 @@
+---
+name: create-pull-request
+description: "Create a remote pull request for a published head with verified readiness and a truthful description. Use only with explicit PR creation authorization."
+---
+
 # Create Pull Request
 
 ## Intent

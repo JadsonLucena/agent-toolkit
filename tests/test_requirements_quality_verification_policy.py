@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RULE = ROOT / "contexts/requirements/rules/requirements.md"
-VALIDATION = ROOT / "contexts/requirements/skills/validation/SKILL.md"
+VALIDATION = ROOT / "contexts/requirements/skills/requirements-validation/SKILL.md"
 CONTRACT = ROOT / "contracts/requirements.md"
 TEST_BASIS = ROOT / "contracts/test-basis.md"
 

@@ -1,3 +1,8 @@
+---
+description: "Apply when planning, preparing, creating, reviewing readiness for, or integrating a pull request; preserve scope and authorization gates."
+alwaysApply: false
+---
+
 # Pull Request Rules
 
 ## Core Principle

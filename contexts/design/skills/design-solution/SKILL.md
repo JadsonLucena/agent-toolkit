@@ -1,6 +1,6 @@
 ---
 name: design-solution
-description: "Turn validated requirements or a bounded technical change into an evidence-backed design for the next implementation slice."
+description: "Design a bounded implementation slice from supported change intent, evaluating interfaces, alternatives, compatibility, and recovery. Use for technical decisions, not code edits."
 ---
 
 # Design Solution

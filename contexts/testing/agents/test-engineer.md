@@ -1,3 +1,8 @@
+---
+name: test-engineer
+description: "Design, create, and diagnose automated tests and verification evidence within authorized test scope. Use for test quality without unrelated production edits."
+---
+
 # Test Engineer
 
 ## Role

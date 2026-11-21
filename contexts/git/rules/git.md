@@ -1,3 +1,8 @@
+---
+description: "Apply when inspecting or changing Git state, synchronization, history, branches, worktrees, remote refs, or pre-commit/PR checks; preserve repository safety and explicit authorization."
+alwaysApply: false
+---
+
 # Git Rules
 
 ## Core Principles

@@ -22,6 +22,8 @@ class ToolkitLintTests(unittest.TestCase):
         if (ROOT / "adapters").is_dir():
             shutil.copytree(ROOT / "adapters", self.root / "adapters",
                             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        if (ROOT / ".cursor-plugin").is_dir():
+            shutil.copytree(ROOT / ".cursor-plugin", self.root / ".cursor-plugin")
         for name in ("ARCHITECTURE.md", "README.md", "AGENTS.md"):
             shutil.copy2(ROOT / name, self.root / name)
         # Mirror the CI workflow referenced by AGENTS.md in the test repository.
@@ -56,7 +58,7 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_broken_canonical_reference(self):
         self.change(
-            "contexts/requirements/skills/definition/SKILL.md",
+            "contexts/requirements/skills/requirements-definition/SKILL.md",
             "contexts/requirements/skills/example-discovery/SKILL.md",
             "contexts/requirements/skills/never-existed/SKILL.md",
         )
@@ -64,7 +66,7 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_skill_cannot_depend_on_command(self):
         self.change(
-            "contexts/requirements/skills/definition/SKILL.md",
+            "contexts/requirements/skills/requirements-definition/SKILL.md",
             "## Uses\n",
             "## Uses\n\n* Command: \x60contexts/requirements/commands/specify-and-plan-change.md\x60\n",
         )
@@ -83,15 +85,17 @@ class ToolkitLintTests(unittest.TestCase):
         self.assert_error("duplicate canonical ownership")
 
     def test_read_only_boundary_regression(self):
+        # Do not mutate the new discovery frontmatter: only the canonical
+        # Invocation and Boundary sections define actual authorization.
         self.change(
             "contexts/git/commands/plan-pull-requests.md",
-            "read-only",
-            "non-mutating",
+            "Invocation authorizes read-only analysis",
+            "Invocation authorizes non-mutating analysis",
         )
         self.change(
             "contexts/git/commands/plan-pull-requests.md",
-            "read-only",
-            "non-mutating",
+            "This command is read-only.",
+            "This command is non-mutating.",
         )
         self.assert_error("planning must remain read-only")
 
@@ -280,9 +284,233 @@ class ToolkitLintTests(unittest.TestCase):
         self.change(
             "contexts/requirements/skills/example-discovery/SKILL.md",
             "## Uses\n",
-            "## Uses\n\n* Skill: \x60contexts/requirements/skills/definition/SKILL.md\x60\n",
+            "## Uses\n\n* Skill: \x60contexts/requirements/skills/requirements-definition/SKILL.md\x60\n",
         )
         self.assert_error("cyclic Skill -> Skill")
+
+
+    def test_metadata_names_and_descriptions_are_unique(self):
+        self.assertEqual([], lint_toolkit(self.root))
+
+    def test_metadata_description_cannot_be_empty_or_vague(self):
+        path = "contexts/requirements/skills/requirements-definition/SKILL.md"
+        content = (self.root / path).read_text(encoding="utf-8")
+        original = next(line for line in content.splitlines()
+                        if line.startswith("description: "))
+        self.change(path, original, 'description: "Define requirements."')
+        self.assert_error("metadata description must have 50-260 meaningful characters")
+
+    def test_metadata_descriptions_must_not_be_copied_between_artifacts(self):
+        source = self.root / "contexts/review/agents/security-reviewer.md"
+        target = "contexts/review/agents/correctness-reviewer.md"
+        content = (self.root / target).read_text(encoding="utf-8")
+        old = next(line for line in content.splitlines()
+                   if line.startswith("description: "))
+        source_line = next(line for line in source.read_text(encoding="utf-8").splitlines()
+                           if line.startswith("description: "))
+        self.change(target, old, source_line)
+        self.assert_error("duplicate metadata description")
+
+    def test_public_skill_names_remain_unique_across_contexts(self):
+        # Preserve same file/directory names in this fixture; a duplicate
+        # public name in another context would collide in host skill discovery.
+        source = self.root / "contexts/design/skills/design-solution/SKILL.md"
+        destination = self.root / "contexts/requirements/skills/design-solution/SKILL.md"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        self.assert_error("duplicate Skill public name")
+
+    def test_command_frontmatter_must_match_public_filename(self):
+        self.change("contexts/review/commands/review-code.md",
+                    "name: review-code", "name: unrelated-command")
+        self.assert_error("invalid portable Command name")
+
+    def test_command_frontmatter_is_required(self):
+        self.change("contexts/testing/commands/generate-tests.md",
+                    "name: generate-tests", "command: generate-tests")
+        self.assert_error("missing portable Command name/description frontmatter")
+
+    def test_command_description_is_discovery_metadata(self):
+        path = "contexts/git/commands/commit.md"
+        content = (self.root / path).read_text(encoding="utf-8")
+        description = next(line for line in content.splitlines()
+                           if line.startswith("description: "))
+        self.change(path, description, 'description: "Perform Git actions."')
+        self.assert_error("metadata description must have 50-260 meaningful characters")
+
+    def test_requirements_skills_have_domain_qualified_public_names(self):
+        for name in ("requirements-definition", "requirements-validation"):
+            path = self.root / "contexts/requirements/skills" / name / "SKILL.md"
+            self.assertTrue(path.is_file())
+            self.assertIn(f"name: {name}", path.read_text(encoding="utf-8"))
+        self.assertEqual([], lint_toolkit(self.root))
+
+    def test_architecture_structure_tracks_requirement_skills(self):
+        # Keep the human-readable directory map aligned with live canonical
+        # paths, including when Skills are renamed.
+        import re
+        document = (self.root / "ARCHITECTURE.md").read_text(encoding="utf-8")
+        requirement_tree = document.split("## Canonical Structure", 1)[1]
+        requirement_tree = requirement_tree.split("├── requirements/\n", 1)[1]
+        requirement_tree = requirement_tree.split("├── design/\n", 1)[0]
+        skills = requirement_tree.split("│   ├── skills/\n", 1)[1]
+        skills = skills.split("│   ├── commands/\n", 1)[0]
+        listed = set(re.findall(r"([a-z][a-z0-9-]*)/SKILL\.md", skills))
+        actual = {
+            path.parent.name
+            for path in (self.root / "contexts/requirements/skills").glob("*/SKILL.md")
+        }
+        self.assertEqual(actual, listed)
+
+    def test_cursor_plugin_manifest_covers_canonical_sources(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        self.assertTrue((self.root / ".cursor-plugin/plugin.json").is_file())
+
+    def test_cursor_marketplace_targets_root_plugin_without_copy(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        marketplace = self.root / ".cursor-plugin/marketplace.json"
+        self.assertTrue(marketplace.is_file())
+
+    def test_cursor_marketplace_declares_owner(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual("JadsonLucena", manifest["owner"]["name"])
+        self.assertEqual([], lint_toolkit(self.root))
+
+    def test_cursor_marketplace_rejects_missing_owner(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        del manifest["owner"]
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("owner.name must be a non-empty string")
+
+    def test_cursor_marketplace_rejects_missing_owner_name(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["owner"] = {}
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("owner.name must be a non-empty string")
+
+    def test_cursor_marketplace_rejects_blank_owner_name(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["owner"]["name"] = "  "
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("owner.name must be a non-empty string")
+
+    def test_cursor_marketplace_rejects_invalid_owner_shape(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["owner"] = "not an object"
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("owner.name must be a non-empty string")
+
+    def test_cursor_marketplace_rejects_missing_manifest(self):
+        (self.root / ".cursor-plugin/marketplace.json").unlink()
+        self.assert_error("required for folder marketplace import")
+
+    def test_cursor_marketplace_description_must_match_plugin(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["plugins"][0]["description"] = "Unrelated capability."
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("plugin description must match plugin.json")
+
+    def test_cursor_marketplace_rejects_divergent_source(self):
+        self.change(".cursor-plugin/marketplace.json",
+                    '"source": "."', '"source": "./plugins/copied-toolkit"')
+        self.assert_error("expected one root plugin with source '.'")
+
+    def test_cursor_plugin_rejects_path_escape(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/review/skills", "../outside")
+        self.assert_error("unsafe plugin path")
+
+    def test_cursor_plugin_rejects_missing_context(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/review/commands/review-code.md",
+                    "./contexts/missing/commands/review-code.md")
+        self.assert_error("missing plugin path")
+        self.assert_error("commands coverage mismatch")
+
+    def test_cursor_plugin_rejects_agent_directory_in_array(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/review/agents/code-reviewer.md",
+                    "./contexts/review/agents")
+        self.assert_error("agents requires explicit file paths")
+
+    def test_cursor_plugin_rejects_command_directory_in_array(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/review/commands/review-code.md",
+                    "./contexts/review/commands")
+        self.assert_error("commands requires explicit file paths")
+
+    def test_cursor_agent_identity_must_match_file(self):
+        self.change("contexts/review/agents/code-reviewer.md",
+                    "name: code-reviewer", "name: not-code-reviewer")
+        self.assert_error("invalid portable Agent name/description frontmatter")
+
+    def test_cursor_agent_cannot_add_host_execution_metadata(self):
+        self.change("contexts/review/agents/code-reviewer.md",
+                    '---\n\n# Code Reviewer', 'model: cursor\n---\n\n# Code Reviewer')
+        self.assert_error("invalid portable Agent name/description frontmatter")
+
+    def test_cursor_plugin_lists_every_canonical_rule_once(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        import json
+        manifest = json.loads(
+            (self.root / ".cursor-plugin/plugin.json").read_text(encoding="utf-8")
+        )
+        actual = set(manifest["rules"])
+        expected = {
+            "./" + path.relative_to(self.root).as_posix()
+            for path in (self.root / "contexts").glob("*/rules/*.md")
+        }
+        self.assertEqual(expected, actual)
+        self.assertEqual(14, len(actual))
+
+    def test_cursor_plugin_rejects_missing_canonical_rule(self):
+        target = self.root / ".cursor-plugin/plugin.json"
+        import json
+        manifest = json.loads(target.read_text(encoding="utf-8"))
+        manifest["rules"].remove("./contexts/git/rules/gitflow.md")
+        target.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("rules coverage mismatch")
+
+    def test_cursor_plugin_rejects_duplicate_rule(self):
+        target = self.root / ".cursor-plugin/plugin.json"
+        import json
+        manifest = json.loads(target.read_text(encoding="utf-8"))
+        manifest["rules"].append("./contexts/review/rules/code-review.md")
+        target.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("duplicate rules artifact")
+
+    def test_cursor_rule_requires_description(self):
+        self.change("contexts/requirements/rules/tailoring.md",
+                    "description: ", "undocumented: ")
+        self.assert_error("invalid Cursor Rule frontmatter")
+
+    def test_cursor_rules_remain_not_always_applied(self):
+        self.change("contexts/git/rules/gitflow.md",
+                    "alwaysApply: false", "alwaysApply: true")
+        self.assert_error("invalid Cursor Rule frontmatter")
+
+    def test_cursor_rejects_rule_directory_in_array(self):
+        self.change(".cursor-plugin/plugin.json",
+                    "./contexts/testing/rules/testing.md",
+                    "./contexts/testing/rules")
+        self.assert_error("rules requires explicit file paths")
+
+    def test_cursor_rule_pilot_cannot_be_always_on(self):
+        self.change("contexts/review/rules/code-review.md",
+                    "alwaysApply: false", "alwaysApply: true")
+        self.assert_error("invalid Cursor Rule frontmatter")
 
 
 if __name__ == "__main__":

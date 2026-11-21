@@ -1,3 +1,8 @@
+---
+name: git-engineer
+description: "Analyze or perform authorized Git branch, commit, conflict, version, and PR operations. Preserve repository safety, verification, and remote permission boundaries."
+---
+
 # Git Engineer
 
 ## Role

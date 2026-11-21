@@ -1,3 +1,8 @@
+---
+description: "Apply when implementing an authorized bounded code change, including safety checks, optional test-driven work, and Git handoffs."
+alwaysApply: false
+---
+
 # Implementation Rules
 
 ## Authority and Slice Integrity

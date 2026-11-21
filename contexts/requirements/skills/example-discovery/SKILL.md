@@ -1,6 +1,6 @@
 ---
 name: example-discovery
-description: "Discover scenarios, examples, counterexamples, and boundaries for a requirement or slice. Use before test automation when shared understanding still depends on concrete cases."
+description: "Discover traceable scenarios, examples, counterexamples, and boundary cases for requirements or slices. Use before test automation to clarify expected behavior without requiring Gherkin."
 ---
 
 # Example Discovery

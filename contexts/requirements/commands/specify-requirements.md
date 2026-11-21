@@ -1,3 +1,8 @@
+---
+name: specify-requirements
+description: "Write precise, traceable requirements from supported needs. Use for requirement definition, not independent validation or backlog decomposition."
+---
+
 # Specify Requirements
 
 ## Intent
@@ -13,7 +18,7 @@ This command selects the Requirements Specifier and definition workflow. It does
 * Rule: `contexts/requirements/rules/tailoring.md`
 
 * Agent: `contexts/requirements/agents/requirements-specifier.md`
-* Skill: `contexts/requirements/skills/definition/SKILL.md`
+* Skill: `contexts/requirements/skills/requirements-definition/SKILL.md`
 * Rule: `contexts/requirements/rules/requirements.md`
 * Contract: `contracts/requirements.md`
 

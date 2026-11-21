@@ -1,3 +1,8 @@
+---
+name: testing-reviewer
+description: "Review assertions, regression coverage, test doubles, CI freshness, and misleading verification in a code change. Read-only specialist scoped by the Code Review Lead."
+---
+
 # Test Adequacy Reviewer
 
 ## Role

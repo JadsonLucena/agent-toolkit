@@ -1,3 +1,8 @@
+---
+name: design-engineer
+description: "Develop justified architecture, interfaces, compatibility decisions, and safe evolution for the next bounded change. Use for technical design, not code edits."
+---
+
 # Design Engineer
 
 ## Role

@@ -1,3 +1,8 @@
+---
+description: "Apply when eliciting, defining, changing, or validating supported requirements, scenarios, business rules, quality constraints, and traceable domain evidence."
+alwaysApply: false
+---
+
 # Requirements Rules
 
 Apply `contexts/requirements/rules/tailoring.md` when deciding how much rigor and representation are necessary.

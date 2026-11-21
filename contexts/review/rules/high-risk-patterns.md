@@ -1,3 +1,8 @@
+---
+description: "Apply as falsification heuristics during code review of reachable high-risk side effects, retries, concurrency, schema changes, or authorization; not automatic blockers."
+alwaysApply: false
+---
+
 # High-Risk Review Patterns
 
 ## Purpose

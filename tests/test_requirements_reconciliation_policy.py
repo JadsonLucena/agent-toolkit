@@ -37,8 +37,8 @@ class RequirementsReconciliationPolicyTests(unittest.TestCase):
             self.assertIn(term, text)
 
     def test_workflows_route_reconciliation_without_mutating_validation(self):
-        definition = doc("contexts/requirements/skills/definition/SKILL.md")
-        validation = doc("contexts/requirements/skills/validation/SKILL.md")
+        definition = doc("contexts/requirements/skills/requirements-definition/SKILL.md")
+        validation = doc("contexts/requirements/skills/requirements-validation/SKILL.md")
         shape = doc("contexts/requirements/commands/specify-and-plan-change.md")
         basis = doc("contracts/test-basis.md")
         self.assertIn("InspectEvidence --> ComparePriorSemantics", definition)

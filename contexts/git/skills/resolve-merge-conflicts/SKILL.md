@@ -1,6 +1,6 @@
 ---
 name: resolve-merge-conflicts
-description: "Diagnose and resolve merge, rebase and cherry-pick conflicts by reconstructing intent, reconciling three-way changes and verifying integrated behavior."
+description: "Diagnose merge, rebase, cherry-pick, and marker-free interference; when authorized, reconcile intent and verify integrated behavior without implicit continuation or commit."
 ---
 
 # Resolve Merge Conflicts
