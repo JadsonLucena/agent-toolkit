@@ -13,9 +13,9 @@ contexts/
 │   │   └── backlog.md
 │   ├── skills/
 │   │   ├── elicitation/SKILL.md
-│   │   ├── definition/SKILL.md
+│   │   ├── requirements-definition/SKILL.md
 │   │   ├── example-discovery/SKILL.md
-│   │   ├── validation/SKILL.md
+│   │   ├── requirements-validation/SKILL.md
 │   │   └── backlog-planning/SKILL.md
 │   ├── commands/
 │   │   ├── specify-and-plan-change.md

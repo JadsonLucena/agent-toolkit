@@ -345,6 +345,23 @@ class ToolkitLintTests(unittest.TestCase):
             self.assertIn(f"name: {name}", path.read_text(encoding="utf-8"))
         self.assertEqual([], lint_toolkit(self.root))
 
+    def test_architecture_structure_tracks_requirement_skills(self):
+        # Keep the human-readable directory map aligned with live canonical
+        # paths, including when Skills are renamed.
+        import re
+        document = (self.root / "ARCHITECTURE.md").read_text(encoding="utf-8")
+        requirement_tree = document.split("## Canonical Structure", 1)[1]
+        requirement_tree = requirement_tree.split("├── requirements/\n", 1)[1]
+        requirement_tree = requirement_tree.split("├── design/\n", 1)[0]
+        skills = requirement_tree.split("│   ├── skills/\n", 1)[1]
+        skills = skills.split("│   ├── commands/\n", 1)[0]
+        listed = set(re.findall(r"([a-z][a-z0-9-]*)/SKILL\.md", skills))
+        actual = {
+            path.parent.name
+            for path in (self.root / "contexts/requirements/skills").glob("*/SKILL.md")
+        }
+        self.assertEqual(actual, listed)
+
     def test_cursor_plugin_manifest_covers_canonical_sources(self):
         self.assertEqual([], lint_toolkit(self.root))
         self.assertTrue((self.root / ".cursor-plugin/plugin.json").is_file())
