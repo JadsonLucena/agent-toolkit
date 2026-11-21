@@ -99,6 +99,12 @@ def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> li
                     or marketplace["plugins"][0].get("name") != manifest["name"]
                     or marketplace["plugins"][0].get("source") != "."):
                 errors.append(".cursor-plugin/marketplace.json: expected one root plugin with source '.'")
+            # Cursor's documented marketplace format includes owner.name.
+            owner = marketplace.get("owner") if isinstance(marketplace, dict) else None
+            if (not isinstance(owner, dict)
+                    or not isinstance(owner.get("name"), str)
+                    or not owner["name"].strip()):
+                errors.append(".cursor-plugin/marketplace.json: owner.name must be a non-empty string")
 
     # The marketplace and plugin are separate catalog surfaces for the same
     # canonical capability. Keep their public descriptions consistent.

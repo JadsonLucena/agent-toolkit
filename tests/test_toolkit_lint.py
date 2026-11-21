@@ -354,6 +354,45 @@ class ToolkitLintTests(unittest.TestCase):
         marketplace = self.root / ".cursor-plugin/marketplace.json"
         self.assertTrue(marketplace.is_file())
 
+    def test_cursor_marketplace_declares_owner(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual("JadsonLucena", manifest["owner"]["name"])
+        self.assertEqual([], lint_toolkit(self.root))
+
+    def test_cursor_marketplace_rejects_missing_owner(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        del manifest["owner"]
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("owner.name must be a non-empty string")
+
+    def test_cursor_marketplace_rejects_missing_owner_name(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["owner"] = {}
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("owner.name must be a non-empty string")
+
+    def test_cursor_marketplace_rejects_blank_owner_name(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["owner"]["name"] = "  "
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("owner.name must be a non-empty string")
+
+    def test_cursor_marketplace_rejects_invalid_owner_shape(self):
+        import json
+        path = self.root / ".cursor-plugin/marketplace.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["owner"] = "not an object"
+        path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        self.assert_error("owner.name must be a non-empty string")
+
     def test_cursor_marketplace_rejects_missing_manifest(self):
         (self.root / ".cursor-plugin/marketplace.json").unlink()
         self.assert_error("required for folder marketplace import")

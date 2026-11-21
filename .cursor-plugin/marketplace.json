@@ -1,5 +1,8 @@
 {
   "name": "agent-toolkit",
+  "owner": {
+    "name": "JadsonLucena"
+  },
   "metadata": {
     "description": "Local marketplace for Agent Toolkit, offering traceable, risk-aware software engineering guidance for AI coding agents."
   },
