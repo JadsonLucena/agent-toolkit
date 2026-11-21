@@ -11,7 +11,7 @@ python3 scripts/routing_evals.py --catalog evals/routing/cases.json
 python3 -m unittest tests.test_routing_evals -v
 ```
 
-CI validates unique scenario identities, real canonical capability names, meaningful prompts, explicit Command dispatch scenarios, positive/negative expectations, and evaluator behavior. The output **STRUCTURAL_PASS; NOT_MEASURED** is intentional: no model was invoked, no host event occurred, and no successful route was inferred.
+CI validates unique scenario identities, real canonical capability names, meaningful prompts, explicit Command dispatch scenarios, required/forbidden/permitted-companion expectations, and evaluator behavior. The output **STRUCTURAL_PASS; NOT_MEASURED** is intentional: no model was invoked, no host event occurred, and no successful route was inferred.
 
 ## Host runtime study
 
@@ -71,9 +71,11 @@ A collected file has this shape:
 }
 ```
 
-Record *all* observed activations of the evaluated kind, including unexpected ones. A true negative uses status **observed** and an empty events array; this requires an actual session trace, not absence of a test. Results marked **not-run** or **unsupported** are never counted as passing runtime cases. The scorer validates event attribution and references structurally; it **cannot authenticate** a claimed host trace or prove isolation by itself. Retain raw host logs and independently verify provenance before making deployment or quality-gate claims.
+Each case lists `expected` (required activations), `forbidden` (explicitly disallowed activations), and optionally `allowed_companions` (contextually legitimate but **not required** supporting activations of the same kind). The three sets must be disjoint; companions must be named per scenario, not globally whitelisted. For example, the high-risk Review case requires `high-risk-patterns` and permits `code-review` for finding classification. This does **not** permit `high-risk-patterns` in the low-risk Review negative case. A companion alone cannot satisfy a missing required activation.
 
-Metrics: **precision** = correct activations / all activations of the evaluated kind; **recall** = correct activations / all expected activations; **false positives** = unexpected activations; **false negatives** = missed expected activations; **forbidden activations** = explicit disallowed matches; **coverage** = measured scenarios / total scenarios. Undefined precision/recall are reported as null, not 100%.
+Record *all* observed activations of the evaluated kind, including unexpected ones and permitted companions. A true negative uses status **observed** and an empty events array; this requires an actual session trace, not absence of a test. Results marked **not-run** or **unsupported** are never counted as passing runtime cases. The scorer validates event attribution and references structurally; it **cannot authenticate** a claimed host trace or prove isolation by itself. Retain raw host logs and independently verify provenance before making deployment or quality-gate claims.
+
+Metrics: **precision** = required activations observed / (required activations observed + unexpected activations); **recall** = required activations observed / all required activations; **false positives** = observed activations neither required nor permitted; **false negatives** = missed required activations; **permitted_companion_activations** counts optional, legitimate supporting activations without inflating true positives or penalizing precision; **forbidden activations** = explicit disallowed matches; **coverage** = measured scenarios / total scenarios. Undefined precision/recall are reported as null, not 100%.
 
 ## Semantic boundaries tested
 

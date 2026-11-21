@@ -157,7 +157,10 @@
       "expected": [
         "test-driven-development"
       ],
-      "forbidden": []
+      "forbidden": [],
+      "allowed_companions": [
+        "implement-slice"
+      ]
     },
     {
       "id": "skill-tdd-not-default",
@@ -202,7 +205,10 @@
       "expected": [
         "coordinate-review-team"
       ],
-      "forbidden": []
+      "forbidden": [],
+      "allowed_companions": [
+        "review-change"
+      ]
     },
     {
       "id": "skill-review-team-low-risk",
@@ -661,6 +667,9 @@
       ],
       "forbidden": [
         "semantic-commit"
+      ],
+      "allowed_companions": [
+        "code-review"
       ]
     },
     {
@@ -683,7 +692,10 @@
       "expected": [
         "gitflow"
       ],
-      "forbidden": []
+      "forbidden": [],
+      "allowed_companions": [
+        "git"
+      ]
     },
     {
       "id": "rule-gitflow-not-universal",
@@ -729,6 +741,9 @@
       ],
       "forbidden": [
         "pull-request"
+      ],
+      "allowed_companions": [
+        "git"
       ]
     },
     {
@@ -741,6 +756,9 @@
       ],
       "forbidden": [
         "gitflow"
+      ],
+      "allowed_companions": [
+        "git"
       ]
     }
   ]

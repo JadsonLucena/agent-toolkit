@@ -70,15 +70,20 @@ def validate_catalog(catalog: dict, inventory: dict[str, set[str]]) -> list[str]
             errors.append(f"{label}: prompt is missing or too short")
         expected = case.get("expected")
         forbidden = case.get("forbidden")
+        allowed = case.get("allowed_companions", [])
         if not isinstance(expected, list) or not isinstance(forbidden, list):
             errors.append(f"{label}: expected and forbidden must be arrays")
             continue
-        if any(not isinstance(name, str) for name in expected + forbidden):
+        if not isinstance(allowed, list):
+            errors.append(f"{label}: allowed_companions must be an array")
+            continue
+        if any(not isinstance(name, str) for name in expected + forbidden + allowed):
             errors.append(f"{label}: all capability names must be strings")
             continue
         if not expected and not forbidden:
             errors.append(f"{label}: require an expected or forbidden routing condition")
-        for name_list, key in ((expected, "expected"), (forbidden, "forbidden")):
+        for name_list, key in ((expected, "expected"), (forbidden, "forbidden"),
+                               (allowed, "allowed_companions")):
             if len(name_list) != len(set(map(str, name_list))):
                 errors.append(f"{label}: duplicate {key} entries")
             for name in name_list:
@@ -86,7 +91,12 @@ def validate_catalog(catalog: dict, inventory: dict[str, set[str]]) -> list[str]
                     errors.append(f"{label}: unknown {case['kind']} {key} {name!r}")
         if set(expected) & set(forbidden):
             errors.append(f"{label}: expected and forbidden overlap")
-        if case["kind"] == "command" and expected and case.get("mode") != "explicit":
+        if set(expected) & set(allowed):
+            errors.append(f"{label}: expected and allowed_companions overlap")
+        if set(forbidden) & set(allowed):
+            errors.append(f"{label}: forbidden and allowed_companions overlap")
+        if (case["kind"] == "command" and (expected or allowed)
+                and case.get("mode") != "explicit"):
             errors.append(f"{label}: Commands must use explicit invocation in this catalog")
     return errors
 
@@ -119,7 +129,7 @@ def score_observations(cases: list[dict], observations: dict) -> dict:
         indexed[identifier] = result
     # Superset results are permitted when scoring a single capability kind.
 
-    total_tp = total_fp = total_fn = forbidden_activations = 0
+    total_tp = total_fp = total_fn = forbidden_activations = permitted_companion_activations = 0
     measured = unsupported = true_negative_cases = 0
     failures: list[dict] = []
     pending: list[str] = []
@@ -160,19 +170,25 @@ def score_observations(cases: list[dict], observations: dict) -> dict:
             true_negative_cases += 1
         expected = set(case["expected"])
         forbidden = set(case["forbidden"])
+        allowed = set(case.get("allowed_companions", []))
+        # Only required activations earn true positives; companions are
+        # permissible composition, not substitutes for missing requirements.
         tp = len(selected & expected)
-        fp = len(selected - expected)
+        companion_hits = selected & allowed
+        unexpected = selected - expected - allowed
+        fp = len(unexpected)
         fn = len(expected - selected)
         forbidden_hits = selected & forbidden
         total_tp += tp
         total_fp += fp
         total_fn += fn
         forbidden_activations += len(forbidden_hits)
+        permitted_companion_activations += len(companion_hits)
         if fp or fn or forbidden_hits:
             failures.append({
                 "id": identifier,
                 "missing": sorted(expected - selected),
-                "unexpected": sorted(selected - expected),
+                "unexpected": sorted(unexpected),
                 "forbidden": sorted(forbidden_hits),
             })
     precision = (total_tp / (total_tp + total_fp) if total_tp + total_fp else None)
@@ -191,6 +207,7 @@ def score_observations(cases: list[dict], observations: dict) -> dict:
         "true_positives": total_tp,
         "false_positives": total_fp,
         "false_negatives": total_fn,
+        "permitted_companion_activations": permitted_companion_activations,
         "forbidden_activations": forbidden_activations,
         "precision": precision,
         "recall": recall,

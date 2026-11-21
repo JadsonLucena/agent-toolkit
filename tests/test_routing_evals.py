@@ -79,6 +79,111 @@ class RoutingEvalsTests(unittest.TestCase):
         ]}
         self.assertIn("Commands must use explicit", " ".join(validate_catalog(catalog, self.inventory)))
 
+    def test_optional_companion_passes_without_false_positive(self):
+        case = self.case(allowed_companions=["elicitation"])
+        report = score_observations([case], self.observations([{
+            "id": case["id"], "status": "observed",
+            "events": [
+                self.event("requirements-validation"),
+                self.event("elicitation"),
+            ],
+        }]))
+        self.assertEqual("PASS", report["status"])
+        self.assertEqual(1, report["true_positives"])
+        self.assertEqual(1, report["permitted_companion_activations"])
+        self.assertEqual(0, report["false_positives"])
+        self.assertEqual(1.0, report["precision"])
+        self.assertEqual(1.0, report["recall"])
+
+    def test_companion_alone_cannot_substitute_required_activation(self):
+        case = self.case(allowed_companions=["elicitation"])
+        report = score_observations([case], self.observations([{
+            "id": case["id"], "status": "observed",
+            "events": [self.event("elicitation")],
+        }]))
+        self.assertEqual("FAIL", report["status"])
+        self.assertEqual(1, report["false_negatives"])
+        self.assertEqual(1, report["permitted_companion_activations"])
+        self.assertEqual(0, report["false_positives"])
+        self.assertEqual(0.0, report["recall"])
+
+    def test_unlisted_companion_is_still_a_false_positive(self):
+        case = self.case(allowed_companions=["elicitation"])
+        report = score_observations([case], self.observations([{
+            "id": case["id"], "status": "observed",
+            "events": [
+                self.event("requirements-validation"),
+                self.event("example-discovery"),
+            ],
+        }]))
+        self.assertEqual("FAIL", report["status"])
+        self.assertEqual(1, report["false_positives"])
+        self.assertEqual(["example-discovery"], report["failures"][0]["unexpected"])
+
+    def test_catalog_rejects_unknown_or_duplicate_companions(self):
+        for allowed, reason in (
+            (["missing-skill"], "unknown skill allowed_companions"),
+            (["elicitation", "elicitation"], "duplicate allowed_companions"),
+            ("elicitation", "allowed_companions must be an array"),
+            ([123], "all capability names must be strings"),
+        ):
+            with self.subTest(allowed=allowed):
+                catalog = {"schema_version": 1, "cases": [
+                    self.case(allowed_companions=allowed)
+                ]}
+                self.assertIn(reason, " ".join(validate_catalog(catalog, self.inventory)))
+
+    def test_catalog_rejects_companion_overlap_with_required_or_forbidden(self):
+        for allowed, reason in (
+            (["requirements-validation"], "expected and allowed_companions overlap"),
+            (["requirements-definition"], "forbidden and allowed_companions overlap"),
+        ):
+            with self.subTest(allowed=allowed):
+                catalog = {"schema_version": 1, "cases": [
+                    self.case(allowed_companions=allowed)
+                ]}
+                self.assertIn(reason, " ".join(validate_catalog(catalog, self.inventory)))
+
+    def test_implicit_command_cannot_be_disguised_as_companion(self):
+        catalog = {"schema_version": 1, "cases": [
+            self.case(kind="command", expected=[], forbidden=["commit"],
+                      allowed_companions=["review-code"], mode="implicit")
+        ]}
+        self.assertIn("Commands must use explicit",
+                      " ".join(validate_catalog(catalog, self.inventory)))
+
+    def test_high_risk_rule_companion_uses_real_catalog_case(self):
+        import json
+        catalog = json.loads((ROOT / "evals/routing/cases.json").read_text(encoding="utf-8"))
+        by_id = {case["id"]: case for case in catalog["cases"]}
+        high_risk = by_id["rule-high-risk-pattern-context"]
+        self.assertEqual(["code-review"], high_risk["allowed_companions"])
+        report = score_observations([high_risk], self.observations([{
+            "id": high_risk["id"], "status": "observed",
+            "events": [
+                self.event("high-risk-patterns", kind="rule"),
+                self.event("code-review", kind="rule"),
+            ],
+        }]))
+        self.assertEqual("PASS", report["status"])
+        self.assertEqual(1, report["permitted_companion_activations"])
+        self.assertEqual(0, report["false_positives"])
+
+    def test_companions_do_not_disable_negative_routing_guards(self):
+        import json
+        catalog = json.loads((ROOT / "evals/routing/cases.json").read_text(encoding="utf-8"))
+        by_id = {case["id"]: case for case in catalog["cases"]}
+        negative = by_id["rule-high-risk-not-default"]
+        report = score_observations([negative], self.observations([{
+            "id": negative["id"], "status": "observed",
+            "events": [
+                self.event("code-review", kind="rule"),
+                self.event("high-risk-patterns", kind="rule"),
+            ],
+        }]))
+        self.assertEqual("FAIL", report["status"])
+        self.assertEqual(1, report["forbidden_activations"])
+
     def test_positive_activation_passes_with_real_host_reference_field(self):
         case = self.case()
         report = score_observations([case], self.observations([{
