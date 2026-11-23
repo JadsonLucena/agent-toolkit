@@ -1,3 +1,8 @@
+---
+description: "Apply when designing, writing, reviewing, or diagnosing automated tests; evaluate behavioral assertions, scenario traceability, determinism, and regression evidence."
+alwaysApply: false
+---
+
 # Automated Testing Rules
 
 ## Core Principles

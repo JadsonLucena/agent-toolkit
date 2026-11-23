@@ -1,3 +1,8 @@
+---
+name: finding-verifier
+description: "Falsify candidate code-review findings and peer disagreements using source evidence. Verify independently when isolated, otherwise disclose native second-pass limits; no final verdict."
+---
+
 # Finding Verifier
 
 ## Role

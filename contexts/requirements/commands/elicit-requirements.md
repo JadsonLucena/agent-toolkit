@@ -1,3 +1,8 @@
+---
+name: elicit-requirements
+description: "Investigate stakeholder needs, evidence, unknowns, and scope before formal specification. Use when change intent is not sufficiently understood."
+---
+
 # Elicit Requirements
 
 ## Intent

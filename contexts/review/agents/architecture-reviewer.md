@@ -1,3 +1,8 @@
+---
+name: architecture-reviewer
+description: "Review dependencies, interfaces, compatibility, scalability, operational safety, and documentation drift. Read-only specialist scoped by the Code Review Lead."
+---
+
 # Architecture and Operations Reviewer
 
 ## Role

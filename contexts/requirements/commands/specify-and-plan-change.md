@@ -1,3 +1,8 @@
+---
+name: specify-and-plan-change
+description: "Route only the needed Requirements discovery, specification, validation, and backlog steps. Use for an end-to-end planning handoff, not implementation."
+---
+
 # Specify and Plan Change
 
 ## Intent
@@ -19,8 +24,8 @@ Invocation does not authorize architecture selection, implementation, automated-
 * Agent: `contexts/requirements/agents/requirements-specifier.md`
 * Agent: `contexts/requirements/agents/backlog-planner.md`
 * Skill: `contexts/requirements/skills/elicitation/SKILL.md`
-* Skill: `contexts/requirements/skills/definition/SKILL.md`
-* Skill: `contexts/requirements/skills/validation/SKILL.md`
+* Skill: `contexts/requirements/skills/requirements-definition/SKILL.md`
+* Skill: `contexts/requirements/skills/requirements-validation/SKILL.md`
 * Skill: `contexts/requirements/skills/backlog-planning/SKILL.md`
 * Contract: `contracts/requirements.md`
 * Contract: `contracts/work-item.md`

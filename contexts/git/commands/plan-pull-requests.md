@@ -1,3 +1,8 @@
+---
+name: plan-pull-requests
+description: "Plan coherent PR boundaries and dependencies for a larger change. Use before implementation or integration; analysis is read-only."
+---
+
 # Plan Pull Requests
 
 ## Intent

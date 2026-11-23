@@ -1,6 +1,6 @@
 ---
 name: verify-findings
-description: "Investigate candidate review findings and classify them with evidence. Use before a finding becomes a blocker."
+description: "Falsify, verify, and deduplicate candidate Code Review findings against actual source and tests. Use after findings arise, not for initial review or test generation."
 ---
 
 # Verify Review Findings

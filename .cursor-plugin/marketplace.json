@@ -1,0 +1,16 @@
+{
+  "name": "agent-toolkit",
+  "owner": {
+    "name": "JadsonLucena"
+  },
+  "metadata": {
+    "description": "Local marketplace for Agent Toolkit, offering traceable, risk-aware software engineering guidance for AI coding agents."
+  },
+  "plugins": [
+    {
+      "name": "agent-toolkit",
+      "source": ".",
+      "description": "Guide AI coding agents from change requests to reviewable software increments with clear ownership, traceable evidence, and risk-aware verification."
+    }
+  ]
+}

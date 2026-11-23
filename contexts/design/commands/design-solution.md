@@ -1,3 +1,8 @@
+---
+name: design-solution
+description: "Design the next bounded technical slice from supported requirements and constraints. Use for architecture and interface decisions, not code or Git mutations."
+---
+
 # Design Solution
 
 ## Intent

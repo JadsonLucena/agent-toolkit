@@ -1,8 +1,8 @@
 # Agent Toolkit
 
-**A vendor-neutral software engineering toolkit for AI coding agents.**
+**From change requests to reviewable software increments—with traceable evidence and clear engineering responsibilities.**
 
-Agent Toolkit organizes reusable engineering guidance into Rules, Skills, Commands, and specialist Agents. It helps teams move from requirements to delivery with explicit responsibility boundaries, traceable evidence, and risk-appropriate verification—without tying the engineering model to one IDE, model, or provider.
+Agent Toolkit provides vendor-neutral, reusable guidance for AI coding agents across requirements, design, implementation, testing, review, delivery, and Git. Its Rules, Skills, Commands, specialist Agents, and shared Contracts clarify ownership, preserve evidence across handoffs, and support verification proportionate to risk.
 
 The toolkit is a collection of portable, version-controlled Markdown artifacts, **not a standalone executable agent or an automatically installed CLI**. Agent runtimes can discover or integrate the relevant artifacts; optional adapters support specific environments.
 
@@ -14,8 +14,8 @@ The toolkit is a collection of portable, version-controlled Markdown artifacts, 
 | [Design](contexts/design/) | Define technical decisions for a bounded implementation slice. |
 | [Implementation](contexts/implementation/) | Implement and verify an authorized increment. |
 | [Delivery](contexts/delivery/) | Coordinate evidence-based handoffs across the lifecycle. |
-| [Testing](contexts/testing/) | Design and generate automated tests with traceable evidence. |
-| [Review](contexts/review/) | Independently assess changes, risks, and documentation consistency. |
+| [Testing](contexts/testing/) | Design, generate, and verify automated tests with traceable evidence. |
+| [Review](contexts/review/) | Assess code changes and risks, verify findings, and distinguish advisory review from independently attested gates. |
 | [Git](contexts/git/) | Manage repository changes, semantic commits, branches, and pull requests. |
 
 Within each context, **Rules** define durable constraints; **Skills** describe reusable procedures; **Commands** provide explicit invocation entry points; and **Agents** describe specialist roles. Shared [Contracts](contracts/) carry evidence between contexts without forcing them to depend on each other's internal workflows.
@@ -31,6 +31,8 @@ Canonical Skills follow the [Agent Skills specification](https://agentskills.io/
 
 ## Optional integrations
 
+The [Cursor Plugin](.cursor-plugin/README.md) optionally exposes canonical Skills, Commands, Agents and Rules without duplicating sources; contextual Rule activation must be verified in Cursor.
+
 The [adapters](adapters/) directory contains optional runtime integrations, including [portable Review execution](adapters/review/README.md), [OCR-assisted discovery](adapters/ocr/README.md), [team orchestration](adapters/teams/README.md), [GitHub PR safeguards](adapters/github/README.md), and [context retrieval](adapters/context/README.md). Canonical workflows remain usable without any particular adapter.
 
 ## Documentation
@@ -39,5 +41,6 @@ The [adapters](adapters/) directory contains optional runtime integrations, incl
 - [Agent contributor instructions](AGENTS.md) — how coding agents should navigate, change, and verify this repository.
 - [Review runtime guide](adapters/review/README.md) — review integration and execution options.
 - [Evaluation catalogs](evals/) — provider-neutral behavioral evaluation baselines and their limitations.
+- [Capability routing evaluations](evals/routing/README.md) — discovery, activation, and negative-selection test protocol with host-observed evidence.
 
 Agent Toolkit favors **composition without duplicating authority**: one owner for each rule, procedure, invocation boundary, or evidence contract.

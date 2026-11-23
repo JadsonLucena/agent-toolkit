@@ -1,6 +1,6 @@
 ---
 name: coordinate-delivery
-description: "Coordinate an authorized SDD change across existing contexts, with evidence-gated handoffs and safe stopping or resumption."
+description: "Coordinate authorized SDLC/SDD stages, PR boundaries, recovery, and optional feedback with evidence-gated specialist handoffs. Use for multi-context delivery."
 ---
 
 # Coordinate Delivery

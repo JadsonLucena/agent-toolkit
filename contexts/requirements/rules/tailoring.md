@@ -1,3 +1,8 @@
+---
+description: "Apply when selecting risk-proportionate requirements rigor, investigation depth, artifacts, or verification detail."
+alwaysApply: false
+---
+
 # Requirements Tailoring Rules
 
 ## Principle

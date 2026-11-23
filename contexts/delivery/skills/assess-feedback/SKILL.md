@@ -1,6 +1,6 @@
 ---
 name: assess-feedback
-description: "Assess observed agent execution or product-outcome feedback, distinguish evidence from hypotheses, and route learning without unauthorized mutation."
+description: "Assess observed agent execution, delivery feedback, or product outcomes; separate evidence from hypotheses and route learning to owners. Use read-only, without applying fixes."
 ---
 
 # Assess Feedback

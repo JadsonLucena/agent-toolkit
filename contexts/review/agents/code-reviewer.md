@@ -1,3 +1,8 @@
+---
+name: code-reviewer
+description: "Lead an explicitly requested, read-only Code Review with risk-selected specialists and verified findings. Issue one advisory or independently attested gate verdict, never remediation."
+---
+
 # Code Reviewer
 
 ## Role

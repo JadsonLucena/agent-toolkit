@@ -1,3 +1,8 @@
+---
+name: build-backlog
+description: "Create traceable work items and slices from supported requirements or other work sources. Use for new backlog planning, not requirement invention."
+---
+
 # Build Backlog
 
 ## Intent

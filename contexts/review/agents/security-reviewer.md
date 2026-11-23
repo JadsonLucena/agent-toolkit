@@ -1,3 +1,8 @@
+---
+name: security-reviewer
+description: "Review authentication, authorization, trust boundaries, privacy, secrets, and realistic misuse in a code change. Read-only specialist scoped by the Code Review Lead."
+---
+
 # Security and Privacy Reviewer
 
 ## Role

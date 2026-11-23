@@ -1,3 +1,8 @@
+---
+name: backlog-planner
+description: "Structure and refine traceable backlog slices from requirements, defects, and other supported work sources. Use for dependencies and readiness; do not invent priorities."
+---
+
 # Backlog Planner
 
 ## Role

@@ -1,3 +1,8 @@
+---
+name: resolve-conflicts
+description: "Diagnose Git merge, rebase, or cherry-pick interference read-only. Apply a scoped resolution only with separate explicit authorization."
+---
+
 # Resolve Conflicts
 
 ## Intent

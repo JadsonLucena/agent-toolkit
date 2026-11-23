@@ -1,6 +1,6 @@
 ---
-name: definition
-description: "Turn understood needs into precise, verifiable, traceable requirements. Use when the evidence is sufficient to specify without inventing stakeholder intent."
+name: requirements-definition
+description: "Define traceable functional, quality, and temporal requirements from supported stakeholder evidence. Use after elicitation, not to validate existing specifications or plan backlog."
 ---
 
 # Requirements Definition

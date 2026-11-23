@@ -1,6 +1,6 @@
 ---
 name: coordinate-review-team
-description: "Orchestrate a risk-proportionate code-review team and record whether coordination was live, relayed, or native. Use when a review may need isolated specialists."
+description: "Coordinate scoped code-review specialists and finding verification when distinct risk concerns justify delegation. Use isolated or relayed teams only when observed; otherwise native review."
 ---
 
 # Coordinate Review Team

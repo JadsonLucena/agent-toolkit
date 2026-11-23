@@ -1,0 +1,765 @@
+{
+  "schema_version": 1,
+  "description": "Vendor-neutral capability-routing scenarios. Expected/forbidden reflect intent; CI validates structure only, not model behavior.",
+  "cases": [
+    {
+      "id": "skill-elicitation-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "We have an unclear request for a subscription renewal feature. Interview for stakeholder needs, current behavior, and missing business decisions before writing requirements.",
+      "expected": [
+        "elicitation"
+      ],
+      "forbidden": [
+        "requirements-definition",
+        "requirements-validation"
+      ]
+    },
+    {
+      "id": "skill-definition-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Stakeholder intent and acceptance evidence are already established. Write precise, traceable functional and temporal requirements for the approved renewal behavior.",
+      "expected": [
+        "requirements-definition"
+      ],
+      "forbidden": [
+        "elicitation",
+        "requirements-validation"
+      ]
+    },
+    {
+      "id": "skill-validation-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Here is an existing requirements specification with acceptance scenarios. Assess ambiguity, contradictions, traceability, and readiness for technical design without editing it.",
+      "expected": [
+        "requirements-validation"
+      ],
+      "forbidden": [
+        "requirements-definition",
+        "implement-slice"
+      ]
+    },
+    {
+      "id": "skill-validation-negative-discovery",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "We still do not know what problem the users face. Identify stakeholders, investigate goals, and surface unanswered questions; do not assess an existing specification.",
+      "expected": [
+        "elicitation"
+      ],
+      "forbidden": [
+        "requirements-validation"
+      ]
+    },
+    {
+      "id": "skill-definition-negative-review",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "The specification is already frozen. Only inspect its quality and contradictions before backlog planning; do not draft or change requirements.",
+      "expected": [
+        "requirements-validation"
+      ],
+      "forbidden": [
+        "requirements-definition"
+      ]
+    },
+    {
+      "id": "skill-example-discovery-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Before automating tests, explore concrete examples, counterexamples, edge cases, and stable scenario identities for this subscription rule.",
+      "expected": [
+        "example-discovery"
+      ],
+      "forbidden": [
+        "generate-tests"
+      ]
+    },
+    {
+      "id": "skill-backlog-create",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Turn accepted requirements and supported defects into a traceable set of small backlog slices with dependencies and readiness decisions.",
+      "expected": [
+        "backlog-planning"
+      ],
+      "forbidden": [
+        "requirements-definition"
+      ]
+    },
+    {
+      "id": "skill-backlog-refine",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Refine the existing backlog items and dependencies without inventing new product behavior or silently altering acceptance criteria.",
+      "expected": [
+        "backlog-planning"
+      ],
+      "forbidden": [
+        "requirements-definition"
+      ]
+    },
+    {
+      "id": "skill-design-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "The change boundary is accepted. Compare interface and data ownership options and prepare a bounded, reversible technical design; do not edit application code.",
+      "expected": [
+        "design-solution"
+      ],
+      "forbidden": [
+        "implement-slice"
+      ]
+    },
+    {
+      "id": "skill-implementation-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "In a disposable test repository, implement the approved refund endpoint slice and run local checks; code and tests for this exact slice are authorized.",
+      "expected": [
+        "implement-slice"
+      ],
+      "forbidden": [
+        "generate-tests"
+      ]
+    },
+    {
+      "id": "skill-testing-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "In a disposable fixture repository, add focused automated tests for the already specified refund rules; do not change production code.",
+      "expected": [
+        "generate-tests"
+      ],
+      "forbidden": [
+        "implement-slice"
+      ]
+    },
+    {
+      "id": "skill-implementation-negative-tests",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "I need additional regression tests only, with no production changes; all behavior and expected results are already documented.",
+      "expected": [
+        "generate-tests"
+      ],
+      "forbidden": [
+        "implement-slice"
+      ]
+    },
+    {
+      "id": "skill-tdd-selected",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "For this explicitly authorized feature slice in a disposable repo, use test-driven development with observed RED, GREEN, and REFACTOR cycles.",
+      "expected": [
+        "test-driven-development"
+      ],
+      "forbidden": [],
+      "allowed_companions": [
+        "implement-slice"
+      ]
+    },
+    {
+      "id": "skill-tdd-not-default",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Read the current tests for confidence gaps, but do not edit files or start test-first implementation just because tests are involved.",
+      "expected": [],
+      "forbidden": [
+        "test-driven-development",
+        "implement-slice"
+      ]
+    },
+    {
+      "id": "skill-review-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Review the explicit pull-request diff for correctness and security, in read-only advisory mode, with evidence for each finding.",
+      "expected": [
+        "review-change"
+      ],
+      "forbidden": [
+        "implement-slice"
+      ]
+    },
+    {
+      "id": "skill-review-negative-implementation",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "The task is to implement the explicitly approved small change in a disposable repo and run existing checks; an independent code review was not requested.",
+      "expected": [
+        "implement-slice"
+      ],
+      "forbidden": [
+        "review-change"
+      ]
+    },
+    {
+      "id": "skill-review-team-risk",
+      "kind": "skill",
+      "mode": "contextual",
+      "prompt": "The code review concerns payment authorization and a schema migration. Coordinate distinct security and reliability investigators with verifiable isolated handoffs if supported.",
+      "expected": [
+        "coordinate-review-team"
+      ],
+      "forbidden": [],
+      "allowed_companions": [
+        "review-change"
+      ]
+    },
+    {
+      "id": "skill-review-team-low-risk",
+      "kind": "skill",
+      "mode": "contextual",
+      "prompt": "Review a tiny documentation typo with no executable change, read-only. Do not spin up multiple specialists for an R0 change.",
+      "expected": [
+        "review-change"
+      ],
+      "forbidden": [
+        "coordinate-review-team"
+      ]
+    },
+    {
+      "id": "skill-finding-verification",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Two reviewers disagree whether a duplicate charge is reachable. Independently falsify or confirm this candidate finding using actual code and tests.",
+      "expected": [
+        "verify-findings"
+      ],
+      "forbidden": [
+        "generate-tests"
+      ]
+    },
+    {
+      "id": "skill-feedback-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "After the delivery, compare observed operational outcomes with the expected behavior; record evidence, uncertainties, and learning without applying fixes.",
+      "expected": [
+        "assess-feedback"
+      ],
+      "forbidden": [
+        "coordinate-delivery"
+      ]
+    },
+    {
+      "id": "skill-delivery-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Coordinate this approved change through selected Requirements, Design, Implementation, Review and Git handoffs toward the requested stage, preserving evidence.",
+      "expected": [
+        "coordinate-delivery"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "skill-git-commit-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "In a disposable Git fixture with explicit local commit permission, partition completed work into verified atomic semantic commits.",
+      "expected": [
+        "create-semantic-commits"
+      ],
+      "forbidden": [
+        "manage-pull-request"
+      ]
+    },
+    {
+      "id": "skill-git-branch-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Diagnose how to synchronize the existing feature branch with its verified upstream while preserving uncommitted changes; use read-only inspection.",
+      "expected": [
+        "manage-branch-work"
+      ],
+      "forbidden": [
+        "create-semantic-commits"
+      ]
+    },
+    {
+      "id": "skill-git-pr-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Propose a safe plan for two stacked pull requests with coherent boundaries and traceability; do not publish or push anything.",
+      "expected": [
+        "manage-pull-request"
+      ],
+      "forbidden": [
+        "create-semantic-commits"
+      ]
+    },
+    {
+      "id": "skill-git-version-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Determine a semantic version increment from documented public API compatibility changes and this repository release policy; do not create tags.",
+      "expected": [
+        "determine-semantic-version"
+      ],
+      "forbidden": [
+        "manage-branch-work"
+      ]
+    },
+    {
+      "id": "skill-git-conflict-positive",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Analyze a rebase conflict from base, ours, and theirs; explain intended integrated behavior without staging or continuing the operation.",
+      "expected": [
+        "resolve-merge-conflicts"
+      ],
+      "forbidden": [
+        "manage-branch-work"
+      ]
+    },
+    {
+      "id": "agent-requirements-elicitor",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "Delegate discovery of unclear stakeholder needs and supporting sources before anyone writes formal acceptance requirements.",
+      "expected": [
+        "requirements-elicitor"
+      ],
+      "forbidden": [
+        "requirements-specifier"
+      ]
+    },
+    {
+      "id": "agent-requirements-specifier",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "Delegate drafting formal acceptance criteria and temporal constraints from an already approved set of needs; exclude backlog creation.",
+      "expected": [
+        "requirements-specifier"
+      ],
+      "forbidden": [
+        "backlog-planner"
+      ]
+    },
+    {
+      "id": "agent-backlog-planner",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "Delegate splitting defined behavior into a traceable backlog with dependencies, not a redesign of the approved requirements.",
+      "expected": [
+        "backlog-planner"
+      ],
+      "forbidden": [
+        "requirements-elicitor"
+      ]
+    },
+    {
+      "id": "agent-design-engineer",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "Delegate a read-only architecture decision for a bounded change from accepted constraints, without implementation.",
+      "expected": [
+        "design-engineer"
+      ],
+      "forbidden": [
+        "implementation-engineer"
+      ]
+    },
+    {
+      "id": "agent-implementation-engineer",
+      "kind": "agent",
+      "mode": "explicit",
+      "prompt": "In an isolated disposable repo with explicitly granted edits, delegate implementing the selected code slice and reporting actual checks.",
+      "expected": [
+        "implementation-engineer"
+      ],
+      "forbidden": [
+        "test-engineer"
+      ]
+    },
+    {
+      "id": "agent-test-engineer",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "Delegate adding automated tests in a disposable fixture for a specified behavior only; production code edits are not authorized.",
+      "expected": [
+        "test-engineer"
+      ],
+      "forbidden": [
+        "implementation-engineer"
+      ]
+    },
+    {
+      "id": "agent-code-review-lead",
+      "kind": "agent",
+      "mode": "explicit",
+      "prompt": "Explicitly delegate an independent read-only review of the bounded payment code diff; one Review Lead should own the final verdict.",
+      "expected": [
+        "code-reviewer"
+      ],
+      "forbidden": [
+        "implementation-engineer"
+      ]
+    },
+    {
+      "id": "agent-security-specialist",
+      "kind": "agent",
+      "mode": "contextual",
+      "prompt": "As Code Review Lead, delegate the authentication and data-authorization concerns in this payment diff to a read-only security specialist.",
+      "expected": [
+        "security-reviewer"
+      ],
+      "forbidden": [
+        "correctness-reviewer"
+      ]
+    },
+    {
+      "id": "agent-reliability-specialist",
+      "kind": "agent",
+      "mode": "contextual",
+      "prompt": "As Code Review Lead, delegate idempotency, retries, and crash-window risks in the renewal diff to the reliability specialist.",
+      "expected": [
+        "reliability-reviewer"
+      ],
+      "forbidden": [
+        "security-reviewer"
+      ]
+    },
+    {
+      "id": "agent-finding-verifier",
+      "kind": "agent",
+      "mode": "contextual",
+      "prompt": "The review team has contradictory findings for the same reachable state transition. Delegate independent falsification without issuing the final verdict.",
+      "expected": [
+        "finding-verifier"
+      ],
+      "forbidden": [
+        "code-reviewer"
+      ]
+    },
+    {
+      "id": "agent-low-risk-no-team",
+      "kind": "agent",
+      "mode": "contextual",
+      "prompt": "Review a one-word documentation correction; there are no separate risk lenses justifying specialist subagents.",
+      "expected": [],
+      "forbidden": [
+        "security-reviewer",
+        "reliability-reviewer",
+        "finding-verifier"
+      ]
+    },
+    {
+      "id": "agent-git-engineer",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "Delegate read-only Git analysis to determine PR boundaries and branch freshness while keeping push and remote creation unauthorized.",
+      "expected": [
+        "git-engineer"
+      ],
+      "forbidden": [
+        "implementation-engineer"
+      ]
+    },
+    {
+      "id": "agent-delivery-coordinator",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "Delegate planning the cross-context handoffs toward the requested stage without claiming the coordinator performed each specialist's work.",
+      "expected": [
+        "delivery-coordinator"
+      ],
+      "forbidden": [
+        "requirements-specifier"
+      ]
+    },
+    {
+      "id": "command-requirements-validation",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /validate-requirements for the supplied specification and report its quality findings read-only.",
+      "expected": [
+        "validate-requirements"
+      ],
+      "forbidden": [
+        "specify-requirements"
+      ]
+    },
+    {
+      "id": "command-requirements-specification",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /specify-requirements using this accepted elicitation handoff to draft the defined requirements.",
+      "expected": [
+        "specify-requirements"
+      ],
+      "forbidden": [
+        "validate-requirements"
+      ]
+    },
+    {
+      "id": "command-review-explicit",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /review-code on this explicit patch in read-only advisory profile with evidence; do not publish a PR.",
+      "expected": [
+        "review-code"
+      ],
+      "forbidden": [
+        "implement-slice"
+      ]
+    },
+    {
+      "id": "command-plan-pr-explicit",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /plan-pull-requests to plan separate coherent changes; read-only analysis only.",
+      "expected": [
+        "plan-pull-requests"
+      ],
+      "forbidden": [
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "command-semver-explicit",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /determine-semantic-version to analyze an API change; do not create a release or tag.",
+      "expected": [
+        "determine-semantic-version"
+      ],
+      "forbidden": [
+        "commit"
+      ]
+    },
+    {
+      "id": "command-review-not-implicit",
+      "kind": "command",
+      "mode": "implicit",
+      "prompt": "Implement this small approved code change in a disposable repository; no slash command was entered and there is no separate review request.",
+      "expected": [],
+      "forbidden": [
+        "review-code"
+      ]
+    },
+    {
+      "id": "command-no-implicit-commit",
+      "kind": "command",
+      "mode": "implicit",
+      "prompt": "Provide a suggested semantic commit message for this diff, without executing a Git commit or any slash command.",
+      "expected": [],
+      "forbidden": [
+        "commit"
+      ]
+    },
+    {
+      "id": "command-no-implicit-create-pr",
+      "kind": "command",
+      "mode": "implicit",
+      "prompt": "Draft the text for a pull request but do not create it remotely; no slash command or external mutation is authorized.",
+      "expected": [],
+      "forbidden": [
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "command-no-implicit-test-write",
+      "kind": "command",
+      "mode": "implicit",
+      "prompt": "Explain which existing tests cover this code; I did not request test edits or invoke /generate-tests.",
+      "expected": [],
+      "forbidden": [
+        "generate-tests"
+      ]
+    },
+    {
+      "id": "rule-requirements-context",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "We are formally specifying domain business rules and acceptance conditions from authoritative stakeholder evidence.",
+      "expected": [
+        "requirements"
+      ],
+      "forbidden": [
+        "testing",
+        "code-review"
+      ]
+    },
+    {
+      "id": "rule-backlog-context",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "We are refining traceable backlog slices and dependencies from accepted requirements, without changing the source semantics.",
+      "expected": [
+        "backlog"
+      ],
+      "forbidden": [
+        "implementation"
+      ]
+    },
+    {
+      "id": "rule-tailoring-context",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "Choose proportional requirements rigor for a low-risk documentation change without imposing a full high-assurance specification.",
+      "expected": [
+        "tailoring"
+      ],
+      "forbidden": [
+        "high-risk-patterns"
+      ]
+    },
+    {
+      "id": "rule-design-context",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "We are making technical design tradeoffs for an architecture slice before authorizing any production edits.",
+      "expected": [
+        "design"
+      ],
+      "forbidden": [
+        "implementation"
+      ]
+    },
+    {
+      "id": "rule-implementation-context",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "In a disposable test repository, implement an authorized production slice and verify behavior; do not claim independent review.",
+      "expected": [
+        "implementation"
+      ],
+      "forbidden": [
+        "code-review"
+      ]
+    },
+    {
+      "id": "rule-test-context",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "The only authorized task is to design deterministic automated tests that cover a known boundary case.",
+      "expected": [
+        "testing"
+      ],
+      "forbidden": [
+        "implementation"
+      ]
+    },
+    {
+      "id": "rule-code-review-context",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "Perform a read-only independent Code Review of the explicit diff, assess impact and calibrate evidence-backed findings.",
+      "expected": [
+        "code-review"
+      ],
+      "forbidden": [
+        "implementation"
+      ]
+    },
+    {
+      "id": "rule-high-risk-pattern-context",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "During the review of financial payment code, investigate external side-effect windows and idempotency failure patterns.",
+      "expected": [
+        "high-risk-patterns"
+      ],
+      "forbidden": [
+        "semantic-commit"
+      ],
+      "allowed_companions": [
+        "code-review"
+      ]
+    },
+    {
+      "id": "rule-high-risk-not-default",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "Review a harmless README formatting change with no reachable runtime side effects or high-risk mechanism.",
+      "expected": [
+        "code-review"
+      ],
+      "forbidden": [
+        "high-risk-patterns"
+      ]
+    },
+    {
+      "id": "rule-gitflow-only",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "This repository explicitly uses Gitflow with develop, release and hotfix branches. Evaluate the branch lifecycle under that policy.",
+      "expected": [
+        "gitflow"
+      ],
+      "forbidden": [],
+      "allowed_companions": [
+        "git"
+      ]
+    },
+    {
+      "id": "rule-gitflow-not-universal",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "This repository explicitly uses trunk-based development and has no develop/release Gitflow branch model. Plan its branch strategy.",
+      "expected": [
+        "git"
+      ],
+      "forbidden": [
+        "gitflow"
+      ]
+    },
+    {
+      "id": "rule-semver-only",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "The project declares SemVer and a public API; determine if a backward incompatible API change affects MAJOR.",
+      "expected": [
+        "semantic-version"
+      ],
+      "forbidden": [
+        "semantic-commit"
+      ]
+    },
+    {
+      "id": "rule-semver-not-universal",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "This private ad-hoc script has no declared public API or SemVer release policy. Do not infer a major version bump.",
+      "expected": [],
+      "forbidden": [
+        "semantic-version"
+      ]
+    },
+    {
+      "id": "rule-commit-atomicity",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "Create a scoped local commit for a verified intention following repository message conventions and atomicity.",
+      "expected": [
+        "semantic-commit"
+      ],
+      "forbidden": [
+        "pull-request"
+      ],
+      "allowed_companions": [
+        "git"
+      ]
+    },
+    {
+      "id": "rule-pr-reviewability",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "Plan a small reviewable pull-request boundary and assess scope, template, quality gates and readiness without publication.",
+      "expected": [
+        "pull-request"
+      ],
+      "forbidden": [
+        "gitflow"
+      ],
+      "allowed_companions": [
+        "git"
+      ]
+    }
+  ]
+}
