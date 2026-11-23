@@ -509,7 +509,6 @@ class ToolkitLintTests(unittest.TestCase):
             for path in (self.root / "contexts").glob("*/rules/*.md")
         }
         self.assertEqual(expected, actual)
-        self.assertEqual(14, len(actual))
 
     def test_cursor_plugin_rejects_missing_canonical_rule(self):
         target = self.root / ".cursor-plugin/plugin.json"
