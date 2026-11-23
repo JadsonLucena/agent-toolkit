@@ -45,6 +45,16 @@ The diagram governs the loop. Apply `contexts/debugging/rules/debugging.md` for 
 * **Experiment:** distinguish passive inspection, isolated test and potentially mutating operation. Without actual scoped permission, record an unexecuted proposal; do not edit source, write tests or deploy instrumentation. Reconsider the method when repeated attempts yield no new information.
 * **Conclude and hand off:** emit `confirmed`, `probable`, `inconclusive` or `blocked` with inspected evidence and counterevidence. Assign Implementation, Requirements, Design, Testing, Review or Delivery/operations as next owner according to responsibility; no new authorization is conferred.
 
+## Conditional Techniques
+
+Load only the relevant reference when its trigger is material; these are supplemental investigative procedures, not mandatory sub-skills or new artifact owners:
+
+* [Differential investigation](references/differential-investigation.md) — working/failing comparisons and safe regression isolation.
+* [Causal tracing](references/causal-tracing.md) — backward data/event tracing through service boundaries.
+* [Async and concurrency](references/async-and-concurrency.md) — races, retry, ordering, flaky tests and condition-based waiting.
+
+The default native evidence-first process remains sufficient when none applies.
+
 ## Output
 
 A concise `contracts/debugging-evidence.md`-compatible diagnosis: revision/scope, observations, tested hypotheses, causal assessment, limits, required next evidence and next responsible owner. Trivial cases may remain inline; no persistent artifact is mandatory.
