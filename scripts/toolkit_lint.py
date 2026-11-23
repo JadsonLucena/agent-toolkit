@@ -14,7 +14,7 @@ from pathlib import Path, PurePosixPath
 ROOT = Path(__file__).resolve().parents[1]
 PATH_REF = re.compile(r"\x60((?:contexts|contracts)/[A-Za-z0-9_./-]+\.md)\x60")
 MATRIX_ROW = re.compile(
-    r"^\|\s*(Requirements|Design|Implementation|Delivery|Testing|Review|Git|Cross-context)\s*\|\s*"
+    r"^\|\s*(Requirements|Design|Debugging|Implementation|Delivery|Testing|Review|Git|Cross-context)\s*\|\s*"
     r"\x60([^\x60]+)\x60\s*\|\s*(Rule|Skill|Command|Agent|Contract)\s*\|",
     re.MULTILINE,
 )
@@ -46,7 +46,7 @@ def classify(path: Path) -> tuple[str, str] | None:
     if len(parts) < 4 or parts[0] != "contexts":
         return None
     context = parts[1].capitalize()
-    if context not in ("Requirements", "Design", "Implementation", "Delivery", "Testing", "Review", "Git"):
+    if context not in ("Requirements", "Design", "Debugging", "Implementation", "Delivery", "Testing", "Review", "Git"):
         return None
     if len(parts) == 4 and parts[3].endswith(".md"):
         kind = {"rules": "Rule", "agents": "Agent", "commands": "Command"}.get(parts[2])
