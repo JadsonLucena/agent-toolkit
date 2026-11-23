@@ -80,6 +80,7 @@ Metrics: **precision** = required activations observed / (required activations o
 ## Semantic boundaries tested
 
 - **Requirements:** elicitation versus definition versus read-only validation; backlog planning versus requirement creation.
+- **Debugging:** evidence-first standalone diagnosis versus Requirements ambiguity, Implementation fixes, Review candidate verification and test-only work; no implied runtime tool permission.
 - **Implementation and Testing:** production-slice editing versus test-only work; TDD only when selected.
 - **Review:** an explicitly scoped review versus routine implementation checks; reviewer-team delegation only when risk justifies it; candidate verification after findings exist.
 - **Git:** atomic commit, PR planning, remote PR creation and SemVer are distinct and independently authorized; Gitflow is conditional.
