@@ -44,6 +44,30 @@ class ToolkitLintTests(unittest.TestCase):
     def test_current_canonical_repository_passes(self):
         self.assertEqual([], lint_toolkit(self.root))
 
+    def test_debugging_is_canonical_and_covered_by_cursor(self):
+        # The new context must be recognized by both matrix ownership
+        # and optional plugin discovery, not treated as an unknown directory.
+        self.assertEqual([], lint_toolkit(self.root))
+        target = self.root / "contexts/debugging/agents/debugging-investigator.md"
+        target.unlink()
+        self.assert_error("ownership entry points to missing artifact")
+
+    def test_debugging_missing_cursor_rule_is_rejected(self):
+        self.change(
+            ".cursor-plugin/plugin.json",
+            '"./contexts/debugging/rules/debugging.md",',
+            "",
+        )
+        self.assert_error("rules coverage mismatch")
+
+    def test_debugging_missing_matrix_owner_is_rejected(self):
+        self.change(
+            "ARCHITECTURE.md",
+            "| Debugging | `rules/debugging.md` | Rule |",
+            "| Debugging | `rules/unknown.md` | Rule |",
+        )
+        self.assert_error("missing ownership entry")
+
     def test_missing_repository_agent_instructions(self):
         (self.root / "AGENTS.md").unlink()
         self.assert_error("AGENTS.md: missing repository agent instructions")
