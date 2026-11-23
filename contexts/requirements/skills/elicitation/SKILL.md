@@ -14,6 +14,7 @@ Use to discover and structure the knowledge needed to understand a change before
 * Rule: `contexts/requirements/rules/tailoring.md`
 * Rule: `contexts/requirements/rules/requirements.md`
 * Contract: `contracts/requirements.md`
+* Optional technical diagnosis input: `contracts/debugging-evidence.md`
 
 ## State Model
 
@@ -100,6 +101,10 @@ Select only an approach that can change a material interpretation, evidence need
 Select these techniques only when the relevant decision signal is present. Prefer a narrow question, event sequence, relationship list or comparison over a formal map, workshop or classification when it conveys the same knowledge. Do not imply that interviews, workshops, metric collection, experiments, hazard analysis or independent safety review occurred when they have not. Preserve relationships through the existing need, goal, actor, event, option, assumption, risk, decision and provenance semantics in `contracts/requirements.md`; no new artifact is required.
 
 Use techniques in combination only when each resolves a distinct material uncertainty. After investigation, re-evaluate what remains unknown and stop when further analysis cannot change the next decision without new evidence or authority. Preserve proposed tests or experiments as learning options; elicitation alone does not authorize execution.
+
+### Unexpected technical behavior during discovery
+
+When elicitation observes a **specific existing-system failure** whose mechanism materially affects Current State, an available technical diagnosis may be consumed through `contracts/debugging-evidence.md`. If the mechanism is not yet supported and further diagnosis would change the next requirements decision, request a separately authorized Debugging investigation rather than imitating its code/log procedure here. Requirements still owns the expected business semantics, stakeholder decisions and Change Boundary. A technical trace does not prove what stakeholders intended; do not require a repository or Debugging for ordinary ambiguity.
 
 ### Decision-frontier interview protocol
 

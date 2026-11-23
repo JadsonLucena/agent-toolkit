@@ -13,6 +13,7 @@ Independently investigate candidate code-review findings and produce traceable, 
 
 * Rule: `contexts/review/rules/code-review.md`
 * Output contract: `contracts/review-evidence.md`
+* Optional technical diagnosis input: `contracts/debugging-evidence.md`
 
 ## Working State
 
@@ -37,6 +38,10 @@ The diagram is the procedure. Apply `contexts/review/rules/code-review.md` for s
 ## Output
 
 A normalized, traceable finding set under `contracts/review-evidence.md`, including raw-finding mappings, rejected reasons, unresolved concerns, and whether further verification is required.
+
+## Optional Causal Evidence
+
+When a candidate finding depends on a runtime sequence or distributed mechanism not established by source inspection alone, consume available scoped `contracts/debugging-evidence.md` or request a **separately authorized** read-only diagnosis. Do not invoke another context's internal agent merely to retrieve data. Independently verify that any diagnosis applies to the Review-frozen head/base or explicitly pinned external context, inspect the relevant code and counterevidence, and retain `unverified` when decisive evidence is absent. A Debugging status is not a finding classification, independent reviewer attestation or a second PASS/FAIL.
 
 ## Source and External-Context Verification
 
