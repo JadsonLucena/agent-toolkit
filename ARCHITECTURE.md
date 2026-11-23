@@ -33,6 +33,11 @@ contexts/
 │   ├── skills/design-solution/SKILL.md
 │   ├── commands/design-solution.md
 │   └── agents/design-engineer.md
+├── debugging/
+│   ├── rules/debugging.md
+│   ├── skills/systematic-debugging/SKILL.md
+│   ├── commands/investigate-defect.md
+│   └── agents/debugging-investigator.md
 ├── implementation/
 │   ├── rules/implementation.md
 │   ├── skills/implement-slice/SKILL.md
@@ -92,7 +97,8 @@ contracts/
 ├── work-item.md
 ├── test-basis.md
 ├── test-evidence.md
-└── review-evidence.md
+├── review-evidence.md
+└── debugging-evidence.md
 ```
 
 ## Optional Vendor Adapters
@@ -158,6 +164,10 @@ Host-specific discovery and invocation settings belong in optional integrations.
 | Design | `skills/design-solution/SKILL.md` | Skill | Evidence-backed design of the next bounded implementation slice |
 | Design | `commands/design-solution.md` | Command | Start scoped technical design without implementation authority |
 | Design | `agents/design-engineer.md` | Agent | Own technical design decisions and handoff integrity |
+| Debugging | `rules/debugging.md` | Rule | Evidence-based causal diagnosis, safety and read-only authority |
+| Debugging | `skills/systematic-debugging/SKILL.md` | Skill | Progressive localization, falsifiable experiments and diagnosis handoff |
+| Debugging | `agents/debugging-investigator.md` | Agent | Technical investigator, uncertainty and responsible-owner routing |
+| Debugging | `commands/investigate-defect.md` | Command | Explicit read-only diagnostic invocation |
 | Implementation | `rules/implementation.md` | Rule | Authorized slice, verification, reversibility, atomic delivery and recovery invariants |
 | Implementation | `skills/implement-slice/SKILL.md` | Skill | Implement and locally verify one bounded increment |
 | Implementation | `skills/test-driven-development/SKILL.md` | Skill | Conditional RED/GREEN/REFACTOR inner loop with observed feedback |
@@ -205,6 +215,7 @@ Host-specific discovery and invocation settings belong in optional integrations.
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
 | Cross-context | `contracts/outcome-evidence.md` | Contract | Optional post-delivery outcome observations and feedback |
 | Cross-context | `contracts/design-evidence.md` | Contract | Portable technical design decisions and handoff to Implementation |
+| Cross-context | `contracts/debugging-evidence.md` | Contract | Portable causal findings, provenance, uncertainty and next owner |
 | Cross-context | `contracts/review-evidence.md` | Contract | Portable independent code-review evidence and pre-PR eligibility semantics |
 | Cross-context | `contracts/review-specialist-evidence.md` | Contract | Self-contained specialist and verifier evidence |
 | Cross-context | `contracts/requirements.md` | Contract | Neutral elicitation and requirement-definition handoff semantics |
@@ -232,6 +243,7 @@ Additional rules:
 * Agents own dynamic specialist-level orchestration and handoffs; the command chooses the invoked capability, not the implementation of its procedure.
 * Commands define the authorization granted by invocation; authorization does not silently expand to adjacent mutations or downstream operations.
 * Contracts must not depend on a context implementation.
+* Debugging can investigate observed technical failures for other contexts via neutral evidence; it is not a mandatory SDLC stage and cannot authorize fixes, stakeholder decisions or Review verdicts.
 * A context must not invoke another context's internal agent or skill merely to obtain data.
 * Cross-context integration should pass semantic evidence through contracts or explicit inputs.
 * Cross-context agent or skill composition is allowed only when the invoked workflow explicitly spans those contexts. Data acquisition alone is not sufficient justification for cross-context orchestration.
