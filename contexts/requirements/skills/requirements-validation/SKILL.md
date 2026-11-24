@@ -16,6 +16,9 @@ Do not judge quality by document count.
 * Rule: `contexts/requirements/rules/tailoring.md`
 * Rule: `contexts/requirements/rules/requirements.md`
 * Contract: `contracts/requirements.md`
+* Optional observed-behavior evidence: `contracts/debugging-evidence.md`
+
+A current debugging diagnosis may support an observed-versus-specified behavior comparison, but it does not establish stakeholder authority or independently validate a requirement. Keep the requirements finding taxonomy and readiness decision owned here; do not convert a technical `confirmed` diagnosis into an automatic specification defect.
 
 ## Finding Taxonomy
 
