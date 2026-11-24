@@ -80,8 +80,8 @@ flowchart TD
 
     Verify --> ReviewCheck{"Code Review PASS with full coverage for exact head/base?"}
     ReviewCheck -->|Yes, current evidence| SelectTemplate
-    ReviewCheck -->|Missing or stale| RequestReview
-    ReviewCheck -->|FAIL or unresolved INCOMPLETE| ReviewGap["Review: invoke read-only /review/review-code advisory"]
+    ReviewCheck -->|Missing or stale| RequestReview["Review: invoke read-only /review/review-code advisory"]
+    ReviewCheck -->|FAIL or unresolved INCOMPLETE| ReviewGap
     RequestReview --> ReviewResult{"Actual Review PASS and complete for final head/base?"}
     ReviewResult -->|Yes| SelectTemplate
     ReviewResult -->|No or unavailable| ReviewGap["Record Review findings and missing evidence"]
