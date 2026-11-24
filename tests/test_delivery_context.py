@@ -62,7 +62,7 @@ class DeliveryContextTests(unittest.TestCase):
         for stage in ("planned", "designed", "implemented", "reviewed", "pr-prepared", "pr-created", "integrated"):
             self.assertIn(stage, doc(COMMAND))
             self.assertIn(stage, skill)
-        self.assertIn("sole technical verdict", skill)
+        self.assertRegex(skill, r"Review (?:retains|owns) the (?:sole|single) technical verdict")
         self.assertIn("not a substitute Review verdict", agent)
 
     def test_no_implicit_authorization(self):

@@ -103,13 +103,9 @@ contracts/
 
 ## Optional Vendor Adapters
 
-`adapters/` contains noncanonical provider/runtime-specific integrations. The optional `.cursor-plugin/plugin.json` is a Cursor discovery manifest that points to existing canonical components; the manifest does not change their authority or guarantee runtime enforcement. Portable Agent `name`/`description` metadata supports discovery without selecting a provider. The Cursor plugin declares the canonical `.md` Rules directly using opt-in contextual discovery metadata; the observed Review Rule discovery does not establish automatic Rule activation or host-side enforcement. The plugin remains a noncanonical integration, not a new source of policy. For example, `adapters/ocr/` bridges Alibaba OpenCodeReview's **delegation-mode** file/rule discovery into structured supplemental data for Review. It is excluded from the canonical artifact matrix: adapters may consume canonical semantics, while canonical rules, skills, agents, commands and contracts must remain fully operable without them.
+Canonical Rules, Skills, Commands, Agents and Contracts remain usable without provider-specific adapters. The optional [Cursor plugin](.cursor-plugin/README.md) and [runtime adapters](adapters/) consume canonical sources; neither defines new authority nor proves host discovery or enforcement.
 
-Agent Teams runtime integration is optional as well. The Review context defines team roles and a provider-neutral messaging workflow; **actual peer-to-peer delivery, isolated agent spawning, and progress tracking require a runtime adapter capable of those actions**. No Markdown file or OCR adapter creates runtime messaging by itself. Where unsupported, the lead uses relayed or native-solo review and reports the actual execution mode.
-
-`adapters/review/run_review.py` is the reference entrypoint for canonical `/review/review-code`: it calls `prepare_context.py` **before** the approved reviewer, verifies Git head/diff or workspace fingerprint afterward, and freezes R0–R3 risk/concerns before any advertised Task spawn. Preparation prioritizes OCR >=1.9.0 when allowed and preserves neutral inventory in `adapters/review/git_scope.py`; `--no-ocr` never imports OCR. `adapters/review/team_orchestration.py` is the provider-neutral Task protocol: risk-proportionate N from the canonical coordinate-review-team skill, including small critical diffs with fewer genuine concerns; isolated Tasks without observed direct exchange are `team-relayed`, not `team-live`. A host must actually bind its Task API to the protocol: Markdown alone never spawns or isolates agents. `adapters/teams/peer_bus.py` implements bounded in-process peer messages with explicit request/response/resolution tracking for host-supplied role handlers, not independent model spawning or a `team-live` review. `adapters/github/guarded_pr.py` is an explicitly invoked GitHub CLI preflight-and-create adapter: it verifies SSH-signed review evidence from a key approved by an **external protected policy**, executes the policy's required checks, and verifies the created remote PR after mutation. The trusted runtime must protect signer keys, policies and their selection. No wrapper can prevent bypass through unrelated GitHub clients without separate platform authorization enforcement.
-
-An adapter must not claim review coverage, bypass verification, publish remote changes, install dependencies or mutate project artifacts merely because the helper exists. OCR's excluded/unaccounted paths remain in the independent review's Git inventory. Adapter failures trigger native fallback when Git context is still inspectable.
+The [Review](adapters/review/README.md), [OCR](adapters/ocr/README.md), [Agent Teams](adapters/teams/README.md), [GitHub](adapters/github/README.md), [Context](adapters/context/README.md), and [Delivery](adapters/delivery/README.md) guides own integration details and version-specific constraints. Host APIs must actually implement isolation, peer messaging, remote effects and protected policy checks; Markdown cannot do so. Optional hints never reduce required native review coverage. On failure, fall back only when the relevant evidence and operation remain safely verifiable.
 
 ## Responsibility Model
 
@@ -135,7 +131,7 @@ Metadata is a **discovery hint**, not a policy, procedure, permission grant, or 
 - **Rule:** `description` states the applicability condition and governed invariant, including exclusions such as Gitflow-only rules. The optional Cursor `alwaysApply: false` marks Rules as requestable, not as proven contextually loaded.
 - **Contract:** is selected by a canonical reference or handoff obligation; it does not acquire an Agent/Skill routing description.
 
-Stable names must be unique within their public capability kind. Renames update every reference, manifest, ownership entry and regression fixture atomically. Avoid keyword stuffing, unverifiable claims (for example \"guarantees correctness\"), duplicated normative instructions, and generic descriptions that fit unrelated tasks. Description length is an editorial heuristic; **correct trigger and exclusion semantics take precedence over a universal character count**.
+Stable names must be unique within their public capability kind. Renames update every reference, manifest, ownership entry and regression fixture atomically. Avoid keyword stuffing, unverifiable claims (for example \"guarantees correctness\"), duplicated normative instructions, and generic descriptions that fit unrelated tasks. The toolkit linter enforces **50–260 characters** for discovery descriptions as a **repository-specific quality gate**, not a universal Cursor or Agent Skills limit. Preserve accurate triggers and exclusions; do not pad descriptions solely to reach a target.
 
 Host-specific discovery and invocation settings belong in optional integrations. Evaluate selection with positive, negative and adjacent prompts plus **observed host events**; structural lint alone cannot establish activation, correct delegation or permission enforcement.
 
@@ -476,22 +472,9 @@ The following do not currently require first-class commands:
 
 Promote one to a command only when there is a clear user-facing invocation intent. Reusable internal procedures may remain skills without public command entry points.
 
-### Portable Review Execution
+## Portable Review Execution
 
-The canonical Rule/Skill/Agent/Command/Contract artifacts define the required
-semantics. Adapters in `adapters/review/` are optional reference implementations,
-not the source of truth for any IDE, model, issue tracker, Git host or runtime.
-
-Host-native Review follows the same **prepare → scoped investigation →
-validate evidence** contract as a subprocess reviewer. Preparation freezes
-repository, base/head or workspace fingerprint, full inventory and R0–R3
-risk before any isolated task. The validator checks that the same snapshot
-remains current. Optional OCR hints never reduce native review coverage.
-
-Canonical concerns: `contract`, `correctness`, `security`, `reliability`,
-`testing`, `architecture`. The CLI accepts aliases `spec`,
-`specification` and `arch`. `--base-branch` resolves local/cached
-refs without fetch; `--output-language` selects human report prose.
+Review uses **prepare → scoped investigation → validate evidence**, preserving the same frozen head/base or workspace snapshot, complete file inventory, and risk classification. Neither optional OCR discovery nor agent orchestration reduces native coverage. The [Review runtime guide](adapters/review/README.md) owns CLI flags, aliases, adapter behavior, and provider-specific execution details.
 
 ## Advisory and Gate Review Semantics
 

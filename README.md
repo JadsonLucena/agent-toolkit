@@ -14,7 +14,7 @@ The toolkit is a collection of portable, version-controlled Markdown artifacts, 
 | [Design](contexts/design/) | Define technical decisions for a bounded implementation slice. |
 | [Debugging](contexts/debugging/) | Investigate observed technical defects without applying changes; provide reusable causal evidence. |
 | [Implementation](contexts/implementation/) | Implement and verify an authorized increment. |
-| [Delivery](contexts/delivery/) | Coordinate evidence-based handoffs across the lifecycle. |
+| [Delivery](contexts/delivery/) | Coordinate authorized changes from Requirements through reviewable PRs. |
 | [Testing](contexts/testing/) | Design, generate, and verify automated tests with traceable evidence. |
 | [Review](contexts/review/) | Assess code changes and risks, verify findings, and distinguish advisory review from independently attested gates. |
 | [Git](contexts/git/) | Manage repository changes, semantic commits, branches, and pull requests. |

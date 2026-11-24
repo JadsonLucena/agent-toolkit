@@ -3,6 +3,18 @@
   "description": "Vendor-neutral capability-routing scenarios. Expected/forbidden reflect intent; CI validates structure only, not model behavior.",
   "cases": [
     {
+      "id": "command-review-advisory-pr",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /review/review-code for the final PR diff in advisory mode before publication. Examine the complete head/base, report one evidence-backed verdict, and do not create the PR.",
+      "expected": [
+        "review-code"
+      ],
+      "forbidden": [
+        "create-pull-request"
+      ]
+    },
+    {
       "id": "skill-coordinate-delivery-e2e",
       "kind": "skill",
       "mode": "implicit",

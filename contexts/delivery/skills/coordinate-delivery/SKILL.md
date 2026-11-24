@@ -28,7 +28,7 @@ Preserve a small slice-scoped context selection: source and baseline references,
 
 Track the governing Product Slice or learning objective, source obligation/scenario identities, contributing PR Boundaries and their actual integration status, integrated target revisions and cross-PR verification evidence when material, alongside the next step.
 
-Track `target_stage`, authorized operations and restrictions, Change Boundary, existing or planned Git PR Boundary, available accepted baselines, per-slice dependencies/readiness, intended and actual PR head/base, local verification and Code Review evidence identity, review profile and verdict, preparation state, published PR status, post-publication checks/approvals, merge authorization and observed target state, commit authorization and observed SHA or uncommitted/blocked state, owned specialist outputs, external effects, pending decisions, and current outcome status. Never invent checkpoint persistence.
+Track the requested `target_stage`, authorized operations and restrictions, Change Boundary, source baseline and slice readiness. Preserve PR Boundary, actual head/base, verified commit SHA (or uncommitted/blocked state), checks, Code Review profile/verdict, publication and merge status, external effects, blockers and next owner. Record outcome evidence separately from technical milestones. Never invent checkpoint persistence.
 
 ## Optional Runtime Integrations
 
