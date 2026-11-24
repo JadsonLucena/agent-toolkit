@@ -170,7 +170,7 @@ Host-specific discovery and invocation settings belong in optional integrations.
 | Debugging | `commands/investigate-defect.md` | Command | Explicit read-only diagnostic invocation |
 | Implementation | `rules/implementation.md` | Rule | Authorized slice, verification, reversibility, atomic delivery and recovery invariants |
 | Implementation | `skills/implement-slice/SKILL.md` | Skill | Implement and locally verify one bounded increment |
-| Implementation | `skills/test-driven-development/SKILL.md` | Skill | Conditional RED/GREEN/REFACTOR inner loop with observed feedback |
+| Implementation | `skills/test-driven-development/SKILL.md` | Skill | Preferred RED/GREEN/REFACTOR inner loop for testable behavior, with evidence and justified exceptions |
 | Implementation | `commands/implement-slice.md` | Command | Authorize scoped production/test edits and local implementation |
 | Implementation | `agents/implementation-engineer.md` | Agent | Own implementation evidence, scope and safe handoffs |
 | Delivery | `rules/delivery.md` | Rule | Cross-context stage, authorization, recovery and handoff integrity |

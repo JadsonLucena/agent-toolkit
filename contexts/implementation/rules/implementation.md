@@ -1,5 +1,5 @@
 ---
-description: "Apply when implementing an authorized bounded code change, including safety checks, optional test-driven work, and Git handoffs."
+description: "Apply during authorized code implementation: prefer test-first TDD for testable behavior, document opt-outs and exceptions, preserve safety and Git handoffs."
 alwaysApply: false
 ---
 
@@ -21,7 +21,10 @@ alwaysApply: false
 
 ## Test-Driven Execution
 
-* Test-driven development is a conditional, authorized implementation strategy, not a prerequisite for all tasks. Select it where an executable small-behavior test can provide valuable feedback.
+* Prefer TDD (RED/GREEN/REFACTOR) for authorized changes to observable behavior when a supported, executable test can be written before production edits with available, permitted tools. This applies especially to new features, bug fixes (first reproduce the defect where feasible), and business-rule changes; the caller need not explicitly request TDD. The preference is not a prerequisite for all tasks.
+* Choose direct implementation only with a concrete exception: the caller explicitly opts out of TDD (which does not prohibit tests); no behavioral change (such as documentation, formatting, or non-behavioral configuration); an exploratory spike without an accepted expected behavior; an explicit restriction on test authoring; or unsafe/disproportionate test-first setup after checking reasonable alternatives at the appropriate test level. Convenience, the absence of a TDD keyword, and existing passing tests alone do not justify skipping TDD.
+* Decide and record the strategy before production edits, including the supported behavior or characterization basis, the concrete exception and risk when TDD is skipped, and the alternative verification plan. Skipping TDD never waives required tests, lint or other verification. If the caller explicitly requires TDD but it cannot be performed safely within scope, stop and report the blocker instead of silently falling back. Both paths retain all applicable required tests, lint, and other quality gates.
+* After a verification failure, establish a supported diagnosis before modifying code again. Reconsider test strategy whenever the behavior, test basis or implementation approach changes or remains uncertain; maintain TDD for new testable behavior unless a justified exception applies. A narrowly scoped repair of an already tested behavior may reuse its existing failing test without inventing a new RED. A failure alone never authorizes silently abandoning TDD.
 * The selected behavior must come from a supported requirement, scenario, observable contract, or existing characterization target; never invent acceptance semantics to make a convenient test.
 * RED: write the smallest relevant failing test and execute it. Confirm failure is for the **expected behavioral reason**, not a setup error, unrelated regression or missing dependency. A test that already passes is not RED evidence.
 * GREEN: change only the in-scope production code necessary to satisfy the selected behavior, while retaining existing material guarantees. Run the focused test and applicable regression checks.

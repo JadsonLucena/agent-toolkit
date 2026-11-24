@@ -1,6 +1,6 @@
 ---
 name: implement-slice
-description: "Implement an authorized production-code slice with local verification and safe atomic Git handoffs. Use for feature or defect implementation; use Testing for test-only changes."
+description: "Implement authorized code slices with TDD as the preferred testable-behavior strategy, justified opt-outs, local verification and atomic Git handoffs; not test-only work."
 ---
 
 # Implement Slice
@@ -37,11 +37,13 @@ flowchart TD
     PlanReady -->|No| Block["Stop with evidence and responsible owner"]
     PlanReady -->|Yes| Plan["Safe Implementation: choose next coherent intention"]
     Strategy -->|Not required or existing plan valid| Plan
-    Plan --> Test{"Test-first or TDD appropriate and authorized?"}
-    Test -->|Yes| Prepare["Select smallest behavior and test design"]
-    Test -->|No| Change["Apply minimal in-scope implementation"]
-    Prepare --> Change
-    Change --> Check["Verification and Feedback: execute applicable checks"]
+    Plan --> Test{"TDD required or preferred for supported behavior?"}
+    Test -->|Yes and feasible| TDD["test-driven-development: RED/GREEN/REFACTOR"]
+    TDD --> Check["Verification and Feedback: execute applicable checks"]
+    Test -->|Justified exception| Explain["Record concrete reason, risk and alternative checks"]
+    Explain --> Change["Apply minimal in-scope implementation"]
+    Change --> Check
+    Test -->|Required but unavailable or unsafe| Block
     Check --> Gate{"Verified and coherent intention?"}
     Gate -->|Yes| CommitAuthority{"Resolved local-commit authority permits commit?"}
     CommitAuthority -->|Yes| Commit["Git Engineer: create-semantic-commits handoff"]
@@ -56,12 +58,18 @@ flowchart TD
     More -->|Yes| Plan
     More -->|No| Done["Completion: record evidence and status"]
     Gate -->|Actionable failure| Diagnose["Establish diagnosis and evidence; revise only within authorized scope"]
-    Diagnose -->|Material new progress possible| Change
+    Diagnose -->|Material new progress possible| Reassess{"New behavior, changed test basis, or strategy uncertainty?"}
+    Reassess -->|Yes or uncertain| Test
+    Reassess -->|No; repair existing tested behavior| Change
     Diagnose -->|Unproductive or out of scope| Block
     Gate -->|Missing authority or unsafe effect| Block
 ```
 
 Apply the named sections of `contexts/implementation/rules/implementation.md`. When TDD is selected, delegate its inner RED/GREEN/REFACTOR loop to `contexts/implementation/skills/test-driven-development/SKILL.md` rather than rewriting it here. Git owns semantic commit execution; Implementation supplies a completed in-scope intention and waits for verified Git evidence before selecting another intention when a local commit is permitted. Do not treat silence in an authorized implementation plan as missing commit authority. When TDD is selected, multiple RED/GREEN/REFACTOR cycles may complete the same intention; return here for integrated verification and Git handoff as soon as that intention is complete, before selecting a different intention.
+
+## Test Strategy Selection
+
+Before production edits, apply the **Test-Driven Execution** policy in `contexts/implementation/rules/implementation.md`. Prefer the existing TDD Skill for testable observable behavior without waiting for a TDD keyword. An explicit caller opt-out of TDD permits direct implementation but never waives applicable tests; otherwise use direct implementation only for a recorded concrete exception and alternative verification plan. Explicitly required TDD that cannot run safely stops the affected change. After diagnosis, reselect TDD when behavior or its test basis changes; only a repair to the same already-tested behavior may proceed without a fresh RED, with the original test evidence preserved. Neither path expands mutation or remote-operation authority.
 
 ### Failure diagnosis boundary
 
@@ -75,7 +83,7 @@ For a nontrivial or unexplained failure, use the canonical Debugging investigati
 
 ## Output
 
-Return the bounded implementation state for a separate Integration stage; do not initiate independent Code Review, Git PR preparation/creation or merge as a side effect of completing this Skill. Report implementation files and affected interfaces, source and design references where available, verification commands and observed results, verified commit SHAs and resulting Git state when authorized and completed, or explicit uncommitted/blocked handoff status; PR-plan status when material; residual risks and readiness. Use `contracts/test-evidence.md` for supported scenario coverage without inventing passed tests.
+Return the bounded implementation state for a separate Integration stage; do not initiate independent Code Review, Git PR preparation/creation or merge as a side effect of completing this Skill. Report implementation files and affected interfaces, source and design references where available, verification commands and observed results, verified commit SHAs and resulting Git state when authorized and completed, or explicit uncommitted/blocked handoff status; PR-plan status when material; selected test strategy, concrete exception and alternative verification when TDD was skipped; residual risks and readiness. Use `contracts/test-evidence.md` for supported scenario coverage without inventing passed tests.
 
 ## Boundary
 
