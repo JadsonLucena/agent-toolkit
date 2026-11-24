@@ -760,6 +760,156 @@
       "allowed_companions": [
         "git"
       ]
+    },
+    {
+      "id": "skill-debugging-technical-failure",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "An intermittent renewal worker duplicates a payment under concurrent retries. Diagnose the technical mechanism from existing traces and code read-only; do not edit the system.",
+      "expected": [
+        "systematic-debugging"
+      ],
+      "forbidden": [
+        "implement-slice",
+        "verify-findings"
+      ]
+    },
+    {
+      "id": "skill-debugging-requirement-ambiguity",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Two stakeholders disagree on the intended billing grace-period policy and no runtime defect has been observed. Clarify authority and expected behavior before specification.",
+      "expected": [
+        "elicitation"
+      ],
+      "forbidden": [
+        "systematic-debugging"
+      ]
+    },
+    {
+      "id": "skill-debugging-review-verification",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "During a requested PR review, falsify an already reported candidate finding against the frozen diff and relevant tests; issue no standalone incident diagnosis.",
+      "expected": [
+        "verify-findings"
+      ],
+      "forbidden": [
+        "systematic-debugging"
+      ]
+    },
+    {
+      "id": "skill-debugging-test-only",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "The expected behavior is already established, and I explicitly authorize only automated regression test additions in a throwaway repository. Do not investigate a new defect.",
+      "expected": [
+        "generate-tests"
+      ],
+      "forbidden": [
+        "systematic-debugging",
+        "implement-slice"
+      ]
+    },
+    {
+      "id": "skill-debugging-composition",
+      "kind": "skill",
+      "mode": "contextual",
+      "prompt": "Implementation is authorized for a bounded bug-fix slice. An unexpected failing check has an uncertain cause: investigate first, then apply only the authorized correction and rerun verification.",
+      "expected": [
+        "implement-slice"
+      ],
+      "forbidden": [],
+      "allowed_companions": [
+        "systematic-debugging"
+      ]
+    },
+    {
+      "id": "skill-debugging-readonly-negative-fix",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Investigate a crash reported from production by reading pinned logs and Git history. Do not patch source, create tests, deploy or change infrastructure; report uncertainty.",
+      "expected": [
+        "systematic-debugging"
+      ],
+      "forbidden": [
+        "implement-slice",
+        "test-driven-development"
+      ]
+    },
+    {
+      "id": "agent-debugging-standalone",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "Delegate a bounded, read-only investigation of an intermittent queue-processing fault to a specialist who returns causal evidence without remediation.",
+      "expected": [
+        "debugging-investigator"
+      ],
+      "forbidden": [
+        "implementation-engineer",
+        "code-reviewer"
+      ]
+    },
+    {
+      "id": "agent-debugging-not-for-implementation",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "An approved code fix and acceptance scenarios are ready. Delegate the in-scope source and test modification to the owner of implementation, not a read-only investigator.",
+      "expected": [
+        "implementation-engineer"
+      ],
+      "forbidden": [
+        "debugging-investigator"
+      ]
+    },
+    {
+      "id": "command-debugging-explicit",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Run /debugging/investigate-defect for the observed deadlock and return source-backed hypotheses only; do not edit files or create a PR.",
+      "expected": [
+        "investigate-defect"
+      ],
+      "forbidden": [
+        "implement-slice",
+        "review-code"
+      ]
+    },
+    {
+      "id": "command-debugging-not-review",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Run /review/review-code on this specific PR diff in advisory mode; independently verify candidate findings and report the single Review verdict.",
+      "expected": [
+        "review-code"
+      ],
+      "forbidden": [
+        "investigate-defect"
+      ]
+    },
+    {
+      "id": "rule-debugging-readonly",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "During an explicitly requested read-only technical defect investigation, apply the invariant that causal evidence is required and potentially side-effecting probes need separate approval.",
+      "expected": [
+        "debugging"
+      ],
+      "forbidden": [
+        "implementation"
+      ]
+    },
+    {
+      "id": "rule-debugging-not-ordinary-elicit",
+      "kind": "rule",
+      "mode": "contextual",
+      "prompt": "Discover stakeholder goals and business definitions for a new renewal feature with no observed technical failure or source repository. Do not import debugging constraints.",
+      "expected": [
+        "requirements"
+      ],
+      "forbidden": [
+        "debugging"
+      ]
     }
   ]
 }

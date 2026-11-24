@@ -19,6 +19,7 @@ Carry a change toward the explicitly authorized target stage, selecting only the
 * Input/output contract: `contracts/test-basis.md` when available
 * Input/output contract: `contracts/test-evidence.md` when available
 * Input/output contract: `contracts/review-evidence.md` when available
+* Optional input diagnosis: `contracts/debugging-evidence.md`
 * Optional output contract: `contracts/outcome-evidence.md`
 
 ## Working State
@@ -69,6 +70,8 @@ flowchart TD
 The main diagram deliberately omits specialist-internal transitions. Route planned to Requirements, designed to Design, implemented to Implementation, reviewed to independent Review after applicable verification through Testing or authorized checks, and pr-prepared, pr-created or integrated through Git-owned preparation, publication and integration handoffs below. These routes do **not** grant additional permissions or allow a later-stage claim without its own evidence.
 
 This explicit cross-context workflow permits **routing** existing specialist capabilities; they continue to own their procedures and authorization gates. Requirements owns its internal elicitation/validation/backlog loop, Implementation owns its optional TDD and atomic Git commit handoffs, Review owns its verdict and Git owns PR planning, preparation, creation and merge. The diagram intentionally does not duplicate those internal workflows. Resolve Requirements composition against the **actually installed command**: use `/requirements/specify-and-plan-change` when the renamed command is present (independent PR #31), or `/requirements/shape-change` when the current installation still provides the original command. Verify the entry point exists before routing; do not assume an uninstalled command or a host alias. Both are Requirements-only and do not authorize the full delivery sequence. Review keeps the sole technical verdict. No tool execution is implied merely by this Markdown procedure.
+
+Debugging is a cross-context **conditional evidence-producing capability**, not a mandatory Delivery stage. If observed technical failure blocks a requested authorized stage, Delivery may route an explicitly scoped, read-only investigation and consume the resulting `contracts/debugging-evidence.md`, checking source identity and diagnosis limits. Any subsequent correction remains separately authorized and Implementation-owned; stakeholder semantics, architecture, tests and Review verdicts retain their owners.
 
 ## Transition Contract
 

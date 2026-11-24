@@ -18,6 +18,7 @@ Implement one supported, independently verifiable code slice without silently mo
 * Optional input contract: `contracts/work-item.md`
 * Optional input contract: `contracts/test-basis.md`
 * Optional output contract: `contracts/test-evidence.md`
+* Optional input diagnosis: `contracts/debugging-evidence.md`
 
 ## Working State
 
@@ -50,13 +51,17 @@ flowchart TD
     Continuation -->|No| DoneUncommitted["Return uncommitted state; stop before next intention"]
     More -->|Yes| Plan
     More -->|No| Done["Completion: record evidence and status"]
-    Gate -->|Actionable failure| Diagnose["Diagnose and revise only within authorized scope"]
+    Gate -->|Actionable failure| Diagnose["Establish diagnosis and evidence; revise only within authorized scope"]
     Diagnose -->|Material new progress possible| Change
     Diagnose -->|Unproductive or out of scope| Block
     Gate -->|Missing authority or unsafe effect| Block
 ```
 
 Apply the named sections of `contexts/implementation/rules/implementation.md`. When TDD is selected, delegate its inner RED/GREEN/REFACTOR loop to `contexts/implementation/skills/test-driven-development/SKILL.md` rather than rewriting it here. Git owns semantic commit execution; Implementation supplies a completed in-scope intention and waits for verified Git evidence before selecting another intention when a local commit is permitted.
+
+### Failure diagnosis boundary
+
+For a nontrivial or unexplained failure, use the canonical Debugging investigation **when it provides material information**; consume the resulting `contracts/debugging-evidence.md` as evidence, not mutation authority. Simple, already-evidenced local failures need no extra delegation. If expected behavior is unsupported, defer to Requirements; if the proposed repair changes a critical architectural contract, defer to Design. Only this authorized Implementation operation may edit production code and related tests. New source revisions or contrary observations require diagnostic revalidation; do not loop through speculative patches or assume a fixed retry count proves an architectural flaw.
 
 ## Cross-context Handoffs
 

@@ -65,6 +65,10 @@ When authoritative specification or other source behavior is applicable, `specif
 
 This record supplements the usual Review findings and coverage; it does not redefine test evidence, source requirements, the review profiles, or Git preflight. Do not automatically reject a change because a formal Scenario Set is absent. A `checked` label does not imply every business outcome was observed, and a `PASS` still depends on the one existing Review verdict policy.
 
+## Optional Debugging Handoff
+
+A finding may reference a source-pinned `contracts/debugging-evidence.md` diagnosis (`debugging_evidence_refs`) when it materially supports a failure mechanism or a disconfirming observation. Preserve its actual confidence and limits, and let Review independently verify relevance to the frozen head/base, trigger, consequence and severity. A `confirmed` debugging result cannot become an automatic Review blocker or PASS; the Review Lead remains the sole verdict owner.
+
 ## Findings
 
 Each finding should include:

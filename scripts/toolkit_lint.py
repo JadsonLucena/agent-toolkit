@@ -14,7 +14,7 @@ from pathlib import Path, PurePosixPath
 ROOT = Path(__file__).resolve().parents[1]
 PATH_REF = re.compile(r"\x60((?:contexts|contracts)/[A-Za-z0-9_./-]+\.md)\x60")
 MATRIX_ROW = re.compile(
-    r"^\|\s*(Requirements|Design|Implementation|Delivery|Testing|Review|Git|Cross-context)\s*\|\s*"
+    r"^\|\s*(Requirements|Design|Debugging|Implementation|Delivery|Testing|Review|Git|Cross-context)\s*\|\s*"
     r"\x60([^\x60]+)\x60\s*\|\s*(Rule|Skill|Command|Agent|Contract)\s*\|",
     re.MULTILINE,
 )
@@ -46,7 +46,7 @@ def classify(path: Path) -> tuple[str, str] | None:
     if len(parts) < 4 or parts[0] != "contexts":
         return None
     context = parts[1].capitalize()
-    if context not in ("Requirements", "Design", "Implementation", "Delivery", "Testing", "Review", "Git"):
+    if context not in ("Requirements", "Design", "Debugging", "Implementation", "Delivery", "Testing", "Review", "Git"):
         return None
     if len(parts) == 4 and parts[3].endswith(".md"):
         kind = {"rules": "Rule", "agents": "Agent", "commands": "Command"}.get(parts[2])
@@ -243,6 +243,15 @@ def lint_toolkit(root: Path) -> list[str]:
                 # canonical artifact kind. All Markdown links still get checked.
                 if (len(rel.parts) == 4 and rel.parts[:3] ==
                         ("contexts", "review", "templates") and rel.suffix == ".md"):
+                    continue
+                # Specialist technique references are noncanonical, lazily
+                # loaded supporting documents owned by systematic-debugging.
+                # Keep the exception path narrow so arbitrary new Markdown
+                # cannot silently bypass canonical ownership checks.
+                if (len(rel.parts) == 6 and rel.parts[:5] ==
+                        ("contexts", "debugging", "skills",
+                         "systematic-debugging", "references") and
+                        rel.suffix == ".md"):
                     continue
                 errors.append(f"{rel}: invalid canonical artifact location")
             else:

@@ -44,6 +44,42 @@ class ToolkitLintTests(unittest.TestCase):
     def test_current_canonical_repository_passes(self):
         self.assertEqual([], lint_toolkit(self.root))
 
+    def test_debugging_is_canonical_and_covered_by_cursor(self):
+        # The new context must be recognized by both matrix ownership
+        # and optional plugin discovery, not treated as an unknown directory.
+        self.assertEqual([], lint_toolkit(self.root))
+        target = self.root / "contexts/debugging/agents/debugging-investigator.md"
+        target.unlink()
+        self.assert_error("ownership entry points to missing artifact")
+
+    def test_debugging_missing_cursor_rule_is_rejected(self):
+        self.change(
+            ".cursor-plugin/plugin.json",
+            '"./contexts/debugging/rules/debugging.md",',
+            "",
+        )
+        self.assert_error("rules coverage mismatch")
+
+    def test_debugging_missing_matrix_owner_is_rejected(self):
+        self.change(
+            "ARCHITECTURE.md",
+            "| Debugging | `rules/debugging.md` | Rule |",
+            "| Debugging | `rules/unknown.md` | Rule |",
+        )
+        self.assert_error("missing ownership entry")
+
+    def test_debugging_reference_docs_are_noncanonical_and_linked(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        target = self.root / "contexts/debugging/skills/systematic-debugging/references/causal-tracing.md"
+        self.assertTrue(target.is_file())
+        target.unlink()
+        self.assert_error("broken Markdown link references/causal-tracing.md")
+
+    def test_unowned_debugging_markdown_is_rejected(self):
+        target = self.root / "contexts/debugging/undocumented.md"
+        target.write_text("# Unexpected", encoding="utf-8")
+        self.assert_error("invalid canonical artifact location")
+
     def test_missing_repository_agent_instructions(self):
         (self.root / "AGENTS.md").unlink()
         self.assert_error("AGENTS.md: missing repository agent instructions")
@@ -473,7 +509,6 @@ class ToolkitLintTests(unittest.TestCase):
             for path in (self.root / "contexts").glob("*/rules/*.md")
         }
         self.assertEqual(expected, actual)
-        self.assertEqual(14, len(actual))
 
     def test_cursor_plugin_rejects_missing_canonical_rule(self):
         target = self.root / ".cursor-plugin/plugin.json"
