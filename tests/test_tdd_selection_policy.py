@@ -26,7 +26,7 @@ class TddSelectionPolicyTests(unittest.TestCase):
                        "caller need not explicitly request TDD"):
             with self.subTest(marker=marker):
                 self.assertIn(marker, rule)
-        self.assertIn("missing an explicit TDD request does not mean direct implementation", command)
+        self.assertIn("absence of a TDD request is not a direct-implementation exception", command)
         self.assertIn("prefer TDD when feasible", agent)
         self.assertIn("Preferred for features, fixes and business rules", tdd)
 
