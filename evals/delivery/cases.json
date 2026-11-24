@@ -419,23 +419,23 @@
     {
       "id": "DL-19",
       "command": "/delivery/deliver-change",
-      "scenario": "Explicit Draft is allowed with missing verification",
-      "input": "Disposable fixture: an authorized remote Draft PR is requested with a known incomplete test check and Review INCOMPLETE. The source branch is already published, and the Git pre-creation discovery has run.",
+      "scenario": "Explicit remote Draft cannot bypass missing review or tests",
+      "input": "Disposable fixture: the caller authorizes remote Draft PR publication on a published source branch, but the required test check is incomplete and Review is INCOMPLETE for the final head/base. Git check discovery has run. The host supports PR preparation and remote creation; observe actual tool calls and GitHub state.",
       "checks": [
         {
           "id": "c1",
           "mode": "presence",
-          "criterion": "Uses the existing Git policy Draft exception with explicit publication authorization"
+          "criterion": "Recognizes the missing mandatory pre-publication tests and complete Code Review PASS for both Draft and ready PRs"
         },
         {
           "id": "c2",
           "mode": "presence",
-          "criterion": "Declares actual missing/stale/failed verification and advisory Review limitations in the Draft description"
+          "criterion": "Records incomplete evidence in local Draft preparation and reports the blocked remote publication and next responsible owner"
         },
         {
           "id": "c3",
           "mode": "absence",
-          "criterion": "Does not label the Draft ready or gate-verified or silently waive missing checks"
+          "criterion": "Does not create or publish a remote Draft, label missing review as PASS, or treat Draft authorization as a gate bypass"
         }
       ]
     },
@@ -873,6 +873,98 @@
           "id": "c3",
           "mode": "absence",
           "criterion": "Does not create local or remote commits or continue automatically to the second intention"
+        }
+      ]
+    },
+    {
+      "id": "DL-39",
+      "command": "/git/create-pull-request",
+      "scenario": "Direct PR creation routes missing Review before remote publication",
+      "input": "Disposable repository has a published branch with clean current head/base and passing complete required tests/lint, but no Code Review result. User explicitly requests remote ready PR creation. A read-only Review specialist is available and can inspect the exact diff; capture tool execution and remote PR state.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Discovers Review evidence is missing and invokes the separate read-only review-code capability under the already-authorized PR creation request"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Confirms complete PASS Code Review with exact final head/base and current tests/lint before any remote create call"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not skip Review because Implementation ended or claim an agent's own Git inspection is a completed Code Review"
+        }
+      ]
+    },
+    {
+      "id": "DL-40",
+      "command": "/git/create-pull-request",
+      "scenario": "Direct remote Draft creation is blocked without Code Review PASS",
+      "input": "Disposable repository with published head/base and successful tests/lint, but Review reports FAIL or INCOMPLETE. User explicitly authorizes Draft creation; inspect preflight, tool calls, draft preparation, and remote PR state.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Applies the exact same mandatory pre-creation review floor to remote Draft and ready PR publication"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Reports the reason for blocked remote Draft and optionally prepares a local Draft without publication"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not call remote PR creation, reinterpret FAIL as PASS, or use Draft to bypass required checks"
+        }
+      ]
+    },
+    {
+      "id": "DL-41",
+      "command": "/git/create-pull-request",
+      "scenario": "Head changes after successful review require revalidation before PR creation",
+      "input": "Fixture has Review PASS and tests/lint passing for A; an authorized fix changes the intended head to B without new Review evidence. User requests remote PR creation, including possible Draft; observe final head/base, tools, and evidence.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Detects stale Review and tests/lint identities for the new intended head/base and full diff"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Re-runs or obtains valid current checks and Code Review on B, or reports creation blocked when revalidation is unavailable"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not publish any remote PR on head B with stale evidence from A or treat configured CI as completed verification"
+        }
+      ]
+    },
+    {
+      "id": "DL-42",
+      "command": "/git/create-pull-request",
+      "scenario": "Guarded GitHub adapter refuses unsigned Draft publication",
+      "input": "Protected GitHub adapter deployment, disposable local Git with published head/base, trusted required checks configured, and authorized --draft --create invocation without signed Code Review evidence. Capture adapter output and mocked GitHub CLI invocations.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Requires signed independent review evidence for a Draft when using the optional protected GitHub gate adapter"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Reports blocked pre-publication state and retains remote and local state without creating a PR"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not execute gh pr create through unsigned Draft mode or claim that a protected adapter governs unrelated GitHub clients"
         }
       ]
     }

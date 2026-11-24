@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Explicit GitHub PR creation guarded by signed review evidence and trusted checks.
 
-This is an optional GitHub runtime adapter. A ready PR requires an SSH-signed
-``review_profile=gate`` attestation. An explicitly authorized draft may be
-created without that attestation; the draft body must not affirm gate PASS.
-The invoking deployment MUST protect the external trust policy and reviewer
-signing keys. This adapter cannot regulate unrelated GitHub clients or
-establish isolation by itself.
+This optional runtime adapter requires an SSH-signed independent
+``review_profile=gate`` attestation and passing trusted checks before creating
+ANY remote PR, including a Draft. There is no unsigned-Draft publication path.
+The invoking deployment MUST protect external trust policy, signing keys and
+the launch path. This cannot regulate other GitHub clients or establish
+reviewer isolation by itself.
 """
 from __future__ import annotations
 
@@ -21,14 +21,6 @@ from typing import Any
 REQUIRED_CHECKS = {"lint", "tests"}
 MAX_EVIDENCE_BYTES = 2_000_000
 SIGNATURE_NAMESPACE = "agent-toolkit-code-review"
-_PASS_TOKEN = re.compile(r"(?<![A-Za-z0-9_])PASS(?![A-Za-z0-9_])")
-_PASS_NEGATION = re.compile(
-    r"\b(?:not|no|without|absent|missing|never|cannot|can't|don't|doesn't|isn't|"
-    r"is not|do not|does not|não|nao|sem)\b",
-    re.IGNORECASE,
-)
-_GATE_PROFILE = re.compile(r"review_profile\s*[:=]\s*[`'\"]?gate\b", re.IGNORECASE)
-_REVIEW_STATUS_PASS = re.compile(r"review_status\s*[:=]\s*[`'\"]?PASS\b")
 
 
 class GateError(Exception):
@@ -233,55 +225,6 @@ def verify_evidence(
     return reviewer
 
 
-def _clause_bounds(text: str, start: int, end: int) -> tuple[int, int]:
-    """Return the clause bounds that hold [start, end), split on sentence boundaries."""
-    left = 0
-    for index in range(start - 1, -1, -1):
-        if text[index] in ".!?;\n":
-            left = index + 1
-            break
-    right = len(text)
-    for index in range(end, len(text)):
-        if text[index] in ".!?;\n":
-            right = index
-            break
-    return left, right
-
-
-_TRAILING_PASS_NEGATION = re.compile(
-    r"^\s*(?:is|was|are|were)\s+(?:not|absent|missing)\b|^\s*(?:not|absent|missing)\b",
-    re.IGNORECASE,
-)
-
-
-def _negates_pass(clause: str, start: int, end: int) -> bool:
-    """A negation qualifies PASS only when it governs that token.
-
-    A comma starts another claim, so \"no blockers\" or an earlier \"No issues\"
-    does not cancel PASS. A predicate placed immediately after the token does.
-    """
-    before = clause[:start].rsplit(",", 1)[-1]
-    if _PASS_NEGATION.search(before):
-        return True
-    return _TRAILING_PASS_NEGATION.match(clause[end:]) is not None
-
-
-def body_claims_gate_pass(text: str) -> bool:
-    """A draft body affirms gate PASS when it records that profile or an unnegated PASS token.
-
-    A negation qualifies PASS only inside the same clause, and only when it
-    governs that token. An earlier sentence that says evidence is absent does
-    not cancel a later affirmative PASS.
-    """
-    if _GATE_PROFILE.search(text) or _REVIEW_STATUS_PASS.search(text):
-        return True
-    for match in _PASS_TOKEN.finditer(text):
-        left, right = _clause_bounds(text, match.start(), match.end())
-        if not _negates_pass(text[left:right], match.start() - left, match.end() - left):
-            return True
-    return False
-
-
 def remote_head(repo: Path, remote: str, branch: str, expected: str, what: str) -> None:
     refs = git(repo, "ls-remote", "--heads", remote, branch)
     if not any(row.split()[0] == expected for row in refs.splitlines() if row.split()):
@@ -362,25 +305,6 @@ def guard(
     }
 
 
-def guard_unsigned_draft(
-    repo: Path, base_ref: str, head_ref: str, body_path: Path, trust_policy_path: Path,
-    *, remote: str = "origin", timeout: int = 300,
-) -> dict[str, Any]:
-    state = require_checkout(repo, base_ref, head_ref, trust_policy_path, remote)
-    body = read_bytes(body_path).decode("utf-8", "replace")
-    if body_claims_gate_pass(body):
-        raise GateError("draft body affirms gate PASS")
-    completed = run_checks(state, timeout)
-    recheck_checkout(state, base_ref, head_ref, remote, trust_policy_path)
-    if read_bytes(body_path).decode("utf-8", "replace") != body:
-        raise GateError("draft body changed during verification")
-    return {
-        "repository": state["policy"]["github_repository"],
-        "base_sha": state["base"], "head_sha": state["head"],
-        "checks_passed": completed, "signed_review_verified": False,
-    }
-
-
 def verify_created_pr(
     created_url: str, expected: dict[str, Any], base_ref: str, head_ref: str,
     title: str, draft: bool, repo: Path, timeout: int,
@@ -428,20 +352,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.create and (not args.title or args.body_file is None):
         ap.error("--create requires --title and --body-file")
     try:
-        if args.draft and args.signature is None:
-            if args.evidence is not None:
-                raise GateError("unsigned draft does not accept review evidence")
-            if args.body_file is None:
-                raise GateError("unsigned draft requires a body file")
-            info = guard_unsigned_draft(
-                args.repo, args.base, args.head, args.body_file, args.trust_policy,
-                remote=args.remote, timeout=args.timeout,
-            )
-        else:
-            if args.evidence is None or args.signature is None:
-                raise GateError("signed preflight requires --evidence and --signature")
-            info = guard(args.repo, args.base, args.head, args.evidence, args.signature,
-                         args.trust_policy, remote=args.remote, timeout=args.timeout)
+        if args.evidence is None or args.signature is None:
+            raise GateError("all PRs including Draft require --evidence and --signature")
+        info = guard(args.repo, args.base, args.head, args.evidence, args.signature,
+                     args.trust_policy, remote=args.remote, timeout=args.timeout)
     except GateError as exc:
         print(json.dumps({"status": "blocked", "reason": str(exc)}))
         return 2

@@ -13,7 +13,7 @@ Inspect an implemented change and prepare a truthful, reviewable pull request ti
 
 Use when a branch or diff is intended for review and needs to be reconciled with its objective, repository conventions, PR template, tests/evidence, and reviewability constraints.
 
-Invocation authorizes read-only repository inspection and non-destructive project verification when available, including discovery of effective hooks/CI, execution of missing authorized lint/tests and established coverage checks, and reconciliation of independent code-review evidence. It does not authorize remote PR creation or modification. Preparation may report missing evidence, but no remote PR may be created until all applicable pre-creation checks pass.
+Invocation authorizes read-only repository inspection and non-destructive project verification when available, including discovery of effective hooks/CI, execution of missing authorized lint/tests and established coverage checks, and reconciliation of independent code-review evidence. It does not authorize remote PR creation or modification. Preparation may report missing evidence as a local `draft`/`blocked` state, but neither ready nor Draft remote PR may be created until all applicable pre-creation checks and Code Review have passed.
 
 ## Uses
 
