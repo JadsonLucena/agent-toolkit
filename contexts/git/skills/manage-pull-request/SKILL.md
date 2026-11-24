@@ -80,7 +80,8 @@ flowchart TD
 
     Verify --> ReviewCheck{"Code Review PASS with full coverage for exact head/base?"}
     ReviewCheck -->|Yes, current evidence| SelectTemplate
-    ReviewCheck -->|No, missing/stale/failed/incomplete| RequestReview["Review: invoke read-only /review/review-code advisory"]
+    ReviewCheck -->|Missing or stale| RequestReview
+    ReviewCheck -->|FAIL or unresolved INCOMPLETE| ReviewGap["Review: invoke read-only /review/review-code advisory"]
     RequestReview --> ReviewResult{"Actual Review PASS and complete for final head/base?"}
     ReviewResult -->|Yes| SelectTemplate
     ReviewResult -->|No or unavailable| ReviewGap["Record Review findings and missing evidence"]
@@ -117,7 +118,7 @@ flowchart TD
     Blocked --> Done
 ```
 
-The diagram is the procedure. Apply the rule section named on each decision node. Do not restate it. In both `prepare` and `create` modes, check the final PR diff for existing Code Review evidence; if missing or stale, route an authorized read-only `/review/review-code` execution with `review_profile=advisory`. Git consumes the resulting evidence and must not claim that its own inspection is Review. If Review or required tests/lint fail, `prepare` may return a local Draft, but `create` blocks publication regardless of `--draft`. For existing diffs, assess decomposition in `prepare` without claiming that pre-implementation planning occurred. A scoped request for one increment does not authorize implementing the entire roadmap.
+The diagram is the procedure. Apply the rule section named on each decision node. Do not restate it. In both `prepare` and `create` modes, check the final PR diff for existing Code Review evidence; if missing or stale, route an authorized read-only `/review/review-code` execution with `review_profile=advisory`. Git consumes the resulting evidence and must not claim that its own inspection is Review. If Review or required tests/lint fail, `prepare` may return a local Draft, but `create` blocks publication regardless of `--draft`. A confirmed Review `FAIL` or unresolved material `INCOMPLETE` must be routed to its responsible correction owner; do not repeat unchanged Review merely to seek a different verdict. For existing diffs, assess decomposition in `prepare` without claiming that pre-implementation planning occurred. A scoped request for one increment does not authorize implementing the entire roadmap.
 
 ## Decomposition Signals
 
