@@ -15,7 +15,8 @@ alwaysApply: false
 * Balance completeness with cost. Review depth is risk-proportionate; do not require every specialist or test technique for every change.
 * Select modes, team size and verifier requirements using the single normative source `contexts/review/skills/coordinate-review-team/SKILL.md`. A platform-specific Task API is never the source of truth; no peer messaging or consensus may be invented.
 * Only an independently executed reviewer can satisfy `gate` independence; assigning another role to an author's session does not create independence. A verifier examines the source rather than accepting consensus. See Review Profiles below.
-* Keep review findings, verification evidence, risk decisions, and the Git PR readiness decision separate. Review produces `contracts/review-evidence.md`; Git owns remote PR creation.
+* Keep review findings, verification evidence, risk decisions, and the Git PR readiness decision separate.
+* A portable `contracts/debugging-evidence.md` diagnosis can supply technical observations or causal hypotheses, but Review independently verifies relevance to the frozen target and retains the sole finding classification and review verdict. Diagnostic ownership does not replace `verify-findings` or justify mutating the reviewed tree. Review produces `contracts/review-evidence.md`; Git owns remote PR creation.
 * Repository-specific rules and enforceable project conventions take precedence over generic preferences when they preserve critical safety guarantees. A narrower local rule must not silently remove security, data-integrity, or evidence obligations.
 
 ## Review Profiles

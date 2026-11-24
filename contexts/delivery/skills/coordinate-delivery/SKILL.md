@@ -19,6 +19,7 @@ Carry a change toward the explicitly authorized target stage, selecting only the
 * Input/output contract: `contracts/test-basis.md` when available
 * Input/output contract: `contracts/test-evidence.md` when available
 * Input/output contract: `contracts/review-evidence.md` when available
+* Optional input diagnosis: `contracts/debugging-evidence.md`
 * Optional output contract: `contracts/outcome-evidence.md`
 
 ## Working State
@@ -70,6 +71,8 @@ The main diagram deliberately omits specialist-internal transitions. Route plann
 
 This explicit cross-context workflow permits **routing** existing specialist capabilities; they continue to own their procedures and authorization gates. Requirements owns its internal elicitation/validation/backlog loop, Implementation owns its optional TDD and atomic Git commit handoffs, Review owns its verdict and Git owns PR planning, preparation, creation and merge. The diagram intentionally does not duplicate those internal workflows. Resolve Requirements composition against the **actually installed command**: use `/requirements/specify-and-plan-change` when the renamed command is present (independent PR #31), or `/requirements/shape-change` when the current installation still provides the original command. Verify the entry point exists before routing; do not assume an uninstalled command or a host alias. Both are Requirements-only and do not authorize the full delivery sequence. Review keeps the sole technical verdict. No tool execution is implied merely by this Markdown procedure.
 
+Debugging is a cross-context **conditional evidence-producing capability**, not a mandatory Delivery stage. If observed technical failure blocks a requested authorized stage, Delivery may route an explicitly scoped, read-only investigation and consume the resulting `contracts/debugging-evidence.md`, checking source identity and diagnosis limits. Any subsequent correction remains separately authorized and Implementation-owned; stakeholder semantics, architecture, tests and Review verdicts retain their owners.
+
 ## Transition Contract
 
 This is the **Delivery-owned map of cross-context transitions**, not a second implementation of specialist procedures or an executable state machine. Each row is conditional on the requested stage and the evidence already available: **do not run every row as a mandatory sequence**. A valid earlier result may be reused only while its scope, source baseline and revisions remain current. The specialist's canonical Rule, Skill and Command define the detailed gates; Delivery checks the returned claim before choosing another transition. A verified milestone never grants the next operation's permission.
@@ -93,7 +96,7 @@ This is the **Delivery-owned map of cross-context transitions**, not a second im
 ## Git Planning and Commit Handoffs
 
 * Before any implementation mutation of a composite initiative, request Git's read-only `plan` via `contexts/git/skills/manage-pull-request/SKILL.md` unless the PR Boundary is already current. Pass the resulting scope, base and dependencies to Implementation without expanding authorization.
-* During Implementation, pass the caller's local-commit permission and await the Git Engineer's actual verified commit SHA or explicit blocked/uncommitted state. A requested commit or passing check alone never establishes commit success.
+* During Implementation, resolve local-commit permission from scoped implementation authority and caller/repository restrictions, then pass the effective permission to Git and await its actual verified commit SHA or explicit blocked/uncommitted state. A plan's silence is not a commit prohibition, but a target stage alone grants no mutation authority. A requested commit or passing check alone never establishes commit success.
 * After Implementation, use independent Review and the Git `prepare` operation as separate stages. `create`, push, merge, release and deployment require separate permissions.
 
 ## Integration Handoffs

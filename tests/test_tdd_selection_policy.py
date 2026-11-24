@@ -34,7 +34,8 @@ class TddSelectionPolicyTests(unittest.TestCase):
         rule = read("contexts/implementation/rules/implementation.md")
         implementation = read("contexts/implementation/skills/implement-slice/SKILL.md")
 
-        for marker in ("documentation, formatting, or non-behavioral configuration",
+        for marker in ("caller explicitly opts out of TDD",
+                       "documentation, formatting, or non-behavioral configuration",
                        "exploratory spike", "explicit restriction on test authoring",
                        "unsafe/disproportionate test-first setup",
                        "Convenience, the absence of a TDD keyword",
@@ -46,6 +47,49 @@ class TddSelectionPolicyTests(unittest.TestCase):
         self.assertIn('Explain --> Change["Apply minimal in-scope implementation"]', implementation)
         self.assertIn('Change --> Check', implementation)
         self.assertIn("concrete exception and alternative verification", implementation)
+
+    def test_explicit_caller_opt_out_does_not_remove_required_tests(self):
+        rule = read("contexts/implementation/rules/implementation.md")
+        command = read("contexts/implementation/commands/implement-slice.md")
+        implementation = read("contexts/implementation/skills/implement-slice/SKILL.md")
+        self.assertIn("caller explicitly opts out of TDD", rule)
+        self.assertIn("Skipping TDD never waives required tests", rule)
+        self.assertIn("An explicit caller TDD opt-out affects sequencing, not required testing", command)
+        self.assertIn("Explicit TDD requirement or caller TDD opt-out", command)
+        self.assertIn("explicit caller opt-out of TDD permits direct implementation", implementation)
+        self.assertIn('Test -->|Justified exception| Explain', implementation)
+
+    def test_failure_reselects_tdd_unless_same_behavior_already_tested(self):
+        rule = read("contexts/implementation/rules/implementation.md")
+        implementation = read("contexts/implementation/skills/implement-slice/SKILL.md")
+        self.assertIn("A failure alone never authorizes silently abandoning TDD", rule)
+        self.assertIn('Diagnose -->|Material new progress possible| Reassess', implementation)
+        self.assertIn('Reassess -->|Yes or uncertain| Test', implementation)
+        self.assertIn('Reassess -->|No; repair existing tested behavior| Change', implementation)
+        self.assertNotIn('Diagnose -->|Material new progress possible| Change', implementation)
+        self.assertIn("After diagnosis, reselect TDD", implementation)
+
+    def test_merged_atomic_commit_boundary_and_authorization_are_preserved(self):
+        implementation = read("contexts/implementation/skills/implement-slice/SKILL.md")
+        tdd = read("contexts/implementation/skills/test-driven-development/SKILL.md")
+        self.assertIn('ScopeGate -->|No or unclear| Block', implementation)
+        self.assertIn("ResolveCommit --> Strategy", implementation)
+        self.assertIn('CommitAuthority -->|Explicitly denied| Uncommitted', implementation)
+        self.assertIn('CommitAuthority -->|Unknown| Block', implementation)
+        self.assertIn('Evidence --> Boundary{"Current atomic intention complete?"}', tdd)
+        self.assertIn('Boundary -->|Yes| Done["Return to implement-slice for integrated verification and Git handoff"]', tdd)
+        self.assertIn("multiple RED/GREEN/REFACTOR cycles may complete the same intention", implementation)
+        self.assertIn('CommitVerified -->|Yes| More', implementation)
+
+    def test_discovery_and_architecture_metadata_match_preferred_policy(self):
+        rule = read("contexts/implementation/rules/implementation.md")
+        command = read("contexts/implementation/commands/implement-slice.md")
+        implementation = read("contexts/implementation/skills/implement-slice/SKILL.md")
+        arch = read("ARCHITECTURE.md")
+        self.assertIn("prefer test-first TDD for testable behavior", rule.split("---", 2)[1])
+        self.assertIn("preferring test-first TDD", command.split("---", 2)[1])
+        self.assertIn("TDD as the preferred testable-behavior strategy", implementation.split("---", 2)[1])
+        self.assertIn("Preferred RED/GREEN/REFACTOR inner loop", arch)
 
     def test_required_tdd_cannot_silently_degrade_to_direct_implementation(self):
         rule = read("contexts/implementation/rules/implementation.md")

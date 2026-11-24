@@ -12,6 +12,7 @@ The toolkit is a collection of portable, version-controlled Markdown artifacts, 
 | --- | --- |
 | [Requirements](contexts/requirements/) | Discover needs, specify and validate requirements, and plan a backlog. |
 | [Design](contexts/design/) | Define technical decisions for a bounded implementation slice. |
+| [Debugging](contexts/debugging/) | Investigate observed technical defects without applying changes; provide reusable causal evidence. |
 | [Implementation](contexts/implementation/) | Implement and verify an authorized increment. |
 | [Delivery](contexts/delivery/) | Coordinate evidence-based handoffs across the lifecycle. |
 | [Testing](contexts/testing/) | Design, generate, and verify automated tests with traceable evidence. |

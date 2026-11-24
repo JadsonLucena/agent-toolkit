@@ -45,6 +45,16 @@ class TddPolicyTests(unittest.TestCase):
         self.assertIn("follow the native rule-driven path", skill)
         self.assertIn("only authorized test files", skill)
 
+    def test_tdd_returns_at_atomic_intention_boundary(self):
+        skill = read("contexts/implementation/skills/test-driven-development/SKILL.md")
+        implementation = read("contexts/implementation/skills/implement-slice/SKILL.md")
+        self.assertIn('Evidence --> Boundary{"Current atomic intention complete?"}', skill)
+        self.assertIn('Boundary -->|Yes| Done["Return to implement-slice for integrated verification and Git handoff"]', skill)
+        self.assertIn('Boundary -->|No, more behavior in same intention| Select', skill)
+        self.assertNotIn('More -->|Yes| Select', skill)
+        self.assertIn('multiple RED/GREEN/REFACTOR cycles may complete the same intention', implementation)
+        self.assertIn('CommitVerified -->|Yes| More', implementation)
+
     def test_tdd_remains_implementation_owned(self):
         self.assertIn("| Implementation | `skills/test-driven-development/SKILL.md` | Skill |", read("ARCHITECTURE.md"))
         self.assertIn("test-driven-development/SKILL.md", read("contexts/implementation/agents/implementation-engineer.md"))
