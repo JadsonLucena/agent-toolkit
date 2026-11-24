@@ -28,7 +28,7 @@ class TddSelectionPolicyTests(unittest.TestCase):
                 self.assertIn(marker, rule)
         self.assertIn("absence of a TDD request is not a direct-implementation exception", command)
         self.assertIn("prefer TDD when feasible", agent)
-        self.assertIn("Preferred for features, fixes and business rules", tdd)
+        self.assertIn("preferred when feasible under implement-slice", tdd)
 
     def test_exception_path_records_reason_risk_and_alternative_checks(self):
         rule = read("contexts/implementation/rules/implementation.md")
