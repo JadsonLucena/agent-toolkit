@@ -21,7 +21,7 @@ class SddLifecyclePolicyTests(unittest.TestCase):
     def test_loops_and_parallel_work_are_bounded(self):
         loop = ARCH.split("## Controlled Iteration and Recovery", 1)[1].split("## Safe Parallel Work", 1)[0]
         parallel = ARCH.split("## Safe Parallel Work", 1)[1].split("## Change Boundary", 1)[0]
-        for token in ("stop condition", "checkpoint", "authorization", "externally observable", "Independent review"):
+        for token in ("stop condition", "checkpoint", "authorization", "externally observable", "Code Review"):
             self.assertIn(token.lower(), loop.lower())
         for token in ("isolation", "stale", "synchronization", "immutable"):
             self.assertIn(token.lower(), parallel.lower())

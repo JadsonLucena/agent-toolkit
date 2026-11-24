@@ -31,14 +31,14 @@ alwaysApply: false
 * REFACTOR: improve structure without changing expected behavior; rerun relevant tests. A refactor with unverified preservation is not a completed TDD cycle.
 * Repeat for another small behavior only after the current cycle's evidence is established. Persist the failure/output, actual commands, revision and supported scenario mapping when material.
 * Repeated failures without a new actionable diagnosis, uncertainty in the expected behavior, a scope change or unsafe side effects stop the affected cycle and require the responsible decision owner. Automated test generation remains independently available in Testing.
-* TDD cycle completion is not integrated verification, independent Code Review, deployment or business acceptance.
+* TDD cycle completion is not integrated verification, Code Review, deployment or business acceptance.
 
 ## Verification and Feedback
 
 * Use supported tests and `contracts/test-basis.md`/`contracts/test-evidence.md` when supplied; scenarios remain semantic, not necessarily identical to test identifiers. Respect canonical `contexts/testing/rules/testing.md` as a quality reference without taking ownership of Testing's separate workflow.
 * Execute applicable project verification after each completed intention: fast targeted checks first, then required integrated checks. Record exact commands, result, tested revision and why applicable checks were not run.
 * A failing check is evidence to diagnose, not permission to rewrite expected business behavior. Repetition requires new evidence or a changed hypothesis. Stop when an attempt is unproductive, unsafe or out of authorized scope.
-* A passing local check does not imply independent Code Review, deployment, acceptance, or measured outcomes. Review remains read-only and independently owned.
+* A passing local check does not imply Code Review, deployment, acceptance, or measured outcomes. Review remains read-only and separately owned.
 
 ## Git Handoff Integrity
 
@@ -59,9 +59,9 @@ alwaysApply: false
 ## Completion
 
 * Report changed files, requirement/scenario and design references when known, observed checks, unresolved blockers, side-effect/recovery risks, and the current revision/scope. A completed slice is not a completed product outcome.
-* Leave work with explicit status `implemented`, `blocked`, or `incomplete`, with limitations and next owner; never claim acceptance or independent review solely from self-verification.
+* Leave work with explicit status `implemented`, `blocked`, or `incomplete`, with limitations and next owner; never claim acceptance or Code Review solely from self-verification.
 
-* Completing Implementation means the bounded slice and its local verification and Git handoff state are reported. It does not imply independent Review, PR readiness, PR publication, merge, or integration into the target branch. Forward the exact implementation revision, tests and known limits for a separate integration-stage decision.
+* Completing Implementation means the bounded slice and its local verification and Git handoff state are reported. It does not imply Code Review, PR readiness, PR publication, merge, or integration into the target branch. Forward the exact implementation revision, tests and known limits for a separate integration-stage decision.
 
 ## Foundational Guidance
 

@@ -26,7 +26,7 @@ class ImplementationContextTests(unittest.TestCase):
         rule = doc("contexts/implementation/rules/implementation.md")
         self.assertIn("do not invent product policy", rule)
         self.assertIn("Git revert does not reverse external outcomes", rule)
-        self.assertIn("Review remains read-only and independently owned", rule)
+        self.assertIn("Review remains read-only and separately owned", rule)
 
     def test_composite_pr_plan_precedes_mutation(self):
         skill = doc("contexts/implementation/skills/implement-slice/SKILL.md")

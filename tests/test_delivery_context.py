@@ -96,11 +96,18 @@ class DeliveryContextTests(unittest.TestCase):
 
     def test_review_publication_and_draft_gates_survive(self):
         skill = doc(SKILL)
-        for marker in ("authorized tests/lint", "independent Code Review",
+        for marker in ("authorized tests/lint", "request Code Review through Review",
                        "advisory ", "no remote PR (including Draft)",
                        "pr-prepared", "pr-created", "post-PR checks"):
             self.assertIn(marker, skill)
         self.assertIn("review_profile=advisory", doc(RULE))
+
+    def test_advisory_review_does_not_claim_attested_independence(self):
+        skill, rule = doc(SKILL), doc(RULE)
+        self.assertIn("An `advisory` review may be self-performed", rule)
+        self.assertIn("externally attested `gate`", rule)
+        self.assertNotIn("independent Code Review", skill + rule)
+        self.assertNotIn("independent Review", skill + rule)
 
     def test_remote_branch_and_existing_pr_guards_survive(self):
         skill = doc(SKILL)
@@ -165,7 +172,7 @@ class DeliveryContextTests(unittest.TestCase):
         for ident, fields in {
             "T04": ("before first code mutation", "Git", "PR Boundary", "Implementation", "Block"),
             "T05": ("authorized bounded intention", "Implementation", "commit SHA", "implemented", "failed/unverified"),
-            "T06": ("reviewed stage", "independent Review", "tests/lint", "reviewed", "self-review"),
+            "T06": ("reviewed stage", "Code Review", "tests/lint", "reviewed", "self-review"),
             "T07": ("pr-prepared", "Git", "T06", "pr-prepared", "Draft"),
             "T08": ("after T07", "Git", "create authorization", "pr-created", "push"),
             "T09": ("already exists", "Git", "head/base", "existing PR", "Draft"),

@@ -36,7 +36,7 @@ Select the Delivery Coordinator and its cross-context workflow. An explicit end-
 
 ## Output
 
-Actual completed stage and source/revision identity, next safe required capability, routed specialist results, PR-plan evidence where material, verified commit identities or explicit uncommitted/blocked state, current verification and independent Review evidence, prepared/published PR identity when observed, post-PR checks and approvals, verified merge target only when integration actually occurred, blockers, pending decisions, and evidence of operations actually executed.
+Actual completed stage and source/revision identity, next safe required capability, routed specialist results, PR-plan evidence where material, verified commit identities or explicit uncommitted/blocked state, current verification and Code Review evidence, prepared/published PR identity when observed, post-PR checks and approvals, verified merge target only when integration actually occurred, blockers, pending decisions, and evidence of operations actually executed.
 
 ## Boundary
 

@@ -13,7 +13,7 @@ Perform an evidence-based review in the requested `advisory` or independently en
 
 Use to review a specified PR, branch diff, commit/range, file set, or current workspace changes. Invocation authorizes read-only inspection and non-destructive verification only where allowed by the runtime, including risk-selected collaboration between read-only review agents if the platform supports isolation and peer messaging. It does not authorize remediation or PR publication.
 
-**Mandatory semantics; optional adapter:** Freeze repository, target SHA/workspace fingerprint, full Git inventory, risk and separable concerns before any review. The Python `adapters/review/run_review.py` is one reference adapter, not a mandatory runtime. A host-native reviewer may use two phases: `run_review.py --prepare-only --out <context.json>`, perform the independent review using approved native capabilities, then `run_review.py --validate-evidence <evidence.json> --context <context.json>`. Equivalent host implementations must preserve the same validation and report adapter provenance.
+**Mandatory semantics; optional adapter:** Freeze repository, target SHA/workspace fingerprint, full Git inventory, risk and separable concerns before any review. The Python `adapters/review/run_review.py` is one reference adapter, not a mandatory runtime. A host-native reviewer may use two phases: `run_review.py --prepare-only --out <context.json>`, perform the scoped review using approved native capabilities, then `run_review.py --validate-evidence <evidence.json> --context <context.json>`. Equivalent host implementations must preserve the same validation and report adapter provenance.
 
 ## Uses
 

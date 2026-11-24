@@ -187,8 +187,8 @@ Host-specific discovery and invocation settings belong in optional integrations.
 | Review | `skills/review-change/SKILL.md` | Skill | Native review of a complete diff with context, coverage, risk, optional helpers, and evidence |
 | Review | `skills/coordinate-review-team/SKILL.md` | Skill | Risk-based Agent Team coordination, peer messaging, challenge routing, verification and native fallback |
 | Review | `skills/verify-findings/SKILL.md` | Skill | Falsification, verification, deduplication, and triage of candidate findings |
-| Review | `commands/review-code.md` | Command | Start read-only independent review of a bounded code change |
-| Review | `agents/code-reviewer.md` | Agent | Lead independent reviews, select specialists, coordinate team exchanges and issue one evidence-backed verdict |
+| Review | `commands/review-code.md` | Command | Start read-only Code Review with an explicit advisory or attested gate profile |
+| Review | `agents/code-reviewer.md` | Agent | Lead scoped reviews, select specialists, coordinate team exchanges and issue one evidence-backed verdict |
 | Review | `agents/specification-reviewer.md` | Agent | Investigate specification and contract compliance |
 | Review | `agents/correctness-reviewer.md` | Agent | Investigate behavioral correctness and regressions |
 | Review | `agents/security-reviewer.md` | Agent | Investigate security and privacy boundaries |
@@ -216,7 +216,7 @@ Host-specific discovery and invocation settings belong in optional integrations.
 | Cross-context | `contracts/outcome-evidence.md` | Contract | Optional post-delivery outcome observations and feedback |
 | Cross-context | `contracts/design-evidence.md` | Contract | Portable technical design decisions and handoff to Implementation |
 | Cross-context | `contracts/debugging-evidence.md` | Contract | Portable causal findings, provenance, uncertainty and next owner |
-| Cross-context | `contracts/review-evidence.md` | Contract | Portable independent code-review evidence and pre-PR eligibility semantics |
+| Cross-context | `contracts/review-evidence.md` | Contract | Portable advisory/gate Code Review evidence and pre-PR eligibility semantics |
 | Cross-context | `contracts/review-specialist-evidence.md` | Contract | Self-contained specialist and verifier evidence |
 | Cross-context | `contracts/requirements.md` | Contract | Neutral elicitation and requirement-definition handoff semantics |
 | Cross-context | `contracts/work-item.md` | Contract | Neutral planning-item handoff semantics |
@@ -310,7 +310,7 @@ A workflow may diagnose an out-of-scope defect without gaining authority to muta
 
 ## SDLC Coverage, Reversibility, and Outcome Evidence
 
-Use the software development lifecycle (SDLC) as a **coverage model**, not a mandatory sequential ceremony or a replacement for context ownership. Requirements owns business and specification knowledge; Design and Implementation own their respective future engineering responsibilities; Testing owns test engineering; Review owns independent assessment; Git owns repository integration. Deployment, operations, and business-outcome evidence require explicit owners and authorization when those capabilities exist.
+Use the software development lifecycle (SDLC) as a **coverage model**, not a mandatory sequential ceremony or a replacement for context ownership. Requirements owns business and specification knowledge; Design and Implementation own their respective future engineering responsibilities; Testing owns test engineering; Review owns the separate assessment and verdict; Git owns repository integration. Deployment, operations, and business-outcome evidence require explicit owners and authorization when those capabilities exist.
 
 Specification validated, design ready, slice implemented, verification passed, review passed, PR ready, deployed, accepted, and outcome demonstrated are **distinct evidence claims**. Do not infer deployment, acceptance, or outcome from a commit, test, review verdict, or PR. An unavailable operational result is pending or unknown, not a successful outcome.
 
@@ -324,7 +324,7 @@ Apply these invariants only to workflows with meaningful iteration, retries, mut
 * Repeated attempts require a plausible transient failure, new evidence, or a changed strategy. Stop or escalate when retries are unproductive, safety is uncertain, resources are exhausted, or a material decision is missing.
 * Checkpoints identify the source revision or workspace fingerprint, relevant authoritative baseline, current decision state, observed results, and already performed side effects when material. Restore only after revalidating those references and authorization.
 * A checkpoint or state-graph replay is **not** a transactional rollback. Before repeating a mutating step, reconcile its externally observable effects; use idempotency, compensation, or explicit human intervention as required by risk.
-* Avoid automatic self-approval, speculative requirement edits to make checks pass, and unbounded review/fix/review loops. Independent review remains independently owned and must examine the final relevant revision.
+* Avoid automatic self-approval, speculative requirement edits to make checks pass, and unbounded review/fix/review loops. Code Review remains separately owned and must examine the final relevant revision.
 * Rules own these invariants, Skills own their concrete iteration/recovery procedures, Agents own specialist routing, Commands own invocation authorization, and runtimes enforce tool permissions where supported.
 
 ## Safe Parallel Work
@@ -482,7 +482,7 @@ The canonical Rule/Skill/Agent/Command/Contract artifacts define the required
 semantics. Adapters in `adapters/review/` are optional reference implementations,
 not the source of truth for any IDE, model, issue tracker, Git host or runtime.
 
-Host-native Review follows the same **prepare → independent investigation →
+Host-native Review follows the same **prepare → scoped investigation →
 validate evidence** contract as a subprocess reviewer. Preparation freezes
 repository, base/head or workspace fingerprint, full inventory and R0–R3
 risk before any isolated task. The validator checks that the same snapshot

@@ -200,7 +200,7 @@ When no applicable repository template exists, use only the sections that are re
 
 - Acceptance criteria / scenarios covered:
 - Tests / lint checks executed and observed result:
-- Independent code review: verdict, head/base, coverage, findings or remaining blockers:
+- Code Review: profile, verdict, head/base, coverage, findings or remaining blockers:
 - Not executed / limitations:
 
 ## Impact and risks
