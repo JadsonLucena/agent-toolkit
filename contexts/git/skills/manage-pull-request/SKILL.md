@@ -78,7 +78,14 @@ flowchart TD
 
     SplitFinding --> Verify
 
-    Verify --> SelectTemplate
+    Verify --> ReviewCheck{"Code Review PASS with full coverage for exact head/base?"}
+    ReviewCheck -->|Yes, current evidence| SelectTemplate
+    ReviewCheck -->|No, missing/stale/failed/incomplete| RequestReview["Review: invoke read-only /review/review-code advisory"]
+    RequestReview --> ReviewResult{"Actual Review PASS and complete for final head/base?"}
+    ReviewResult -->|Yes| SelectTemplate
+    ReviewResult -->|No or unavailable| ReviewGap["Record Review findings and missing evidence"]
+    ReviewGap -->|prepare| PreparedDraft
+    ReviewGap -->|create| Blocked
     SelectTemplate -->|one applicable template| Describe["Template Precedence and Description Integrity in pull-request.md"]
     SelectTemplate -->|no template| Fallback
     SelectTemplate -->|materially ambiguous| Blocked
@@ -87,7 +94,7 @@ flowchart TD
 
     Gate -->|prepare: ready| PreparedReady
     Gate -->|prepare: reviewable but incomplete| PreparedDraft
-    Gate -->|create: ready or explicitly authorized draft| CreationGate
+    Gate -->|create: passed pre-publication checks and Review; ready or authorized Draft| CreationGate
     Gate -->|blocked| Blocked
 
     SelectMode -->|create| LoadPreparedState
@@ -95,7 +102,7 @@ flowchart TD
     VerifyRemoteContext --> ExistingPR
 
     ExistingPR -->|equivalent PR exists| ReportExisting
-    ExistingPR -->|none| Gate
+    ExistingPR -->|none| InspectDiff
     CreationGate["Remote Creation Safety in pull-request.md"]
 
     CreationGate -->|blocked| Blocked
@@ -110,7 +117,7 @@ flowchart TD
     Blocked --> Done
 ```
 
-The diagram is the procedure. Apply the rule section named on each decision node. Do not restate it. For existing diffs, assess decomposition in `prepare` without claiming that pre-implementation planning occurred. A scoped request for one increment does not authorize implementing the entire roadmap.
+The diagram is the procedure. Apply the rule section named on each decision node. Do not restate it. In both `prepare` and `create` modes, check the final PR diff for existing Code Review evidence; if missing or stale, route an authorized read-only `/review/review-code` execution with `review_profile=advisory`. Git consumes the resulting evidence and must not claim that its own inspection is Review. If Review or required tests/lint fail, `prepare` may return a local Draft, but `create` blocks publication regardless of `--draft`. For existing diffs, assess decomposition in `prepare` without claiming that pre-implementation planning occurred. A scoped request for one increment does not authorize implementing the entire roadmap.
 
 ## Decomposition Signals
 
@@ -158,7 +165,7 @@ Produce:
 
 * Planning does not authorize implementation, branch creation, commits, pushes, or remote PR creation.
 * Preparing does not authorize modifying production/test code, creating commits, pushing, creating/updating a remote PR, assigning reviewers, labeling, merging, or releasing.
-* Creating authorizes only creation of the remote PR object described by the command. It does not authorize push, history rewrite, reviewer assignment, labels, milestones, auto-merge, merge, branch deletion, release, or deployment unless separately authorized.
+* Creating requires current, complete Code Review `PASS` and passing required checks **before** publishing any remote PR, including Draft. A request to create a PR authorizes the missing read-only Review handoff; a Draft is not a bypass. Creating authorizes only creation of the remote PR object described by the command. It does not authorize push, history rewrite, reviewer assignment, labels, milestones, auto-merge, merge, branch deletion, release, or deployment unless separately authorized.
 * This skill may diagnose scope, test, implementation, or architecture defects, but diagnosis does not authorize changing those artifacts.
 * Do not alter the final diff merely to make the PR description look coherent unless a separate implementation authorization exists.
 * Readiness and what the description may claim are the Pre-Creation Quality Gate in `contexts/git/rules/pull-request.md`.

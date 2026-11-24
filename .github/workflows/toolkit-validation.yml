@@ -2,8 +2,8 @@ name: Toolkit validation
 
 on:
   pull_request:
+  # Validate pushed feature branches before opening a pull request.
   push:
-    branches: [main]
 
 permissions:
   contents: read

@@ -1,6 +1,6 @@
 # SDD Delivery end-to-end behavioral evaluations
 
-The [catalog](cases.json) lists thirty-eight high-value pilot behaviors for the future native SDD workflow: simple feature, financial risk, unresolved source meaning, TDD RED integrity, changed baseline, unproductive retries, unsafe parallelism, side-effect replay, stale review, missing operational observations, and explicit Git handoffs for commits and PR planning. The direct Implementation case verifies Git policy outside Delivery. Additional Integration cases cover Review failure and revision freshness, the distinction between preparation and publication, authorized Drafts with gaps, post-PR CI failures, and separately authorized merge with target-state verification.
+The [catalog](cases.json) lists forty-two high-value pilot behaviors for the future native SDD workflow: simple feature, financial risk, unresolved source meaning, TDD RED integrity, changed baseline, unproductive retries, unsafe parallelism, side-effect replay, stale review, missing operational observations, and explicit Git handoffs for commits and PR planning. The direct Implementation case verifies Git policy outside Delivery. Additional Integration cases cover Review failure and revision freshness, the distinction between preparation and publication, authorized Drafts with gaps, post-PR CI failures, and separately authorized merge with target-state verification.
 
 Additional DL-22–DL-28 cases distinguish PR integration from complete Product Slice behavior, check cross-PR interaction guarantees, verify selective context loading without dropping critical obligations, detect inaccessible or superseded sources, and permit evidence-backed learning slices without invented feature delivery.
 
@@ -9,6 +9,8 @@ DL-29 explicitly checks the blocked remote-publication path when a branch exists
 **DL-30–DL-34 add explicit negative-path checks for Design, Testing and Delivery authority, feedback-driven changes and independent Review. They require observed tool traces and scoped source evidence; a coordinator or specialist must not acquire ownership from a convenient available tool.**
 
 **DL-35–DL-38 cover derived local-commit authority, Delivery handoff, multiple TDD cycles per atomic intention, and explicit no-commit restrictions. Each requires real Git history and tool-trace evidence rather than structural text matches.**
+
+**DL-19 now blocks remote Draft publication with missing checks or Code Review. DL-39–DL-42 exercise direct PR creation, required Review routing, Draft non-bypass, freshness after code changes, and the optional guarded GitHub adapter's signed-Draft restriction. These scenarios still require observed agent/host traces to establish behavior.**
 
 These are specifications of tests, not tests that have been run. A passing structural CI is not evidence of an agent executing a software change.
 

@@ -17,24 +17,6 @@ sys.path.insert(0, str(ROOT / "adapters" / "github"))
 import guarded_pr as gate  # noqa: E402
 
 
-class BodyClaimTests(unittest.TestCase):
-    def test_negation_in_an_earlier_clause_does_not_cancel_a_later_pass(self):
-        self.assertTrue(gate.body_claims_gate_pass("Signed gate evidence is absent.\nGate: PASS\n"))
-        self.assertTrue(gate.body_claims_gate_pass("No remaining implementation work. Gate: PASS"))
-
-    def test_negation_in_the_same_clause_cancels_pass(self):
-        self.assertFalse(gate.body_claims_gate_pass(
-            "This draft does not claim PASS.\nSigned gate evidence is absent.\n"
-        ))
-
-    def test_unrelated_negation_does_not_cancel_an_affirmative_pass(self):
-        self.assertTrue(gate.body_claims_gate_pass("Code Review: PASS (no blockers)"))
-        self.assertTrue(gate.body_claims_gate_pass("No issues found, Code Review PASS"))
-
-    def test_negation_attached_after_pass_cancels_the_claim(self):
-        self.assertFalse(gate.body_claims_gate_pass("Gate PASS is absent."))
-
-
 def git(cwd: Path, *args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=cwd, stderr=subprocess.DEVNULL).decode().strip()
 
@@ -345,58 +327,70 @@ class GuardedPRTests(unittest.TestCase):
                 rc = gate.main(argv)
         return rc, out.getvalue()
 
-    def unsigned_draft_cli(self, *extra):
+    def draft_cli(self, *extra):
         return [
             "--repo", str(self.repo), "--base", "main", "--head", "feature",
             "--trust-policy", str(self.check_policy), "--draft", *extra,
         ]
 
-    def test_unsigned_draft_creates_without_gate_evidence(self):
-        self.body.write_text("Signed gate evidence is absent.\n")
-        commands = []
-        seen, mock = self.gh_mock(wrong_draft=True, commands=commands)
-        rc, raw = self.run_cli(self.unsigned_draft_cli(
-            "--create", "--title", "Add feature", "--body-file", str(self.body),
-        ), mock)
-        result = json.loads(raw)
-        self.assertEqual(0, rc)
-        self.assertEqual(["create", "verify"], seen)
-        self.assertIn("--draft", commands[0])
-        self.assertNotIn("--evidence", commands[0])
-        self.assertEqual("org/repo", commands[0][commands[0].index("--repo") + 1])
-        self.assertFalse(result["signed_review_verified"])
-        self.assertEqual({"lint", "tests"}, set(result["checks_passed"]))
-        self.assertTrue(result["remote_verified"])
-
-    def test_unsigned_draft_refuses_body_that_affirms_pass(self):
-        self.body.write_text("independent code review (PASS)\n")
+    def test_draft_without_review_is_blocked_before_remote_creation(self):
         seen, mock = self.gh_mock(wrong_draft=True)
-        rc, raw = self.run_cli(self.unsigned_draft_cli(
+        rc, raw = self.run_cli(self.draft_cli(
             "--create", "--title", "Add feature", "--body-file", str(self.body),
         ), mock)
         self.assertEqual(2, rc)
         self.assertEqual([], seen)
-        self.assertIn("affirms", json.loads(raw)["reason"])
+        self.assertIn("all PRs including Draft require", json.loads(raw)["reason"])
 
-    def test_unsigned_draft_refuses_review_profile_gate_in_body(self):
-        self.body.write_text("review_profile=gate\n")
+    def test_draft_cannot_use_unsigned_review_evidence(self):
         seen, mock = self.gh_mock(wrong_draft=True)
-        rc, raw = self.run_cli(self.unsigned_draft_cli(
+        rc, raw = self.run_cli(self.draft_cli(
+            "--evidence", str(self.evidence),
             "--create", "--title", "Add feature", "--body-file", str(self.body),
         ), mock)
         self.assertEqual(2, rc)
         self.assertEqual([], seen)
-        self.assertIn("affirms", json.loads(raw)["reason"])
+        self.assertIn("--signature", json.loads(raw)["reason"])
 
-    def test_negated_pass_token_does_not_block_unsigned_draft(self):
-        self.body.write_text("This draft does not claim PASS.\nSigned gate evidence is absent.\n")
+    def test_draft_cannot_use_signature_without_evidence(self):
         seen, mock = self.gh_mock(wrong_draft=True)
-        rc, raw = self.run_cli(self.unsigned_draft_cli(
+        rc, raw = self.run_cli(self.draft_cli(
+            "--signature", str(self.signature),
             "--create", "--title", "Add feature", "--body-file", str(self.body),
         ), mock)
-        self.assertEqual(0, rc)
-        self.assertEqual(["create", "verify"], seen)
-        self.assertFalse(json.loads(raw)["signed_review_verified"])
+        self.assertEqual(2, rc)
+        self.assertEqual([], seen)
+        self.assertIn("--evidence", json.loads(raw)["reason"])
+
+    def test_draft_with_failed_review_is_blocked(self):
+        self.write_evidence(review_status="FAIL")
+        seen, mock = self.gh_mock(wrong_draft=True)
+        rc, raw = self.run_cli(self.cli(
+            "--draft", "--create", "--title", "Add feature", "--body-file", str(self.body),
+        ), mock)
+        self.assertEqual(2, rc)
+        self.assertEqual([], seen)
+        self.assertIn("not PASS", json.loads(raw)["reason"])
+
+    def test_draft_with_stale_review_is_blocked(self):
+        self.write_evidence(target={"base_sha": self.base, "head_sha": self.base})
+        seen, mock = self.gh_mock(wrong_draft=True)
+        rc, raw = self.run_cli(self.cli(
+            "--draft", "--create", "--title", "Add feature", "--body-file", str(self.body),
+        ), mock)
+        self.assertEqual(2, rc)
+        self.assertEqual([], seen)
+        self.assertIn("another head/base", json.loads(raw)["reason"])
+
+    def test_failed_checks_block_signed_draft(self):
+        self.write_policy(fail="tests")
+        seen, mock = self.gh_mock(wrong_draft=True)
+        rc, raw = self.run_cli(self.cli(
+            "--draft", "--create", "--title", "Add feature", "--body-file", str(self.body),
+        ), mock)
+        self.assertEqual(2, rc)
+        self.assertEqual([], seen)
+        self.assertEqual("blocked", json.loads(raw)["status"])
 
     def test_ready_creation_without_signature_never_calls_github(self):
         seen, mock = self.gh_mock()
@@ -407,28 +401,7 @@ class GuardedPRTests(unittest.TestCase):
         ], mock)
         self.assertEqual(2, rc)
         self.assertEqual([], seen)
-        self.assertIn("signature", json.loads(raw)["reason"])
-
-    def test_unsigned_draft_rejects_unverified_evidence_file(self):
-        seen, mock = self.gh_mock(wrong_draft=True)
-        rc, raw = self.run_cli(self.unsigned_draft_cli(
-            "--evidence", str(self.evidence),
-            "--create", "--title", "Add feature", "--body-file", str(self.body),
-        ), mock)
-        self.assertEqual(2, rc)
-        self.assertEqual([], seen)
-        self.assertIn("does not accept", json.loads(raw)["reason"])
-
-    def test_failed_checks_still_block_unsigned_draft(self):
-        self.write_policy(fail="tests")
-        self.body.write_text("Signed gate evidence is absent.\n")
-        seen, mock = self.gh_mock(wrong_draft=True)
-        rc, raw = self.run_cli(self.unsigned_draft_cli(
-            "--create", "--title", "Add feature", "--body-file", str(self.body),
-        ), mock)
-        self.assertEqual(2, rc)
-        self.assertEqual([], seen)
-        self.assertEqual("blocked", json.loads(raw)["status"])
+        self.assertIn("--signature", json.loads(raw)["reason"])
 
     def test_signed_draft_still_verifies_gate_evidence(self):
         seen, mock = self.gh_mock(wrong_draft=True)
