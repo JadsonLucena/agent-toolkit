@@ -12,9 +12,9 @@ from requirements_evals import load_catalog, evaluate  # noqa: E402
 class DeliveryE2EEvalsTests(unittest.TestCase):
     def test_cases_are_valid_and_target_delivery(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
-        self.assertEqual(38, len(cat["cases"]))
+        self.assertEqual(43, len(cat["cases"]))
         self.assertTrue(all(x["command"] in {"/delivery/deliver-change", "/implementation/implement-slice"} for x in cat["cases"]))
-        self.assertEqual({f"DL-{i:02d}" for i in range(11, 39)},
+        self.assertEqual({f"DL-{i:02d}" for i in range(11, 44)},
                          {x["id"] for x in cat["cases"] if int(x["id"].split("-")[1]) >= 11})
         self.assertEqual(len(cat["cases"]), len(set(x["id"] for x in cat["cases"])))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
@@ -99,11 +99,30 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
         self.assertIn("multiple TDD cycles", cases["DL-37"]["input"])
         self.assertIn("explicitly forbids", cases["DL-38"]["input"])
 
+    def test_preferred_tdd_opt_out_exception_and_recovery_cases(self):
+        cat = load_catalog(ROOT / "evals/delivery/cases.json")
+        cases = {item["id"]: item for item in cat["cases"]}
+        expectations = {
+            "DL-39": ("without naming TDD", "/implementation/implement-slice"),
+            "DL-40": ("without TDD", "/implementation/implement-slice"),
+            "DL-41": ("destructive third-party service", "/implementation/implement-slice"),
+            "DL-42": ("explicitly requires TDD", "/implementation/implement-slice"),
+            "DL-43": ("behavioral edge case", "/delivery/deliver-change"),
+        }
+        for case_id, (prompt, command) in expectations.items():
+            with self.subTest(case=case_id):
+                case = cases[case_id]
+                self.assertIn(prompt, case["input"])
+                self.assertEqual(command, case["command"])
+                self.assertEqual(["presence", "presence", "absence"],
+                                 [check["mode"] for check in case["checks"]])
+                self.assertTrue(case["checks"][-1]["criterion"].startswith("Does not"))
+
     def test_no_invented_pass_without_agent_execution(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         summary = evaluate(cat, {"version": 1, "assessments": []}, ROOT / "evals/delivery")
         self.assertEqual("INCOMPLETE", summary["status"])
-        self.assertEqual(38, summary["incomplete"])
+        self.assertEqual(43, summary["incomplete"])
 
 
 if __name__ == "__main__":
