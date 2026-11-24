@@ -68,6 +68,18 @@ class ToolkitLintTests(unittest.TestCase):
         )
         self.assert_error("missing ownership entry")
 
+    def test_debugging_reference_docs_are_noncanonical_and_linked(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        target = self.root / "contexts/debugging/skills/systematic-debugging/references/causal-tracing.md"
+        self.assertTrue(target.is_file())
+        target.unlink()
+        self.assert_error("broken Markdown link references/causal-tracing.md")
+
+    def test_unowned_debugging_markdown_is_rejected(self):
+        target = self.root / "contexts/debugging/undocumented.md"
+        target.write_text("# Unexpected", encoding="utf-8")
+        self.assert_error("invalid canonical artifact location")
+
     def test_missing_repository_agent_instructions(self):
         (self.root / "AGENTS.md").unlink()
         self.assert_error("AGENTS.md: missing repository agent instructions")

@@ -244,6 +244,15 @@ def lint_toolkit(root: Path) -> list[str]:
                 if (len(rel.parts) == 4 and rel.parts[:3] ==
                         ("contexts", "review", "templates") and rel.suffix == ".md"):
                     continue
+                # Specialist technique references are noncanonical, lazily
+                # loaded supporting documents owned by systematic-debugging.
+                # Keep the exception path narrow so arbitrary new Markdown
+                # cannot silently bypass canonical ownership checks.
+                if (len(rel.parts) == 6 and rel.parts[:5] ==
+                        ("contexts", "debugging", "skills",
+                         "systematic-debugging", "references") and
+                        rel.suffix == ".md"):
+                    continue
                 errors.append(f"{rel}: invalid canonical artifact location")
             else:
                 discovered[rel.as_posix()] = kind
