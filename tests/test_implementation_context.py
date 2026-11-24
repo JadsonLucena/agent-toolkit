@@ -45,7 +45,8 @@ class ImplementationContextTests(unittest.TestCase):
 
     def test_uncommitted_work_does_not_advance_silently(self):
         skill = doc("contexts/implementation/skills/implement-slice/SKILL.md")
-        self.assertIn('CommitAuthority -->|No| Uncommitted', skill)
+        self.assertIn('CommitAuthority -->|Explicitly denied| Uncommitted', skill)
+        self.assertIn('CommitAuthority -->|Unknown| Block', skill)
         self.assertIn('Continuation -->|No| DoneUncommitted', skill)
         self.assertIn("explicit safe-continuation authorization", skill)
 

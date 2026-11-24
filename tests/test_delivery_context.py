@@ -67,8 +67,11 @@ class DeliveryContextTests(unittest.TestCase):
 
     def test_no_implicit_authorization(self):
         command, rule = doc(COMMAND).lower(), doc(RULE).lower()
-        for token in ("read-only", "target_stage", "no implicit", "authorization"):
+        for token in ("read-only", "target_stage", "authorization"):
             self.assertIn(token, command)
+        self.assertIn("a target stage alone does not authorize code mutation", command)
+        self.assertIn("never implies push", command)
+        self.assertIn("once implementation mutation is authorized", command)
         self.assertIn("operation-specific authorization", rule)
 
     def test_requirements_command_is_resolved_at_runtime(self):
