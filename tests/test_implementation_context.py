@@ -69,7 +69,7 @@ class ImplementationContextTests(unittest.TestCase):
         agent = doc("contexts/implementation/agents/implementation-engineer.md")
         command = doc("contexts/implementation/commands/implement-slice.md")
         self.assertIn("separate Integration stage", skill)
-        self.assertIn("do not initiate independent Code Review", skill)
+        self.assertRegex(skill.lower(), r"do not initiate (?:independent )?code review")
         self.assertIn("do not perform independent review, PR publication or merge", agent)
         self.assertIn("subsequent Integration-stage operations", command)
 

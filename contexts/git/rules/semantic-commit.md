@@ -73,13 +73,31 @@ alwaysApply: false
 * Describe what compatibility is broken and, when known, how consumers should migrate.
 * Standardize new messages on `BREAKING CHANGE:`; accept `BREAKING-CHANGE:` when parsing existing Conventional Commit history.
 
+## Atomic Intention and Separation Test
+
+An **atomic intention** is the smallest meaningful change with one identifiable reason to accept or revert it, a coherent observable outcome, and enough associated verification to judge that outcome. It may include production code, tests and documentation. A card, task, work item, PR, release, file or individual RED/GREEN/REFACTOR cycle is **not** itself a commit boundary.
+
+**Before the first source or test edit**, inspect the entire authorized change, existing behavior and working-tree state. Enumerate candidate intentions in a brief working-state plan: purpose, affected behavior, verification, meaningful independent reversal, dependency order and proposed valid intermediate state. Even when there is only one intention, identify it; no permanent planning document is required. Unknown scope is a reason to investigate, not to assume the entire card is indivisible.
+
+Apply this **separation test** before implementation and again to the staged diff:
+
+1. Can change A be completed and verified with B still absent, leaving the repository in a buildable, safe and behaviorally coherent state?
+2. Can B later be removed or reverted while A remains useful and valid, or does A have its own distinct reason to be accepted or rolled back?
+3. Can A and B be reviewed, deferred or rolled back for different reasons without falsifying their shared guarantees?
+
+When the evidence supports separate meaningful outcomes, **create separate ordered commits**, even when they share a ticket, files, deployment or PR. A dependency B → A establishes **commit order**, not an automatic reason to combine them. A and B need not be independently revertible in both directions: an experiment can be reverted without reverting its prerequisite.
+
+For example, retiring a legacy retention flag may be a complete first commit if its replacement strategy works and tests pass without the experiment. An optional payment experiment that consumes the new strategy is then a second commit; reverting the experiment leaves the baseline change intact. Do not combine them merely because the experiment calls a changed method. If the first change genuinely cannot be made valid alone, consider a small compatibility/seam commit or document the specific invariant that makes separation unsafe before grouping. **An untested intermediate state is not proof that no safe split exists.**
+
+Several TDD cycles may belong to one intention only when they jointly establish one inseparable behavior that cannot satisfy this separation test as distinct verified outcomes. Conversely, a completed independent behavior closes its intention even when the card has more acceptance criteria. External task-level or "one commit per card" cadence is subordinate to Git's atomicity rule; it cannot override this test. Reassess the plan when investigation uncovers an unanticipated intention, and stop before mixing its edits with the current unit.
+
 ## Atomicity
 
 * Do not combine unrelated intentions in the same commit.
 * When a change maps to multiple semantic types, split it whenever the resulting units remain valid, understandable, and appropriately verifiable.
 * Split changes that have different purposes or can be meaningfully reviewed or reverted separately.
 * A plan, branch, pull request, or single delivery is not a commit unit. Split intents that can be reverted separately even when they ship together.
-* Keep changes together when separating them would create an invalid, incomplete, unverified, or misleading intermediate state.
+* Keep changes together only when a concrete required invariant would be violated by every reasonable separately verifiable intermediate state; a later change depending on an earlier valid commit is not enough. Record the invariant and why a compatibility/seam step cannot preserve it.
 * A file that contains two intents is split with hunk staging. The cost of hunk staging does not justify one commit. That exception applies only when no hunk cut leaves each commit coherent and verifiable. Reaching for it to avoid hunk staging means split or ask.
 * Implementation and its directly related tests normally belong to the same commit when they jointly constitute one behavior change.
 * Atomicity is based on logical intent and dependency, not file boundaries, file count, or diff size.
@@ -88,14 +106,14 @@ alwaysApply: false
 
 * An authorized implementation permits local commits of its completed, in-scope atomic intentions unless the task or repository policy explicitly prohibits commits. It does not authorize other Git or remote operations.
 * A plan or implementation request does not need to repeat the word `commit`: silence about local commits is not a prohibition. Resolve effective permission from the invoking Command, authorized mutation scope, and caller/repository restrictions. A stage name or read-only assessment alone grants no mutation or commit authority.
-* Commit each completed intention once its staged unit satisfies the Pre-Commit Verification in `contexts/git/rules/git.md`, before starting the next intention. Do not accumulate completed intentions in the working tree awaiting a later commit request.
+* Commit each preidentified or newly discovered completed intention once its staged unit satisfies the Pre-Commit Verification in `contexts/git/rules/git.md`, before starting a separable next intention. Do not accumulate completed intentions in the working tree awaiting a later commit request.
 * Do not commit an incomplete intention, unrelated pre-existing working-tree or staged changes, or work belonging to the next intention. If the current unit cannot be verified, stop rather than proceeding.
 * A later explicit request to commit remaining authorized changes still follows Atomicity; it does not authorize a snapshot commit combining separable intentions.
 
 ## Quality Guardrails
 
 * Base the message on the actual staged changes or intended patch when available.
-* Verify that the staged diff represents exactly one coherent logical unit before committing, and split it when it does not.
+* Compare the staged diff with the pre-edit intention list and rerun the separation test; verify it represents exactly one coherent logical unit before committing, and split it when it does not.
 * Do not hide unrelated changes behind a broad or ambiguous commit message.
 * Do not create a commit without the pre-commit verification required by `contexts/git/rules/git.md`.
 
@@ -108,6 +126,7 @@ Foundational references used to shape this rule include:
 
 * *Conventional Commits 1.0.0*.
 * The Angular project's Git commit message conventions, particularly their type/scope and message-style guidance.
-* The official Git documentation for commit objects and trailer-compatible metadata.
+* The official Git documentation for commit objects, interactive staging (`git add -p`) and trailer-compatible metadata.
+* Martin Fowler's description of TDD as iterative RED/GREEN/REFACTOR feedback, which is distinct from a Git commit boundary.
 
 Conventional Commit types communicate declared intent; they do not override contradictory evidence from the actual change or its compatibility impact.

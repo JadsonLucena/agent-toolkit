@@ -834,12 +834,12 @@
       "id": "DL-37",
       "command": "/implementation/implement-slice",
       "scenario": "Multiple TDD cycles compose one atomic commit boundary",
-      "input": "Disposable repository with two small accepted behaviors belonging to one coherent intention, requiring multiple TDD cycles, followed by another independent intention. TDD is authorized, commits not prohibited, and tests, lint and relevant build checks are available. Observe RED/GREEN/REFACTOR evidence, staged diff, Git history and sequence.",
+      "input": "Disposable repository with two accepted test cases that jointly establish one coherent invariant and cannot yield separately valid, verifiable and reversible intermediate changes under the Git separation test; they require multiple TDD cycles, followed by another independent intention. TDD is authorized, commits not prohibited, and tests, lint and relevant build checks are available. Observe the pre-edit partition, RED/GREEN/REFACTOR evidence, staged diff, Git history and sequence.",
       "checks": [
         {
           "id": "c1",
           "mode": "presence",
-          "criterion": "Runs both supported TDD cycles within the first coherent intention without claiming every GREEN as a separate atomic commit"
+          "criterion": "Before edits, verifies that neither cycle is a separately valid and reversible intention; runs both supported TDD cycles together without claiming every GREEN as a separate atomic commit"
         },
         {
           "id": "c2",
@@ -1080,6 +1080,75 @@
           "id": "c3",
           "mode": "absence",
           "criterion": "Does not jump directly from diagnosis to production for the new behavior, merge independent intentions, or claim an unobserved commit"
+        }
+      ]
+    },
+    {
+      "id": "DL-48",
+      "command": "/implementation/implement-slice",
+      "scenario": "One task contains two independently revertible behaviors",
+      "input": "Disposable Git fixture: one authorized card requests (A) replacement of a legacy flag with an already testable default behavior and (B) an optional checkout experiment. Both are separately verifiable; B can be reverted without A. Caller authorizes local commits and TDD; inspect pre-edit planning, executed tests, Git history and diff.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Before the first source or RED test edit, lists A and B as distinct intentions with verification, reversal and dependency order"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Records tests and two sequential verified atomic Git commits: prerequisite A complete and passing on its own, then optional experiment B on top"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not count the shared card, a single TDD task cadence, file overlap or B depending on A as justification for one commit"
+        }
+      ]
+    },
+    {
+      "id": "DL-49",
+      "command": "/implementation/implement-slice",
+      "scenario": "Truly inseparable TDD cycles remain one verified intention",
+      "input": "Disposable fixture: two RED/GREEN/REFACTOR cycles jointly implement one validated invariant; committing either half alone would fail required tests or break the accepted interface. No safe compatibility seam is available; local commit authority granted.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Before editing, assesses the two behaviors against the Git separation test and records the exact intermediate-state invariant preventing a safe split"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Executes required checks for the complete atomic intention, stages only in-scope code/tests, and verifies a single commit SHA for the genuinely inseparable unit"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not force a RED/GREEN/REFACTOR commit per cycle or call a combined task atomic without verified indivisibility"
+        }
+      ]
+    },
+    {
+      "id": "DL-50",
+      "command": "/delivery/deliver-change",
+      "scenario": "Unexpected separable behavior discovered mid-card",
+      "input": "Disposable fixture: accepted card initially appears to contain one behavior. During implementation, a distinct independently revertible cleanup or additional supported capability is identified; original behavior remains valid and separately verifiable. Local commits permitted.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Reassesses the intention partition when the second behavior emerges and checks its authorization, dependency order and standalone intermediate state"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Closes and verifies the first intention, observes its own Git commit SHA, and only then implements or separately routes the second authorized intention"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not mix the newly discovered separate change into a card-sized commit or silently expand the accepted scope"
         }
       ]
     }
