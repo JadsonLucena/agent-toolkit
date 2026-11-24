@@ -1,13 +1,13 @@
 ---
 name: test-driven-development
-description: "Run a conditional RED/GREEN/REFACTOR loop for an authorized implementation behavior. Use only when TDD is selected, not for every test generation or code review."
+description: "Execute RED/GREEN/REFACTOR for an authorized testable behavior change. Preferred for features, fixes and business rules when feasible; not standalone test generation or review."
 ---
 
 # Test-Driven Development
 
 ## Purpose
 
-Guide implementation through one small executable behavior at a time with verifiable RED, GREEN and REFACTOR evidence when TDD is selected.
+Guide implementation through one small executable behavior at a time with verifiable RED, GREEN and REFACTOR evidence when selected by the owning Implementation workflow. Selection and exceptions are decided by `implement-slice` under the Implementation rule, not by this inner loop.
 
 ## Uses
 

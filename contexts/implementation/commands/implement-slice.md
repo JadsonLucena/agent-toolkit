@@ -1,6 +1,6 @@
 ---
 name: implement-slice
-description: "Implement a specifically authorized, verifiable software slice with local tests and safe Git handoffs. Use for production changes, not standalone test generation."
+description: "Implement an authorized production slice, preferring TDD for testable behavior changes with justified exceptions and safe Git handoffs. Use Testing for test-only work."
 ---
 
 # Implement Slice
@@ -11,7 +11,7 @@ Implement one bounded, coherent, verifiable software change under the accepted s
 
 ## Invocation
 
-Select the Implementation Engineer and implement-slice procedure. Authorizes in-scope production and related test edits and local checks; completed verified atomic intentions may be locally committed under the existing Git rules unless explicitly prohibited. When necessary, a read-only Git PR-plan handoff precedes the first mutation; each authorized completed atomic intention is handed to Git for commit verification before further intentions. No permission to publish or deploy is inferred.
+Select the Implementation Engineer and implement-slice procedure. Apply the Implementation rule's preferred-TDD selection for testable behavior changes and document justified exceptions; missing an explicit TDD request does not mean direct implementation. Authorizes in-scope production and related test edits and local checks; completed verified atomic intentions may be locally committed under the existing Git rules unless explicitly prohibited. When necessary, a read-only Git PR-plan handoff precedes the first mutation; each authorized completed atomic intention is handed to Git for commit verification before further intentions. No permission to publish or deploy is inferred.
 
 ## Uses
 
