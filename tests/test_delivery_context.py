@@ -20,7 +20,7 @@ TRANSITION_BASELINE = {
     "pre-plan": (RULE, ("before the first implementation mutation", "read-only", "PR Boundary")),
     "commit": (RULE, ("create-semantic-commits/SKILL.md", "verified commit SHA or blocker")),
     "review": (RULE, ("single Code Review verdict", "review_profile=advisory", "PASS")),
-    "draft": (RULE, ("explicitly authorized Draft PR", "failed, missing, stale or incomplete")),
+    "draft": (RULE, ("remote Draft PR", "same mandatory pre-publication tests/lint and Code Review", "local `draft` preparation")),
     "integration": (RULE, ("separately authorized", "post-publication CI", "observed target state")),
     "slice-completeness": (RULE, ("integrated target revision", "cross-PR", "Product Slice still incomplete")),
     "recovery": (RULE, ("Checkpoints cannot undo", "no material progress")),
