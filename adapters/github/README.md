@@ -3,8 +3,7 @@
 \`adapters/github/guarded_pr.py\` is an optional **GitHub-specific, executable
 pre-creation gate** for the portable Review → Git evidence contract.
 
-The adapter verifies an **SSH-signed review attestation** from an authorized
-reviewer and executes all checks specified in a **deployment-protected policy**.
+The adapter verifies an **SSH-signed independent Code Review attestation** for **every remote PR, including Draft**, and executes all checks specified in a **deployment-protected policy**.
 Only after success, and only with explicit \`--create\`, does it invoke
 \`gh pr create\`. It then queries the created PR through \`gh api\` and checks
 the returned repository, base/head refs **and SHAs**, title, and Draft state.
@@ -118,10 +117,12 @@ python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
   --trust-policy /protected/review-policy.json \
   --create --title "feat: example" --body-file /tmp/pr-description.md
 
-# An explicitly authorized draft without signed evidence.
-# The body must name the gap and must not affirm PASS:
+# Draft also requires a completed signed Code Review and passing checks.
+# It can remain Draft for other pending work or reviewer discussion:
 python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
   --repo . --base main --head feature/example \
+  --evidence /protected/review-evidence.json \
+  --signature /protected/review-evidence.json.sig \
   --trust-policy /protected/review-policy.json \
   --draft --create --title "feat: example" --body-file /tmp/pr-description.md
 \`\`\`
@@ -155,21 +156,24 @@ protected check-policy failures, and simulates \`gh pr create\` plus subsequent
 ## Gate Profile Integrity
 
 The protected pre-PR validator accepts only SSHSIG-signed evidence explicitly
-declaring `review_profile: gate` for a ready PR. Signed `advisory` results,
+declaring `review_profile: gate` for any remote PR, including Draft. Signed `advisory` results,
 missing legacy profiles and independent-looking flags cannot bypass the gate.
 The profile is part of the **exact signed JSON bytes**; no adapter may
-retroactively promote an advisory finding. An advisory PASS may be useful in
-an IDE, but has no ready-PR authority. Explicitly nonmaterial questions with
+retroactively promote an advisory finding. An advisory PASS may satisfy the canonical pre-publication review record
+when otherwise valid, but does not satisfy this adapter's signed gate. Explicitly nonmaterial questions with
 `material:false` may remain without granting false certainty about
 material unresolved issues. The signer and protected runtime remain
 responsible for actual reviewer independence.
 
-`--draft` without `--evidence` and without `--signature` creates an unsigned
-draft. It does not read review evidence and does not verify
-`review_profile=gate`. It refuses a body that records `review_profile=gate`
-or affirms the status token `PASS` (a negation in the preceding words, such
-as "does not claim PASS", is not an affirmation). Trusted lint and tests,
-the clean published head, and the protected repository identity still apply.
-`signed_review_verified` is false. Passing `--draft` together with
-`--signature` keeps the signed path. Passing `--evidence` without
-`--signature` is refused, so an unverified file is not treated as a review.
+There is **no unsigned Draft path**. Both ready and Draft creation require
+`--evidence` and `--signature`, a complete signed independent `PASS`
+review for the current base/head, and trusted lint/tests. `--draft` changes
+the GitHub PR status only; it cannot bypass review or checks. An incomplete
+review may still be reported during **local preparation** without publication.
+
+This optional adapter enforces a **stronger** reviewer-authenticity policy
+than the portable canonical advisory pre-publication floor, which permits an
+observed complete `advisory` review under an appropriately enforced host.
+Neither policy nor this wrapper can prevent direct GitHub API creation
+through unrelated credentials or clients. Production enforcement requires
+routing PR creation through a trusted entrypoint and limiting bypass paths.

@@ -20,7 +20,7 @@ TRANSITION_BASELINE = {
     "pre-plan": (RULE, ("before the first implementation mutation", "read-only", "PR Boundary")),
     "commit": (RULE, ("create-semantic-commits/SKILL.md", "verified commit SHA or blocker")),
     "review": (RULE, ("single Code Review verdict", "review_profile=advisory", "PASS")),
-    "draft": (RULE, ("explicitly authorized Draft PR", "failed, missing, stale or incomplete")),
+    "draft": (RULE, ("remote Draft PR", "same mandatory pre-publication tests/lint and Code Review", "local `draft` preparation")),
     "integration": (RULE, ("separately authorized", "post-publication CI", "observed target state")),
     "slice-completeness": (RULE, ("integrated target revision", "cross-PR", "Product Slice still incomplete")),
     "recovery": (RULE, ("Checkpoints cannot undo", "no material progress")),
@@ -90,7 +90,7 @@ class DeliveryContextTests(unittest.TestCase):
     def test_review_publication_and_draft_gates_survive(self):
         skill = doc(SKILL)
         for marker in ("authorized tests/lint", "independent Code Review",
-                       "advisory ", "only an explicitly authorized Draft",
+                       "advisory ", "no remote PR (including Draft)",
                        "pr-prepared", "pr-created", "post-PR checks"):
             self.assertIn(marker, skill)
         self.assertIn("review_profile=advisory", doc(RULE))

@@ -452,7 +452,7 @@ Commands remain thin. `Invocation` defines what the call authorizes; `Boundary` 
 17. Pull-request work is owned by Git as a review/integration concern: durable PR policy lives in `rules/pull-request.md`, reusable plan/prepare/create procedure lives in `skills/manage-pull-request/SKILL.md`, and separate commands preserve different authorization levels. Implementation remains outside Git.
 
 18. Code Review is a separate, read-only context. It operates natively without required providers/adapters; OCR and similar helpers are optional. Requirements, Testing, and Git retain their own authority.
-19. Independent review, applicable tests, and lint are distinct pre-creation prerequisites for PRs. Git consumes `contracts/review-evidence.md` without depending on Review's internal procedures. Enforcing this policy requires runtime/CI controls; Markdown alone cannot block unauthorized remote creation.
+19. Completed Code Review, applicable tests, and lint are distinct **pre-creation prerequisites for every remote PR, including Draft**. Git initiates Review when the evidence is missing and consumes `contracts/review-evidence.md` without performing Review internals. The portable advisory review record is distinct from a protected independent gate claim. Enforcing publication requires runtime/CI controls; Markdown alone cannot block bypassing clients.
 20. Review uses an optional risk-driven Agent Team, with the Code Review Lead coordinating specialist-to-specialist evidence exchange and independent falsification. R2/R3 favor relevant collaborative specialists where runtime support exists; native-solo and lead-relayed fallback remain valid. Provider-specific team orchestration is a runtime responsibility, not a requirement for canonical review.
 21. One fact has one owner. A command states the authorization and points at the skill. An agent routes to the skill. The skill diagram names the rule section for each decision. The rule owns the invariant and its Foundational Guidance. The contract owns the evidence shape.
 
@@ -496,12 +496,15 @@ refs without fetch; `--output-language` selects human report prose.
 ## Advisory and Gate Review Semantics
 
 Canonical `contexts/review/rules/code-review.md` owns the two review
-profiles and calibrated finding policy. `advisory` can support complete
-read-only local reviews without independent session attestation; it must be
-visibly labeled and **cannot** satisfy remote PR preflight. `gate` additionally
-requires independently executed review and protected, externally verified
-SSHSIG evidence. The Git adapter rejects missing/legacy/advisory profile
-regardless of a PASS, signer or local success.
+profiles and calibrated finding policy. A complete, current `advisory` PASS
+may satisfy the **portable** pre-publication review floor (ready or Draft),
+but it is not evidence of reviewer independence or a signed gate claim.
+`gate` additionally requires independently executed review and protected,
+externally verified attestation in the configured runtime. The **optional**
+GitHub guarded adapter deliberately requires signed `review_profile=gate`
+for both ready and Draft publication and rejects unsigned/advisory evidence;
+this stronger deployment requirement does not change the canonical profile
+definitions or constrain unrelated GitHub clients.
 
 `contracts/review-evidence.md` defines portable `review_profile`, optional
 `likelihood`, `origin`, `lead_confirmed`, and pinned
