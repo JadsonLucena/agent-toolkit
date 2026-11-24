@@ -11,7 +11,7 @@ Implement one bounded, coherent, verifiable software change under the accepted s
 
 ## Invocation
 
-Select the Implementation Engineer and implement-slice procedure. Authorizes in-scope production and related test edits and local checks; completed verified atomic intentions may be locally committed under the existing Git rules unless explicitly prohibited. When necessary, a read-only Git PR-plan handoff precedes the first mutation; each authorized completed atomic intention is handed to Git for commit verification before further intentions. No permission to publish or deploy is inferred.
+Select the Implementation Engineer and implement-slice procedure. Authorizes in-scope production and related test edits and local checks; completed verified atomic intentions may be locally committed under the existing Git rules unless explicitly prohibited by the caller or repository. An authorized implementation plan need not repeat commit permission; preserve restrictions inherited from the invoking context. When necessary, a read-only Git PR-plan handoff precedes the first mutation; each authorized completed atomic intention is handed to Git for commit verification before further intentions. No permission to publish or deploy is inferred.
 
 ## Uses
 

@@ -43,12 +43,13 @@ flowchart TD
     Verify -->|No| Fix["Restore behavior within authorized scope"]
     Fix --> Verify
     Verify -->|Yes| Evidence["Record phase results and test-evidence handoff"]
-    Evidence --> More{"Next supported behavior?"}
-    More -->|Yes| Select
-    More -->|No| Done["Return to implement-slice for integrated verification"]
+    Evidence --> Boundary{"Current atomic intention complete?"}
+    Boundary -->|Yes| Done["Return to implement-slice for integrated verification and Git handoff"]
+    Boundary -->|No, more behavior in same intention| Select
+    Boundary -->|Uncertain or blocked| Stop
 ```
 
-The workflow implements `contexts/implementation/rules/implementation.md` sections **Test-Driven Execution** and **Verification and Feedback**; the rule owns TDD phase invariants. Apply `contexts/testing/rules/testing.md` as the **canonical test-quality reference** in RED, including relevant observable assertions, test isolation, determinism, scenario traceability and test-level selection, without copying its procedure here.
+The workflow implements `contexts/implementation/rules/implementation.md` sections **Test-Driven Execution** and **Verification and Feedback**; the rule owns TDD phase invariants. A RED/GREEN/REFACTOR cycle is not automatically a commit boundary: several small behaviors may be required to complete one coherent intention. Once that intention is complete, return to `implement-slice` for integrated verification and Git commit handoff before starting a different intention. TDD does not create commits. Apply `contexts/testing/rules/testing.md` as the **canonical test-quality reference** in RED, including relevant observable assertions, test isolation, determinism, scenario traceability and test-level selection, without copying its procedure here.
 
 ## RED Test-Authoring Handoff
 
@@ -56,7 +57,7 @@ The workflow implements `contexts/implementation/rules/implementation.md` sectio
 * **Conditional composition:** when specialized test design or authoring materially helps and the caller's authorized scope and host permit cross-context routing, request `contexts/testing/skills/generate-tests/SKILL.md` through the Testing specialist for **test-artifact design/authoring only**, using `contracts/test-basis.md` or equivalent accepted behavior, scenario IDs, risk boundaries and applicable rules. This is not a mandatory delegation for every TDD cycle.
 * **Handoff boundary:** Testing may propose or author **only authorized test files** and report traceability, uncertainty, executed checks and their actual outcomes. The requested behavior is deliberately not implemented yet; communicate that a focused, expected RED is not a defect to fix by relaxing assertions or changing behavior. A standalone Testing workflow may report incomplete/failing verification; do not reinterpret that as a GREEN success or suppress it to satisfy its ordinary completion criteria.
 * **Implementation owns the loop:** after optional handoff, Implementation inspects the test against authoritative behavior and Testing quality rules, **executes or verifies RED** and diagnoses the failure before any GREEN production edit. Testing does not own GREEN, REFACTOR, production edits, TDD phase advancement, independent Review or Git actions. If routing is unavailable or would conflict with the intentional RED, follow the native rule-driven path without inventing a specialist invocation.
-* Return control to the owning `implement-slice` workflow for integrated verification and atomic Git commit handoff. Do not make RED pass by redefining an accepted specification or inventing missing acceptance semantics.
+* Return control to the owning `implement-slice` workflow at each completed atomic intention for integrated verification and atomic Git commit handoff. Do not make RED pass by redefining an accepted specification or inventing missing acceptance semantics.
 
 ## Output
 

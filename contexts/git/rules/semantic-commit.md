@@ -87,6 +87,7 @@ alwaysApply: false
 ## Commit Timing During Authorized Implementation
 
 * An authorized implementation permits local commits of its completed, in-scope atomic intentions unless the task or repository policy explicitly prohibits commits. It does not authorize other Git or remote operations.
+* A plan or implementation request does not need to repeat the word `commit`: silence about local commits is not a prohibition. Resolve effective permission from the invoking Command, authorized mutation scope, and caller/repository restrictions. A stage name or read-only assessment alone grants no mutation or commit authority.
 * Commit each completed intention once its staged unit satisfies the Pre-Commit Verification in `contexts/git/rules/git.md`, before starting the next intention. Do not accumulate completed intentions in the working tree awaiting a later commit request.
 * Do not commit an incomplete intention, unrelated pre-existing working-tree or staged changes, or work belonging to the next intention. If the current unit cannot be verified, stop rather than proceeding.
 * A later explicit request to commit remaining authorized changes still follows Atomicity; it does not authorize a snapshot commit combining separable intentions.
