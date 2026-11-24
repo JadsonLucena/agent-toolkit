@@ -159,8 +159,8 @@ The protected pre-PR validator accepts only SSHSIG-signed evidence explicitly
 declaring `review_profile: gate` for any remote PR, including Draft. Signed `advisory` results,
 missing legacy profiles and independent-looking flags cannot bypass the gate.
 The profile is part of the **exact signed JSON bytes**; no adapter may
-retroactively promote an advisory finding. An advisory PASS may be useful in
-an IDE, but has no ready-PR authority. Explicitly nonmaterial questions with
+retroactively promote an advisory finding. An advisory PASS may satisfy the canonical pre-publication review record
+when otherwise valid, but does not satisfy this adapter's signed gate. Explicitly nonmaterial questions with
 `material:false` may remain without granting false certainty about
 material unresolved issues. The signer and protected runtime remain
 responsible for actual reviewer independence.
