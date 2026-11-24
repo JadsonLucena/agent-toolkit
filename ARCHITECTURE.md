@@ -176,7 +176,7 @@ Host-specific discovery and invocation settings belong in optional integrations.
 | Delivery | `rules/delivery.md` | Rule | Cross-context stage, authorization, recovery and handoff integrity |
 | Delivery | `skills/coordinate-delivery/SKILL.md` | Skill | Evidence-gated conditional SDD workflow composition |
 | Delivery | `skills/assess-feedback/SKILL.md` | Skill | Read-only assessment of operational feedback and observed outcome evidence with owner-routed learning |
-| Delivery | `commands/deliver-change.md` | Command | Authorize explicit target-stage routing without blanket mutations |
+| Delivery | `commands/deliver-change.md` | Command | Coordinate a requested stage or end-to-end Requirements-to-PR delivery with operation-specific authorization |
 | Delivery | `agents/delivery-coordinator.md` | Agent | Coordinate specialist handoffs and truthful delivery status |
 | Testing | `rules/testing.md` | Rule | Automated-testing standards and quality invariants |
 | Testing | `skills/generate-tests/SKILL.md` | Skill | Test-design, generation, verification, and diagnosis workflow |

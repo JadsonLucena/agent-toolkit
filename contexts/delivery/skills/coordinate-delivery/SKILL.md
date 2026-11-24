@@ -1,6 +1,6 @@
 ---
 name: coordinate-delivery
-description: "Coordinate authorized SDLC/SDD stages, PR boundaries, recovery, and optional feedback with evidence-gated specialist handoffs. Use for multi-context delivery."
+description: "Coordinate a software increment end-to-end from requirements through design, implementation, tests, review, and PR creation, or resume a stage. Use evidence-gated handoffs with scoped authorization."
 ---
 
 # Coordinate Delivery
@@ -69,7 +69,7 @@ flowchart TD
 
 The main diagram deliberately omits specialist-internal transitions. Route planned to Requirements, designed to Design, implemented to Implementation, reviewed to independent Review after applicable verification through Testing or authorized checks, and pr-prepared, pr-created or integrated through Git-owned preparation, publication and integration handoffs below. These routes do **not** grant additional permissions or allow a later-stage claim without its own evidence.
 
-This explicit cross-context workflow permits **routing** existing specialist capabilities; they continue to own their procedures and authorization gates. Requirements owns its internal elicitation/validation/backlog loop, Implementation owns its optional TDD and atomic Git commit handoffs, Review owns its verdict and Git owns PR planning, preparation, creation and merge. The diagram intentionally does not duplicate those internal workflows. Resolve Requirements composition against the **actually installed command**: use `/requirements/specify-and-plan-change` when the renamed command is present (independent PR #31), or `/requirements/shape-change` when the current installation still provides the original command. Verify the entry point exists before routing; do not assume an uninstalled command or a host alias. Both are Requirements-only and do not authorize the full delivery sequence. Review keeps the sole technical verdict. No tool execution is implied merely by this Markdown procedure.
+This workflow routes existing specialists without replacing their procedures or gates. Requirements owns elicitation, validation, and backlog; Implementation owns test-first TDD as the preferred strategy for testable behavior (with justified exceptions) and atomic Git commit handoffs; Review retains the sole technical verdict; Git owns PR planning, preparation, creation, and merge. Use `/requirements/specify-and-plan-change` for Requirements composition. Verify the entry point exists before routing; do not assume an uninstalled host command or alias. This is a Requirements-only command, not an end-to-end delivery entry point. Routing grants no new permissions and implies no tool execution.
 
 Debugging is a cross-context **conditional evidence-producing capability**, not a mandatory Delivery stage. If observed technical failure blocks a requested authorized stage, Delivery may route an explicitly scoped, read-only investigation and consume the resulting `contracts/debugging-evidence.md`, checking source identity and diagnosis limits. Any subsequent correction remains separately authorized and Implementation-owned; stakeholder semantics, architecture, tests and Review verdicts retain their owners.
 

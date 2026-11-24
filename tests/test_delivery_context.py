@@ -74,11 +74,18 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn("once implementation mutation is authorized", command)
         self.assertIn("operation-specific authorization", rule)
 
-    def test_requirements_command_is_resolved_at_runtime(self):
+    def test_deliver_change_end_to_end_discovery(self):
+        command = doc(COMMAND).lower()
+        self.assertIn("requirements and backlog through design", command)
+        self.assertIn("code review, and pull requests", command)
+        self.assertIn("target_stage=pr-created", command)
+        self.assertIn("separate authorization", command)
+
+    def test_requirements_command_uses_current_entry_point(self):
         skill = doc(SKILL)
-        for marker in ("/requirements/specify-and-plan-change", "/requirements/shape-change",
-                       "actually installed command", "Verify the entry point exists before routing"):
-            self.assertIn(marker, skill)
+        self.assertIn("/requirements/specify-and-plan-change", skill)
+        self.assertNotIn("/requirements/shape-change", skill)
+        self.assertIn("Verify the entry point exists before routing", skill)
 
     def test_preimplementation_plan_and_verified_commits_survive(self):
         skill = doc(SKILL)

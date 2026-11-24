@@ -3,6 +3,58 @@
   "description": "Vendor-neutral capability-routing scenarios. Expected/forbidden reflect intent; CI validates structure only, not model behavior.",
   "cases": [
     {
+      "id": "skill-coordinate-delivery-e2e",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Coordinate this change from requirements and backlog through design, implementation, tests, review and pull requests. Preserve evidence and stop before operations lacking authorization.",
+      "expected": [
+        "coordinate-delivery"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "command-deliver-end-to-end",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /delivery/deliver-change for a software increment, from Requirements and backlog through implementation and review to PR creation. The requested target is pr-created; do not assume permission to push or publish.",
+      "expected": [
+        "deliver-change"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "command-deliver-selected-stage",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /delivery/deliver-change to coordinate only the Design stage of an already planned change. Stop at designed without implementation or PR mutations.",
+      "expected": [
+        "deliver-change"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "command-requirements-not-delivery",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /requirements/specify-and-plan-change solely for elicitation, requirements validation and backlog generation; do not orchestrate design, implementation or PR creation.",
+      "expected": [
+        "specify-and-plan-change"
+      ],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
+      "id": "command-deliver-no-implicit-execution",
+      "kind": "command",
+      "mode": "implicit",
+      "prompt": "Explain what an end-to-end software delivery pipeline would involve; do not invoke a slash command, edit files, or publish anything.",
+      "expected": [],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
       "id": "skill-elicitation-positive",
       "kind": "skill",
       "mode": "implicit",

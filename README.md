@@ -24,7 +24,7 @@ Within each context, **Rules** define durable constraints; **Skills** describe r
 ## Getting started
 
 1. Explore the [contexts](contexts/) and select the engineering responsibility you need.
-2. Open the applicable command and skill; for example, [elicit requirements](contexts/requirements/commands/elicit-requirements.md) or [review code](contexts/review/commands/review-code.md).
+2. Use [deliver change](contexts/delivery/commands/deliver-change.md) to coordinate Requirements through PR creation, or select a focused command such as [elicit requirements](contexts/requirements/commands/elicit-requirements.md) or [review code](contexts/review/commands/review-code.md).
 3. Make those artifacts available to your agent host using its supported instruction or skill mechanism. Command names such as `/review/review-code` are **logical toolkit entry points**, not universally pre-registered slash commands.
 4. Supply the task, relevant sources, and the authorization required by that command. The selected agent or runtime must execute and verify the work; Markdown instructions alone do not enforce permissions.
 
