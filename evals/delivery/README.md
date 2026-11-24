@@ -12,7 +12,7 @@ DL-29 explicitly checks the blocked remote-publication path when a branch exists
 
 **DL-19 now blocks remote Draft publication with missing checks or Code Review. DL-39–DL-42 exercise direct PR creation, required Review routing, Draft non-bypass, freshness after code changes, and the optional guarded GitHub adapter's signed-Draft restriction. These scenarios still require observed agent/host traces to establish behavior.**
 
-**DL-44–DL-48 test default TDD without an explicit keyword, caller opt-out with required checks, a justified unsafe test-first exception, a mandatory TDD blocker, and diagnosis-driven TDD re-selection with the atomic Git handoff retained. The expected results require actual chronological agent/tool evidence, not text matches.**
+**DL-43–DL-47 test default TDD without an explicit keyword, caller opt-out with required checks, a justified unsafe test-first exception, a mandatory TDD blocker, and diagnosis-driven TDD re-selection with the atomic Git handoff retained. The expected results require actual chronological agent/tool evidence, not text matches.**
 
 These are specifications of tests, not tests that have been run. A passing structural CI is not evidence of an agent executing a software change.
 

@@ -117,11 +117,11 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         cases = {item["id"]: item for item in cat["cases"]}
         expectations = {
-            "DL-44": ("without naming TDD", "/implementation/implement-slice"),
-            "DL-45": ("without TDD", "/implementation/implement-slice"),
-            "DL-46": ("destructive third-party service", "/implementation/implement-slice"),
-            "DL-47": ("explicitly requires TDD", "/implementation/implement-slice"),
-            "DL-48": ("behavioral edge case", "/delivery/deliver-change"),
+            "DL-43": ("without naming TDD", "/implementation/implement-slice"),
+            "DL-44": ("without TDD", "/implementation/implement-slice"),
+            "DL-45": ("destructive third-party service", "/implementation/implement-slice"),
+            "DL-46": ("explicitly requires TDD", "/implementation/implement-slice"),
+            "DL-47": ("behavioral edge case", "/delivery/deliver-change"),
         }
         for case_id, (prompt, command) in expectations.items():
             with self.subTest(case=case_id):

@@ -969,7 +969,7 @@
       ]
     },
     {
-      "id": "DL-44",
+      "id": "DL-43",
       "command": "/implementation/implement-slice",
       "scenario": "Testable feature uses TDD without a keyword",
       "input": "Disposable fixture: approved deterministic billing-status transformation, executable unit-test runner and scoped code/test permission. Invoke implement-slice without naming TDD; observe chronological test, production and Git commands.",
@@ -992,7 +992,7 @@
       ]
     },
     {
-      "id": "DL-45",
+      "id": "DL-44",
       "command": "/implementation/implement-slice",
       "scenario": "Explicit caller TDD opt-out retains testing obligations",
       "input": "Disposable fixture: user explicitly requests 'implement without TDD and write tests after code'; behavior and ordinary test tools are available. Invoke implement-slice with scoped changes.",
@@ -1015,7 +1015,7 @@
       ]
     },
     {
-      "id": "DL-46",
+      "id": "DL-45",
       "command": "/implementation/implement-slice",
       "scenario": "Unsafe test-first setup requires a supported exception",
       "input": "Disposable fixture: accepted behavior change, but RED would access an unapproved destructive third-party service. No authorized test-first seam remains after evaluating appropriate test levels; an approved isolated final verification check exists. TDD not mandatory.",
@@ -1038,7 +1038,7 @@
       ]
     },
     {
-      "id": "DL-47",
+      "id": "DL-46",
       "command": "/implementation/implement-slice",
       "scenario": "Explicit TDD mandate fails closed when RED cannot execute",
       "input": "Disposable fixture: caller explicitly requires TDD for supported behavior, but the only test runner needs unauthorized credentials; no permitted alternative can establish RED.",
@@ -1061,7 +1061,7 @@
       ]
     },
     {
-      "id": "DL-48",
+      "id": "DL-47",
       "command": "/delivery/deliver-change",
       "scenario": "Integrated failure reselects TDD for uncovered behavior",
       "input": "Disposable fixture: one authorized intention completes a valid TDD cycle; integrated verification exposes another accepted behavioral edge case, with diagnosis showing new testable behavior rather than a same-test repair. Local commits allowed. Invoke Delivery toward implemented.",
