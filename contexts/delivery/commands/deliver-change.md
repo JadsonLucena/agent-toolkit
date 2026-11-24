@@ -11,7 +11,7 @@ Coordinate a bounded change from its current evidence state toward one explicitl
 
 ## Invocation
 
-Select the Delivery Coordinator and its cross-context workflow. If `target_stage` or authorized mutation scope is absent, operate read-only to assess readiness and next actions. An explicit feedback-assessment request without a delivery target routes only the read-only `assess-feedback` capability; it does not imply a new delivery stage. Explicit stage/operation authorization is required for implementation, source/test edits and local commits; independently authorize remote PR creation, push, merge, release or deployment. Routing never grants permissions owned by the invoked specialty.
+Select the Delivery Coordinator and its cross-context workflow. If `target_stage` or authorized mutation scope is absent, operate read-only to assess readiness and next actions. An explicit feedback-assessment request without a delivery target routes only the read-only `assess-feedback` capability; it does not imply a new delivery stage. Explicit stage and scoped operation authorization are required for implementation and source/test edits. Once implementation mutation is authorized, its verified in-scope atomic intentions may be locally committed by default under Git rules unless the caller or repository explicitly prohibits commits; a separate commit phrase is not required. Independently authorize remote PR creation, push, merge, release or deployment. Routing never grants permissions owned by the invoked specialty.
 
 ## Uses
 
@@ -40,4 +40,4 @@ Actual completed stage and source/revision identity, next safe required capabili
 
 ## Boundary
 
-Default is read-only assessment. No implicit code mutation, commit, push, PR publication, merge, release, deployment, third-party transmission or acceptance of a business outcome. A PR ready for review requires current applicable tests/lint and independent advisory Review PASS under Git policy; an explicitly authorized Draft can disclose gaps without claiming ready. A target stage expresses intent, not blanket tool authorization; escalate missing permission before effects.
+Default is read-only assessment. A target stage alone does not authorize code mutation or commits. Authorized implementation may include verified local commits as defined above, but never implies push, PR publication, merge, release, deployment, third-party transmission or acceptance of a business outcome. A PR ready for review requires current applicable tests/lint and independent advisory Review PASS under Git policy; an explicitly authorized Draft can disclose gaps without claiming ready. A target stage expresses intent, not blanket tool authorization; escalate missing permission before effects.

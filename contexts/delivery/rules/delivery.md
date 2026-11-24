@@ -14,7 +14,7 @@ alwaysApply: false
 
 ## Authorization and Gate Integrity
 
-* A Delivery request carries an explicit `target_stage` and operation-specific authorization. Default to read-only assessment when execution scope is unspecified; do not infer code mutation, local commit, push, PR creation, merge, deploy or release from workflow naming.
+* A Delivery request carries an explicit `target_stage` and operation-specific authorization. Default to read-only assessment when execution scope is unspecified; a stage name alone never grants code mutation or commits. Once scoped implementation mutation is authorized, local commits of verified atomic intentions follow the Git default unless explicitly prohibited. Never infer push, PR creation, merge, deploy or release from workflow naming or implementation permission.
 * Route each authorized operation to its owning capability and honor its more specific boundary. A stage transition must not broaden permissions automatically, even when needed to finish the objective.
 * Review is the **single technical review verdict**. Apply the existing review profile and Git PR readiness policies. Local verification, independent review and remote PR creation remain distinct actions with distinct evidence and authority.
 * Freeze and revalidate applicable source baseline, changed-file state, tests, review target and approvals before consuming evidence. Invalidate only affected downstream claims when authoritative inputs change.
@@ -22,10 +22,10 @@ alwaysApply: false
 ## Pre-Implementation PR Strategy and Git Handoffs
 
 * On a composite initiative with plausible independent or stacked PRs, route the Git Engineer's read-only `contexts/git/skills/manage-pull-request/SKILL.md` `plan` mode **before the first implementation mutation**, following `contexts/git/rules/pull-request.md`. Reuse a current plan when valid; do not impose ceremony on a single coherent PR.
-* Give Implementation the PR Boundary, authorized slice, intended base, dependencies, checks and permission restrictions as **evidence inputs**. Git's plan does not authorize implementing every proposed PR or any remote publication.
+* Give Implementation the PR Boundary, authorized slice, intended base, dependencies, checks and resolved effective commit permission or restrictions as **evidence inputs**. Git's plan does not authorize implementing every proposed PR or any remote publication.
 * When code already exists without a prior PR plan, ask Git to assess the actual diff during `prepare`; never claim that planning happened before mutation.
 * Implementation detects each completed atomic intention; Git executes `contexts/git/skills/create-semantic-commits/SKILL.md` and returns a verified commit SHA or blocker. Delivery must not schedule dependent work from a merely requested, failed, stale or unverified commit handoff.
-* Planning, local commits, pushing, creating PRs and merging remain separate operations with separate authorization and evidence.
+* Git planning, pushing, creating PRs and merging remain separate operations with separate authorization and evidence; local commits derive only from authorized implementation or an explicit commit request and still require verified Git evidence.
 
 ## Integration Readiness and PR Lifecycle
 

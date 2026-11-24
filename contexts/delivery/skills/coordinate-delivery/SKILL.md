@@ -93,7 +93,7 @@ This is the **Delivery-owned map of cross-context transitions**, not a second im
 ## Git Planning and Commit Handoffs
 
 * Before any implementation mutation of a composite initiative, request Git's read-only `plan` via `contexts/git/skills/manage-pull-request/SKILL.md` unless the PR Boundary is already current. Pass the resulting scope, base and dependencies to Implementation without expanding authorization.
-* During Implementation, pass the caller's local-commit permission and await the Git Engineer's actual verified commit SHA or explicit blocked/uncommitted state. A requested commit or passing check alone never establishes commit success.
+* During Implementation, resolve local-commit permission from scoped implementation authority and caller/repository restrictions, then pass the effective permission to Git and await its actual verified commit SHA or explicit blocked/uncommitted state. A plan's silence is not a commit prohibition, but a target stage alone grants no mutation authority. A requested commit or passing check alone never establishes commit success.
 * After Implementation, use independent Review and the Git `prepare` operation as separate stages. `create`, push, merge, release and deployment require separate permissions.
 
 ## Integration Handoffs

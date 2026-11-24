@@ -49,6 +49,20 @@ class ImplementationContextTests(unittest.TestCase):
         self.assertIn('Continuation -->|No| DoneUncommitted', skill)
         self.assertIn("explicit safe-continuation authorization", skill)
 
+    def test_commit_authority_inherited_without_repeated_phrase(self):
+        command = doc("contexts/implementation/commands/implement-slice.md")
+        rule = doc("contexts/implementation/rules/implementation.md")
+        skill = doc("contexts/implementation/skills/implement-slice/SKILL.md")
+        git_rule = doc("contexts/git/rules/semantic-commit.md")
+        self.assertIn("plan need not repeat commit permission", command)
+        self.assertIn("plan's silence about commits is not denial", rule)
+        self.assertIn("silence about local commits is not a prohibition", git_rule)
+        self.assertIn('ScopeGate -->|No or unclear| Block', skill)
+        self.assertIn("ResolveCommit --> Strategy", skill)
+        self.assertIn('CommitAuthority -->|Explicitly denied| Uncommitted', skill)
+        self.assertIn('CommitAuthority -->|Unknown| Block', skill)
+        self.assertNotIn('CommitAuthority -->|No| Uncommitted', skill)
+
     def test_implementation_ends_before_review_and_pr_publication(self):
         skill = doc("contexts/implementation/skills/implement-slice/SKILL.md")
         agent = doc("contexts/implementation/agents/implementation-engineer.md")

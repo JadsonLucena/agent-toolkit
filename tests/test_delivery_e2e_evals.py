@@ -12,9 +12,9 @@ from requirements_evals import load_catalog, evaluate  # noqa: E402
 class DeliveryE2EEvalsTests(unittest.TestCase):
     def test_cases_are_valid_and_target_delivery(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
-        self.assertEqual(34, len(cat["cases"]))
+        self.assertEqual(38, len(cat["cases"]))
         self.assertTrue(all(x["command"] in {"/delivery/deliver-change", "/implementation/implement-slice"} for x in cat["cases"]))
-        self.assertEqual({f"DL-{i:02d}" for i in range(11, 35)},
+        self.assertEqual({f"DL-{i:02d}" for i in range(11, 39)},
                          {x["id"] for x in cat["cases"] if int(x["id"].split("-")[1]) >= 11})
         self.assertEqual(len(cat["cases"]), len(set(x["id"] for x in cat["cases"])))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
@@ -85,11 +85,25 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
                 self.assertTrue(checks[-1]["criterion"].startswith("Does not"))
                 self.assertIn(owner.lower(), " ".join(check["criterion"] for check in checks).lower())
 
+    def test_commit_authority_and_tdd_behavioral_pilots(self):
+        cat = load_catalog(ROOT / "evals/delivery/cases.json")
+        cases = {item["id"]: item for item in cat["cases"]}
+        for case_id in ("DL-35", "DL-36", "DL-37", "DL-38"):
+            case = cases[case_id]
+            self.assertEqual(3, len(case["checks"]))
+            self.assertEqual(["presence", "presence", "absence"],
+                             [check["mode"] for check in case["checks"]])
+            self.assertTrue(case["checks"][-1]["criterion"].startswith("Does not"))
+        self.assertEqual("/implementation/implement-slice", cases["DL-35"]["command"])
+        self.assertEqual("/delivery/deliver-change", cases["DL-36"]["command"])
+        self.assertIn("multiple TDD cycles", cases["DL-37"]["input"])
+        self.assertIn("explicitly forbids", cases["DL-38"]["input"])
+
     def test_no_invented_pass_without_agent_execution(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         summary = evaluate(cat, {"version": 1, "assessments": []}, ROOT / "evals/delivery")
         self.assertEqual("INCOMPLETE", summary["status"])
-        self.assertEqual(34, summary["incomplete"])
+        self.assertEqual(38, summary["incomplete"])
 
 
 if __name__ == "__main__":
