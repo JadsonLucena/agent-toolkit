@@ -41,7 +41,7 @@ The [adapters](adapters/) directory contains optional runtime integrations, incl
 - [Architecture](ARCHITECTURE.md) — canonical structure, ownership matrix, dependency rules, and architectural invariants.
 - [Agent contributor instructions](AGENTS.md) — how coding agents should navigate, change, and verify this repository.
 - [Review runtime guide](adapters/review/README.md) — review integration and execution options.
-- [Evaluation catalogs](evals/) — provider-neutral behavioral evaluation baselines and their limitations.
+- [Evaluation principles and catalogs](evals/README.md) — evidence-based assessment methodology, behavioral scenarios, and their limitations.
 - [Capability routing evaluations](evals/routing/README.md) — discovery, activation, and negative-selection test protocol with host-observed evidence.
 
 Agent Toolkit favors **composition without duplicating authority**: one owner for each rule, procedure, invocation boundary, or evidence contract.
