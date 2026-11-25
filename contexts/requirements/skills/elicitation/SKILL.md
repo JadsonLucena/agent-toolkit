@@ -111,12 +111,12 @@ When elicitation observes a **specific existing-system failure** whose mechanism
 The state model determines order and re-entry. The following are **selection
 constraints**, not a second procedural sequence:
 
-* **Materiality:** Include only decisions that could alter the Need, Change Boundary, requirements, critical guarantees or next handoff. Distinguish supported facts, stakeholder decisions, assumptions and conditional branches without constructing a full tree for trivial changes.
-* **Authority and provenance:** Resolve factual prerequisites from inspectable sources. Preserve missing authoritative decisions or inaccessible evidence as unresolved; never infer stakeholder intent.
-* **Decision frontier:** Ask a question only after its prerequisites are settled. Group questions only when one answer cannot invalidate another; prioritize high-impact pivots, not speculative or out-of-scope branches.
-* **Interaction cost:** Explain why each proposed question matters. Present supported options and trade-offs; label recommendations distinctly from approved decisions. Ask sequentially where dependencies or cognitive load warrant it.
+* **Materiality:** Include only decisions that could alter the Need, Change Boundary, requirements, critical guarantees or next handoff. Distinguish supported facts, stakeholder decisions, assumptions and conditional branches Do not manufacture a full decision tree for trivial changes.
+* **Authority and provenance:** Resolve factual prerequisites from inspectable sources. Preserve missing authoritative decisions or inaccessible evidence as unresolved; A missing authoritative business decision is not a fact the agent may infer.
+* **Decision frontier:** Ask a question only after its prerequisite facts and decisions are settled. Two questions may share a round only if answering one cannot change whether, or how, the other should be asked. Prioritize pivots that reshape the next material decision; defer dependent, speculative or out-of-scope questions.
+* **Interaction cost:** Explain why each proposed question matters. Present supported options and trade-offs; label recommendations distinctly from approved decisions and wait for authorized confirmation. Ask sequentially where dependencies or cognitive load warrant it.
 * **Reconciliation:** After new evidence, update dependencies, provenance and any affected Change Boundary. Reopen previously settled decisions when contradicted; never silently settle downstream questions.
-* **Sufficiency and stop:** Exit when the next material decision is supported at the selected rigor. Defer unrelated branches; block only the path affected by missing authority, material ambiguity or a critical guarantee.
+* **Sufficiency and stop:** Stop on sufficiency, not exhaustive interviewing: exit when the next material decision is supported at the selected rigor and retain explicit unresolved or deferred branches. A missing critical guarantee, conflicting authority or material semantic ambiguity blocks only the affected path.
 
 The decision-tree/frontier technique draws on [Matt Pocock's grilling skill](https://github.com/mattpocock/skills/blob/main/skills/productivity/grilling/SKILL.md); the toolkit's tailoring, scope authority and stop criteria remain canonical.
 
