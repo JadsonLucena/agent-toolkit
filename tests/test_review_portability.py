@@ -97,7 +97,7 @@ class PortableReviewTests(unittest.TestCase):
         proof.update(review_id=context["team_plan"]["review_id"], risk_profile="R3")
         for name, mutate in (
             ("risk", lambda p: p["team_plan"].update(risk_profile="R1")),
-            ("roles", lambda p: p["team_plan"].update(selected_roles=[])),
+            ("roles", lambda p: p["team_plan"].update(selected_roles=["security-reviewer"])),
         ):
             with self.subTest(name=name):
                 altered = json.loads(json.dumps(context))
