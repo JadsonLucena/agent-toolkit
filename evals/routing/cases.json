@@ -3,6 +3,84 @@
   "description": "Vendor-neutral capability-routing scenarios. Expected/forbidden reflect intent; CI validates structure only, not model behavior.",
   "cases": [
     {
+      "id": "command-deliver-natural-end-to-end",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Take this proposed software feature from initial requirements and backlog through technical design, TDD implementation, automated tests, code review, and opening the required pull requests. Preserve approvals before every external action.",
+      "expected": [
+        "deliver-change"
+      ],
+      "forbidden": [],
+      "allowed_companions": [
+        "specify-and-plan-change",
+        "design-solution",
+        "implement-slice",
+        "review-code",
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "command-deliver-natural-readiness-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Assess the readiness and missing evidence for taking this proposed change from requirements through pull requests. Do not modify source, create commits, or publish anything.",
+      "expected": [
+        "deliver-change"
+      ],
+      "forbidden": [
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "command-requirements-natural-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Take this stakeholder change request through elicitation, validated requirements, and a prioritized backlog, then stop. Do not design or implement it.",
+      "expected": [
+        "specify-and-plan-change"
+      ],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
+      "id": "command-design-natural-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Produce just the bounded technical design and interface decisions for this already approved slice. Stop before implementation and pull requests.",
+      "expected": [
+        "design-solution"
+      ],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
+      "id": "command-review-natural-advisory",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Review the final bounded diff in advisory mode before we consider publishing a PR. Report verified findings and one review verdict, without editing files.",
+      "expected": [
+        "review-code"
+      ],
+      "forbidden": [
+        "deliver-change",
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "command-pr-natural-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Create the remote pull request from the already published and fully verified feature branch, using the current pre-publication review evidence. Do not start the requirements-to-implementation pipeline again.",
+      "expected": [
+        "create-pull-request"
+      ],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
       "id": "command-review-advisory-pr",
       "kind": "command",
       "mode": "explicit",
