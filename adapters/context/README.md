@@ -35,16 +35,24 @@ cover other transitive dependencies. Revalidate on every material handoff.
 To verify a pack saved externally after an interruption:
 
 ```sh
-python3 -m adapters.context.native --repo . --verify /path/to/pack.json
+python3 -m adapters.context.native --repo . \
+  --verify /path/to/pack.json \
+  --critical contexts/delivery/rules/delivery.md#L1-L10 \
+  --source contexts/delivery/skills/coordinate-delivery/SKILL.md#L1-L14
 ```
 
-A moved Git HEAD returns revalidate even if the selected file bytes match.
+Verification selectors MUST come from the caller's original independently
+retained request, not from the saved pack. The verifier reconstructs all
+mandatory references, critical flags and missing-critical status, rejecting
+removed or substituted sources. Without the original selection verification
+fails closed. A moved Git HEAD returns revalidate even if the selected file bytes match.
 A changed critical or requested file returns blocked. Full Context Pack
 verification also compares saved excerpts and line provenance against the
 reread source; a matching file hash alone cannot validate altered pack text.
-Metadata-only checkpoint verification explicitly uses
-`verify_context(..., require_content=False)` for hashes, never an excerpt
-authentication claim. No external mutation
+Metadata-only checkpoint verification explicitly passes
+`expected_selection=recorded_checkpoint_selection` with
+`require_content=False` to verify checkpoint-recorded source hashes. This does
+not authenticate excerpts or establish completeness of the original request. No external mutation
 is performed. The adapter is not a persistent execution checkpoint.
 
 Native search is a bounded literal scan of Git-tracked UTF-8 files under
