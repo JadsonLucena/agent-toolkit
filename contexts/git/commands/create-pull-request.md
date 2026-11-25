@@ -11,7 +11,7 @@ Create a remote pull request for an already published change using a verified he
 
 ## Invocation
 
-**Before any remote action:** PR creation permission does not grant push permission. If the source branch is unpublished and push is not separately authorized, stop; do not run `git push` as part of this command. Refer to the canonical `contexts/git/rules/pull-request.md` remote authorization invariant.
+**Before any remote action:** PR creation permission does not grant push permission. If the source branch is unpublished and push is not separately authorized, stop; do not run `git push` as part of this command. Apply the Git-owned remote authorization invariant before acting.
 
 Use only when remote pull-request creation is explicitly requested. **Before creating either a ready PR or a Draft**, require passing applicable project tests/lint and a complete Code Review `PASS` for the exact final head/base. If review evidence is absent or stale, this request authorizes initiating the separate read-only `/review/review-code` capability with `review_profile=advisory` without a second authorization. A recorded `FAIL` or unresolved material `INCOMPLETE` routes findings to the responsible owner and blocks creation until corrected and re-reviewed. Git consumes `contracts/review-evidence.md` without performing Review internals. Missing or failed evidence blocks remote creation, not merely ready status.
 

@@ -14,7 +14,7 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         self.assertEqual(51, len(cat["cases"]))
         self.assertTrue(all(x["command"] in {"/delivery/deliver-change", "/implementation/implement-slice", "/git/create-pull-request"} for x in cat["cases"]))
-        self.assertEqual({f"DL-{i:02d}" for i in range(11, 51)},
+        self.assertEqual({f"DL-{i:02d}" for i in range(11, 52)},
                          {x["id"] for x in cat["cases"] if int(x["id"].split("-")[1]) >= 11})
         self.assertEqual(len(cat["cases"]), len(set(x["id"] for x in cat["cases"])))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
