@@ -4,102 +4,27 @@ This document defines the canonical structure and responsibility boundaries of A
 
 ## Canonical Structure
 
+The directory conventions below describe **where** capabilities belong; they
+are not a second file-by-file inventory. The [Artifact Matrix](#artifact-matrix)
+is the **exhaustive canonical inventory** of Rules, Skills, Commands, Agents,
+and Contracts. `scripts/toolkit_lint.py` reconciles that matrix with the
+repository filesystem and checks the optional Cursor manifest against those
+canonical sources. Supporting Skill `references/` and Review `templates/`
+are intentionally noncanonical and remain under their owning context.
+
 ```text
 contexts/
-├── requirements/
-│   ├── rules/
-│   │   ├── tailoring.md
-│   │   ├── requirements.md
-│   │   └── backlog.md
-│   ├── skills/
-│   │   ├── elicitation/SKILL.md
-│   │   ├── requirements-definition/SKILL.md
-│   │   ├── example-discovery/SKILL.md
-│   │   ├── requirements-validation/SKILL.md
-│   │   └── backlog-planning/SKILL.md
-│   ├── commands/
-│   │   ├── specify-and-plan-change.md
-│   │   ├── elicit-requirements.md
-│   │   ├── specify-requirements.md
-│   │   ├── validate-requirements.md
-│   │   ├── build-backlog.md
-│   │   └── refine-backlog.md
-│   └── agents/
-│       ├── requirements-elicitor.md
-│       ├── requirements-specifier.md
-│       └── backlog-planner.md
-├── design/
-│   ├── rules/design.md
-│   ├── skills/design-solution/SKILL.md
-│   ├── commands/design-solution.md
-│   └── agents/design-engineer.md
-├── debugging/
-│   ├── rules/debugging.md
-│   ├── skills/systematic-debugging/SKILL.md
-│   ├── commands/investigate-defect.md
-│   └── agents/debugging-investigator.md
-├── implementation/
-│   ├── rules/implementation.md
-│   ├── skills/implement-slice/SKILL.md
-│   ├── skills/test-driven-development/SKILL.md
-│   ├── commands/implement-slice.md
-│   └── agents/implementation-engineer.md
-├── delivery/
-│   ├── rules/delivery.md
-│   ├── skills/coordinate-delivery/SKILL.md
-│   ├── skills/coordinate-delivery/references/transition-contract.md
-│   ├── commands/deliver-change.md
-│   └── agents/delivery-coordinator.md
-├── testing/
-│   ├── rules/testing.md
-│   ├── skills/generate-tests/SKILL.md
-│   ├── commands/generate-tests.md
-│   └── agents/test-engineer.md
-├── review/
-│   ├── rules/code-review.md
-│   ├── skills/
-│   │   ├── review-change/SKILL.md
-│   │   ├── coordinate-review-team/SKILL.md
-│   │   └── verify-findings/SKILL.md
-│   ├── commands/review-code.md
-│   └── agents/
-│       ├── code-reviewer.md
-│       ├── specification-reviewer.md
-│       ├── correctness-reviewer.md
-│       ├── security-reviewer.md
-│       ├── reliability-reviewer.md
-│       ├── testing-reviewer.md
-│       ├── architecture-reviewer.md
-│       └── finding-verifier.md
-└── git/
-    ├── rules/
-    │   ├── git.md
-    │   ├── gitflow.md
-    │   ├── semantic-commit.md
-    │   ├── semantic-version.md
-    │   └── pull-request.md
-    ├── skills/
-    │   ├── create-semantic-commits/SKILL.md
-    │   ├── determine-semantic-version/SKILL.md
-    │   ├── manage-branch-work/SKILL.md
-    │   ├── resolve-merge-conflicts/SKILL.md
-    │   └── manage-pull-request/SKILL.md
-    ├── commands/
-    │   ├── commit.md
-    │   ├── determine-semantic-version.md
-    │   ├── plan-pull-requests.md
-    │   ├── prepare-pull-request.md
-    │   ├── resolve-conflicts.md
-    │   └── create-pull-request.md
-    └── agents/git-engineer.md
-
-contracts/
-├── requirements.md
-├── work-item.md
-├── test-basis.md
-├── test-evidence.md
-├── review-evidence.md
-└── debugging-evidence.md
+  <context>/                       # requirements, design, debugging,
+                                   # implementation, delivery, testing, review, git
+    rules/<concern>.md              # owns durable policy
+    skills/<capability>/SKILL.md    # owns reusable procedure
+      references/<detail>.md        # optional, lazy supporting material
+    commands/<invocation>.md        # explicit entry points
+    agents/<specialist>.md          # role-specific responsibilities
+  review/templates/<report>.md      # supporting Review output templates
+contracts/<handoff>.md             # provider-neutral evidence interfaces
+adapters/<provider-or-capability>/  # optional executable integrations
+evals/<area>/                       # provider-neutral evaluation fixtures
 ```
 
 ## Optional Vendor Adapters
@@ -395,7 +320,7 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 
 ## Naming
 
-* Context names are stable engineering nouns: `requirements`, `design`, `implementation`, `delivery`, `testing`, `review`, `git`.
+* Context names are stable engineering nouns: `requirements`, `design`, `debugging`, `implementation`, `delivery`, `testing`, `review`, `git`.
 * Rule filenames name the governed concern.
 * Skill directories name the reusable capability.
 * Command names use a clear verb-object engineering intent and should remain understandable when surfaced outside their physical context. The context namespace may remove redundancy only when the remaining name stays unambiguous.
