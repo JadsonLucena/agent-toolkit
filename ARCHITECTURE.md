@@ -210,7 +210,7 @@ Host-specific discovery and invocation settings belong in optional integrations.
 | Git | `commands/plan-pull-requests.md` | Command | Plan coherent PR boundaries without repository mutation |
 | Git | `commands/prepare-pull-request.md` | Command | Inspect the final change and prepare a truthful PR without remote mutation |
 | Git | `commands/resolve-conflicts.md` | Command | Begin read-only conflict diagnosis or explicitly authorized scoped application |
-| Git | `commands/create-pull-request.md` | Command | Create a remote PR with explicit creation-only authorization |
+| Git | `commands/create-pull-request.md` | Command | Create an authorized remote PR, including only required first-time non-force publication of its unpublished source branch |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
 | Cross-context | `contracts/outcome-evidence.md` | Contract | Optional post-delivery outcome observations and feedback |
 | Cross-context | `contracts/design-evidence.md` | Contract | Portable technical design decisions and handoff to Implementation |
@@ -258,7 +258,7 @@ Platform adapters and runtimes are responsible for enforcing the declared scope 
 
 * Expose only the tools/capabilities required for the authorized operation, with scoped credentials and resource permissions where possible.
 * Apply tool-level policy checks and approvals **before** sensitive or irreversible actions; do not rely only on agent instructions or output checks.
-* Treat authority as operation-specific: creating a pull request does not authorize push, merge, auto-merge, release, or deployment.
+* Treat authority as operation-specific: an explicit request to create a remote PR may include only the necessary first-time non-force publication of its exact unpublished source branch to the verified hosting remote when not prohibited. It does not authorize updating existing remote refs, force-push, changing remote/fork or protected/default branches, merging, auto-merge, release, or deployment. Implementation or a target-stage label alone does not grant publication permission.
 * Deny or pause out-of-scope operations rather than inferring authorization from an adjacent action.
 * Report which restrictions are technically enforced and which are only instruction-level policy. When enforcement is unavailable, do not represent Markdown instructions as a security control; use an external approval/control or withhold the sensitive capability.
 
