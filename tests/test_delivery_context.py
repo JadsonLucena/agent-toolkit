@@ -114,7 +114,7 @@ class DeliveryContextTests(unittest.TestCase):
         skill = doc(SKILL)
         for marker in ("source branch exists on the correct remote",
                        "If unpublished, Git may perform only",
-                       "remote identity must be reverified before creation",
+                       "always reverify remote identity before creation",
                        "existing published PR", "resume the existing PR",
                        "Never implicitly convert an existing Draft to ready"):
             self.assertIn(marker, skill)
