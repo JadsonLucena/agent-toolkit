@@ -37,7 +37,7 @@ class EditorialConsistencyTests(unittest.TestCase):
         section = el.split("### Decision-frontier interview protocol", 1)[1].split(
             "## Output", 1
         )[0]
-        self.assertFalse(re.search(r"(?m)^\\d+\\.", section))
+        self.assertFalse(re.search(r"(?m)^\d+\.", section))
         fb = read("contexts/delivery/skills/assess-feedback/SKILL.md")
         workflow = fb.split("## Workflow", 1)[1].split("## Output", 1)[0]
         self.assertFalse(re.search(r"(?m)^\\d+\\.", workflow))
