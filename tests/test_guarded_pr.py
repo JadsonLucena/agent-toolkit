@@ -248,6 +248,40 @@ class GuardedPRTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.GateError, "remote head"):
             self.preflight()
 
+    def test_remote_head_uses_portable_ls_remote_args(self):
+        original = gate.git
+        calls = []
+
+        def observed(repo, *args):
+            if "ls-remote" in args:
+                calls.append(args)
+                self.assertNotIn("--branches", args)
+                self.assertNotIn("--heads", args)
+            return original(repo, *args)
+
+        with patch.object(gate, "git", side_effect=observed):
+            gate.remote_head(self.repo, "origin", "feature", self.head, "head")
+        self.assertTrue(calls)
+        self.assertEqual(
+            ("ls-remote", "origin", "refs/heads/feature"), calls[0],
+        )
+
+    def test_expired_signer_at_end_of_checks_blocks_even_with_unchanged_bytes(self):
+        original = gate.verify_signature
+        verified = []
+
+        def simulated_expiry(evidence, signature, reviewer, signers, repo):
+            verified.append((evidence, signature))
+            if len(verified) == 2:
+                raise gate.GateError("review evidence signature is invalid or signer is unauthorized")
+            return original(evidence, signature, reviewer, signers, repo)
+
+        with patch.object(gate, "verify_signature", side_effect=simulated_expiry):
+            with self.assertRaisesRegex(gate.GateError, "signature"):
+                self.preflight()
+        self.assertEqual(2, len(verified))
+        self.assertEqual(verified[0], verified[1])
+
     def test_nested_remote_branch_matches_only_exact_ref(self):
         git(self.remote, "update-ref", "refs/heads/x/feature", self.head)
         gate.remote_head(self.repo, "origin", "x/feature", self.head, "head")
