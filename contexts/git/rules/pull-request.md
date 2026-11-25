@@ -7,7 +7,7 @@ alwaysApply: false
 
 ## Remote authorization invariant
 
-**Creating a PR does not authorize a push.** Branch publication, remote PR creation, merge, release, and deployment are distinct operations with distinct permissions. If the intended head is not already published and push is not separately authorized, stop without publishing or claiming that the PR exists. Instructions cannot enforce this boundary; the host must protect the actual remote-operation tools.
+**An explicit request to create a remote PR authorizes only its necessary first-time, non-force source-branch publication**, when the branch is not yet on the selected hosting remote and the repository, source/destination refs and exact reviewed head/base are unambiguous. Publication is a separately verified **effect within the authorized PR-creation workflow**, not blanket permission to push, update existing remote branches, create forks or change remotes. Explicit refusal of push, host permissions or repository policy take precedence and block publication. A mere proposed `target_stage`, PR planning/preparation or implementation authorization does not grant this permission. Merge, release and deployment still require distinct authorization. Markdown does not enforce remote permissions; the host must protect the actual tools.
 
 ## Core Principle
 
@@ -235,10 +235,10 @@ Do not infer one state from another.
 * Before **any** remote PR creation (ready or Draft), revalidate applicable tests/lint and a complete Code Review `PASS` for the exact final head/base and full diff. Revalidate signed `review_profile=gate` evidence only when claiming an externally enforced gate or using a runtime that requires it. Missing, failed, incomplete or stale evidence blocks publication; local Draft preparation remains available.
 * Creating a PR requires explicit authorization to create the remote review object.
 * Preparing or drafting a PR does not authorize remote PR creation.
-* PR creation additionally does not authorize rewriting history, assigning reviewers, adding labels, enabling auto-merge, closing, or deleting branches unless separately authorized. The remote authorization invariant above governs push, merge, release, and deployment.
+* PR-creation authority permits only the scoped initial source-branch publication described above, not force-push, updating an existing remote branch, rewriting history, changing protected/default branches, selecting another remote/fork, assigning reviewers, adding labels, enabling auto-merge, merging, closing, or deleting branches, releasing, or deploying without separately applicable authority.
 * Before creation, verify the intended head and base, repository workflow, remote publication state, and whether an equivalent open PR already exists.
 * Do not create a duplicate PR for the same effective head/base change when an existing review request should be reused or updated.
-* If the required head branch is not available to the remote hosting platform, report the publication blocker unless push authorization is separately available.
+* If the required head is unpublished, inspect the exact remote branch and apply the scoped first-publication conditions in the Remote Authorization Invariant. Perform necessary non-force publication only when those conditions hold, then verify the remote SHA before creating the PR. An ambiguous or unexpected remote ref, explicit no-push restriction or insufficient host permission blocks the step. If the remote branch already exists at a different SHA, never update it under implicit first-publication authority.
 * Do not silently change the base branch merely to make PR creation succeed.
 
 ## Foundational Guidance

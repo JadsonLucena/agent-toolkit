@@ -113,7 +113,7 @@ class DeliveryContextTests(unittest.TestCase):
     def test_remote_branch_and_existing_pr_guards_survive(self):
         skill = doc(SKILL)
         for marker in ("source branch exists on the correct remote",
-                       "If unpublished, stop and report the blocker",
+                       "If unpublished, Git may perform only",
                        "remote identity must be reverified before creation",
                        "existing published PR", "resume the existing PR",
                        "Never implicitly convert an existing Draft to ready"):
@@ -175,7 +175,7 @@ class DeliveryContextTests(unittest.TestCase):
             "T05": ("authorized bounded intention", "Implementation", "commit SHA", "implemented", "failed/unverified"),
             "T06": ("reviewed stage", "Code Review", "tests/lint", "reviewed", "self-review"),
             "T07": ("pr-prepared", "Git", "T06", "pr-prepared", "Draft"),
-            "T08": ("after T07", "Git", "create authorization", "pr-created", "push"),
+            "T08": ("after T07", "Git", "create authorization", "pr-created", "non-force"),
             "T09": ("already exists", "Git", "head/base", "existing PR", "Draft"),
             "T10": ("integrated stage", "Git", "merge authorization", "integrated", "block"),
             "T11": ("Whole Product Slice", "Delivery", "cross-PR", "business acceptance", "incomplete"),

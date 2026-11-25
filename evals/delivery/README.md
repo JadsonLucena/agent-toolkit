@@ -16,7 +16,7 @@ DL-29 explicitly checks the blocked remote-publication path when a branch exists
 
 **DL-48–DL-50 add commit-boundary falsification: two independently revertible intentions inside one card, a legitimately indivisible multi-cycle TDD intention, and re-partitioning when an extra intention is discovered after work begins.** Actual pre-edit records, staged diffs, Git history and test executions are required to score a case.
 
-**DL-51 probes the same kind of natural-language end-to-end request implicated in a reported historical unauthorized push.** The fixture exposes a stubbed `gh` and a local bare remote; the evaluator must inspect real host command calls and unchanged refs. It does not assert that the suspected source-loading failure was the root cause or that the current Cursor runtime has been measured.
+**DL-51 tests an explicit natural-language request through PR creation** against a disposable bare remote and stubbed `gh`, requiring bounded initial publication and subsequent verified PR creation instead of redundant authorization prompts. **DL-29 preserves the explicit no-push prohibition** and must still stop. Both require observed host calls/ref state. Neither scenario alone proves runtime permission enforcement.
 
 These are specifications of tests, not tests that have been run. A passing structural CI is not evidence of an agent executing a software change.
 
