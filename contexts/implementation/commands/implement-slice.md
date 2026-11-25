@@ -27,6 +27,7 @@ Select the Implementation Engineer and implement-slice procedure. Apply the Impl
 * Authorized slice, Change Boundary and intended acceptance/verification criteria.
 * Applicable specification, design and risk constraints when available.
 * Repository state, existing work and project verification conventions.
+* Before the first edit, a proposed list of independently reversible intentions and dependency-safe verification boundaries, or sufficient evidence to derive it in the read-only preflight.
 * Existing PR strategy or PR Boundary (when applicable), or the evidence needed for a conditional read-only Git PR plan.
 * Explicit TDD requirement or caller TDD opt-out, when supplied; otherwise prefer TDD for testable behavior.
 * Explicit mutation exclusions, credentials/external-effect approvals and local-commit restrictions if any.
@@ -37,4 +38,4 @@ The result describes completed Implementation only; Code Review and PR preparati
 
 ## Boundary
 
-No silent requirement or scope change; no mutation of unrelated work, unapproved external effects, push, PR creation, merge, deployment or release. Missing material authority or mandatory evidence blocks the affected slice.
+No silent requirement or scope change; no mutation of unrelated work, unapproved external effects, push, PR creation, merge, deployment or release. A task/card-level commit heuristic cannot override the Git atomic-intention separation test. Missing material authority or mandatory evidence blocks the affected slice.

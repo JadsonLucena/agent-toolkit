@@ -1,6 +1,6 @@
 ---
 name: review-code
-description: "Review an explicit code change read-only with risk-proportionate evidence and one verdict. Use for a requested Review gate, not ordinary implementation checks."
+description: "Review a bounded code change or PR diff read-only with evidence-backed findings and a verdict in advisory or gate profile. Use for explicit review and pre-PR checks, not routine implementation checks."
 ---
 
 # Review Code

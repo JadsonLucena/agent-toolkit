@@ -12,6 +12,7 @@ SKILL = "contexts/delivery/skills/coordinate-delivery/SKILL.md"
 RULE = "contexts/delivery/rules/delivery.md"
 AGENT = "contexts/delivery/agents/delivery-coordinator.md"
 COMMAND = "contexts/delivery/commands/deliver-change.md"
+TRANSITIONS = "contexts/delivery/skills/coordinate-delivery/references/transition-contract.md"
 
 # Invariant -> canonical source -> required evidence/stop semantics.
 TRANSITION_BASELINE = {
@@ -62,7 +63,7 @@ class DeliveryContextTests(unittest.TestCase):
         for stage in ("planned", "designed", "implemented", "reviewed", "pr-prepared", "pr-created", "integrated"):
             self.assertIn(stage, doc(COMMAND))
             self.assertIn(stage, skill)
-        self.assertIn("sole technical verdict", skill)
+        self.assertRegex(skill, r"Review (?:retains|owns) the (?:sole|single) technical verdict")
         self.assertIn("not a substitute Review verdict", agent)
 
     def test_no_implicit_authorization(self):
@@ -138,8 +139,9 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn("does **not** define a new context-packet contract", skill)
 
     def test_transition_contract_has_complete_conditional_outcomes(self):
-        skill = doc(SKILL)
-        section = re.search(r"(?ms)^## Transition Contract\n(.*?)(?=^## |\Z)", skill)
+        transition_doc = doc(TRANSITIONS)
+        self.assertIn("(references/transition-contract.md)", doc(SKILL))
+        section = re.search(r"(?ms)^## Transition Contract\n(.*?)(?=^## |\Z)", transition_doc)
         self.assertIsNotNone(section)
         lines = [line for line in section.group(1).splitlines()
                  if line.startswith("| T") and line.count("|") == 7]
@@ -161,8 +163,7 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn("not a second implementation", section.group(1))
 
     def test_transitions_retain_review_publication_and_merge_order(self):
-        skill = doc(SKILL)
-        section = re.search(r"(?ms)^## Transition Contract\n(.*?)(?=^## |\Z)", skill).group(1)
+        section = re.search(r"(?ms)^## Transition Contract\n(.*?)(?=^## |\Z)", doc(TRANSITIONS)).group(1)
         rows = {
             parts[0]: parts[1:]
             for line in section.splitlines() if line.startswith("| T")
