@@ -82,11 +82,11 @@ class DeliveryContextTests(unittest.TestCase):
         self.assertIn("target_stage=pr-created", command)
         self.assertIn("separate authorization", command)
 
-    def test_requirements_command_uses_current_entry_point(self):
+    def test_requirements_composition_routes_to_owner_not_host_command(self):
         skill = doc(SKILL)
-        self.assertIn("/requirements/specify-and-plan-change", skill)
-        self.assertNotIn("/requirements/shape-change", skill)
-        self.assertIn("Verify the entry point exists before routing", skill)
+        self.assertIn("applicable canonical Requirements Skills", skill)
+        self.assertIn("not an internal dependency or an assumed host alias", skill)
+        self.assertNotIn("/requirements/specify-and-plan-change", skill)
 
     def test_preimplementation_plan_and_verified_commits_survive(self):
         skill = doc(SKILL)

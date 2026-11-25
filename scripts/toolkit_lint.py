@@ -346,7 +346,7 @@ def lint_toolkit(root: Path) -> list[str]:
             "contexts/git/skills/manage-pull-request/SKILL.md",
             "contexts/git/commands/create-pull-request.md",
         ):
-            if re.search(r"(?i)\\bindependent\\s+(?:code[- ]review|review)\\s+(?:verdict|record|evidence)", content):
+            if re.search(r"(?i)\bindependent\s+(?:code[- ]review|review)\s+(?:verdict|record|evidence)", content):
                 errors.append(f"{rel}: advisory Code Review cannot be called independent")
 
         uses = section(content, "Uses")
