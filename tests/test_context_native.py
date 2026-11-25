@@ -243,6 +243,14 @@ class NativeContextTests(unittest.TestCase):
             self.repo, pack, expected_selection=original,
         )["status"])
 
+    def test_malformed_missing_critical_is_rejected_without_traceback(self):
+        original = self.original_selection()
+        pack = prepare_context(self.repo, ["rules.md"], ["rules.md"])
+        pack["missing_critical"] = [{"ref": "rules.md"}]
+        result = verify_context(self.repo, pack, expected_selection=original)
+        self.assertEqual("blocked", result["status"])
+        self.assertIn("missing_critical", result["invalid_refs"])
+
     def test_duplicate_and_unrequested_sources_fail_verification(self):
         original = self.original_selection()
         pack = prepare_context(self.repo, ["rules.md"], ["rules.md"])

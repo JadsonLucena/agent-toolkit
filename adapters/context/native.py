@@ -260,6 +260,7 @@ def verify_context(
     actual_missing_critical = sorted(unavailable_refs & critical)
     declared_missing = pack.get("missing_critical")
     if (not isinstance(declared_missing, list)
+            or any(not isinstance(ref, str) for ref in declared_missing)
             or sorted(declared_missing) != actual_missing_critical):
         invalid.append("missing_critical")
     stated = pack.get("status")
