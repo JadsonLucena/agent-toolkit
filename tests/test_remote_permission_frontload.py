@@ -42,6 +42,12 @@ class RemotePermissionFrontloadTests(unittest.TestCase):
         self.assertIn("does not authorize publication", git_rule)
         self.assertIn("explicitly prohibited by the user", command)
 
+    def test_architecture_agrees_on_conditional_pr_publication(self):
+        architecture = read("ARCHITECTURE.md")
+        self.assertIn("only the necessary first-time non-force publication", architecture)
+        self.assertIn("does not authorize updating existing remote refs", architecture)
+        self.assertNotIn("creation-only authorization", architecture)
+
     def test_optional_cursor_hook_guidance_does_not_promise_enforcement(self):
         doc = read(".cursor-plugin/README.md")
         self.assertIn("failClosed: true", doc)
