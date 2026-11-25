@@ -264,6 +264,10 @@ Platform adapters and runtimes are responsible for enforcing the declared scope 
 
 An adapter's inability to enforce a control never expands canonical authorization. Runtime enforcement is a deployment responsibility, not a new canonical artifact type.
 
+## Evaluation Methodology
+
+The [evaluation principles](evals/README.md) define how to assess toolkit claims and distinguish documented guidance, structural validation, observed agent behavior, and technically enforced safeguards. They belong to the evaluation layer, **not** to a new canonical Rule, agent responsibility, approval gate, or authority source. Context-owned rules and host permissions remain decisive; behavioral conclusions require actual execution evidence.
+
 ## Behavioral Scenario Traceability
 
 When scenarios are first-class behavioral knowledge, preserve semantic identity across contexts:

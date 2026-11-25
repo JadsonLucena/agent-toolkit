@@ -34,6 +34,8 @@ python3 scripts/toolkit_lint.py
 python3 -m unittest discover -s tests -v
 ```
 
+When evaluating toolkit claims or writing assessment criteria, use the [evaluation principles](evals/README.md) as the single assessment methodology. They guide evidence judgments, not specialist authorization or runtime enforcement.
+
 For evaluation-catalog changes, also run the relevant catalog command documented in [toolkit-validation.yml](.github/workflows/toolkit-validation.yml). Routing scenarios additionally use `python3 scripts/routing_evals.py`; without host observations this validates catalog structure only, not selection behavior. The workflow defines the current CI check set. These checks validate structure and selected evidence, **not** correctness of actual agent behavior or runtime authorization.
 
 Inspect the final diff for broken links, duplication, stale references, and unintentional changes. Report exactly which checks ran, their results, and any checks that could not be executed.
