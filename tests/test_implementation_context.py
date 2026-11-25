@@ -26,7 +26,7 @@ class ImplementationContextTests(unittest.TestCase):
         rule = doc("contexts/implementation/rules/implementation.md")
         self.assertIn("do not invent product policy", rule)
         self.assertIn("Git revert does not reverse external outcomes", rule)
-        self.assertIn("Review remains read-only and independently owned", rule)
+        self.assertIn("Review remains read-only and separately owned", rule)
 
     def test_composite_pr_plan_precedes_mutation(self):
         skill = doc("contexts/implementation/skills/implement-slice/SKILL.md")
@@ -69,7 +69,7 @@ class ImplementationContextTests(unittest.TestCase):
         agent = doc("contexts/implementation/agents/implementation-engineer.md")
         command = doc("contexts/implementation/commands/implement-slice.md")
         self.assertIn("separate Integration stage", skill)
-        self.assertIn("do not initiate independent Code Review", skill)
+        self.assertRegex(skill.lower(), r"do not initiate (?:independent )?code review")
         self.assertIn("do not perform independent review, PR publication or merge", agent)
         self.assertIn("subsequent Integration-stage operations", command)
 

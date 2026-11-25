@@ -1,4 +1,5 @@
 """Regression tests for routing-catalog validity and runtime-event scoring."""
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -72,6 +73,32 @@ class RoutingEvalsTests(unittest.TestCase):
     def test_rejects_overlapping_expected_and_forbidden(self):
         catalog = {"schema_version": 1, "cases": [self.case(forbidden=["requirements-validation"])]}
         self.assertIn("overlap", " ".join(validate_catalog(catalog, self.inventory)))
+
+    def test_delivery_and_neighbors_have_natural_language_routing_cases(self):
+        catalog = json.loads((ROOT / "evals/routing/cases.json").read_text(encoding="utf-8"))
+        cases = {case["id"]: case for case in catalog["cases"]}
+        expectations = {
+            "command-deliver-natural-end-to-end": "deliver-change",
+            "command-deliver-natural-readiness-only": "deliver-change",
+            "command-requirements-natural-only": "specify-and-plan-change",
+            "command-design-natural-only": "design-solution",
+            "command-review-natural-advisory": "review-code",
+            "command-pr-natural-only": "create-pull-request",
+        }
+        for identifier, command in expectations.items():
+            with self.subTest(case=identifier):
+                case = cases[identifier]
+                self.assertEqual("explicit", case["mode"])
+                self.assertEqual("command", case["kind"])
+                self.assertEqual([command], case["expected"])
+                self.assertNotIn("/", case["prompt"], "exercise intent discovery without slash aliases")
+        for identifier in (
+            "command-requirements-natural-only",
+            "command-design-natural-only",
+            "command-review-natural-advisory",
+            "command-pr-natural-only",
+        ):
+            self.assertIn("deliver-change", cases[identifier]["forbidden"])
 
     def test_command_must_be_explicit_when_expected(self):
         catalog = {"schema_version": 1, "cases": [

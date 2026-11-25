@@ -1,17 +1,23 @@
 ---
 name: deliver-change
-description: "Coordinate a specified delivery stage across engineering contexts and evidence handoffs. Use for an authorized target stage; missing authority means read-only readiness analysis."
+description: "Deliver a software change end-to-end, from requirements and backlog through design, implementation, tests, code review, and pull requests. Use for a requested delivery target; each mutation requires appropriate authorization."
 ---
 
 # Deliver Change
 
 ## Intent
 
-Coordinate a bounded change from its current evidence state toward one explicitly requested SDLC/SDD delivery stage.
+Coordinate a change from Requirements and backlog through Design, Implementation, Testing, Review, and PR creation, or stop at the requested delivery stage.
 
 ## Invocation
 
-Select the Delivery Coordinator and its cross-context workflow. If `target_stage` or authorized mutation scope is absent, operate read-only to assess readiness and next actions. An explicit feedback-assessment request without a delivery target routes only the read-only `assess-feedback` capability; it does not imply a new delivery stage. Explicit stage and scoped operation authorization are required for implementation and source/test edits. Once implementation mutation is authorized, its verified in-scope atomic intentions may be locally committed by default under Git rules unless the caller or repository explicitly prohibits commits; a separate commit phrase is not required. Independently authorize remote PR creation, push, merge, release or deployment. Routing never grants permissions owned by the invoked specialty.
+Select the Delivery Coordinator and its cross-context workflow.
+
+* An explicit end-to-end request through PR creation selects `target_stage=pr-created`; otherwise select the requested stopping stage.
+* If the target or authorized mutation scope is absent, assess readiness read-only.
+* An explicit feedback request without a delivery target routes only the read-only `assess-feedback` capability.
+* A target stage alone does not authorize code mutation. Once implementation mutation is authorized, verified in-scope atomic intentions may be locally committed under Git rules unless expressly prohibited.
+* PR creation, push, merge, release, and deployment require separate authorization; implementation never implies push. Routed specialists retain their own checks and authority gates.
 
 ## Uses
 
@@ -36,7 +42,7 @@ Select the Delivery Coordinator and its cross-context workflow. If `target_stage
 
 ## Output
 
-Actual completed stage and source/revision identity, next safe required capability, routed specialist results, PR-plan evidence where material, verified commit identities or explicit uncommitted/blocked state, current verification and independent Review evidence, prepared/published PR identity when observed, post-PR checks and approvals, verified merge target only when integration actually occurred, blockers, pending decisions, and evidence of operations actually executed.
+Report the actual stage, source revisions, next owner, specialist handoffs, blockers, and pending decisions. Include verified commits (or uncommitted/blocked state), applicable checks and Code Review evidence, and PR plan/publication status when observed. Report post-PR approvals, integration target and outcome evidence only when verified.
 
 ## Boundary
 

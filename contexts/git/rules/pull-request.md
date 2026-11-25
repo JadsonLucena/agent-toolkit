@@ -112,6 +112,8 @@ Ready for review does not mean ready for production.
 
 ## Pre-Creation Quality Gate
 
+This is a **toolkit-specific pre-publication policy**, stricter than GitHub's default Draft PR workflow. GitHub may allow Draft creation before checks pass; required status checks usually gate [merging](https://docs.github.com/en/pull-requests/reference/status-checks), not creation. Do not present this rule as a GitHub-native constraint.
+
 * **Before creating any remote pull request, including a Draft**, inspect the final head/base and complete diff, apply the shared check-discovery and evidence policy from `contexts/git/rules/git.md`, and require passing applicable project tests and lint (plus established coverage/other mandated checks). Require an actual Code Review under `contracts/review-evidence.md` with a pre-frozen `review_profile=advisory` or valid stronger `gate` profile, complete coverage, and `review_status=PASS` for the exact intended head/base. Checks and review are separate evidence: neither substitutes for the other. This floor applies to R0/documentation-only changes as well.
 * **Missing, failed, incomplete, stale or uncorroborated evidence blocks remote creation in either state.** Do not publish a Draft to bypass tests, lint, review, or uncertain coverage. The same explicit PR-creation request authorizes initiating the separate read-only `/review/review-code` capability with `review_profile=advisory` if a fresh matching review is missing; no second authorization is required. Git consumes `contracts/review-evidence.md`, never performs Review internals, and must not require OCR or a vendor adapter. On `FAIL` or `INCOMPLETE`, return findings or blockers to their owners; after a correction, revalidate the changed code and obtain fresh review for its final revision.
 * **Local preparation is allowed without this floor.** The `prepare` mode may report `draft` or `blocked` when review/checks have not passed; it does not authorize remote publication. After the floor passes, an explicitly authorized remote Draft remains permissible for other unfinished activities, planned follow-up or reviewer discussion; describe those limitations without pretending the change is production-ready. A Draft is not a substitute for pre-publication quality evidence.
@@ -200,7 +202,7 @@ When no applicable repository template exists, use only the sections that are re
 
 - Acceptance criteria / scenarios covered:
 - Tests / lint checks executed and observed result:
-- Independent code review: verdict, head/base, coverage, findings or remaining blockers:
+- Code Review: profile, verdict, head/base, coverage, findings or remaining blockers:
 - Not executed / limitations:
 
 ## Impact and risks

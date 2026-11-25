@@ -3,6 +3,148 @@
   "description": "Vendor-neutral capability-routing scenarios. Expected/forbidden reflect intent; CI validates structure only, not model behavior.",
   "cases": [
     {
+      "id": "command-deliver-natural-end-to-end",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Take this proposed software feature from initial requirements and backlog through technical design, TDD implementation, automated tests, code review, and opening the required pull requests. Preserve approvals before every external action.",
+      "expected": [
+        "deliver-change"
+      ],
+      "forbidden": [],
+      "allowed_companions": [
+        "specify-and-plan-change",
+        "design-solution",
+        "implement-slice",
+        "review-code",
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "command-deliver-natural-readiness-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Assess the readiness and missing evidence for taking this proposed change from requirements through pull requests. Do not modify source, create commits, or publish anything.",
+      "expected": [
+        "deliver-change"
+      ],
+      "forbidden": [
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "command-requirements-natural-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Take this stakeholder change request through elicitation, validated requirements, and a prioritized backlog, then stop. Do not design or implement it.",
+      "expected": [
+        "specify-and-plan-change"
+      ],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
+      "id": "command-design-natural-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Produce just the bounded technical design and interface decisions for this already approved slice. Stop before implementation and pull requests.",
+      "expected": [
+        "design-solution"
+      ],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
+      "id": "command-review-natural-advisory",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Review the final bounded diff in advisory mode before we consider publishing a PR. Report verified findings and one review verdict, without editing files.",
+      "expected": [
+        "review-code"
+      ],
+      "forbidden": [
+        "deliver-change",
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "command-pr-natural-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Create the remote pull request from the already published and fully verified feature branch, using the current pre-publication review evidence. Do not start the requirements-to-implementation pipeline again.",
+      "expected": [
+        "create-pull-request"
+      ],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
+      "id": "command-review-advisory-pr",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /review/review-code for the final PR diff in advisory mode before publication. Examine the complete head/base, report one evidence-backed verdict, and do not create the PR.",
+      "expected": [
+        "review-code"
+      ],
+      "forbidden": [
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "skill-coordinate-delivery-e2e",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Coordinate this change from requirements and backlog through design, implementation, tests, review and pull requests. Preserve evidence and stop before operations lacking authorization.",
+      "expected": [
+        "coordinate-delivery"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "command-deliver-end-to-end",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /delivery/deliver-change for a software increment, from Requirements and backlog through implementation and review to PR creation. The requested target is pr-created; do not assume permission to push or publish.",
+      "expected": [
+        "deliver-change"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "command-deliver-selected-stage",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /delivery/deliver-change to coordinate only the Design stage of an already planned change. Stop at designed without implementation or PR mutations.",
+      "expected": [
+        "deliver-change"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "command-requirements-not-delivery",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Invoke /requirements/specify-and-plan-change solely for elicitation, requirements validation and backlog generation; do not orchestrate design, implementation or PR creation.",
+      "expected": [
+        "specify-and-plan-change"
+      ],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
+      "id": "command-deliver-no-implicit-execution",
+      "kind": "command",
+      "mode": "implicit",
+      "prompt": "Explain what an end-to-end software delivery pipeline would involve; do not invoke a slash command, edit files, or publish anything.",
+      "expected": [],
+      "forbidden": [
+        "deliver-change"
+      ]
+    },
+    {
       "id": "skill-elicitation-positive",
       "kind": "skill",
       "mode": "implicit",

@@ -1,6 +1,6 @@
 ---
 name: delivery-coordinator
-description: "Coordinate evidence-gated delivery stages, specialist handoffs, PR integration, recovery, and feedback. Use for multi-stage change without owning specialist decisions."
+description: "Coordinate an increment from requirements and backlog through design, implementation, review, and PRs, or resume a requested stage. Route specialists without assuming mutation authority."
 ---
 
 # Delivery Coordinator
