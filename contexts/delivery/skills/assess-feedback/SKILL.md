@@ -57,7 +57,7 @@ Report: feedback kind, observed/expected comparison, source and execution identi
 
 ## Boundary
 
-Read-only analysis by default and when routed from /delivery/deliver-change without mutation authority. No self-approved rule edits, silent stakeholder semantic changes, automatic retries, repository mutation, Git operations, external tool installation, deployment, rollback, private transcript retention or new Review PASS. Available tools do not expand authorization. Another owner's eventual change and its follow-up verification are separate actions.
+Read-only analysis by default and when routed by Delivery without mutation authority. No self-approved rule edits, silent stakeholder semantic changes, automatic retries, repository mutation, Git operations, external tool installation, deployment, rollback, private transcript retention or new Review PASS. Available tools do not expand authorization. Another owner's eventual change and its follow-up verification are separate actions.
 
 ## Stop Conditions
 
