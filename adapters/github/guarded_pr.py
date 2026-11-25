@@ -256,7 +256,7 @@ def remote_head(repo: Path, remote: str, branch: str, expected: str, what: str) 
         raise GateError("invalid branch name for remote verification")
     full_ref = f"refs/heads/{branch}"
     git(repo, "check-ref-format", full_ref)
-    refs = git(repo, "ls-remote", "--branches", remote, full_ref)
+    refs = git(repo, "ls-remote", remote, full_ref)
     matches = [row.split("\t", 1) for row in refs.splitlines() if "\t" in row]
     if matches != [[expected, full_ref]]:
         raise GateError(f"remote {what} does not match reviewed {what}")
@@ -336,6 +336,10 @@ def guard(
     # swapped signature after trusted verification still invalidates the inputs.
     if evidence_bytes != read_bytes(evidence_path) or signature_bytes != read_bytes(signature_path):
         raise GateError("review evidence or signature changed during verification")
+    # Signer authorization has a time boundary: even with unchanged evidence,
+    # valid-before in allowed_signers may expire while checks run. Re-verify
+    # the original frozen buffers immediately before authorizing publication.
+    verify_signature(evidence_bytes, signature_bytes, reviewer, policy["allowed_signers_file"], repo)
     return {
         "repository": policy["github_repository"], "reviewer": reviewer,
         "base_sha": base, "head_sha": head, "changed_files": sorted(actual),

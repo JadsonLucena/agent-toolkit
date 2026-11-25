@@ -93,6 +93,11 @@ check commands and any failed mandatory check.
 Evidence and signatures are captured as bounded regular-file byte snapshots,
 checked again after repository checks, and tied to the **exact** remote branch
 reference rather than a suffix match.
+The remote ref query uses `git ls-remote <remote> refs/heads/<branch>` without
+version-dependent branch-filter options; exact returned ref and SHA are checked
+separately. The original frozen signature is verified **again after checks**
+so an OpenSSH allowed-signer validity window expiring during checks blocks
+publication, without reopening a substituted signature.
 
 **The SSH signature authenticates the signing key, not human independence by
 itself.** Trusted reviewer provisioning, private-key custody, author-to-signer
