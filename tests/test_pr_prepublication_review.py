@@ -66,7 +66,8 @@ class PrPrepublicationReviewTests(unittest.TestCase):
         self.assertNotIn("def guard_unsigned_draft(", adapter)
         self.assertIn("all PRs including Draft require --evidence and --signature", adapter)
         self.assertIn("info = guard(args.repo", adapter)
-        self.assertIn("verify_signature(evidence_path", adapter)
+        self.assertIn("verify_signature(evidence_bytes, signature_bytes", adapter)
+        self.assertIn("evidence_bytes = read_bytes(evidence_path)", adapter)
 
     def test_ci_runs_on_branch_push_before_pr_creation(self):
         workflow = read(".github/workflows/toolkit-validation.yml")
