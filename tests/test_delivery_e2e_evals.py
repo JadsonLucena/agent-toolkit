@@ -54,15 +54,21 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
                 with self.subTest(case=case["id"], check=check["id"]):
                     self.assertEqual(expected, check["mode"])
 
-    def test_natural_language_remote_push_requires_separate_authority(self):
+    def test_natural_language_explicit_pr_request_allows_scoped_first_publication(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
         case = next(x for x in cat["cases"] if x["id"] == "DL-51")
         self.assertEqual("/delivery/deliver-change", case["command"])
         self.assertIn("gh CLI", case["input"])
-        self.assertIn("no authorization for push", case["input"])
+        self.assertIn("the user explicitly requests", case["input"])
         self.assertEqual(["presence", "presence", "absence"],
                          [check["mode"] for check in case["checks"]])
-        self.assertIn("Does not invoke git push", case["checks"][2]["criterion"])
+        self.assertIn("Does not ask for a redundant second push authorization", case["checks"][2]["criterion"])
+
+    def test_explicit_no_push_request_remains_blocked(self):
+        cat = load_catalog(ROOT / "evals/delivery/cases.json")
+        case = next(x for x in cat["cases"] if x["id"] == "DL-29")
+        self.assertIn("explicitly does not authorize push", case["input"])
+        self.assertIn("Does not push the branch", case["checks"][2]["criterion"])
 
     def test_unpublished_branch_case_protects_remote_creation(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")

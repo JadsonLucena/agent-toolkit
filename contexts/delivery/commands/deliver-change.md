@@ -17,7 +17,7 @@ Select the Delivery Coordinator and its cross-context workflow.
 * If the target or authorized mutation scope is absent, assess readiness read-only.
 * An explicit feedback request without a delivery target routes only the read-only `assess-feedback` capability.
 * A target stage alone does not authorize code mutation. Once implementation mutation is authorized, verified in-scope atomic intentions may be locally committed under Git rules unless expressly prohibited.
-* PR creation, push, merge, release, and deployment require separate authorization; implementation never implies push. Routed specialists retain their own checks and authority gates.
+* An explicit, authorized PR-creation request can include initial non-force publication of its required, unpublished source branch under Git policy; implementation or a mere target stage never implies push. Updating existing remote refs, merge, release and deployment require separate authorization. Routed specialists retain their own checks and authority gates.
 
 ## Uses
 
@@ -36,7 +36,7 @@ Select the Delivery Coordinator and its cross-context workflow.
 
 * Change objective, approved scope and current artifacts or source references.
 * Optional operational feedback or observed outcome references, with expected/actual behavior and source/revision identity when known; feedback assessment alone is read-only.
-* Explicit `target_stage`: `planned`, `designed`, `implemented`, `reviewed`, `pr-prepared`, `pr-created`, or `integrated`, plus applicable operation-level permissions. `pr-created` requires explicit PR-creation authority; `integrated` additionally requires merge authority and all repository prerequisites.
+* Explicit `target_stage`: `planned`, `designed`, `implemented`, `reviewed`, `pr-prepared`, `pr-created`, or `integrated`, plus applicable operation-level permissions. `pr-created` requires an explicit request to create PRs, including bounded initial branch publication only when necessary and permitted; `integrated` additionally requires merge authority and all repository prerequisites.
 * Existing repository snapshot, stage evidence, accepted source and scenario references with revision identity, Git-owned PR plan/Boundary when available, local-commit restrictions and blockers when known. Missing source material is retrieved only when relevant and authorized.
 * Runtime capabilities, intended PR base/head and PR publication state, review/check/approval evidence, repository branch protections, and resource/approval limits when known.
 
@@ -46,4 +46,4 @@ Report the actual stage, source revisions, next owner, specialist handoffs, bloc
 
 ## Boundary
 
-Default is read-only assessment. A target stage alone does not authorize code mutation or commits. Authorized implementation may include verified local commits as defined above, but never implies push, PR publication, merge, release, deployment, third-party transmission or acceptance of a business outcome. A PR ready for review requires current applicable tests/lint and a complete Review advisory PASS under Git policy; an explicitly authorized remote Draft still requires passing pre-publication tests/lint and Code Review; local preparation may disclose unresolved gaps without publication. A target stage expresses intent, not blanket tool authorization; escalate missing permission before effects.
+Default is read-only assessment. A target stage alone does not authorize code mutation or commits. Authorized implementation may include verified local commits but does not by itself imply push or PR publication. A separate explicit request to create PRs can include only the required first-time branch publication under Git policy; merge, release, deployment, unrelated third-party transmission and acceptance of a business outcome remain separately authorized. A PR ready for review requires current applicable tests/lint and a complete Review advisory PASS under Git policy; an explicitly authorized remote Draft still requires passing pre-publication tests/lint and Code Review; local preparation may disclose unresolved gaps without publication. A target stage expresses intent, not blanket tool authorization; escalate missing permission before effects.

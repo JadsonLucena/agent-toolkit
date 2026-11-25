@@ -1,6 +1,6 @@
 ---
 name: manage-pull-request
-description: "Plan coherent PR boundaries, prepare evidence-backed descriptions and readiness, or create explicitly authorized remote PRs. Use each mode without implicit push or merge."
+description: "Plan or prepare coherent PRs, or create authorized remote PRs with conditional first publication of their exact source branches. Never infer merge or force-push."
 ---
 
 # Manage Pull Requests
@@ -17,8 +17,8 @@ This skill supports three modes:
 
 ## Authorization boundary before remote tools
 
-- **Creating a PR never authorizes pushing a branch.** Verify separate push authority before any push; when absent and the head is unpublished, stop and report the remote-publication blocker.
-- PR creation itself requires its own authorization, the exact published head/base and the Code Review/check evidence required by the Git Rule. Merge, release and deployment remain separate operations.
+- **An explicit PR-creation request can authorize first-time publication of only its necessary source branch**, not arbitrary push. Verify exact head/base, remote, destination ref absence, repository policy and caller restrictions; never publish when push was prohibited. An existing divergent remote branch requires separate update authority.
+- PR creation itself requires its own authorization, verified remote head/base **after any permitted initial publication**, and Code Review/check evidence required by the Git Rule. Merge, release and deployment remain separate operations.
 - Before a `create` decision, **retrieve and apply** the relevant sections of `contexts/git/rules/pull-request.md` and `contexts/git/rules/git.md` if they are not already present and verified. Listing a Rule in `## Uses` is not evidence that the host loaded it. Lack of access blocks only the affected creation decision.
 
 ## Uses
@@ -113,7 +113,9 @@ flowchart TD
     CreationGate["Remote Creation Safety in pull-request.md"]
 
     CreationGate -->|blocked| Blocked
-    CreationGate -->|authorized and publishable| CreateRemotePR
+    CreationGate -->|authorized and publishable| EnsureHead["Verify or conditionally publish source branch"]
+    EnsureHead --> VerifyRemoteHead["Confirm exact remote head/base SHA"]
+    VerifyRemoteHead --> CreateRemotePR
     CreateRemotePR --> VerifyCreated
     VerifyCreated --> Done
 
@@ -172,7 +174,7 @@ Produce:
 
 * Planning does not authorize implementation, branch creation, commits, pushes, or remote PR creation.
 * Preparing does not authorize modifying production/test code, creating commits, pushing, creating/updating a remote PR, assigning reviewers, labeling, merging, or releasing.
-* Creating requires current, complete Code Review `PASS` and passing required checks **before** publishing any remote PR, including Draft. A request to create a PR authorizes the missing read-only Review handoff; a Draft is not a bypass. Creating authorizes only creation of the remote PR object described by the command. It does not authorize push, history rewrite, reviewer assignment, labels, milestones, auto-merge, merge, branch deletion, release, or deployment unless separately authorized.
+* Creating requires current, complete Code Review `PASS` and passing required checks **before** publishing any remote PR, including Draft. A request to create a PR authorizes the missing read-only Review handoff; a Draft is not a bypass. Creating additionally permits **only the first non-force publication of the specifically intended, absent remote source branch** when needed for the authorized PR and not otherwise prohibited. It does not authorize updates to existing remote branches, force-push, history rewrite, reviewer assignment, labels, milestones, auto-merge, merge, branch deletion, release or deployment.
 * This skill may diagnose scope, test, implementation, or architecture defects, but diagnosis does not authorize changing those artifacts.
 * Do not alter the final diff merely to make the PR description look coherent unless a separate implementation authorization exists.
 * Readiness and what the description may claim are the Pre-Creation Quality Gate in `contexts/git/rules/pull-request.md`.
@@ -191,6 +193,6 @@ Stop only the affected decision and report the blocker when:
 * critical verification required by repository policy is unavailable or failing;
 * source intent is materially ambiguous and changes the PR boundary;
 * secrets or sensitive data would be exposed;
-* remote PR creation is requested but the head is not published and push is not authorized;
+* remote PR creation is requested but the exact source branch cannot be published within the limited first-publication scope (for example, user forbids push, remote/ref is ambiguous, destination already exists at a different SHA or host permission is missing);
 * an equivalent open PR already exists and creating another would be duplicative;
 * continuing would require an unauthorized code, branch, history, push, merge, release, or deployment mutation.
