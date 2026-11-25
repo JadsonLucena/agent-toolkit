@@ -145,6 +145,10 @@ It will fail closed if any required trust anchor or verification is unavailable.
   permission model and repository/organization policy.
 * The wrapper cannot prove that repository tests truly cover every relevant
   behavior; the protected policy must represent effective project checks.
+* Check subprocesses receive an allowlisted environment and an isolated temporary
+  HOME, not the parent process's GitHub/cloud tokens. This **is not a sandbox**:
+  trusted callers must still isolate filesystem, network, credentials and PATH
+  when executing repository-controlled test commands.
   CI triggered only by PR creation is not a substitute for preflight checks.
 * The actual code review belongs to the separate Review context. Neither
   the SSH signature nor the output of the adapter performs a review.
