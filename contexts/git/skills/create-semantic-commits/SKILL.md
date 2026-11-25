@@ -7,7 +7,7 @@ description: "Create atomic Git commits for authorized completed intentions; ver
 
 ## Purpose
 
-Use for each completed intention during authorized implementation, or to partition an explicitly requested change set into the smallest coherent sequence of atomic commits. Apply the same Git and semantic-commit rules in either mode.
+Use for each completed intention during authorized implementation, or to partition an explicitly requested change set into the smallest coherent sequence of atomic commits. The Git-owned separation test, not task or TDD cadence, defines the commit unit.
 
 ## Uses
 
@@ -78,7 +78,9 @@ stateDiagram-v2
     Blocked --> [*]
 ```
 
-The diagram is the procedure. Apply the shared quality-gate discovery and evidence policy in `contexts/git/rules/git.md`. Apply atomicity and message shape in `contexts/git/rules/semantic-commit.md`. Do not restate those rules.
+The diagram is the procedure. Apply the shared quality-gate discovery and evidence policy in `contexts/git/rules/git.md` and the **Atomic Intention and Separation Test** in `contexts/git/rules/semantic-commit.md`. Do not restate those rules.
+
+At each Implementation handoff, reconcile the staged and unstaged diff with the intention boundaries identified **before the first edit**. Reject a combined staged unit if a separately verifiable/revertible behavior was included for task convenience or because it depends on an earlier valid change. Use patch/hunk staging for overlapping files. For an explicit post-hoc commit request, reconstruct the intention partition from the actual changes; do not claim that a pre-edit plan existed. If separation is unsafe, document the precise intermediate-state invariant and block on unresolved ambiguity.
 
 ## Boundaries
 
@@ -91,4 +93,4 @@ The diagram is the procedure. Apply the shared quality-gate discovery and eviden
 
 ## Output
 
-Report the commits created, the logical intent of each commit, discovered quality gates, checks satisfied explicitly or by the effective hook, coverage mode used when applicable, remaining changes, and any blocked or unresolved state. Never claim a commit exists without repository evidence.
+Report the commits created, the separately verified and revertible purpose of each, any justified indivisible grouping, discovered quality gates, checks satisfied explicitly or by the effective hook, coverage mode used when applicable, remaining changes, and any blocked or unresolved state. Never claim a commit exists without repository evidence.

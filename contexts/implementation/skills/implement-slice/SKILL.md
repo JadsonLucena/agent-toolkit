@@ -22,7 +22,7 @@ Implement one supported, independently verifiable code slice without silently mo
 
 ## Working State
 
-Keep the current authorized slice, source baseline, Change Boundary, PR-plan status and boundary when material, affected files, repository state, effective local-commit permission and its authorization source, Git handoff result and commit identity, tests, intended checks, relevant decisions, unresolved risks, retry history, and observed outcomes. Preserve external-effect identifiers when material to safe resumption.
+Keep the current authorized slice, source baseline, Change Boundary, and pre-edit intention partition (purposes, independent revert test, verification, safe intermediate states and dependency order). Track PR-plan status when material, repository state, commit authority and its source, Git handoff SHA, tests/checks, unresolved risks and external effects. Preserve external-effect identifiers when material to safe resumption.
 
 ## Workflow
 
@@ -35,8 +35,11 @@ flowchart TD
     Strategy -->|Yes, missing| PlanPR["Git Engineer: read-only plan-pull-requests handoff"]
     PlanPR --> PlanReady{"PR Boundary and allowed slice reconciled?"}
     PlanReady -->|No| Block["Stop with evidence and responsible owner"]
-    PlanReady -->|Yes| Plan["Safe Implementation: choose next coherent intention"]
-    Strategy -->|Not required or existing plan valid| Plan
+    PlanReady -->|Yes| Partition["Before first source/test edit: name reversible atomic intentions and safe order"]
+    Strategy -->|Not required or existing plan valid| Partition
+    Partition --> PartitionGate{"Separation test supports planned units and valid intermediate states?"}
+    PartitionGate -->|No or unclear| Block
+    PartitionGate -->|Yes| Plan["Choose next preidentified atomic intention"]
     Plan --> Test{"TDD required or preferred for supported behavior?"}
     Test -->|Yes and feasible| TDD["test-driven-development: RED/GREEN/REFACTOR"]
     TDD --> Check["Verification and Feedback: execute applicable checks"]
@@ -55,7 +58,9 @@ flowchart TD
     Uncommitted --> Continuation{"Explicit permission for safe uncommitted continuation?"}
     Continuation -->|Yes| More
     Continuation -->|No| DoneUncommitted["Return uncommitted state; stop before next intention"]
-    More -->|Yes| Plan
+    More -->|Yes| Repartition{"New independent behavior or changed intent boundary?"}
+    Repartition -->|Yes| Partition
+    Repartition -->|No| Plan
     More -->|No| Done["Completion: record evidence and status"]
     Gate -->|Actionable failure| Diagnose["Establish diagnosis and evidence; revise only within authorized scope"]
     Diagnose -->|Material new progress possible| Reassess{"New behavior, changed test basis, or strategy uncertainty?"}
@@ -65,7 +70,11 @@ flowchart TD
     Gate -->|Missing authority or unsafe effect| Block
 ```
 
-Apply the named sections of `contexts/implementation/rules/implementation.md`. When TDD is selected, delegate its inner RED/GREEN/REFACTOR loop to `contexts/implementation/skills/test-driven-development/SKILL.md` rather than rewriting it here. Git owns semantic commit execution; Implementation supplies a completed in-scope intention and waits for verified Git evidence before selecting another intention when a local commit is permitted. Do not treat silence in an authorized implementation plan as missing commit authority. When TDD is selected, multiple RED/GREEN/REFACTOR cycles may complete the same intention; return here for integrated verification and Git handoff as soon as that intention is complete, before selecting a different intention.
+Apply the named sections of `contexts/implementation/rules/implementation.md`. When TDD is selected, delegate its inner RED/GREEN/REFACTOR loop to `contexts/implementation/skills/test-driven-development/SKILL.md` rather than rewriting it here. Git owns semantic commit execution; Implementation supplies a completed in-scope intention and waits for verified Git evidence before selecting another intention when a local commit is permitted. Do not treat silence in an authorized implementation plan as missing commit authority. When TDD is selected, multiple RED/GREEN/REFACTOR cycles may complete the same intention **only if Git's separation test shows no separately verifiable/revertible outcome**; return here for integrated verification and Git handoff as soon as the intention is complete, before selecting another.
+
+## Pre-Edit Atomic Intention Plan
+
+The `Partition` gate precedes **all production and test edits**, including TDD RED. Before executing the first edit, identify each candidate intention by its purpose, expected observable change, verification, meaningful revert boundary, dependency order and a valid intermediate repository state. For a single clearly indivisible change, a brief one-item plan is sufficient. A PR plan or work item is not evidence that a card contains only one intention. When an unexpected independent change appears, preserve the current unit without mixing the new work, re-run the Git separation test and get the first intention verified/committed before editing the next. Do not use task-level commits or external TDD cadence to override Git atomicity.
 
 ## Test Strategy Selection
 
@@ -78,12 +87,12 @@ For a nontrivial or unexplained failure, use the canonical Debugging investigati
 ## Cross-context Handoffs
 
 * **Before mutation, if PR decomposition is material:** ask the Git Engineer to use `contexts/git/skills/manage-pull-request/SKILL.md` in read-only `plan` mode under `contexts/git/rules/pull-request.md`, unless a current plan already exists. Consume its PR Boundary, included/excluded scope, dependencies and intended base without granting additional implementation or publication authority.
-* **After each verified intention:** hand the Git Engineer the current atomic change boundary (including paths/hunks and unrelated-work exclusions), actual workspace/revision, observed checks and resolved effective local-commit authorization. Git applies `contexts/git/skills/create-semantic-commits/SKILL.md` and returns an observed commit SHA, exact committed scope, resulting repository status, or a blocker. Never perform an unverified substitute commit or count a requested handoff as a completed commit.
+* **After each verified intention:** recheck the staged change against the pre-edit reversible-intention partition and hand the Git Engineer the current atomic change boundary (including paths/hunks and unrelated-work exclusions), actual workspace/revision, observed checks and resolved effective local-commit authorization. Git applies `contexts/git/skills/create-semantic-commits/SKILL.md` and returns an observed commit SHA, exact committed scope, resulting repository status, or a blocker. Never perform an unverified substitute commit or count a requested handoff as a completed commit.
 * **Explicitly prohibited local commits:** retain the verified intention as uncommitted evidence; do not automatically begin another intention without explicit safe-continuation authorization. A PR plan does not authorize a commit, push, PR creation or merge.
 
 ## Output
 
-Return the bounded implementation state for a separate Integration stage; do not initiate independent Code Review, Git PR preparation/creation or merge as a side effect of completing this Skill. Report implementation files and affected interfaces, source and design references where available, verification commands and observed results, verified commit SHAs and resulting Git state when authorized and completed, or explicit uncommitted/blocked handoff status; PR-plan status when material; selected test strategy, concrete exception and alternative verification when TDD was skipped; residual risks and readiness. Use `contracts/test-evidence.md` for supported scenario coverage without inventing passed tests.
+Return the bounded implementation state for a separate Integration stage; report the planned atomic intentions, verified commits or outstanding units without treating a task as a commit. Do not initiate Code Review, Git PR preparation/creation or merge as a side effect of completing this Skill. Report implementation files and affected interfaces, source and design references where available, verification commands and observed results, verified commit SHAs and resulting Git state when authorized and completed, or explicit uncommitted/blocked handoff status; PR-plan status when material; selected test strategy, concrete exception and alternative verification when TDD was skipped; residual risks and readiness. Use `contracts/test-evidence.md` for supported scenario coverage without inventing passed tests.
 
 ## Boundary
 

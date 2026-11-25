@@ -31,21 +31,23 @@ alwaysApply: false
 * REFACTOR: improve structure without changing expected behavior; rerun relevant tests. A refactor with unverified preservation is not a completed TDD cycle.
 * Repeat for another small behavior only after the current cycle's evidence is established. Persist the failure/output, actual commands, revision and supported scenario mapping when material.
 * Repeated failures without a new actionable diagnosis, uncertainty in the expected behavior, a scope change or unsafe side effects stop the affected cycle and require the responsible decision owner. Automated test generation remains independently available in Testing.
-* TDD cycle completion is not integrated verification, independent Code Review, deployment or business acceptance.
+* TDD cycle completion is not integrated verification, Code Review, deployment or business acceptance.
 
 ## Verification and Feedback
 
 * Use supported tests and `contracts/test-basis.md`/`contracts/test-evidence.md` when supplied; scenarios remain semantic, not necessarily identical to test identifiers. Respect canonical `contexts/testing/rules/testing.md` as a quality reference without taking ownership of Testing's separate workflow.
 * Execute applicable project verification after each completed intention: fast targeted checks first, then required integrated checks. Record exact commands, result, tested revision and why applicable checks were not run.
 * A failing check is evidence to diagnose, not permission to rewrite expected business behavior. Repetition requires new evidence or a changed hypothesis. Stop when an attempt is unproductive, unsafe or out of authorized scope.
-* A passing local check does not imply independent Code Review, deployment, acceptance, or measured outcomes. Review remains read-only and independently owned.
+* A passing local check does not imply Code Review, deployment, acceptance, or measured outcomes. Review remains read-only and separately owned.
 
 ## Git Handoff Integrity
 
 * Git owns commit atomicity, timing, staging and verification through `contexts/git/rules/semantic-commit.md`, `contexts/git/rules/git.md` and `contexts/git/skills/create-semantic-commits/SKILL.md`. Implementation owns the completed code intention and the handoff, not Git's internal procedure.
 * Resolve effective local-commit authority from the invoking Command and caller/repository restrictions using the Git rule: a plan's silence about commits is not denial when implementation mutation is authorized. An explicit prohibition takes precedence; a Delivery stage name alone never grants mutation authority.
+* **Before the first source or test edit**, apply Git's `Atomic Intention and Separation Test` in `contexts/git/rules/semantic-commit.md` to the entire authorized card/slice. Name the planned separately revertible intentions, supporting verification, safe intermediate states and dependency order in working state; do not equate a task or card with one intention or mandate a separate artifact. Reassess when a new independent behavior appears. An unverified intermediate cannot justify bundling changes.
+* Git atomicity takes precedence over external task-level/TDD commit cadence: a valid prerequisite change and its dependent experiment remain separate commits when the former is independently verifiable and the latter can be reverted without removing it. Use TDD within each intention, not as a reason to combine distinct outcomes.
 * Before the first code mutation of a plausibly multi-PR change, consume an existing valid PR strategy or request the Git Engineer's **read-only** PR-plan capability. A direct Implementation invocation must not silently bypass this condition merely because Delivery was not invoked. Use the Git-owned `contexts/git/rules/pull-request.md` policy; the resulting PR plan is evidence, not authorization to implement additional slices.
-* For each verified atomic intention, provide the Git capability with the exact authorized change scope, actual repository/workspace identity, relevant verification results and resolved local-commit permission (including its source or restriction). A completed code change is not a verified commit.
+* For each verified atomic intention, compare its actual changes with the pre-edit partition and provide Git the exact authorized change scope, actual repository/workspace identity, relevant verification results and resolved local-commit permission (including its source or restriction). A completed code change is not a verified commit.
 * Do not advance automatically to another atomic intention when an authorized Git commit is blocked, failed, unverified, or lacks a confirmed matching commit identity. When commits are prohibited, preserve the uncommitted state and stop before the next intention unless the caller separately authorizes a safe uncommitted continuation.
 * A PR strategy, a successful commit and an implemented slice are distinct results. Planning, preparing and creating PRs remain Git-owned operations with separate authorization; local commits do not imply push, remote PR publication or merge.
 
@@ -59,9 +61,9 @@ alwaysApply: false
 ## Completion
 
 * Report changed files, requirement/scenario and design references when known, observed checks, unresolved blockers, side-effect/recovery risks, and the current revision/scope. A completed slice is not a completed product outcome.
-* Leave work with explicit status `implemented`, `blocked`, or `incomplete`, with limitations and next owner; never claim acceptance or independent review solely from self-verification.
+* Leave work with explicit status `implemented`, `blocked`, or `incomplete`, with limitations and next owner; never claim acceptance or Code Review solely from self-verification.
 
-* Completing Implementation means the bounded slice and its local verification and Git handoff state are reported. It does not imply independent Review, PR readiness, PR publication, merge, or integration into the target branch. Forward the exact implementation revision, tests and known limits for a separate integration-stage decision.
+* Completing Implementation means the bounded slice and its local verification and Git handoff state are reported. It does not imply Code Review, PR readiness, PR publication, merge, or integration into the target branch. Forward the exact implementation revision, tests and known limits for a separate integration-stage decision.
 
 ## Foundational Guidance
 

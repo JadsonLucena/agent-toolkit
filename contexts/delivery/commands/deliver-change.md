@@ -11,7 +11,13 @@ Coordinate a change from Requirements and backlog through Design, Implementation
 
 ## Invocation
 
-Select the Delivery Coordinator and its cross-context workflow. An explicit end-to-end objective such as "from requirements through PR creation" selects `target_stage=pr-created`; a requested stopping point selects its matching stage. If the target or authorized mutation scope is absent, assess readiness read-only. An explicit feedback request without a delivery target routes only the read-only `assess-feedback` capability. A target stage alone does not authorize code mutation. Once implementation mutation is authorized, verified in-scope atomic intentions may be locally committed under Git rules unless expressly prohibited; no separate commit phrase is needed. PR creation, push, merge, release, and deployment require separate authorization; implementation never implies push. Every routed specialist retains its own checks and authority gates.
+Select the Delivery Coordinator and its cross-context workflow.
+
+* An explicit end-to-end request through PR creation selects `target_stage=pr-created`; otherwise select the requested stopping stage.
+* If the target or authorized mutation scope is absent, assess readiness read-only.
+* An explicit feedback request without a delivery target routes only the read-only `assess-feedback` capability.
+* A target stage alone does not authorize code mutation. Once implementation mutation is authorized, verified in-scope atomic intentions may be locally committed under Git rules unless expressly prohibited.
+* PR creation, push, merge, release, and deployment require separate authorization; implementation never implies push. Routed specialists retain their own checks and authority gates.
 
 ## Uses
 
@@ -36,7 +42,7 @@ Select the Delivery Coordinator and its cross-context workflow. An explicit end-
 
 ## Output
 
-Actual completed stage and source/revision identity, next safe required capability, routed specialist results, PR-plan evidence where material, verified commit identities or explicit uncommitted/blocked state, current verification and independent Review evidence, prepared/published PR identity when observed, post-PR checks and approvals, verified merge target only when integration actually occurred, blockers, pending decisions, and evidence of operations actually executed.
+Report the actual stage, source revisions, next owner, specialist handoffs, blockers, and pending decisions. Include verified commits (or uncommitted/blocked state), applicable checks and Code Review evidence, and PR plan/publication status when observed. Report post-PR approvals, integration target and outcome evidence only when verified.
 
 ## Boundary
 

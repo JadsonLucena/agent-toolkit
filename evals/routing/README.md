@@ -2,6 +2,8 @@
 
 This catalog tests **discovery and invocation decisions**, not the quality of the final engineering artifact. It is owned by the evaluation layer, not by any Skill, Agent, Command, Rule, or provider adapter.
 
+For Commands, `mode=explicit` means the user explicitly requests an operation, **not necessarily that they type a slash command**. Natural-language selection cases must be run only on hosts that actually expose Command discovery; mark unsupported hosts as such rather than inventing dispatch evidence. Selecting a command never grants repository or remote mutation authority.
+
 ## What CI proves
 
 From repository root:
