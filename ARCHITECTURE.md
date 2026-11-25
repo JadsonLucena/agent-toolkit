@@ -47,6 +47,7 @@ contexts/
 ├── delivery/
 │   ├── rules/delivery.md
 │   ├── skills/coordinate-delivery/SKILL.md
+│   ├── skills/coordinate-delivery/references/transition-contract.md
 │   ├── commands/deliver-change.md
 │   └── agents/delivery-coordinator.md
 ├── testing/
@@ -118,6 +119,8 @@ The [Review](adapters/review/README.md), [OCR](adapters/ocr/README.md), [Agent T
 | Contract | Neutral handoff semantics and schema meaning | Policy, workflow, orchestration, specialist behavior |
 
 Contracts are supporting artifact kinds outside the four canonical behavioral artifact types (Rule, Skill, Command, Agent). They carry neutral schemas rather than behavior.
+
+Skill-specific `references/*.md` are noncanonical, linked supporting documents. Keep them under the owning Skill and load them when the corresponding detailed procedure is needed; they never acquire independent policy or invocation authority.
 
 Rules may include an optional `## Foundational Guidance` section when established standards, specifications, books, papers, or engineering practices materially shaped the rule. The section documents conceptual provenance and interpretation; it must not contain reusable procedure or silently override repository, organization, stakeholder, or domain-specific policy. Include only material references, and do not add the section merely for structural symmetry.
 

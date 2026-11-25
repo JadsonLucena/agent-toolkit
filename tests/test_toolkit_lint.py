@@ -68,6 +68,22 @@ class ToolkitLintTests(unittest.TestCase):
         )
         self.assert_error("missing ownership entry")
 
+    def test_delivery_skill_reference_is_linked_and_lazy(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        path = "contexts/delivery/skills/coordinate-delivery/references/transition-contract.md"
+        self.assertTrue((self.root / path).is_file())
+        self.change("contexts/delivery/skills/coordinate-delivery/SKILL.md",
+                    "(references/transition-contract.md)",
+                    "(references/incorrect-contract.md)")
+        self.assert_error("unlinked supporting Skill reference")
+        self.assert_error("broken Markdown link references/incorrect-contract.md")
+
+    def test_unowned_skill_reference_is_rejected(self):
+        target = self.root / "contexts/delivery/skills/unknown-skill/references/orphan.md"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("# Orphan", encoding="utf-8")
+        self.assert_error("invalid canonical artifact location")
+
     def test_debugging_reference_docs_are_noncanonical_and_linked(self):
         self.assertEqual([], lint_toolkit(self.root))
         target = self.root / "contexts/debugging/skills/systematic-debugging/references/causal-tracing.md"
