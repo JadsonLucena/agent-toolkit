@@ -90,6 +90,9 @@ It refuses unsigned/tampered evidence, unknown signers, missing complete file
 coverage, unresolved review blockers, self-review by matching Git author
 email, stale base/head, dirty worktrees, unpublished branches, mismatched
 check commands and any failed mandatory check.
+Evidence and signatures are captured as bounded regular-file byte snapshots,
+checked again after repository checks, and tied to the **exact** remote branch
+reference rather than a suffix match.
 
 **The SSH signature authenticates the signing key, not human independence by
 itself.** Trusted reviewer provisioning, private-key custody, author-to-signer

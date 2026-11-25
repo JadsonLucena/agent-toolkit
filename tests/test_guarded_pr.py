@@ -4,6 +4,7 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -240,6 +241,49 @@ class GuardedPRTests(unittest.TestCase):
         git(self.repo, "commit", "-q", "-m", "unpublished")
         with self.assertRaisesRegex(gate.GateError, "remote head"):
             self.preflight()
+
+    def test_remote_ref_suffix_collision_is_rejected(self):
+        git(self.remote, "update-ref", "refs/heads/x/feature", self.head)
+        git(self.remote, "update-ref", "refs/heads/feature", self.base)
+        with self.assertRaisesRegex(gate.GateError, "remote head"):
+            self.preflight()
+
+    def test_nested_remote_branch_matches_only_exact_ref(self):
+        git(self.remote, "update-ref", "refs/heads/x/feature", self.head)
+        gate.remote_head(self.repo, "origin", "x/feature", self.head, "head")
+
+    def test_fifo_evidence_is_rejected_without_waiting_for_writer(self):
+        if not hasattr(os, "mkfifo"):
+            self.skipTest("FIFO unavailable")
+        fifo = self.root / "review.fifo"
+        os.mkfifo(fifo)
+        with self.assertRaisesRegex(gate.GateError, "regular file"):
+            gate.guard(self.repo, "main", "feature", fifo, self.signature, self.check_policy)
+
+    def test_symlinked_review_evidence_is_rejected(self):
+        alias = self.root / "review-alias.json"
+        alias.symlink_to(self.evidence)
+        with self.assertRaisesRegex(gate.GateError, "file unavailable"):
+            gate.guard(self.repo, "main", "feature", alias, self.signature, self.check_policy)
+
+    def test_byte_changes_during_checks_invalidate_signed_evidence(self):
+        def mutate(_state, _timeout):
+            # Same semantic JSON, different signed bytes.
+            self.evidence.write_bytes(self.evidence.read_bytes() + b" ")
+            return ["lint", "tests"]
+
+        with patch.object(gate, "run_checks", side_effect=mutate):
+            with self.assertRaisesRegex(gate.GateError, "changed during verification"):
+                self.preflight()
+
+    def test_signature_swap_during_checks_blocks(self):
+        def mutate(_state, _timeout):
+            self.signature.write_bytes(self.signature.read_bytes() + b" ")
+            return ["lint", "tests"]
+
+        with patch.object(gate, "run_checks", side_effect=mutate):
+            with self.assertRaisesRegex(gate.GateError, "changed during verification"):
+                self.preflight()
 
     def gh_mock(self, *, wrong_head=False, wrong_draft=False, commands=None):
         seen = []
