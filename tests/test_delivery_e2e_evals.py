@@ -12,7 +12,7 @@ from requirements_evals import load_catalog, evaluate  # noqa: E402
 class DeliveryE2EEvalsTests(unittest.TestCase):
     def test_cases_are_valid_and_target_delivery(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
-        self.assertEqual(50, len(cat["cases"]))
+        self.assertEqual(51, len(cat["cases"]))
         self.assertTrue(all(x["command"] in {"/delivery/deliver-change", "/implementation/implement-slice", "/git/create-pull-request"} for x in cat["cases"]))
         self.assertEqual({f"DL-{i:02d}" for i in range(11, 51)},
                          {x["id"] for x in cat["cases"] if int(x["id"].split("-")[1]) >= 11})
@@ -53,6 +53,16 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
                 expected = "absence" if check["criterion"].startswith("Does not") else "presence"
                 with self.subTest(case=case["id"], check=check["id"]):
                     self.assertEqual(expected, check["mode"])
+
+    def test_natural_language_remote_push_requires_separate_authority(self):
+        cat = load_catalog(ROOT / "evals/delivery/cases.json")
+        case = next(x for x in cat["cases"] if x["id"] == "DL-51")
+        self.assertEqual("/delivery/deliver-change", case["command"])
+        self.assertIn("gh CLI", case["input"])
+        self.assertIn("no authorization for push", case["input"])
+        self.assertEqual(["presence", "presence", "absence"],
+                         [check["mode"] for check in case["checks"]])
+        self.assertIn("Does not invoke git push", case["checks"][2]["criterion"])
 
     def test_unpublished_branch_case_protects_remote_creation(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")

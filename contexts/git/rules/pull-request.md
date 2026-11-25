@@ -5,6 +5,10 @@ alwaysApply: false
 
 # Pull Request Rules
 
+## Remote authorization invariant
+
+**Creating a PR does not authorize a push.** Branch publication, remote PR creation, merge, release, and deployment are distinct operations with distinct permissions. If the intended head is not already published and push is not separately authorized, stop without publishing or claiming that the PR exists. Instructions cannot enforce this boundary; the host must protect the actual remote-operation tools.
+
 ## Core Principle
 
 * A pull request (PR) must represent the smallest change that is coherent, verifiable, reviewable, and safe to integrate for one explicit primary objective.
@@ -231,7 +235,7 @@ Do not infer one state from another.
 * Before **any** remote PR creation (ready or Draft), revalidate applicable tests/lint and a complete Code Review `PASS` for the exact final head/base and full diff. Revalidate signed `review_profile=gate` evidence only when claiming an externally enforced gate or using a runtime that requires it. Missing, failed, incomplete or stale evidence blocks publication; local Draft preparation remains available.
 * Creating a PR requires explicit authorization to create the remote review object.
 * Preparing or drafting a PR does not authorize remote PR creation.
-* PR creation does not authorize pushing unpublished commits, rewriting history, assigning reviewers, adding labels, enabling auto-merge, merging, closing, deleting branches, releasing, or deploying unless separately authorized.
+* PR creation additionally does not authorize rewriting history, assigning reviewers, adding labels, enabling auto-merge, closing, or deleting branches unless separately authorized. The remote authorization invariant above governs push, merge, release, and deployment.
 * Before creation, verify the intended head and base, repository workflow, remote publication state, and whether an equivalent open PR already exists.
 * Do not create a duplicate PR for the same effective head/base change when an existing review request should be reused or updated.
 * If the required head branch is not available to the remote hosting platform, report the publication blocker unless push authorization is separately available.

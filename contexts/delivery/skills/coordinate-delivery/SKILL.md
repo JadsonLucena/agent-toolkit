@@ -9,6 +9,11 @@ description: "Coordinate a software increment end-to-end from requirements throu
 
 Carry a change toward the explicitly authorized target stage, selecting only the required specialist capabilities and preserving decisions and evidence across handoffs.
 
+## Authority and source-loading boundary
+
+- An end-to-end target is not blanket mutation authority. Scoped implementation may permit verified local commits; **push, PR creation, merge, release and deployment remain separate authorization decisions**. An unpublished branch without push authority blocks remote PR creation.
+- Before delegating a material action, retrieve the **next owner's applicable canonical Rule and procedure** if they are not already verified in the active context. Do not substitute a coordinator's summary or the model's prior knowledge for an unread gate. Load only what the next decision needs.
+
 ## Uses
 
 * Rule: `contexts/delivery/rules/delivery.md`

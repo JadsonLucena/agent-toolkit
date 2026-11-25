@@ -15,6 +15,12 @@ This skill supports three modes:
 * **prepare** — inspect an implemented change and produce a truthful review-ready title, description, readiness state, and scope findings;
 * **create** — create the remote PR after preparation and explicit authorization.
 
+## Authorization boundary before remote tools
+
+- **Creating a PR never authorizes pushing a branch.** Verify separate push authority before any push; when absent and the head is unpublished, stop and report the remote-publication blocker.
+- PR creation itself requires its own authorization, the exact published head/base and the Code Review/check evidence required by the Git Rule. Merge, release and deployment remain separate operations.
+- Before a `create` decision, **retrieve and apply** the relevant sections of `contexts/git/rules/pull-request.md` and `contexts/git/rules/git.md` if they are not already present and verified. Listing a Rule in `## Uses` is not evidence that the host loaded it. Lack of access blocks only the affected creation decision.
+
 ## Uses
 
 * Rule: `contexts/git/rules/git.md`
