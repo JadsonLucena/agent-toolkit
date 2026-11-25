@@ -334,7 +334,7 @@ Canonical Skills are stored at `contexts/<context>/skills/<capability>/SKILL.md`
 * `name` matches the capability directory: lowercase letters, digits, and hyphens.
 * `description` says what the skill does and when to use it. Hosts compare the request with this field and load the body only when it matches, or when the user invokes the skill by name.
 
-The body states the procedure once, as a diagram under Workflow. A decision node names the rule section that owns the invariant and does not restate it. Do not keep a numbered list that retells the diagram. Foundational Guidance stays in the rule as the theoretical reference for reviewers of the artifact. Do not add provider metadata such as model, reasoning effort, or tool allowlists to the canonical frontmatter.
+The body states the procedure once, as a diagram under Workflow or in a State Model explicitly referenced from Workflow. Supporting prose and tables may define conditional selection or evidence criteria, but must not duplicate the diagram as a second numbered procedure. A decision node names the Rule section that owns its invariant without restating the policy. Foundational Guidance stays in the owning Rule. Do not add provider metadata such as model, reasoning effort, or tool allowlists to canonical frontmatter.
 
 A host install path, such as `.claude/skills/` or `.agents/skills/`, may symlink or copy the canonical file. That installation is not a second source of truth.
 
