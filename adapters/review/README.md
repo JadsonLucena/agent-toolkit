@@ -84,6 +84,23 @@ The runner compares the returned target/inventory against the preparer's origina
 
 Use `adapters/review/prepare_context.py` separately for debugging the preparation JSON (without dispatching a reviewer). `tests/test_review_dispatch.py` uses a fake OCR executable, Git fixture, and a fake reviewer to verify end-to-end ordering and all fallback paths. `tests/test_review_context.py` tests the bootstrap alone.
 
+## Context commitment and trust boundary
+
+The reference runner computes a deterministic SHA-256 commitment over the
+**entire frozen review-context JSON** (including the risk classification,
+`team_plan`, Git scope and helper metadata). It is a correlation digest, **not**
+a signature or independent proof of the preparer's identity.
+
+In a single-process invocation, the trusted runner keeps the expected digest
+before dispatching the reviewer and checks it before accepting the result. In
+the two-phase flow, `--prepare-only` returns `context_sha256` separately in
+its stdout receipt. An authorized host MUST retain that value in protected
+execution state and supply it through `--expected-context-sha256` at validation.
+Never derive the expected digest from the context file under examination or a
+reviewer-authored field. A host that cannot preserve the receipt independently
+must fail closed instead of reporting a verified review. The implementation uses
+sorted-key compact JSON encoding; it does not claim RFC 8785 interoperability.
+
 ## Host-Agent Two-Phase Workflow
 
 For a host-native reviewer (regardless of IDE, model or provider) use:
@@ -93,11 +110,13 @@ python3 adapters/review/run_review.py --repo . --base-branch origin/main \
   --risk-profile R3 --concern security --output-language pt-BR \
   --prepare-only --out /tmp/review-context.json
 
+# Save context_sha256 from the prepare-only stdout response in trusted host state.
 # Host independently reviews the frozen context using its own runtime tools.
 
 python3 adapters/review/run_review.py --repo . \
   --validate-evidence /tmp/review-evidence.json \
-  --context /tmp/review-context.json
+  --context /tmp/review-context.json \
+  --expected-context-sha256 "$TRUSTED_CONTEXT_SHA256"
 ```
 
 `--prepare-only` does not require or call a subprocess reviewer.

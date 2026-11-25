@@ -17,7 +17,10 @@ from typing import Any
 from prepare_context import prepare_context
 from git_scope import GitScopeError, git_inventory
 from team_orchestration import TeamPlanningError, freeze, CONCERN_CHOICES
-from evidence_validation import EvidenceError, read_json, validate_evidence, assert_target_fresh, review_paths
+from evidence_validation import (
+    EvidenceError, read_json, validate_evidence, assert_target_fresh,
+    review_paths, context_sha256,
+)
 
 MAX_RESULT_BYTES = 4 * 1024 * 1024
 
@@ -34,6 +37,7 @@ def dispatch(
     if not reviewer_command or not reviewer_command[0] or timeout < 1 or timeout > 3600:
         raise ReviewInvocationError("approved host reviewer command and bounded timeout are required")
     assert_target_fresh(context, repo)
+    frozen_digest = context_sha256(context)
     request = json.dumps(context, ensure_ascii=False).encode("utf-8")
     try:
         process = subprocess.run(
@@ -52,7 +56,9 @@ def dispatch(
     except (UnicodeDecodeError, ValueError) as exc:
         raise ReviewInvocationError("reviewer returned invalid JSON evidence") from exc
     try:
-        return validate_evidence(evidence, context, repo)
+        return validate_evidence(
+            evidence, context, repo, expected_context_sha256=frozen_digest,
+        )
     except EvidenceError as exc:
         raise ReviewInvocationError(str(exc)) from exc
 
@@ -82,6 +88,10 @@ def main(argv: list[str] | None = None) -> int:
     phase.add_argument("--validate-evidence", type=Path,
                        help="validate external Review evidence using frozen context")
     ap.add_argument("--context", type=Path, help="frozen JSON context from --prepare-only")
+    ap.add_argument("--expected-context-sha256", help=(
+        "trusted SHA-256 returned by --prepare-only via a separate protected channel; "
+        "never copy it from the context file being checked"
+    ))
     ap.add_argument("--out", type=Path, help="context JSON output outside checkout")
     ap.add_argument("reviewer_command", nargs=argparse.REMAINDER,
                     help="-- <approved-reviewer> (optional subprocess adapter)")
@@ -95,13 +105,20 @@ def main(argv: list[str] | None = None) -> int:
         ap.error("--prepare-only requires --out, without a subprocess reviewer")
     if args.validate_evidence and (not args.context or args.out or command):
         ap.error("--validate-evidence requires --context without --out/reviewer command")
+    if args.validate_evidence and not args.expected_context_sha256:
+        ap.error("--validate-evidence requires --expected-context-sha256 from trusted preparation")
+    if args.expected_context_sha256 and not args.validate_evidence:
+        ap.error("--expected-context-sha256 is only valid with --validate-evidence")
     if not args.prepare_only and not args.validate_evidence and not command:
         ap.error("supply a reviewer command or use --prepare-only")
     try:
         if args.validate_evidence:
             context = read_json(args.context)
             evidence = read_json(args.validate_evidence)
-            result = validate_evidence(evidence, context, args.repo)
+            result = validate_evidence(
+                evidence, context, args.repo,
+                expected_context_sha256=args.expected_context_sha256,
+            )
         else:
             context = prepare_context(
                 args.repo, base=args.base, head=args.head, commit=args.commit,
@@ -110,6 +127,7 @@ def main(argv: list[str] | None = None) -> int:
                 review_profile=args.review_profile,
             )
             context["preparation_adapter"] = "python-reference"
+            context["review_risk_profile"] = args.risk_profile
             if args.task_capable and not args.risk_profile:
                 raise TeamPlanningError("risk_profile must be classified before Task spawn")
             if args.risk_profile is not None:
@@ -135,6 +153,7 @@ def main(argv: list[str] | None = None) -> int:
                     "status": "prepared", "context": str(output),
                     "target": context["target"],
                     "review_id": context.get("team_plan", {}).get("review_id"),
+                    "context_sha256": context_sha256(context),
                 }))
                 return 0
             result = dispatch(context, repo=args.repo, reviewer_command=command, timeout=args.timeout)

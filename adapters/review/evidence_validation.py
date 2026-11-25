@@ -5,7 +5,9 @@ reviewer identity or isolation: the protected PR gate verifies those separately.
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +30,27 @@ def read_json(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise EvidenceError("review evidence/context must be a JSON object")
     return value
+
+
+
+def context_sha256(context: dict[str, Any]) -> str:
+    """Stable byte commitment to the complete review context; not authentication."""
+    try:
+        payload = json.dumps(
+            context, sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+            allow_nan=False,
+        ).encode("utf-8")
+    except (TypeError, ValueError, UnicodeError) as exc:
+        raise EvidenceError("context cannot be deterministically encoded") from exc
+    return hashlib.sha256(payload).hexdigest()
+
+
+def verify_context_commitment(context: dict[str, Any], expected_sha256: str) -> None:
+    """Expected value MUST come from the trusted preparer/caller, never context JSON."""
+    if not isinstance(expected_sha256, str) or not re.fullmatch(r"[0-9a-f]{64}", expected_sha256):
+        raise EvidenceError("trusted expected context digest is required")
+    if context_sha256(context) != expected_sha256:
+        raise EvidenceError("frozen review context digest mismatch")
 
 
 def review_paths(items: Any, name: str) -> set[str]:
@@ -60,8 +83,12 @@ def assert_target_fresh(context: dict[str, Any], repo: Path) -> None:
         raise EvidenceError("Git target or workspace fingerprint changed during review")
 
 
-def validate_evidence(evidence: dict[str, Any], context: dict[str, Any], repo: Path) -> dict[str, Any]:
-    """Same fail-closed validation for subprocess and agent-as-reviewer modes."""
+def validate_evidence(
+    evidence: dict[str, Any], context: dict[str, Any], repo: Path, *,
+    expected_context_sha256: str,
+) -> dict[str, Any]:
+    """Validate against a caller-owned frozen context, not a self-authored pack."""
+    verify_context_commitment(context, expected_context_sha256)
     assert_target_fresh(context, repo)
     if not isinstance(evidence, dict):
         raise EvidenceError("reviewer evidence must be a JSON object")
@@ -139,8 +166,15 @@ def validate_evidence(evidence: dict[str, Any], context: dict[str, Any], repo: P
         raise EvidenceError("confirmed blockers take precedence as FAIL; retain unresolved questions")
     if verdict == "FAIL" and not blockers:
         raise EvidenceError("FAIL requires blocking findings")
+    risk = context.get("review_risk_profile")
     plan = context.get("team_plan")
+    if risk is not None and risk not in ("R0", "R1", "R2", "R3"):
+        raise EvidenceError("invalid frozen review risk")
+    if risk is not None and (not isinstance(plan, dict) or plan.get("risk_profile") != risk):
+        raise EvidenceError("frozen risk requires its original team plan")
     if plan is not None:
+        if not isinstance(plan, dict) or (risk is not None and plan.get("risk_profile") != risk):
+            raise EvidenceError("invalid frozen team plan")
         if evidence.get("review_id") != plan.get("review_id") or evidence.get("risk_profile") != plan.get("risk_profile"):
             raise EvidenceError("reviewer omitted frozen team or risk identity")
         if verdict == "PASS":
@@ -180,6 +214,7 @@ def validate_evidence(evidence: dict[str, Any], context: dict[str, Any], repo: P
     # Reviewer-supplied helper metadata is never trusted as execution history.
     evidence = dict(evidence)
     evidence["review_profile"] = profile
+    evidence["context_sha256"] = expected_context_sha256
     evidence["optional_helpers"] = context["optional_helpers"]
     ocr_status = context["optional_helpers"]["ocr"]["status"]
     evidence["review_preparation"] = {
