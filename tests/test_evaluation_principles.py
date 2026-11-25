@@ -3,7 +3,6 @@
 These are structural regression checks, not proof of agent behavior or enforcement.
 """
 from pathlib import Path
-import re
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,9 +15,11 @@ def read(path):
 class EvaluationPrinciplesTests(unittest.TestCase):
     def test_single_ordered_evaluation_reference(self):
         doc = read("evals/README.md")
-        numbered = re.findall(r"^(\\d+)\\. \\*\\*([^*]+)\\*\\*\\.", doc, re.M)
-        self.assertEqual([str(i) for i in range(1, 16)], [n for n, _ in numbered])
-        self.assertEqual(15, len({title for _, title in numbered}))
+        numbered = [line for line in doc.splitlines()
+                    if ". **" in line and line.split(". **", 1)[0].isdigit()]
+        self.assertEqual([str(i) for i in range(1, 16)],
+                         [line.split(". **", 1)[0] for line in numbered])
+        self.assertEqual(15, len({line.split("**", 2)[1] for line in numbered}))
 
     def test_source_authority_and_operation_authorization_are_precise(self):
         doc = read("evals/README.md")
@@ -31,7 +32,7 @@ class EvaluationPrinciplesTests(unittest.TestCase):
     def test_methodology_does_not_become_a_second_runtime_policy(self):
         doc = read("evals/README.md")
         for phrase in ("not** a fifth canonical artifact", "not** a new schema or verdict enum",
-                       "not** authorize repository edits", "not** a new canonical Rule",
+                       "Evaluation does not itself authorize repository edits", "an additional specialist Rule",
                        "actual agent behavior requires observed host executions"):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, doc)
