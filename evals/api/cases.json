@@ -369,6 +369,98 @@
           "criterion": "Does not edit production behavior or require a particular Presenter implementation"
         }
       ]
+    },
+    {
+      "id": "API-17",
+      "command": "/design/design-solution",
+      "scenario": "ETag used for optimistic concurrency with representation variants",
+      "input": "Accepted API has GET JSON responses, optional compressed variants, and PATCH updates that risk lost updates. Domain entity has version 7. Design the selected validators and conditional update semantics without mandating any framework.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Distinguishes strong selected-representation ETag and If-Match from internal aggregate version"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Specifies a testable atomic update and stale-precondition behavior"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim a weak ETag or If-Match wildcard prevents lost updates"
+        }
+      ]
+    },
+    {
+      "id": "API-18",
+      "command": "/review/review-code",
+      "scenario": "Non-atomic optimistic concurrency check in persistence",
+      "input": "Frozen diff: PATCH reads entity version 7, compares If-Match, then executes unconditional UPDATE in a later transaction. Two writers can both pass the check. Review this exact change.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies a reachable time-of-check/time-of-use race and concrete lost-update outcome"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Requests authoritative atomic conditional write and an integration counterexample"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not accept ETag header presence or a unit mock as proof of concurrency safety"
+        }
+      ]
+    },
+    {
+      "id": "API-19",
+      "command": "/design/design-solution",
+      "scenario": "ETag used only for cache revalidation on immutable catalog",
+      "input": "Accepted GET contract uses If-None-Match for cache revalidation of a public immutable catalog. There are no writes or lost-update risks. Review whether the selected contract needs optimistic concurrency.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Preserves cache-validator semantics and conditional GET behavior"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not mandate If-Match, version columns or 428 for this read-only interface"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not infer that cache ETag confers transaction or consistency guarantees"
+        }
+      ]
+    },
+    {
+      "id": "API-20",
+      "command": "/implementation/implement-slice",
+      "scenario": "Timeout after conditional financial operation commit",
+      "input": "Approved subscription update with payment side effect uses If-Match, a stable idempotency key and outbox. First request times out after commit; retry with old If-Match returns 412. Implement the scoped recovery behavior.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Distinguishes stale precondition from whether first payment operation succeeded"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Preserves approved idempotency, outbox and invariant guarantees across retries"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not blindly replay a charge or claim exactly-once from ETag alone"
+        }
+      ]
     }
   ]
 }

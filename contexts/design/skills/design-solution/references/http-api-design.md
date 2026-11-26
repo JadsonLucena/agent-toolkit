@@ -38,6 +38,28 @@ Use these as **protocol-grounded questions**, not a catalog of mandatory feature
 | Conditional requests | Validators and preconditions such as ETag, If-Match and If-None-Match have protocol-defined interpretation when used; ETag is **not universally mandatory**. | Could stale updates bypass the expected precondition or a validator misrepresent the chosen representation? |
 | Caching / negotiation | Cache-Control, Vary, Accept and representation metadata have defined semantics when relevant, including authenticated/shared-cache boundaries. | Could an intermediary reuse a private or incompatible representation? |
 
+## Conditional Requests and Optimistic Concurrency
+
+Apply this reasoning **only** when a supported contract, lost-update risk or explicit HTTP precondition warrants it; an ETag is neither obligatory for every API nor evidence of concurrency safety by itself.
+
+### Distinguish the Two Purposes
+
+* **Cache revalidation:** a GET/HEAD with `If-None-Match` can receive `304 Not Modified` when the selected representation matches; a successful response can carry an appropriate `ETag`. Caching authorization and shared-cache isolation remain separate design decisions.
+* **Lost-update prevention:** a client reads a representation and retains a **strong** ETag, then sends an update with `If-Match: "v7"`. The origin server must apply the HTTP **strong comparison** function; `W/"v7"` cannot satisfy `If-Match`. A failed precondition normally yields `412 Precondition Failed` without applying the requested mutation, subject to RFC 9110's narrow already-succeeded exception.
+* **Existence is not freshness:** `If-Match: *` requires a current representation but does not assert which version was read. `If-None-Match: *` can condition creation on absence. If server policy requires a condition and it is missing, `428 Precondition Required` (RFC 6585) may apply; a domain-state conflict independent of an HTTP precondition can warrant `409 Conflict`. Follow RFC 9110 evaluation ordering and method semantics; do not treat these codes as interchangeable.
+
+### Bind Representation Semantics to Atomic State Changes
+
+1. Decide **what the selected public representation means** and which concurrent changes should invalidate it. A domain Aggregate version may help generate an ETag, but it is **not inherently** a strong validator for all representations, media types, content codings, field projections, authorization-dependent masks or negotiated variants. Validators must follow the actual selected representation's semantics.
+2. Ensure the version check and mutation are **atomic at the authoritative write boundary**, e.g. a conditional update `UPDATE ... SET version = version + 1 WHERE id = ? AND version = ?` within a transaction that also preserves the affected domain invariants. A `SELECT` that checks a version before a separate unguarded `UPDATE` has a race window. A zero-row result also requires distinguishing stale state from missing/unauthorized resources without leaking their existence.
+3. Define the client recovery behavior: on `412`, fetch current state and reconcile intent where supported; never blindly replace the ETag and replay a noncommutative update. A network timeout or replay can mean the first operation succeeded; `412` on retry is **not** proof it failed.
+4. Keep separate guarantees separate: `If-Match` does not supply operation idempotency, financial deduplication, atomic cross-resource effects, outbox delivery or exactly-once execution. Consider accepted idempotency keys, transactions, uniqueness constraints and external provider behavior only when their risks apply.
+5. Respect method-specific validator constraints: RFC 9110 restricts emitting an ETag in a successful **PUT** response if the received representation was transformed before storage. Do not promise a new ETag on every write irrespective of the method and actual representation semantics.
+
+### Verification Counterexamples
+
+For material risk, verify two concurrent requests using the same validator: only the allowed change succeeds and the resulting state satisfies invariants. Exercise missing required preconditions, stale and weak tags, mismatched variants, authorization/tenant scopes, a timeout after commit and the actual storage isolation/atomicity. Unit mocks and an `ETag` response header do not establish the write guarantee. Avoid tests that charge live payment providers.
+
 ## Architectural and Contract Design Heuristics
 
 These concerns are **contextual choices**, not universal RFC obligations or evidence that an API has reached a particular Richardson level.
@@ -65,7 +87,7 @@ Within the existing `contracts/design-evidence.md` semantics, keep only conseque
 
 ## Normative and Interpretive Sources
 
-* [RFC 9110 — HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.html); [RFC 9111 — HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111.html); [RFC 5789 — PATCH](https://www.rfc-editor.org/rfc/rfc5789.html).
+* [RFC 9110 — HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.html) (ETag §8.8.3; If-Match §13.1.1; PUT §9.3.4); [RFC 9111 — HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111.html); [RFC 5789 — PATCH](https://www.rfc-editor.org/rfc/rfc5789.html); [RFC 6585 — 428 Precondition Required](https://www.rfc-editor.org/rfc/rfc6585.html#section-3).
 * [RFC 9457 — Problem Details](https://www.rfc-editor.org/rfc/rfc9457.html); [RFC 8288 — Web Linking](https://www.rfc-editor.org/rfc/rfc8288.html); [RFC 9700 — OAuth 2.0 Security BCP](https://www.rfc-editor.org/rfc/rfc9700.html).
 * [Roy Fielding's REST dissertation, chapter 5](https://roy.gbiv.com/pubs/dissertation/rest_arch_style.htm); [Fielding on hypertext](https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven); [Richardson Maturity Model — Martin Fowler](https://martinfowler.com/articles/richardsonMaturityModel.html).
 * [OpenAPI Specification](https://spec.openapis.org/oas/latest.html); [JSON:API](https://jsonapi.org/format/); [OData 4.01](https://docs.oasis-open.org/odata/odata/v4.01/); [Google API Improvement Proposals](https://google.aip.dev/).
