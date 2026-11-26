@@ -46,6 +46,7 @@ class PortableReviewTests(unittest.TestCase):
         self.head = git(self.repo, "rev-parse", "HEAD")
         self.context_path = self.root / "context.json"
         self.evidence_path = self.root / "evidence.json"
+        self.prepared_digest = None
 
     def call(self, *args):
         stdout = io.StringIO()
@@ -59,6 +60,7 @@ class PortableReviewTests(unittest.TestCase):
             *args, "--prepare-only", "--out", str(self.context_path),
         )
         self.assertEqual(0, code, output)
+        self.prepared_digest = output["context_sha256"]
         return json.loads(self.context_path.read_text())
 
     @staticmethod
@@ -76,7 +78,49 @@ class PortableReviewTests(unittest.TestCase):
         return self.call(
             "--validate-evidence", str(self.evidence_path),
             "--context", str(context_path or self.context_path),
+            "--expected-context-sha256", self.prepared_digest,
         )
+
+    def test_removed_team_plan_cannot_downgrade_r3(self):
+        context = self.prepare("--risk-profile", "R3", "--concern", "security")
+        evidence = self.valid_evidence(context)
+        evidence.update(review_id=context["team_plan"]["review_id"], risk_profile="R3")
+        del context["team_plan"]
+        self.context_path.write_text(json.dumps(context))
+        code, result = self.validate(evidence)
+        self.assertEqual(2, code, result)
+        self.assertIn("digest mismatch", result["reason"])
+
+    def test_downgrade_risk_or_change_team_roles_is_rejected(self):
+        context = self.prepare("--risk-profile", "R3", "--concern", "security")
+        proof = self.valid_evidence(context)
+        proof.update(review_id=context["team_plan"]["review_id"], risk_profile="R3")
+        for name, mutate in (
+            ("risk", lambda p: p["team_plan"].update(risk_profile="R1")),
+            ("roles", lambda p: p["team_plan"].update(selected_roles=["security-reviewer"])),
+        ):
+            with self.subTest(name=name):
+                altered = json.loads(json.dumps(context))
+                mutate(altered)
+                self.context_path.write_text(json.dumps(altered))
+                code, result = self.validate(proof)
+                self.assertEqual(2, code, result)
+                self.assertIn("digest mismatch", result["reason"])
+
+    def test_reused_context_commitment_is_rejected(self):
+        context = self.prepare()
+        self.context_path.write_text(json.dumps({**context, "review_profile": "gate"}))
+        code, result = self.validate(self.valid_evidence(context))
+        self.assertEqual(2, code, result)
+        self.assertIn("digest mismatch", result["reason"])
+
+    def test_context_cannot_supply_its_own_trust_digest(self):
+        context = self.prepare()
+        context["claimed_context_sha256"] = self.prepared_digest
+        self.context_path.write_text(json.dumps(context))
+        code, result = self.validate(self.valid_evidence(context))
+        self.assertEqual(2, code, result)
+        self.assertIn("digest mismatch", result["reason"])
 
     def test_two_phase_preparation_and_validation(self):
         context = self.prepare()
@@ -218,8 +262,9 @@ class PortableReviewTests(unittest.TestCase):
         self.assertIn("coverage", result["reason"].lower())
 
     def test_two_phase_stale_workspace_is_blocked(self):
-        code, _ = self.call("--no-ocr", "--prepare-only", "--out", str(self.context_path))
+        code, receipt = self.call("--no-ocr", "--prepare-only", "--out", str(self.context_path))
         self.assertEqual(0, code)
+        self.prepared_digest = receipt["context_sha256"]
         context = json.loads(self.context_path.read_text())
         (self.repo / "untracked.txt").write_text("new\n")
         code, result = self.validate(self.valid_evidence(context))

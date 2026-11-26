@@ -9,6 +9,11 @@ Provide a vendor-neutral, portable handoff for **advisory** and independently ex
 A review result should carry:
 
 * `review_id` — stable identity for this review execution when available;
+* `context_sha256` — optional deterministic full-context binding for the Python
+  reference adapter. The expected value must be obtained from the trusted
+  preparation channel, not from the evidence or context being validated.
+  A digest alone does not authenticate the preparer or independently attest
+  reviewer identity; different hosts may use equivalent protected commitments;
 * `review_profile` — `advisory` or `gate`, frozen before review. The default without independently attested review is `advisory`; a missing or legacy profile **never** qualifies as a gate claim;
 * `context_id` and `source_refs` — optional change/slice/requirement/decision traceability without redefining source semantics;
 * `repository` and `target` — actual repository and commit/branch/workspace subject;

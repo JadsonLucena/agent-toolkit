@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "adapters" / "review"))
 from prepare_context import prepare_context  # noqa: E402
 import team_orchestration as team  # noqa: E402
-from evidence_validation import validate_evidence  # noqa: E402
+from evidence_validation import validate_evidence, context_sha256  # noqa: E402
 
 
 def git(repo, *args):
@@ -417,7 +417,7 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
             lead_independent=True, verified_blockers=[], unresolved_material=[],
         )
         self.assertEqual([], proof["unreviewed_files"])
-        validate_evidence(proof, self.ctx, self.repo)
+        validate_evidence(proof, self.ctx, self.repo, expected_context_sha256=context_sha256(self.ctx))
         partial = team.finalize(
             result, self.ctx, self.repo,
             lead_reviewed_files=["payments.py"],
