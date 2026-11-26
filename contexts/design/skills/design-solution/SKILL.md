@@ -38,7 +38,7 @@ flowchart TD
     Clarify --> Block
 ```
 
-Apply the named sections in `contexts/design/rules/design.md`; do not copy their invariants into this procedure. Analyze independent concerns in parallel only when evidence and contract reconciliation are possible.
+Apply the named sections in `contexts/design/rules/design.md`; do not copy their invariants into this procedure. Analyze independent concerns in parallel only when evidence and contract reconciliation are possible. For material refactoring or legacy displacement, load `references/refactoring-options.md` as conditional selection guidance; keep the selected strategy, compared alternatives and preservation obligations in the existing `contracts/design-evidence.md` handoff rather than inventing a second design contract.
 
 ## Output
 
