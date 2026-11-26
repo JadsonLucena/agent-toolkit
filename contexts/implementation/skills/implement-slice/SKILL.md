@@ -42,6 +42,8 @@ flowchart TD
     PartitionGate -->|Yes| Plan["Choose next preidentified atomic intention"]
     Plan --> Test{"TDD required or preferred for supported behavior?"}
     Test -->|Yes and feasible| TDD["test-driven-development: RED/GREEN/REFACTOR"]
+    Test -->|Structural-only, no new behavior| Baseline["Capture passing behavioral baseline and preservation obligations"]
+    Baseline --> Change
     TDD --> Check["Verification and Feedback: execute applicable checks"]
     Test -->|Justified exception| Explain["Record concrete reason, risk and alternative checks"]
     Explain --> Change["Apply minimal in-scope implementation"]
@@ -79,6 +81,8 @@ The `Partition` gate precedes **all production and test edits**, including TDD R
 ## Test Strategy Selection
 
 Before production edits, apply the **Test-Driven Execution** policy in `contexts/implementation/rules/implementation.md`. Prefer the existing TDD Skill for testable observable behavior without waiting for a TDD keyword. An explicit caller opt-out of TDD permits direct implementation but never waives applicable tests; otherwise use direct implementation only for a recorded concrete exception and alternative verification plan. Explicitly required TDD that cannot run safely stops the affected change. After diagnosis, reselect TDD when behavior or its test basis changes; only a repair to the same already-tested behavior may proceed without a fresh RED, with the original test evidence preserved. Neither path expands mutation or remote-operation authority.
+
+For **standalone behavior-preserving refactoring**, use the structural-only branch: establish baseline evidence before editing and run the same applicable integrated checks after each small transformation. A passing baseline is not a TDD RED; do not weaken assertions to manufacture one. For **preparatory refactoring**, use Git's separation test before the first edit and keep independent verified changes separate from subsequent behavior work. When refactoring is material or the code is legacy, read `references/refactoring.md` ([conditional guide](references/refactoring.md)) for a bounded selection and verification procedure; do not invoke the TDD inner loop for structural-only work. Report the actual evidence and any uncovered behavioral ambiguity rather than assuming equivalence.
 
 ### Failure diagnosis boundary
 
