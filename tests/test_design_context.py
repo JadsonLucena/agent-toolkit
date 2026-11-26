@@ -39,6 +39,18 @@ class DesignContextTests(unittest.TestCase):
         self.assertIn("not an automatic requirement", reference)
         self.assertIn("contracts/design-evidence.md", skill)
 
+    def test_http_resource_modeling_does_not_conflate_ddd_and_rest(self):
+        reference = doc("contexts/design/skills/design-solution/references/http-api-design.md")
+        self.assertIn("## Resource Modeling and Domain Boundaries", reference)
+        self.assertIn("## HTTP Protocol Semantics", reference)
+        self.assertIn("## Architectural and Contract Design Heuristics", reference)
+        self.assertIn("DDD is not a prerequisite", reference)
+        self.assertIn("An Aggregate defines a consistency/invariant boundary", reference)
+        self.assertIn("not automatically", reference)
+        self.assertIn("A resource may expose a stable identity", reference)
+        self.assertNotIn("| Resource identity |", reference)
+        self.assertIn("Martin Fowler — DDD Aggregate", reference)
+
     def test_architecture_and_linter_register_context(self):
         arch = doc("ARCHITECTURE.md")
         lint = doc("scripts/toolkit_lint.py")
