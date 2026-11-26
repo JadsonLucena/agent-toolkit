@@ -107,6 +107,9 @@ Use quality metrics as diagnostic signals, not proof of correctness; follow proj
 * For legacy or externally constrained code that must be safely changed, consider characterization tests before refactoring.
 * Characterization tests capture current observable behavior; they do not legitimize poor design.
 * Document the purpose of a characterization test when it is not obvious.
+* For behavior-preserving refactoring, establish an observable pre-change baseline and retest the affected contracts after each meaningful transformation. A characterization test may start green and is not evidence of a TDD RED; do not weaken existing assertions to construct an artificial failure.
+* When risk warrants it, check preconditions, postconditions, domain invariants, public/API/event/schema compatibility, time/ordering, concurrency, failure behavior and external side effects beyond return values. Differential or shadow comparisons require controlled effects: never replay real payments, messages or other irreversible actions simply to compare implementations.
+* Distinguish preserving an existing defect from an explicitly authorized fix. Tests documenting observed behavior do not establish business correctness; changes to accepted behavior require separately grounded regression evidence.
 
 ## Testability Signals
 
