@@ -24,6 +24,20 @@ Model the **public interface** from supported business capabilities, interaction
 
 **Illustration, not a prescribed mapping:** `/subscriptions/{id}` may expose an active subscription, `/subscriptions/{id}/invoices` a read projection, and `/subscriptions/{id}/cancellation-requests` a business request. This does **not** establish that each is a separate aggregate, or that any particular HTTP shape is required.
 
+### CRUD-Oriented vs Domain-Oriented APIs
+
+CRUD is one possible resource-interface style, **not** a synonym for REST or an instruction to expose persistence entities. Domain-oriented APIs model supported business capabilities and transitions; they may still use ordinary HTTP methods and resources. These are **contextual alternatives**, not mutually exclusive architectures.
+
+| Situation | Design option | Trade-off to examine |
+| --- | --- | --- |
+| Simple resource administration with limited invariants | Straightforward CRUD can be sufficient | Avoid mirroring database tables or granting unrestricted writes solely for convenience |
+| Business transitions with eligibility, side effects or asynchronous outcomes | Model explicit domain intent, possibly as a request/process resource | Additional public concepts and lifecycle contracts must earn their maintenance cost |
+| Both needs exist | Combine stable CRUD surfaces and domain operations | Preserve authorization, published semantics and consumer compatibility across both |
+
+**Illustration, not a required endpoint shape:** `PATCH /subscriptions/{id}` with `{"status":"CANCELED"}` exposes a state mutation; `POST /subscriptions/{id}/cancellation-requests` expresses cancellation intent, which might be scheduled or rejected. **Neither HTTP shape by itself enforces domain invariants, authorization or side-effect safety.** Do not create a bespoke command for every trivial field edit or assume a domain operation requires RPC-style verb URLs, CQRS or an Aggregate-per-resource mapping.
+
+**Decision prompts:** Is the consumer maintaining a simple resource or requesting a business outcome? Which transitions and invariants must be protected? Does a proposed operation reveal internal state that clients should not control? What complexity, compatibility and lifecycle consequences follow from each choice?
+
 ## HTTP Protocol Semantics
 
 Use these as **protocol-grounded questions**, not a catalog of mandatory features. The applicable published contract may intentionally expose HTTP RPC rather than claim Fielding-style REST. RFC requirements govern the semantics they actually define; project conventions govern chosen representations and API structure within those constraints.

@@ -51,6 +51,17 @@ class DesignContextTests(unittest.TestCase):
         self.assertNotIn("| Resource identity |", reference)
         self.assertIn("Martin Fowler — DDD Aggregate", reference)
 
+    def test_http_crud_and_domain_oriented_design_is_contextual(self):
+        reference = doc("contexts/design/skills/design-solution/references/http-api-design.md")
+        section = reference.split("### CRUD-Oriented vs Domain-Oriented APIs", 1)[1].split("\n## ", 1)[0]
+        for expected in (
+            "not** a synonym for REST", "Straightforward CRUD can be sufficient",
+            "explicit domain intent", "cancellation-requests", "Neither HTTP shape",
+            "Do not create a bespoke command", "not mutually exclusive",
+        ):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, section)
+
     def test_architecture_and_linter_register_context(self):
         arch = doc("ARCHITECTURE.md")
         lint = doc("scripts/toolkit_lint.py")
