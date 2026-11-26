@@ -24,6 +24,12 @@ Apply `contexts/requirements/rules/tailoring.md` when deciding how much decompos
 * When a work item reveals unsupported behavior, materially changes source intent, or expands/narrows an explicit Change Boundary, return the issue for requirements clarification or an authorized scope decision rather than silently changing scope.
 * A task, test, architecture change, or implementation step with no evidenced parent outcome is a traceability finding.
 
+## Structural and Enabling Work
+
+* Accept evidence-backed structural improvement work (including preparation for a supported slice, legacy risk reduction and independently valuable refactoring) as a planning input when its engineering outcome, source, scope, verification and critical guarantees are explicit. Do not invent a user-facing feature or silently alter accepted requirements to justify it.
+* Distinguish a structural-only change with preserved behavior from a behavioral change or defect fix; separate independently revertible intentions and track dependencies, including characterization, compatibility and migration steps where material.
+* Treat suspected code smells and design preferences as investigation candidates, not automatic backlog commitments. Unapproved scope expansion or changes to acceptance semantics return to the appropriate owner.
+
 ## Decomposition and Vertical Slicing
 
 * Decompose by coherent deliverable intent, observable behavior, learning, risk, dependency, or independently valuable outcome rather than by arbitrary file, layer, component, or organizational boundary.

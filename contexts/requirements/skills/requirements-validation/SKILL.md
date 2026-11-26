@@ -11,6 +11,8 @@ Use as a read-only quality gate for requirements knowledge before a downstream d
 
 Do not judge quality by document count.
 
+When examining proposed editorial restructuring of requirements, compare meaning, identifiers, traceability and known downstream consumers against the accepted baseline; a clearer representation is not authorization to change acceptance semantics. Structural debt found in code is an engineering observation, not automatically a requirements-quality defect: retain evidence and route authorized technical decisions to Design or planning without altering the validated specification.
+
 ## Uses
 
 * Rule: `contexts/requirements/rules/tailoring.md`

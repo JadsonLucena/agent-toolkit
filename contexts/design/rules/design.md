@@ -21,6 +21,14 @@ alwaysApply: false
 * Relate decisions to requirement, scenario, risk or existing constraint identifiers when present. Preserve authoritative versions and record decisions that still require approval.
 * A design can guide Implementation only when the material decisions governing that slice are sufficiently stable. Unresolved issues that can change an API, data contract, safety guarantee or acceptance behavior block the affected handoff, not all unrelated work.
 
+## Refactoring Strategy Selection
+
+* For an evidence-backed structural change, distinguish the observed design problem from a preferred pattern. Assess change amplification, cognitive load, obscured dependencies, information leakage, affected consumers and the cost of verification; code smells or style preferences alone are not sufficient reasons to redesign.
+* Choose strategy proportional to the boundary: local behavior-preserving transformation, internal substitution behind an abstraction, compatible API/schema evolution, or incremental displacement of a legacy capability. Consider meaningful alternatives when risk or coupling justifies them, without requiring a pattern catalogue for trivial work.
+* Prefer abstractions that hide significant volatile knowledge behind stable interfaces; avoid needless pass-through layers, speculative generality and extra indirection merely to satisfy SOLID, GoF or Object Calisthenics.
+* Specify the observable contracts and critical invariants that Implementation must preserve. For replacement or transition architectures, identify routing, coexistence, data ownership, compatibility windows, migration and safe failure/rollback paths. A traffic switch alone does not reverse durable effects.
+* Structural improvement and an authorized behavior change remain distinct intentions, even when one prepares for the other; a Design recommendation does not confer mutation or requirements authority.
+
 ## Small, Reversible Design
 
 * Prefer the smallest coherent design that can implement and verify the next slice without breaking existing guarantees.

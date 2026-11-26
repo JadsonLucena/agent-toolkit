@@ -38,6 +38,14 @@ When current-state knowledge matters, distinguish genuine business rules from ac
 * When solution uncertainty is material, preserve candidate options and the evidence needed to compare them rather than collapsing prematurely to one design.
 * A prototype, experiment, probe, or spike may be valid work when its purpose is to reduce a material uncertainty.
 
+## Structural Engineering Needs and Semantic Preservation
+
+* Treat confirmed change friction, coupling, architecture erosion, or testability barriers as possible engineering needs, not automatically as a new user feature or an approved solution. Identify the observed symptom, credible cost or risk, affected behavior, sources and open questions; speculative smells alone do not establish a need.
+* Distinguish **structural-only** improvements from intended changes to user-visible behavior, business rules, acceptance criteria or service guarantees. Existing implementation behavior is evidence about the current state, not automatically stakeholder-approved policy.
+* When revising a requirements artifact for clarity, terminology, decomposition or traceability, compare old and proposed meanings against the authoritative baseline; preserve accepted semantics, identities and links. Material semantic changes require the existing Requirement Change and Impact authority and assessment.
+* Requirements may capture preservation obligations and critical invariants for a refactoring initiative, but must not prescribe Strategy, SOLID, microservices, Strangler Fig or another design technique as the solution without a supported constraint or accepted design decision. Route technical strategy to Design.
+* A justified engineering-risk or maintainability item may proceed through backlog planning without manufacturing a product story; missing scope authorization remains unresolved.
+
 ## Problem Investigation and Decision Evidence
 
 Use investigative methods only to reduce uncertainty that materially affects the next requirements decision. A named method is a reasoning aid, not evidence, a required artifact, or authority to choose a solution.
