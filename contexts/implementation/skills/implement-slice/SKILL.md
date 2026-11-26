@@ -80,6 +80,10 @@ For a slice that implements or changes an HTTP API, inspect accepted interface/b
 
 Do not treat a Design reference as an implementation command or a new acceptance source. If a guarantee is not justified, return a behavioral ambiguity to Requirements or a technical choice to Design. Use the existing TDD and verification flow for supported behaviors, including a production database integration test when index plans or isolation semantics materially determine correctness. A unit mock cannot prove query performance or concurrency guarantees.
 
+## Protected Output Contract Realization (Conditional)
+
+When an accepted change affects outward data, trace the authorized audience, purpose, field-level policy and published representation before coding. Construct only approved response properties and transformations; do not serialize domain/ORM objects, stack traces or internal metadata merely because a framework makes it easy. Reuse a suitable existing Presenter, DTO or serializer rather than creating mandatory Clean Architecture ceremony. Verify sensitive information stays protected across errors, logs, traces, event payloads, caches and exports **where those paths are reachable**. Treat masking as a representation decision, not an authorization check. Return missing policy or legal authority to Requirements instead of inventing it.
+
 ## Pre-Edit Atomic Intention Plan
 
 The `Partition` gate precedes **all production and test edits**, including TDD RED. Before executing the first edit, identify each candidate intention by its purpose, expected observable change, verification, meaningful revert boundary, dependency order and a valid intermediate repository state. For a single clearly indivisible change, a brief one-item plan is sufficient. A PR plan or work item is not evidence that a card contains only one intention. When an unexpected independent change appears, preserve the current unit without mixing the new work, re-run the Git separation test and get the first intention verified/committed before editing the next. Do not use task-level commits or external TDD cadence to override Git atomicity.

@@ -101,6 +101,10 @@ For UI/component tests:
 
 Use quality metrics as diagnostic signals, not proof of correctness; follow project-defined thresholds instead of imposing universal targets.
 
+## Output Boundary and Protected Data Tests (Conditional)
+
+When outward disclosure or transformation is affected, test permitted and forbidden **properties** for relevant roles, tenants, purposes and projection/expansion paths, not merely whether authentication succeeds. Check the actual serialized response and any reachable error, log, trace, event, cache or export path for sensitive-data leaks; include nested and default-serialization cases where risk warrants them. Use synthetic fixtures, not real personal data. Verify omitted versus intentionally masked values from the approved contract; a UI-only mask must not be mistaken for an API authorization control. Do not require a class named Presenter or a specific framework pattern.
+
 ## HTTP API Contract Tests (Conditional)
 
 When the changed behavior concerns an HTTP API, select tests from applicable accepted contracts and risks: method safety/idempotency, status and Problem Details semantics, resource/object/property authorization, cache headers and response selection, conditional requests and lost updates, asynchronous transitions, retries/duplicate effects, compatibility and documented media types. Test actual wire-level semantics at an integration/contract boundary when framework behavior matters; do not assert that a header's presence proves the promised effect.
