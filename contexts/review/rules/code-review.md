@@ -69,6 +69,15 @@ Evaluate applicable concerns, with evidence and reachable consequences:
 * **Test adequacy:** verify what regressions existing assertions would catch; identify missing, stale, skipped, flaky, or ineffective tests. Use coverage, CRAP, mutation testing, and complexity as contextual signals, not universal merge blockers. In native and specialist review, apply relevant test-quality standards as evaluation criteria, without invoking test-generation workflows or granting authorization to edit tests. Review alone owns finding calibration and the verdict.
 * **Delivery safety:** reviewability, impact radius, rollout, feature flags, compatibility windows, deployment dependencies, and recovery when applicable.
 
+## Structural Refactoring Assessment
+
+* When a reviewed change claims to refactor or restructure code, determine the exact intended preservation boundary and compare it against the actual diff and affected consumers. Evaluate observable output, error conditions, persistence, concurrency, events, idempotency, public contracts and external effects where applicable. Passing tests alone are not a proof of equivalence.
+* Inspect whether the change demonstrably reduces a material source of change amplification, cognitive load, information leakage, coupling or test friction, while accounting for indirection, new abstractions and migration complexity it introduces. A reduction in LOC, method length or code-smell count is not sufficient evidence of improvement.
+* A pre-existing smell or stylistic preference is normally advisory, not a blocker. Classify structural findings by the actual introduced or amplified reachable consequence under Finding Integrity and Decision; avoid unrelated cleanup requests or automatic SOLID/GoF compliance.
+* Distinguish structural-only work from intended feature/defect changes. An unauthorized behavioral change is a correctness or scope finding, not an acceptable side effect of a claimed refactor. Missing authoritative semantics requiring material judgment are routed as decision-needed, not invented by Review.
+* For legacy replacement or parallel migration, assess staged compatibility, coexistence, side-effect suppression, data ownership and reversibility of deployed effects. A Git revert or traffic rollback does not undo durable changes.
+* Review remains read-only. Record supported improvement opportunities without prescribing implementation edits or launching a refactoring process within Review.
+
 ## Requirement Authority and Project Conventions
 
 * Use applicable version-controlled requirements, behavior contracts, acceptance criteria and ADRs as sources, not assumptions. A source that explicitly and credibly supersedes another controls the relevant requirement; cite the supersession and its revision.
