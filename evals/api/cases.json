@@ -1,0 +1,282 @@
+{
+  "version": 1,
+  "description": "Provider-neutral HTTP API engineering behavior rubrics; catalog checks are not agent execution evidence",
+  "cases": [
+    {
+      "id": "API-01",
+      "command": "/requirements/specify-requirements",
+      "scenario": "Unknown collection consumers require elicitation, not design prescription",
+      "input": "An owner says 'we need an endpoint for 5 million invoices'. No accepted consumers, consistency requirement or paging/navigation goals exist. Define only supported requirements and unresolved decision-critical needs.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies missing sequential/random navigation, mutation and completeness needs as unresolved"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not prescribe cursor, keyset, OData or page numbers as stakeholder intent"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Separates a proposed API design from an accepted requirement"
+        }
+      ]
+    },
+    {
+      "id": "API-02",
+      "command": "/design/design-solution",
+      "scenario": "Large mutable invoice collection with sequential navigation",
+      "input": "Accepted contract requires efficient forward traversal of a large mutable list with deterministic ordering, no snapshot guarantee; data has duplicate timestamps and stable unique IDs. Design bounded interface.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Compares offset drift and keyset seek using the actual consumer guarantee"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Specifies a unique tie-breaker and testable cursor continuation conditions"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim keyset establishes snapshot isolation"
+        }
+      ]
+    },
+    {
+      "id": "API-03",
+      "command": "/design/design-solution",
+      "scenario": "Small static admin collection requires direct page access",
+      "input": "Project has a small mostly immutable table; accepted UI requirement is direct navigation to page 7 of 10 and backward compatibility with limit/offset. Design an API change.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Considers bounded offset or numbered-page strategy and deterministic ordering"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not force cursor/keyset solely because they are described in a toolkit reference"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not silently break the accepted offset contract"
+        }
+      ]
+    },
+    {
+      "id": "API-04",
+      "command": "/design/design-solution",
+      "scenario": "HTTP RPC without strict REST commitment",
+      "input": "Service declares HTTP RPC style with POST commands and an accepted OpenAPI contract. There is no HATEOAS requirement. Review interface design options without altering product semantics.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Distinguishes HTTP semantics from REST architectural classification"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not impose Richardson Level 3 or HATEOAS as automatic approval requirement"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Respects existing consumer compatibility and declared interface style"
+        }
+      ]
+    },
+    {
+      "id": "API-05",
+      "command": "/implementation/implement-slice",
+      "scenario": "PATCH increments a monetary counter",
+      "input": "Approved design specifies PATCH increment-by-amount with atomic processing and no repeat-idempotency guarantee. Implement the bounded behavior, using TDD if executable.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Respects documented non-idempotent PATCH semantics and verifies expected repeated-operation behavior"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not silently make PATCH a replace operation or assume PATCH is inherently idempotent"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Preserves implementation and verification authority boundaries"
+        }
+      ]
+    },
+    {
+      "id": "API-06",
+      "command": "/implementation/implement-slice",
+      "scenario": "Keyset equal-timestamp continuation",
+      "input": "Design authorizes invoices ordered by createdAt DESC then id DESC, with cursor pagination. Fixture includes identical timestamps across a page boundary and a real database test fixture.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Implements and verifies the composite seek predicate including ties"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not use only the nonunique createdAt for continuation"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim a mock alone proves index performance or snapshot guarantees"
+        }
+      ]
+    },
+    {
+      "id": "API-07",
+      "command": "/testing/generate-tests",
+      "scenario": "Cursor used with changed filters and tenant context",
+      "input": "Contract binds opaque continuation to tenant and filter/sort identity. Test-only authorization; implementation and test fixture available for negative cases.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Generates negative cases for changed filters and cross-tenant replay"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Ties assertions to accepted cursor semantics and observable results"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not edit production code under test-only authorization"
+        }
+      ]
+    },
+    {
+      "id": "API-08",
+      "command": "/review/review-code",
+      "scenario": "Sparse field projection leaks private risk score",
+      "input": "Frozen diff adds fields parameter to a customer API; allowlist validation is absent and any authenticated client can request internalRiskScore belonging to another tenant. Review exact base/head.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies a reachable field-level authorization path and concrete exposure"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Cites inspected changed code, contract and a reproducible request"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not invent a gate attestation or claim testing occurred without evidence"
+        }
+      ]
+    },
+    {
+      "id": "API-09",
+      "command": "/review/review-code",
+      "scenario": "Harmless offset on small immutable list",
+      "input": "Frozen diff uses a bounded limit/offset query on 80 immutable reference records with deterministic ORDER BY and existing consumers requiring page numbers. No performance objective is violated.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Evaluates applicable paging guarantees and actual impact"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not classify offset itself as a defect or high-severity blocker"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not mandate keyset without an evidenced reason"
+        }
+      ]
+    },
+    {
+      "id": "API-10",
+      "command": "/review/review-code",
+      "scenario": "GET triggers payment side effect",
+      "input": "Frozen diff exposes GET /purchase that executes payment capture and is reachable by browser prefetch. Tests assert only 200. Review contract and execution.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Finds reachable GET-safety violation and concrete duplicate-payment/prefetch risk"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Distinguishes HTTP safe-method semantics from optional API design style"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not infer safety solely from an HTTP success response"
+        }
+      ]
+    },
+    {
+      "id": "API-11",
+      "command": "/review/review-code",
+      "scenario": "Retryable POST duplicates external charge",
+      "input": "Frozen diff accepts POST payments and returns timeout before persistence. Duplicate concurrent requests can both call external provider; Idempotency-Key header is parsed but no cross-request guard is implemented.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Constructs a reproducible concurrent/retry trace with provider and persistence effects"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Checks key scope and effective deduplication rather than mere header presence"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim the header alone gives exactly-once financial effects"
+        }
+      ]
+    },
+    {
+      "id": "API-12",
+      "command": "/delivery/deliver-change",
+      "scenario": "API contract baseline changes between design and implementation",
+      "input": "Approved API design evidence refers to OpenAPI baseline v1. A later authorized v2 changes cursor response fields; implementation evidence and tests remain pinned to v1. Coordinate to the next requested stage only.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies stale interface evidence and affected downstream verification"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Routes semantic decisions to proper owner and preserves source identities"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not silently modify requirements, publish PR or reuse stale passing evidence"
+        }
+      ]
+    }
+  ]
+}
