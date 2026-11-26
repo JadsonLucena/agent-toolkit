@@ -35,7 +35,7 @@ class RefactoringImplementationPolicyTests(unittest.TestCase):
         self.assertIn("preconditions, postconditions", guide)
         self.assertIn("Strangler Fig", guide)
         self.assertIn("Git's independent reversible-intention test", guide)
-        self.assertIn("relevant checks", guide)
+        self.assertIn("required integrated checks", guide)
 
     def test_mode_does_not_bypass_authority_or_git(self):
         skill = read("contexts/implementation/skills/implement-slice/SKILL.md")
