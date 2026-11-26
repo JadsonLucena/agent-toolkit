@@ -76,6 +76,7 @@ HTTP statelessness concerns self-contained request semantics, not an instruction
 ## Distributed Effects and Safety
 
 * For money movement, webhook processing, cancellation and other durable effects, examine duplicate/replay windows, concurrency, request-scoped idempotency and external deduplication. A header alone is not exactly-once execution.
+* Where retrying non-idempotent requests risks duplicate effects, consider the proposed [`Idempotency-Key` HTTP header](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/) (**IETF Internet-Draft**, not an RFC). If adopted, define key scope/expiry, payload-reuse policy and concurrent-retry behavior; the header alone does not prevent duplicate effects or replace `If-Match` for lost-update protection.
 * Bound timeout/retry budgets, including upstream provider behavior; identify authoritative terminal versus pending state. An asynchronous 202 response must not assert completion.
 * Separate authentication, authorization per resource/object and property, and browser CORS. `fields` and `include` parameters must not expand access.
 * Prefer secure defaults for secrets/PII; cacheability and HTTP intermediaries must honor the scope of any personalized representation.
