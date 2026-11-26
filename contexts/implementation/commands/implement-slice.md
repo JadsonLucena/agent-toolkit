@@ -1,17 +1,17 @@
 ---
 name: implement-slice
-description: "Implement authorized production changes, preferring test-first TDD when feasible, with caller opt-out, verified checks and safe Git handoffs. Not for test-only work."
+description: "Implement authorized production changes or structural refactoring, preferring test-first TDD for behavior changes when feasible, with verified checks and Git handoffs. Not test-only or review."
 ---
 
 # Implement Slice
 
 ## Intent
 
-Implement one bounded, coherent, verifiable software change under the accepted specification and authorized Change Boundary.
+Implement one bounded, coherent, verifiable software change, including authorized behavior-preserving refactoring, under the accepted specification and authorized Change Boundary.
 
 ## Invocation
 
-Select the Implementation Engineer and implement-slice procedure. Apply the Implementation rule's preferred-TDD selection for testable behavior changes; absence of a TDD request is not a direct-implementation exception. An explicit caller TDD opt-out affects sequencing, not required testing. Authorizes in-scope production and related test edits and local checks; completed verified atomic intentions may be locally committed under the existing Git rules unless explicitly prohibited by the caller or repository. An authorized implementation plan need not repeat commit permission; preserve restrictions inherited from the invoking context. When necessary, a read-only Git PR-plan handoff precedes the first mutation; each authorized completed atomic intention is handed to Git for commit verification before further intentions. No permission to publish or deploy is inferred.
+Select the Implementation Engineer and implement-slice procedure. For a structural-only refactoring request, use a passing characterization/regression baseline rather than inventing a TDD RED. For changed behavior, apply the Implementation rule's preferred-TDD selection for testable behavior changes; absence of a TDD request is not a direct-implementation exception. An explicit caller TDD opt-out affects sequencing, not required testing. Authorizes in-scope production and related test edits and local checks; completed verified atomic intentions may be locally committed under the existing Git rules unless explicitly prohibited by the caller or repository. An authorized implementation plan need not repeat commit permission; preserve restrictions inherited from the invoking context. When necessary, a read-only Git PR-plan handoff precedes the first mutation; each authorized completed atomic intention is handed to Git for commit verification before further intentions. No permission to publish or deploy is inferred.
 
 ## Uses
 
