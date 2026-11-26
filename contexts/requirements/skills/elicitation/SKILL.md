@@ -108,12 +108,15 @@ When elicitation observes a **specific existing-system failure** whose mechanism
 
 ### Decision-frontier interview protocol
 
-1. **Expose material decisions.** Map only decisions that could change the current Need, Change Boundary, requirement meaning, critical guarantee, or intended next handoff. For each, distinguish verifiable facts, stakeholder-authority decisions, unresolved assumptions, and conditional branches; record prerequisite relationships only when material. Do not manufacture a full decision tree for trivial changes.
-2. **Resolve facts before questioning.** Inspect supplied evidence and accessible context to settle factual prerequisites, citing provenance. A missing authoritative business decision is not a fact the agent may infer. If a source cannot be inspected, retain that uncertainty rather than calling the fact settled.
-3. **Choose the decision frontier.** A question is eligible only when its prerequisite facts and decisions are settled. Two questions may share a round only if answering one cannot change whether, or how, the other should be asked. Prioritize pivots that reshape the next material decision; defer dependent, speculative, low-impact, or out-of-boundary questions.
-4. **Ask proportionally.** For each selected stakeholder question, state why the answer changes the next decision and present relevant options/trade-offs. Recommend an option only when supported by evidence, label it as a recommendation, and wait for authorized confirmation. Group independent questions when that reduces interaction cost; ask sequentially when answers are dependent or cognitively demanding.
-5. **Recompute after each answer or new source.** Update the dependency map, decisions, provenance and any affected Change Boundary proposal. Reopen a previously settled decision when contradictory evidence emerges. Do not silently decide a downstream question whose prerequisites changed.
-6. **Stop on sufficiency, not exhaustive interviewing.** Exit when the next material decision is safely supported at the selected rigor; retain explicit unresolved or deferred branches. A missing critical guarantee, conflicting authority, or material semantic ambiguity blocks only the affected path. Follow existing Stop Conditions rather than forcing all branches of the tree to be answered.
+The state model determines order and re-entry. The following are **selection
+constraints**, not a second procedural sequence:
+
+* **Materiality:** Include only decisions that could alter the Need, Change Boundary, requirements, critical guarantees or next handoff. Distinguish supported facts, stakeholder decisions, assumptions and conditional branches Do not manufacture a full decision tree for trivial changes.
+* **Authority and provenance:** Resolve factual prerequisites from inspectable sources. Preserve missing authoritative decisions or inaccessible evidence as unresolved; A missing authoritative business decision is not a fact the agent may infer.
+* **Decision frontier:** Ask a question only after its prerequisite facts and decisions are settled. Two questions may share a round only if answering one cannot change whether, or how, the other should be asked. Prioritize pivots that reshape the next material decision; defer dependent, speculative or out-of-scope questions.
+* **Interaction cost:** Explain why each proposed question matters. Present supported options and trade-offs; label recommendations distinctly from approved decisions and wait for authorized confirmation. Ask sequentially where dependencies or cognitive load warrant it.
+* **Reconciliation:** After new evidence, update dependencies, provenance and any affected Change Boundary. Reopen previously settled decisions when contradicted; never silently settle downstream questions.
+* **Sufficiency and stop:** Stop on sufficiency, not exhaustive interviewing: exit when the next material decision is supported at the selected rigor and retain explicit unresolved or deferred branches. A missing critical guarantee, conflicting authority or material semantic ambiguity blocks only the affected path.
 
 The decision-tree/frontier technique draws on [Matt Pocock's grilling skill](https://github.com/mattpocock/skills/blob/main/skills/productivity/grilling/SKILL.md); the toolkit's tailoring, scope authority and stop criteria remain canonical.
 

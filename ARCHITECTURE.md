@@ -4,102 +4,27 @@ This document defines the canonical structure and responsibility boundaries of A
 
 ## Canonical Structure
 
+The directory conventions below describe **where** capabilities belong; they
+are not a second file-by-file inventory. The [Artifact Matrix](#artifact-matrix)
+is the **exhaustive canonical inventory** of Rules, Skills, Commands, Agents,
+and Contracts. `scripts/toolkit_lint.py` reconciles that matrix with the
+repository filesystem and checks the optional Cursor manifest against those
+canonical sources. Supporting Skill `references/` and Review `templates/`
+are intentionally noncanonical and remain under their owning context.
+
 ```text
 contexts/
-├── requirements/
-│   ├── rules/
-│   │   ├── tailoring.md
-│   │   ├── requirements.md
-│   │   └── backlog.md
-│   ├── skills/
-│   │   ├── elicitation/SKILL.md
-│   │   ├── requirements-definition/SKILL.md
-│   │   ├── example-discovery/SKILL.md
-│   │   ├── requirements-validation/SKILL.md
-│   │   └── backlog-planning/SKILL.md
-│   ├── commands/
-│   │   ├── specify-and-plan-change.md
-│   │   ├── elicit-requirements.md
-│   │   ├── specify-requirements.md
-│   │   ├── validate-requirements.md
-│   │   ├── build-backlog.md
-│   │   └── refine-backlog.md
-│   └── agents/
-│       ├── requirements-elicitor.md
-│       ├── requirements-specifier.md
-│       └── backlog-planner.md
-├── design/
-│   ├── rules/design.md
-│   ├── skills/design-solution/SKILL.md
-│   ├── commands/design-solution.md
-│   └── agents/design-engineer.md
-├── debugging/
-│   ├── rules/debugging.md
-│   ├── skills/systematic-debugging/SKILL.md
-│   ├── commands/investigate-defect.md
-│   └── agents/debugging-investigator.md
-├── implementation/
-│   ├── rules/implementation.md
-│   ├── skills/implement-slice/SKILL.md
-│   ├── skills/test-driven-development/SKILL.md
-│   ├── commands/implement-slice.md
-│   └── agents/implementation-engineer.md
-├── delivery/
-│   ├── rules/delivery.md
-│   ├── skills/coordinate-delivery/SKILL.md
-│   ├── skills/coordinate-delivery/references/transition-contract.md
-│   ├── commands/deliver-change.md
-│   └── agents/delivery-coordinator.md
-├── testing/
-│   ├── rules/testing.md
-│   ├── skills/generate-tests/SKILL.md
-│   ├── commands/generate-tests.md
-│   └── agents/test-engineer.md
-├── review/
-│   ├── rules/code-review.md
-│   ├── skills/
-│   │   ├── review-change/SKILL.md
-│   │   ├── coordinate-review-team/SKILL.md
-│   │   └── verify-findings/SKILL.md
-│   ├── commands/review-code.md
-│   └── agents/
-│       ├── code-reviewer.md
-│       ├── specification-reviewer.md
-│       ├── correctness-reviewer.md
-│       ├── security-reviewer.md
-│       ├── reliability-reviewer.md
-│       ├── testing-reviewer.md
-│       ├── architecture-reviewer.md
-│       └── finding-verifier.md
-└── git/
-    ├── rules/
-    │   ├── git.md
-    │   ├── gitflow.md
-    │   ├── semantic-commit.md
-    │   ├── semantic-version.md
-    │   └── pull-request.md
-    ├── skills/
-    │   ├── create-semantic-commits/SKILL.md
-    │   ├── determine-semantic-version/SKILL.md
-    │   ├── manage-branch-work/SKILL.md
-    │   ├── resolve-merge-conflicts/SKILL.md
-    │   └── manage-pull-request/SKILL.md
-    ├── commands/
-    │   ├── commit.md
-    │   ├── determine-semantic-version.md
-    │   ├── plan-pull-requests.md
-    │   ├── prepare-pull-request.md
-    │   ├── resolve-conflicts.md
-    │   └── create-pull-request.md
-    └── agents/git-engineer.md
-
-contracts/
-├── requirements.md
-├── work-item.md
-├── test-basis.md
-├── test-evidence.md
-├── review-evidence.md
-└── debugging-evidence.md
+  <context>/                       # requirements, design, debugging,
+                                   # implementation, delivery, testing, review, git
+    rules/<concern>.md              # owns durable policy
+    skills/<capability>/SKILL.md    # owns reusable procedure
+      references/<detail>.md        # optional, lazy supporting material
+    commands/<invocation>.md        # explicit entry points
+    agents/<specialist>.md          # role-specific responsibilities
+  review/templates/<report>.md      # supporting Review output templates
+contracts/<handoff>.md             # provider-neutral evidence interfaces
+adapters/<provider-or-capability>/  # optional executable integrations
+evals/<area>/                       # provider-neutral evaluation fixtures
 ```
 
 ## Optional Vendor Adapters
@@ -210,7 +135,7 @@ Host-specific discovery and invocation settings belong in optional integrations.
 | Git | `commands/plan-pull-requests.md` | Command | Plan coherent PR boundaries without repository mutation |
 | Git | `commands/prepare-pull-request.md` | Command | Inspect the final change and prepare a truthful PR without remote mutation |
 | Git | `commands/resolve-conflicts.md` | Command | Begin read-only conflict diagnosis or explicitly authorized scoped application |
-| Git | `commands/create-pull-request.md` | Command | Create a remote PR with explicit creation-only authorization |
+| Git | `commands/create-pull-request.md` | Command | Create an authorized remote PR, including only required first-time non-force publication of its unpublished source branch |
 | Git | `agents/git-engineer.md` | Agent | Own Git specialization, evidence discipline, operation routing, and boundaries |
 | Cross-context | `contracts/outcome-evidence.md` | Contract | Optional post-delivery outcome observations and feedback |
 | Cross-context | `contracts/design-evidence.md` | Contract | Portable technical design decisions and handoff to Implementation |
@@ -258,7 +183,7 @@ Platform adapters and runtimes are responsible for enforcing the declared scope 
 
 * Expose only the tools/capabilities required for the authorized operation, with scoped credentials and resource permissions where possible.
 * Apply tool-level policy checks and approvals **before** sensitive or irreversible actions; do not rely only on agent instructions or output checks.
-* Treat authority as operation-specific: creating a pull request does not authorize push, merge, auto-merge, release, or deployment.
+* Treat authority as operation-specific: an explicit request to create a remote PR may include only the necessary first-time non-force publication of its exact unpublished source branch to the verified hosting remote when not prohibited. It does not authorize updating existing remote refs, force-push, changing remote/fork or protected/default branches, merging, auto-merge, release, or deployment. Implementation or a target-stage label alone does not grant publication permission.
 * Deny or pause out-of-scope operations rather than inferring authorization from an adjacent action.
 * Report which restrictions are technically enforced and which are only instruction-level policy. When enforcement is unavailable, do not represent Markdown instructions as a security control; use an external approval/control or withhold the sensitive capability.
 
@@ -395,7 +320,7 @@ Ask only when ambiguity can materially change semantics, scope, acceptance, beha
 
 ## Naming
 
-* Context names are stable engineering nouns: `requirements`, `design`, `implementation`, `delivery`, `testing`, `review`, `git`.
+* Context names are stable engineering nouns: `requirements`, `design`, `debugging`, `implementation`, `delivery`, `testing`, `review`, `git`.
 * Rule filenames name the governed concern.
 * Skill directories name the reusable capability.
 * Command names use a clear verb-object engineering intent and should remain understandable when surfaced outside their physical context. The context namespace may remove redundancy only when the remaining name stays unambiguous.
@@ -409,7 +334,7 @@ Canonical Skills are stored at `contexts/<context>/skills/<capability>/SKILL.md`
 * `name` matches the capability directory: lowercase letters, digits, and hyphens.
 * `description` says what the skill does and when to use it. Hosts compare the request with this field and load the body only when it matches, or when the user invokes the skill by name.
 
-The body states the procedure once, as a diagram under Workflow. A decision node names the rule section that owns the invariant and does not restate it. Do not keep a numbered list that retells the diagram. Foundational Guidance stays in the rule as the theoretical reference for reviewers of the artifact. Do not add provider metadata such as model, reasoning effort, or tool allowlists to the canonical frontmatter.
+The body states the procedure once, as a diagram under Workflow or in a State Model explicitly referenced from Workflow. Supporting prose and tables may define conditional selection or evidence criteria, but must not duplicate the diagram as a second numbered procedure. A decision node names the Rule section that owns its invariant without restating the policy. Foundational Guidance stays in the owning Rule. Do not add provider metadata such as model, reasoning effort, or tool allowlists to canonical frontmatter.
 
 A host install path, such as `.claude/skills/` or `.agents/skills/`, may symlink or copy the canonical file. That installation is not a second source of truth.
 

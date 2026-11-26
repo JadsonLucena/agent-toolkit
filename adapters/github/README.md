@@ -1,13 +1,13 @@
 # Guarded GitHub PR Creation
 
-\`adapters/github/guarded_pr.py\` is an optional **GitHub-specific, executable
+`adapters/github/guarded_pr.py` is an optional **GitHub-specific, executable
 pre-creation gate** for the portable Review → Git evidence contract.
 
 The adapter verifies an **SSH-signed independent Code Review attestation** for **every remote PR, including Draft**, and executes all checks specified in a **deployment-protected policy**.
-Only after success, and only with explicit \`--create\`, does it invoke
-\`gh pr create\`. It then queries the created PR through \`gh api\` and checks
+Only after success, and only with explicit `--create`, does it invoke
+`gh pr create`. It then queries the created PR through `gh api` and checks
 the returned repository, base/head refs **and SHAs**, title, and Draft state.
-A mismatch returns \`created_unverified\` with the remote URL and a nonzero exit
+A mismatch returns `created_unverified` with the remote URL and a nonzero exit
 code; it never claims success based only on the creation command's stdout.
 
 ## Trust model and setup
@@ -21,12 +21,12 @@ target repository and outside the implementation author's control:
 3. A protected trust policy listing the authorized review identities, exact
    remote URL, GitHub repository identity and **complete required check argv**.
 4. A fixed, protected invocation of this gate. Do not allow untrusted authors
-   to supply substitute \`--trust-policy\` paths or override required check
+   to supply substitute `--trust-policy` paths or override required check
    configuration.
 
 Example protected trust policy (outside the checked-out repository):
 
-\`\`\`json
+```json
 {
   "schema_version": 1,
   "github_repository": "org/repo",
@@ -38,24 +38,24 @@ Example protected trust policy (outside the checked-out repository):
     "tests": ["python3", "-m", "unittest", "discover", "-s", "tests", "-v"]
   }
 }
-\`\`\`
+```
 
-Add established coverage and other mandated checks to \`checks\`. The optional
-committed \`.github/toolkit-pr-checks.json\` is **not an authority**: when it
+Add established coverage and other mandated checks to `checks`. The optional
+committed `.github/toolkit-pr-checks.json` is **not an authority**: when it
 exists, this wrapper additionally rejects differences from the protected
 check list. The protected policy, not a user-supplied manifest, selects the
 actual commands run.
 
 An SSH allowed-signers file contains a principal and a public key per line:
 
-\`\`\`text
+```text
 reviewer@example.com ssh-ed25519 <PUBLIC_KEY> comment
-\`\`\`
+```
 
 The authorized independent reviewer produces a portable JSON file with the
-semantics of \`contracts/review-evidence.md\`. The signed profile includes:
+semantics of `contracts/review-evidence.md`. The signed profile includes:
 
-\`\`\`json
+```json
 {
   "repository": "org/repo",
   "review_profile": "gate",
@@ -73,19 +73,19 @@ semantics of \`contracts/review-evidence.md\`. The signed profile includes:
   "blocking_findings": [],
   "unresolved_questions": []
 }
-\`\`\`
+```
 
 After completing the **actual independent review**, the authorized signer
 signs the **exact JSON bytes** (the private key must not be committed, copied
 to the implementation workspace, or handed to the code author):
 
-\`\`\`bash
+```bash
 ssh-keygen -Y sign -f /protected/reviewer_key \
   -n agent-toolkit-code-review /protected/review-evidence.json
 # produces /protected/review-evidence.json.sig
-\`\`\`
+```
 
-The wrapper uses \`ssh-keygen -Y verify\` with a dedicated signature namespace.
+The wrapper uses `ssh-keygen -Y verify` with a dedicated signature namespace.
 It refuses unsigned/tampered evidence, unknown signers, missing complete file
 coverage, unresolved review blockers, self-review by matching Git author
 email, stale base/head, dirty worktrees, unpublished branches, mismatched
@@ -100,7 +100,7 @@ signing keys or invocation can defeat the gate.
 
 ## Usage
 
-\`\`\`bash
+```bash
 # Non-mutating preflight:
 python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
   --repo . --base main --head feature/example \
@@ -125,17 +125,17 @@ python3 /path/to/agent-toolkit/adapters/github/guarded_pr.py \
   --signature /protected/review-evidence.json.sig \
   --trust-policy /protected/review-policy.json \
   --draft --create --title "feat: example" --body-file /tmp/pr-description.md
-\`\`\`
+```
 
-Requires Python 3.10+, Git, OpenSSH \`ssh-keygen\`, and authenticated GitHub CLI
-only for \`--create\`. The wrapper does not install or configure these tools.
+Requires Python 3.10+, Git, OpenSSH `ssh-keygen`, and authenticated GitHub CLI
+only for `--create`. The wrapper does not install or configure these tools.
 It will fail closed if any required trust anchor or verification is unavailable.
 
 ## Boundaries
 
-* \`gh pr create\` is not invoked when preflight fails. A PR may have been
+* `gh pr create` is not invoked when preflight fails. A PR may have been
   created **before** post-creation verification fails: the wrapper reports
-  \`created_unverified\` and the URL rather than claiming success, closing
+  `created_unverified` and the URL rather than claiming success, closing
   the PR or creating a duplicate automatically.
 * This is **not a global GitHub authorization boundary**. Other clients
   can still bypass it unless enforced through an approved runtime,
@@ -148,10 +148,10 @@ It will fail closed if any required trust anchor or verification is unavailable.
 
 ## Tests
 
-\`tests/test_guarded_pr.py\` uses real local Git and bare remote fixtures,
+`tests/test_guarded_pr.py` uses real local Git and bare remote fixtures,
 generates temporary SSH signing keys, tests signed/forged/stale evidence and
-protected check-policy failures, and simulates \`gh pr create\` plus subsequent
-\`gh api\` verification. No real PR is created by the tests.
+protected check-policy failures, and simulates `gh pr create` plus subsequent
+`gh api` verification. No real PR is created by the tests.
 
 ## Gate Profile Integrity
 

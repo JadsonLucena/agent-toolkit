@@ -48,10 +48,11 @@ class NativeContextTests(unittest.TestCase):
         self.assertEqual(pack["sources"], [])
 
     def test_untracked_files_cannot_be_injected_into_pack(self):
-        (self.repo / "secret.txt").write_text("private", encoding="utf-8")
+        sentinel = "UNTRACKED_SECRET_SENTINEL_77BD8"
+        (self.repo / "secret.txt").write_text(sentinel, encoding="utf-8")
         pack = prepare_context(self.repo, ["secret.txt"], ["rules.md"])
         self.assertEqual(pack["status"], "partial")
-        self.assertNotIn("private", json.dumps(pack))
+        self.assertNotIn(sentinel, json.dumps(pack))
 
     def test_path_escape_and_symlink_are_rejected(self):
         pack = prepare_context(self.repo, ["../outside"], ["rules.md"])

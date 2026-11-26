@@ -29,10 +29,10 @@ Track target and base/head identity; change boundary and stated claims; changed/
 ```mermaid
 flowchart TD
     Start --> Preflight["Supplied target only. A missing target blocks. code-review.md"]
-    Preflight --> SkipOCR{no-ocr flag?}
+    Preflight --> SkipOCR{Optional OCR disabled?}
     SkipOCR -->|yes| NeutralGit
-    SkipOCR -->|no| OCRFirst[prepare_context: detect OCR >= 1.9]
-    OCRFirst -->|available| OCRRules[OCR file/rule delegation]
+    SkipOCR -->|no| OCRFirst[Optional OCR capability check]
+    OCRFirst -->|available| OCRRules[Optional OCR file/rule hints]
     OCRFirst -->|absent/incompatible/failed| NeutralGit
     OCRRules --> Scope[Full original Git scope]
     NeutralGit --> Scope

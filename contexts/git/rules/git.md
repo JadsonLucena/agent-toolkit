@@ -19,6 +19,8 @@ alwaysApply: false
 * Before mutating repository state, inspect the current branch, working tree, staged changes, upstream configuration, active Git operation, relevant worktrees, and relevant remote references.
 * Do not mix unrelated working-tree or staged changes into the current Git operation.
 * Preserve uncommitted work before switching branches, rebasing, resetting, or performing another operation that may affect it.
+* Before the first commit of a new change, identify the repository's default/integration branch and any established branch policy. Use a topic branch where the repository expects one; direct commits to the default branch are appropriate only when separately authorized and compatible with its workflow (including trunk-based development). If the distinction matters and policy/authority is unclear, resolve it before committing rather than silently choosing a convention.
+* Keep temporary PR descriptions and other working artifacts outside Git's internal `.git/` administration directory (for example in a disposable OS temporary directory); do not treat internal Git metadata as workspace storage.
 * Do not discard local changes unless the intent is explicit and the affected state is understood.
 
 ## Branch Freshness and Synchronization

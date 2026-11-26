@@ -13,7 +13,7 @@ Perform an evidence-based review in the requested `advisory` or independently en
 
 Use to review a specified PR, branch diff, commit/range, file set, or current workspace changes. Invocation authorizes read-only inspection and non-destructive verification only where allowed by the runtime, including risk-selected collaboration between read-only review agents if the platform supports isolation and peer messaging. It does not authorize remediation or PR publication.
 
-**Mandatory semantics; optional adapter:** Freeze repository, target SHA/workspace fingerprint, full Git inventory, risk and separable concerns before any review. The Python `adapters/review/run_review.py` is one reference adapter, not a mandatory runtime. A host-native reviewer may use two phases: `run_review.py --prepare-only --out <context.json>`, perform the scoped review using approved native capabilities, then `run_review.py --validate-evidence <evidence.json> --context <context.json>`. Equivalent host implementations must preserve the same validation and report adapter provenance.
+**Mandatory semantics; optional adapter:** Freeze repository, target SHA/workspace fingerprint, full Git inventory, risk and separable concerns before any review. The Python runner is a reference implementation, not a mandatory runtime. Hosts may perform preparation, authorized review and evidence validation through native capabilities with the same semantic guarantees. The adapter-specific CLI flags and examples belong in `adapters/review/README.md`; record which checks actually ran and their provenance.
 
 ## Uses
 
@@ -27,7 +27,7 @@ Use to review a specified PR, branch diff, commit/range, file set, or current wo
 
 * Explicit target or identified current workspace change, intended comparison base when known, and `review_profile: advisory | gate`. Profile meaning is in `contexts/review/rules/code-review.md`. Whether the record satisfies a ready pull request is decided in `contexts/git/rules/pull-request.md`. The Python reference CLI exposes `--review-profile`; any host can implement equivalent semantics.
 * Optional change objective, Change Boundary, requirements, scenarios, work item, ADRs, PR claims, test evidence, risk constraints or project review instructions.
-* Determine actual runtime capabilities according to `contexts/review/skills/coordinate-review-team/SKILL.md`. Reference CLI accepts `--risk-profile`, repeated `--concern` (`contract|correctness|security|reliability|testing|architecture`), `--task-capable`, `--isolated-subagents`, `--direct-peer-supported`, `--lead-implemented-change`, `--base-branch` and `--output-language`. Aliases: `spec|specification` → `contract`, `arch` → `architecture`.
+* Determine available host capabilities, risk profile, relevant concerns and verified reviewer isolation according to `contexts/review/skills/coordinate-review-team/SKILL.md`. Adapter-specific CLI syntax and aliases are documented only in `adapters/review/README.md`.
 * Optional helper opt-out `--no-ocr` (or equivalent host-native setting) follows the mandatory behavior in `contexts/review/rules/code-review.md`.
 
 **Helper policy:** Optional OCR and native fallback are defined once in `contexts/review/rules/code-review.md`. No helper result proves review completion; inspect all original Git paths.
