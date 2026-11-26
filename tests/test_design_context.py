@@ -28,6 +28,29 @@ class DesignContextTests(unittest.TestCase):
         self.assertIn("A design alternative is not a business requirement", contract)
         self.assertIn("source_baseline_ref", contract)
 
+    def test_http_guidance_is_conditional_and_not_a_new_contract(self):
+        rule = doc("contexts/design/rules/design.md")
+        skill = doc("contexts/design/skills/design-solution/SKILL.md")
+        reference = doc("contexts/design/skills/design-solution/references/http-api-design.md")
+        self.assertIn("When a slice creates or changes an HTTP API", rule)
+        self.assertIn("For an HTTP API contract or behavioral change", skill)
+        self.assertIn("RFC 9110", reference)
+        self.assertIn("RFC 9111", reference)
+        self.assertIn("not an automatic requirement", reference)
+        self.assertIn("contracts/design-evidence.md", skill)
+
+    def test_http_resource_modeling_does_not_conflate_ddd_and_rest(self):
+        reference = doc("contexts/design/skills/design-solution/references/http-api-design.md")
+        self.assertIn("## Resource Modeling and Domain Boundaries", reference)
+        self.assertIn("## HTTP Protocol Semantics", reference)
+        self.assertIn("## Architectural and Contract Design Heuristics", reference)
+        self.assertIn("DDD is not a prerequisite", reference)
+        self.assertIn("An Aggregate defines a consistency/invariant boundary", reference)
+        self.assertIn("not automatically", reference)
+        self.assertIn("A resource may expose a stable identity", reference)
+        self.assertNotIn("| Resource identity |", reference)
+        self.assertIn("Martin Fowler — DDD Aggregate", reference)
+
     def test_architecture_and_linter_register_context(self):
         arch = doc("ARCHITECTURE.md")
         lint = doc("scripts/toolkit_lint.py")

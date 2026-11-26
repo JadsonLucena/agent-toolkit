@@ -21,6 +21,12 @@ alwaysApply: false
 * Relate decisions to requirement, scenario, risk or existing constraint identifiers when present. Preserve authoritative versions and record decisions that still require approval.
 * A design can guide Implementation only when the material decisions governing that slice are sufficiently stable. Unresolved issues that can change an API, data contract, safety guarantee or acceptance behavior block the affected handoff, not all unrelated work.
 
+## HTTP API Contract Decisions
+
+* When a slice creates or changes an HTTP API, identify the declared architectural style and applicable published protocol, local contract, and consumer constraints before selecting resource operations or conventions. An HTTP API, a Richardson level, and Fielding's REST constraints are different assessments.
+* Preserve HTTP method semantics, authorization, state transitions, representation contracts, failure behavior, caching and conditional requests **where applicable**. Derive explicit choices from supported requirements and standards; do not impose hypermedia, versioned URIs, ETags, idempotent PATCH, or a particular API format universally.
+* Capture compatibility and verification consequences of material API changes. Use the conditional guidance in `skills/design-solution/references/http-api-design.md`; Requirements owns unmet behavioral needs, while Design owns the proposed technical realization.
+
 ## Refactoring Strategy Selection
 
 * For an evidence-backed structural change, distinguish the observed design problem from a preferred pattern. Assess change amplification, cognitive load, obscured dependencies, information leakage, affected consumers and the cost of verification; code smells or style preferences alone are not sufficient reasons to redesign.
