@@ -101,6 +101,12 @@ For UI/component tests:
 
 Use quality metrics as diagnostic signals, not proof of correctness; follow project-defined thresholds instead of imposing universal targets.
 
+## HTTP API Contract Tests (Conditional)
+
+When the changed behavior concerns an HTTP API, select tests from applicable accepted contracts and risks: method safety/idempotency, status and Problem Details semantics, resource/object/property authorization, cache headers and response selection, conditional requests and lost updates, asynchronous transitions, retries/duplicate effects, compatibility and documented media types. Test actual wire-level semantics at an integration/contract boundary when framework behavior matters; do not assert that a header's presence proves the promised effect.
+
+For collection queries, challenge deterministic sorting under equal keys, correct filter/authorization scope **before** pagination, stable continuation semantics under insertion/deletion/update, token tampering or changed criteria, allowed field projection, expansion depth, empty/end pages and page-size limits. An in-memory test cannot establish production index cost, consistent snapshot isolation or access control at a real database boundary. Apply only tests justified by the selected contract and concrete risks; absence of HATEOAS, keyset or a particular JSON format is not itself a failed test.
+
 ## Regression and Characterization
 
 * When fixing a defect, add a regression test that fails before the fix and passes after it whenever practical; confirm the pre-fix failure is caused by the defect, not test setup, configuration, or unrelated errors.

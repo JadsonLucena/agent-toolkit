@@ -55,7 +55,7 @@ The diagram is the procedure. Mandatory host-neutral preparation is Preflight.
 Apply `contexts/review/rules/code-review.md` for findings, Specification-Driven Conformance, documentation drift, local checks, and the verdict.
 Apply `contexts/review/skills/coordinate-review-team/SKILL.md` for team mode.
 Apply `contexts/review/skills/verify-findings/SKILL.md` before a candidate becomes a blocker.
-Apply `contexts/review/rules/high-risk-patterns.md` as falsification prompts. Do not restate those sources. For a material refactoring or legacy-displacement diff, consult `references/refactoring-review.md` as [conditional investigation guidance](references/refactoring-review.md). Preserve the normal finding taxonomy, source falsification and single Lead verdict; this is not an additional gate or automatic finding source.
+Apply `contexts/review/rules/high-risk-patterns.md` as falsification prompts. Do not restate those sources. For a change that affects an HTTP API's contract, behavior or consumers, consult only relevant concerns in [HTTP API review investigation](references/http-api-review.md). Its probes are falsification aids, not independent blockers, a mandatory REST level, or a substitute for project/standard source authority. For a material refactoring or legacy-displacement diff, consult `references/refactoring-review.md` as [conditional investigation guidance](references/refactoring-review.md). Preserve the normal finding taxonomy, source falsification and single Lead verdict; this is not an additional gate or automatic finding source.
 
 ## Output
 
