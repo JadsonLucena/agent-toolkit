@@ -211,6 +211,8 @@ For distributed or replicated data, consider when relevant:
 
 A storage type such as `datetime` or `decimal` is not a complete data requirement.
 
+For a collection-access need, elicit only material consumer guarantees: sequential versus random page access; expected cardinality and mutation frequency; filtering, ordering, projection and authorization; completeness/snapshot versus best-effort traversal; consistency, latency and export limits. Record observable needs and uncertainty **without prescribing** offset, keyset, cursor, OData or a query language unless a supported constraint requires one. Design owns the selection and trade-offs.
+
 ## Quality Requirements
 
 * Capture quality concerns as contextualized goals rather than vague adjectives.
