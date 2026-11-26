@@ -46,7 +46,7 @@ A verified remote PR result containing:
 * repository and verified head/base;
 * title and description used;
 * draft/ready state;
-* independent review verdict, identity/coverage, and applicable test/lint evidence;
+* Code Review verdict and profile (`advisory` or `gate`), target/coverage, provenance, and applicable test/lint evidence;
 * preparation and verification summary;
 * relevant limitations, dependencies, and follow-up work.
 

@@ -332,6 +332,38 @@ class ToolkitLintTests(unittest.TestCase):
         )
         self.assert_error("missing ownership entry for contracts/review-evidence.md")
 
+    def test_command_dependency_in_skill_workflow_is_rejected(self):
+        self.change(
+            "contexts/git/skills/manage-pull-request/SKILL.md",
+            "## Workflow",
+            "## Workflow\n\nRoute \x60/review/review-code\x60 to satisfy the gate.",
+        )
+        self.assert_error("forbidden internal dependency on Command /review/review-code")
+
+    def test_command_dependency_in_rule_body_is_rejected(self):
+        self.change(
+            "contexts/git/rules/pull-request.md",
+            "## Pre-Creation Quality Gate",
+            "## Pre-Creation Quality Gate\n\nInvoke \x60/review/review-code\x60 directly.",
+        )
+        self.assert_error("forbidden internal dependency on Command /review/review-code")
+
+    def test_ordinary_path_or_url_does_not_create_command_dependency(self):
+        self.change(
+            "contexts/git/skills/manage-pull-request/SKILL.md",
+            "## Workflow",
+            "## Workflow\n\nReference \x60contexts/review/commands/review-code.md\x60 only as a source.",
+        )
+        self.assertEqual([], lint_toolkit(self.root))
+
+    def test_independent_verdict_label_is_rejected_for_advisory_pr(self):
+        self.change(
+            "contexts/git/commands/create-pull-request.md",
+            "## Output",
+            "## Output\n\n* independent review verdict;",
+        )
+        self.assert_error("advisory Code Review cannot be called independent")
+
     def test_cycle_between_skills(self):
         self.change(
             "contexts/requirements/skills/example-discovery/SKILL.md",

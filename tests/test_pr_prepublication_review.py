@@ -26,8 +26,8 @@ class PrPrepublicationReviewTests(unittest.TestCase):
             "exact intended head/base",
             "Missing, failed, incomplete, stale or uncorroborated evidence blocks remote creation",
             "Do not publish a Draft to bypass",
-            "same explicit PR-creation request authorizes initiating",
-            "read-only `/review/review-code`",
+            "same explicit PR-creation request authorizes requesting",
+            "read-only Review evaluation",
             "Local preparation is allowed without this floor",
         ):
             with self.subTest(expected=expected):
@@ -41,10 +41,11 @@ class PrPrepublicationReviewTests(unittest.TestCase):
         self.assertIn("Before creating either a ready PR or a Draft", command)
         self.assertIn("without a second authorization", command)
         self.assertIn('Verify --> ReviewCheck', workflow)
-        self.assertIn('ReviewCheck -->|Missing or stale| RequestReview["Review: invoke read-only /review/review-code advisory"]', workflow)
+        self.assertIn('ReviewCheck -->|Missing or stale| RequestReview["Review: request read-only Review-owned evaluation (advisory)"]', workflow)
         self.assertIn('ReviewCheck -->|FAIL or unresolved INCOMPLETE| ReviewGap', workflow)
         self.assertNotIn('ReviewCheck -->|FAIL or unresolved INCOMPLETE| ReviewGap[', workflow)
-        self.assertIn('/review/review-code advisory', workflow)
+        self.assertNotIn('/review/review-code', workflow)
+        self.assertIn('Review-owned evaluation', workflow)
         self.assertIn('RequestReview --> ReviewResult', workflow)
         self.assertIn('ReviewResult -->|No or unavailable| ReviewGap', workflow)
         self.assertIn('ReviewGap -->|create| Blocked', workflow)

@@ -1,10 +1,10 @@
 # Review Command Runtime Integration
 
-The canonical `/review/review-code` Command MUST prepare the review context **before inspecting or reviewing changes**. The executable reference integration is `adapters/review/run_review.py`, which invokes `adapters/review/prepare_context.py` and dispatches the resulting JSON context to the approved host reviewer through **stdin**. It never runs a model on its own or grants remote PR approval.
+Every Review execution must establish the host-neutral target and complete Git inventory **before analysis**, under `contexts/review/rules/code-review.md`. The optional executable reference integration is `adapters/review/run_review.py`, which calls `adapters/review/prepare_context.py` and sends its context to an approved host reviewer through **stdin**. The wrapper never runs a model itself or grants PR approval.
 
 ## Configure the host runtime
 
-Map the host's `/review/review-code` entrypoint to the following (the command after `--` must be an authorized, independent host reviewer that reads the JSON context from stdin and writes review-evidence JSON to stdout):
+An authorized host may map its Review entry point to the reference runner below (the executable after `--` must be an approved reviewer that reads JSON context from stdin and returns review-evidence JSON on stdout). This integration does not, by itself, establish reviewer independence:
 
 ```bash
 python3 /path/to/agent-toolkit/adapters/review/run_review.py \
@@ -20,7 +20,7 @@ python3 /path/to/agent-toolkit/adapters/review/run_review.py \
   -- /path/to/approved-reviewer [reviewer-args]
 ```
 
-`/review/review-code` is **canonical Markdown**, not an executable slash-command binding by itself. A Cursor/Claude/other host must map the command to this runner or implement the same required preflight in its own adapter. A host that does not invoke the runner cannot claim it enforced OCR-first ordering.
+The logical `/review/review-code` Command is **canonical Markdown**, not a guaranteed host slash-command binding. Hosts may invoke this optional runner or implement the same mandatory preflight natively. A host that did not actually perform OCR-first preparation must not claim that it did; native review remains valid when the optional helper is absent.
 
 ## Deterministic execution matrix
 
@@ -141,7 +141,7 @@ and cannot be promoted to gate. A ready PR may record them as
 `review_profile=advisory`. For a gate attempt, prepare with
 `--review-profile gate` and supply separately independent reviewer
 evidence. The optional GitHub wrapper requires signed `review_profile=gate`
-before it creates a PR that claims the gate.
+for **every remote PR it creates, ready or Draft**, even when the description does not claim a gate. This stronger adapter policy does not replace the canonical advisory publication floor for other appropriately controlled hosts.
 New optional finding fields are calibrated by `contexts/review/rules/code-review.md`;
 the high-risk pattern prompts in `contexts/review/rules/high-risk-patterns.md`
 do not themselves prove a defect.

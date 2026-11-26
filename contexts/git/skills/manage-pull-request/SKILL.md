@@ -55,7 +55,7 @@ Maintain, when relevant:
 * review-relevant size and complexity signals;
 * applicable PR template and contribution instructions;
 * per-check quality-gate inventory, effective hooks/CI, code identity, observed evidence and missing explicit executions (tests, lint, coverage when established);
-* independent code-review verdict, review target identity and coverage, and known gaps;
+* Code Review verdict and profile (`advisory` or `gate`), target identity and coverage, and known gaps;
 * title and description;
 * readiness: `ready`, `draft`, or `blocked`;
 * remote PR identity and verified state after creation.
@@ -86,7 +86,7 @@ flowchart TD
 
     Verify --> ReviewCheck{"Code Review PASS with full coverage for exact head/base?"}
     ReviewCheck -->|Yes, current evidence| SelectTemplate
-    ReviewCheck -->|Missing or stale| RequestReview["Review: invoke read-only /review/review-code advisory"]
+    ReviewCheck -->|Missing or stale| RequestReview["Review: request read-only Review-owned evaluation (advisory)"]
     ReviewCheck -->|FAIL or unresolved INCOMPLETE| ReviewGap
     RequestReview --> ReviewResult{"Actual Review PASS and complete for final head/base?"}
     ReviewResult -->|Yes| SelectTemplate
@@ -126,7 +126,7 @@ flowchart TD
     Blocked --> Done
 ```
 
-The diagram is the procedure. Apply the rule section named on each decision node. Do not restate it. In both `prepare` and `create` modes, check the final PR diff for existing Code Review evidence; if missing or stale, route an authorized read-only `/review/review-code` execution with `review_profile=advisory`. Git consumes the resulting evidence and must not claim that its own inspection is Review. If Review or required tests/lint fail, `prepare` may return a local Draft, but `create` blocks publication regardless of `--draft`. A confirmed Review `FAIL` or unresolved material `INCOMPLETE` must be routed to its responsible correction owner; do not repeat unchanged Review merely to seek a different verdict. For existing diffs, assess decomposition in `prepare` without claiming that pre-implementation planning occurred. A scoped request for one increment does not authorize implementing the entire roadmap.
+The diagram is the procedure. Apply the rule section named on each decision node. Do not restate it. In both `prepare` and `create` modes, check the final PR diff for existing Code Review evidence; if missing or stale, request an authorized read-only Review through its owning `contexts/review/skills/review-change/SKILL.md` (or equivalent host capability) with `review_profile=advisory`. Git consumes the resulting evidence and must not claim that its own inspection is Review. If Review or required tests/lint fail, `prepare` may return a local Draft, but `create` blocks publication regardless of `--draft`. A confirmed Review `FAIL` or unresolved material `INCOMPLETE` must be routed to its responsible correction owner; do not repeat unchanged Review merely to seek a different verdict. For existing diffs, assess decomposition in `prepare` without claiming that pre-implementation planning occurred. A scoped request for one increment does not authorize implementing the entire roadmap.
 
 ## Decomposition Signals
 
@@ -156,7 +156,7 @@ Produce:
 * applicable template source or fallback decision;
 * proposed title;
 * complete PR description;
-* observed tests, lint, independent review verdict/coverage/identity, and limitations;
+* observed tests, lint, Code Review verdict/profile, target, coverage, provenance, and limitations;
 * material risks, dependencies, and remaining work.
 
 ### Create mode
@@ -167,7 +167,7 @@ Produce:
 * verified head/base;
 * verified draft/ready state;
 * title and description used;
-* preparation/verification summary including evidence origins, exact revision/scope, pre-creation independent review, tests, lint and established coverage;
+* preparation/verification summary including evidence origins, exact revision/scope, pre-creation Code Review verdict/profile, tests, lint and established coverage;
 * any remaining limitations or follow-up work.
 
 ## Boundaries

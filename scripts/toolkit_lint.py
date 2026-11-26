@@ -326,6 +326,29 @@ def lint_toolkit(root: Path) -> list[str]:
                 if target != rel and classify(Path(target)) == ("Skill", context):
                     skill_graph.setdefault(rel, set()).add(target)
 
+        if kind in ("Rule", "Skill"):
+            # Commands are public invocation entry points, not dependencies of
+            # Rules or Skills. Scan the *entire* body, not only ## Uses.
+            # Match only actual canonical aliases, not URLs or filesystem paths.
+            command_aliases = {
+                f"/{PurePosixPath(target).parts[1]}/{PurePosixPath(target).stem}"
+                for target, (target_kind, _) in discovered.items()
+                if target_kind == "Command"
+            }
+            slash_refs = re.findall(
+                r"(?<![A-Za-z0-9_./-])/[a-z][a-z0-9-]*/[a-z][a-z0-9-]*(?![A-Za-z0-9_/-])",
+                content,
+            )
+            for invocation in set(slash_refs) & command_aliases:
+                errors.append(f"{rel}: forbidden internal dependency on Command {invocation}")
+
+        if rel in (
+            "contexts/git/skills/manage-pull-request/SKILL.md",
+            "contexts/git/commands/create-pull-request.md",
+        ):
+            if re.search(r"(?i)\bindependent\s+(?:code[- ]review|review)\s+(?:verdict|record|evidence)", content):
+                errors.append(f"{rel}: advisory Code Review cannot be called independent")
+
         uses = section(content, "Uses")
         for target in PATH_REF.findall(uses):
             target_info = discovered.get(target)
