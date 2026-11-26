@@ -32,7 +32,7 @@ class RefactoringDiscoveryDesignTests(unittest.TestCase):
         skill = read("contexts/design/skills/design-solution/SKILL.md")
         self.assertIn("## Refactoring Strategy Selection", design)
         self.assertIn("information leakage", design)
-        self.assertIn("do not confer mutation or requirements authority", design)
+        self.assertIn("does not confer mutation or requirements authority", design)
         self.assertIn("references/refactoring-options.md", skill)
 
     def test_reference_preserves_modernization_risk(self):
