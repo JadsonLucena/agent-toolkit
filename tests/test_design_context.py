@@ -28,6 +28,17 @@ class DesignContextTests(unittest.TestCase):
         self.assertIn("A design alternative is not a business requirement", contract)
         self.assertIn("source_baseline_ref", contract)
 
+    def test_http_guidance_is_conditional_and_not_a_new_contract(self):
+        rule = doc("contexts/design/rules/design.md")
+        skill = doc("contexts/design/skills/design-solution/SKILL.md")
+        reference = doc("contexts/design/skills/design-solution/references/http-api-design.md")
+        self.assertIn("When a slice creates or changes an HTTP API", rule)
+        self.assertIn("For an HTTP API contract or behavioral change", skill)
+        self.assertIn("RFC 9110", reference)
+        self.assertIn("RFC 9111", reference)
+        self.assertIn("not an automatic requirement", reference)
+        self.assertIn("contracts/design-evidence.md", skill)
+
     def test_architecture_and_linter_register_context(self):
         arch = doc("ARCHITECTURE.md")
         lint = doc("scripts/toolkit_lint.py")
