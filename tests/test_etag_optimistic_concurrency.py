@@ -31,7 +31,7 @@ class OptimisticConcurrencyTests(unittest.TestCase):
         review = read("contexts/review/skills/review-change/references/http-api-review.md")
         implementation = read("contexts/implementation/skills/implement-slice/SKILL.md")
         self.assertIn("two concurrent writers", test_rule)
-        self.assertIn("time-of-check", review.lower() + " time-of-check")
+        self.assertIn("Two writers pass a non-atomic", review)
         self.assertIn("non-atomic", review)
         self.assertIn("atomic", implementation)
         self.assertIn("outbox", implementation)
