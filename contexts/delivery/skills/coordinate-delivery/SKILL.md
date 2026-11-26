@@ -9,6 +9,11 @@ description: "Coordinate a software increment end-to-end from requirements throu
 
 Carry a change toward the explicitly authorized target stage, selecting only the required specialist capabilities and preserving decisions and evidence across handoffs.
 
+## Authority and source-loading boundary
+
+- An end-to-end target is not blanket mutation authority. Scoped implementation may permit verified local commits; **an explicit PR-creation request permits only the necessary first non-force publication of its exact unpublished topic branch** under Git's policy. A target stage or implementation alone does not authorize push. Existing remote updates, merge, release and deployment remain separate decisions.
+- Before delegating a material action, retrieve the **next owner's applicable canonical Rule and procedure** if they are not already verified in the active context. Do not substitute a coordinator's summary or the model's prior knowledge for an unread gate. Load only what the next decision needs.
+
 ## Uses
 
 * Rule: `contexts/delivery/rules/delivery.md`
@@ -69,7 +74,7 @@ flowchart TD
 
 The main diagram deliberately omits specialist-internal transitions. Route planned to Requirements, designed to Design, implemented to Implementation, reviewed to Code Review after applicable verification through Testing or authorized checks, and pr-prepared, pr-created or integrated through Git-owned preparation, publication and integration handoffs below. These routes do **not** grant additional permissions or allow a later-stage claim without its own evidence.
 
-This workflow routes existing specialists without replacing their procedures or gates. Requirements owns elicitation, validation, and backlog; Implementation owns test-first TDD as the preferred strategy for testable behavior (with justified exceptions) and atomic Git commit handoffs; Review retains the sole technical verdict; Git owns PR planning, preparation, creation, and merge. Use `/requirements/specify-and-plan-change` for Requirements composition. Verify the entry point exists before routing; do not assume an uninstalled host command or alias. This is a Requirements-only command, not an end-to-end delivery entry point. Routing grants no new permissions and implies no tool execution.
+This workflow routes existing specialists without replacing their procedures or gates. Requirements owns elicitation, validation, and backlog; Implementation owns test-first TDD as the preferred strategy for testable behavior (with justified exceptions) and atomic Git commit handoffs; Review retains the sole technical verdict; Git owns PR planning, preparation, creation, and merge. Route Requirements composition to the Requirements owner using the applicable canonical Requirements Skills. The logical Requirements Command is a user entry point, not an internal dependency or an assumed host alias. Verify the selected capabilities are available rather than relying on an uninstalled command. Routing grants no new permissions and implies no tool execution.
 
 Debugging is a cross-context **conditional evidence-producing capability**, not a mandatory Delivery stage. If observed technical failure blocks a requested authorized stage, Delivery may route an explicitly scoped, read-only investigation and consume the resulting `contracts/debugging-evidence.md`, checking source identity and diagnosis limits. Any subsequent correction remains separately authorized and Implementation-owned; stakeholder semantics, architecture, tests and Review verdicts retain their owners.
 
@@ -81,13 +86,13 @@ Debugging is a cross-context **conditional evidence-producing capability**, not 
 
 * Before any implementation mutation of a composite initiative, request Git's read-only `plan` via `contexts/git/skills/manage-pull-request/SKILL.md` unless the PR Boundary is already current. Pass the resulting scope, base and dependencies to Implementation without expanding authorization.
 * During Implementation, resolve local-commit permission from scoped implementation authority and caller/repository restrictions, then pass the effective permission to Git and await its actual verified commit SHA or explicit blocked/uncommitted state. A plan's silence is not a commit prohibition, but a target stage alone grants no mutation authority. A requested commit or passing check alone never establishes commit success.
-* After Implementation, use Code Review and the Git `prepare` operation as separate stages. `create`, push, merge, release and deployment require separate permissions.
+* After Implementation, use Code Review and the Git `prepare` operation as separate stages. A separately authorized `create` request may include only Git's bounded first-time source-branch publication; updating published refs, merge, release and deployment require separate permissions.
 
 ## Integration Handoffs
 
 * After Implementation, route final code/commit identity and verification evidence into Integration; collect missing authorized tests/lint with their actual execution scope, then request Code Review through Review's existing capability. Review owns the single verdict; the Git PR readiness rule decides which evidence permits a ready PR.
 * An advisory `PASS` on the current intended head/base permits Git `prepare` for ready status when other checks pass. On `FAIL`, `INCOMPLETE`, or stale evidence, route correctable work to its owner and reverify affected outputs; a local Draft preparation may record gaps, but **no remote PR (including Draft)** is published until the required review and checks pass.
-* Git owns PR `prepare` and separately authorized `create`. A request for `pr-prepared` stops before publication; a request for `pr-created` stops after verifying the remote PR. **Before `create`, Git verifies the intended source branch exists on the correct remote at the exact reviewed head and confirms the intended base.** If unpublished, stop and report the blocker unless push was **separately authorized**; only Git may perform that push, and remote identity must be reverified before creation. Never infer push from create authorization or merge from a created PR.
+* Git owns PR `prepare` and separately authorized `create`. A request for `pr-prepared` stops before publication; a request for `pr-created` stops after verifying the remote PR. **Before `create`, Git verifies the intended source branch exists on the correct remote at the exact reviewed head and confirms the intended base.** If unpublished, Git may perform only the necessary initial non-force branch publication permitted by the explicit PR request, subject to repository policy, no-push restrictions and exact destination-ref absence. If any condition is unmet, stop and report the blocker; always reverify remote identity before creation. Never infer updates to existing remote branches, force-push or merge from PR creation.
 * For an **existing published PR**, check its current remote head/base and pre-PR review/check evidence. If stale, revalidate through the same verification and Review owners, but **resume the existing PR** instead of routing to another `create`. Never implicitly convert an existing Draft to ready, and do not claim that a fresh Review authorizes its remote status change. A correctable defect returns to its owner; unverified readiness remains explicitly pending.
 * After creation or resumption of an existing PR, collect actual post-PR checks and required approvals for the current PR head/base. If code changes, return affected work to Implementation and revalidate necessary checks and Code Review. Confirm **separate merge authorization** after technical prerequisites, then merge only through the Git owner when repository protections are satisfied and verify the resulting target branch before reporting `integrated`.
 * Evaluate Product Slice-wide technical completeness after an observed merge **only when applicable**. A safe merged Architectural Slice/PR is still a valid integration result even when a broader Product Slice is incomplete or cannot yet be verified.
@@ -118,7 +123,7 @@ Report the actual reached stage, per-slice completed and blocked work, applicabl
 
 ## Boundary
 
-Never silently expand scope, execute an unapproved mutation, promote self-review to independent gate, replay unsafe side effects, push, create/merge PRs, deploy, release or claim operational effectiveness without corresponding explicit authorization/evidence.
+Never silently expand scope, execute an unapproved mutation, promote self-review to independent gate, replay unsafe side effects, publish branches beyond Git's defined first-publication scope, create/merge PRs, deploy, release or claim operational effectiveness without corresponding authorization and evidence.
 
 ## Stop Conditions
 

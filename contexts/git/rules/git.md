@@ -135,6 +135,9 @@ alwaysApply: false
 ## Remote Operations
 
 * Verify the destination remote, ref, upstream relationship, and intended update before pushing.
+* For an explicitly authorized PR creation, Git may publish **only the previously unpublished, in-scope topic branch** to the intended authorized hosting remote when needed for that PR. This is a bounded initial branch-creation effect, not permission to update an existing remote ref, change the destination, push unrelated commits, force-update a branch, publish a tag or merge.
+* Before first publication, verify the exact local head SHA and intended base, remote and permissions, repository branch policy (including protected/default refs), absence of the exact remote source ref, and any explicit no-push restriction. Run relevant safe local checks before this external effect; pre-PR checks/review remain mandatory at creation, and completed push CI may support that decision only after it actually runs on the published SHA. After publishing, independently confirm the exact remote source SHA and reconcile any changed state.
+* If the ref already exists but differs from the intended head, or the remote/ref is ambiguous, do not convert publication authority into an update or force-push. Stop and require the appropriate additional authorization. A PR target stage alone, read-only PR planning/preparation or an implementation request does not authorize publication.
 * Do not use an unconditional force push to rewrite shared or published history.
 * Rewrite a published remote ref only when the rewrite is explicitly authorized, repository policy permits it, and the expected remote state has been established.
 * Before an authorized force update, refresh or otherwise inspect the remote ref and determine the exact remote state that the update is allowed to replace.

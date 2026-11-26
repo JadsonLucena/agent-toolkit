@@ -44,6 +44,10 @@ observed in Cursor.
 
 If Rule activation, path resolution, dispatch, or authorization fails, report that component as **unverified/incomplete**, not as working. This repository's structural lint cannot test Cursor model behavior, runtime activation or tool permissions.
 
+## Remote-operation enforcement (optional)
+
+A Cursor `beforeShellExecution` or `beforeMCPExecution` hook can provide **defense in depth** when deployed under a protected host configuration. [Cursor's Hooks documentation](https://cursor.com/docs/hooks) documents the permission response and `failClosed: true` behavior; without fail-closed configuration some hook failures may permit execution. A string-matching shell hook cannot prove user authorization or intercept every alternate GitHub client. Do not silently install a permissive or bypassable hook as a security guarantee. Use host-enforced, operation-specific tool permissions and test the actual host behavior with disposable remotes (see [DL-51](../evals/delivery/README.md)). None of these safeguards are installed by this plugin.
+
 ## Validation
 
 ```sh

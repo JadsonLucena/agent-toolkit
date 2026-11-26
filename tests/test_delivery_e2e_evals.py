@@ -12,9 +12,9 @@ from requirements_evals import load_catalog, evaluate  # noqa: E402
 class DeliveryE2EEvalsTests(unittest.TestCase):
     def test_cases_are_valid_and_target_delivery(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
-        self.assertEqual(50, len(cat["cases"]))
+        self.assertEqual(51, len(cat["cases"]))
         self.assertTrue(all(x["command"] in {"/delivery/deliver-change", "/implementation/implement-slice", "/git/create-pull-request"} for x in cat["cases"]))
-        self.assertEqual({f"DL-{i:02d}" for i in range(11, 51)},
+        self.assertEqual({f"DL-{i:02d}" for i in range(11, 52)},
                          {x["id"] for x in cat["cases"] if int(x["id"].split("-")[1]) >= 11})
         self.assertEqual(len(cat["cases"]), len(set(x["id"] for x in cat["cases"])))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
@@ -53,6 +53,22 @@ class DeliveryE2EEvalsTests(unittest.TestCase):
                 expected = "absence" if check["criterion"].startswith("Does not") else "presence"
                 with self.subTest(case=case["id"], check=check["id"]):
                     self.assertEqual(expected, check["mode"])
+
+    def test_natural_language_explicit_pr_request_allows_scoped_first_publication(self):
+        cat = load_catalog(ROOT / "evals/delivery/cases.json")
+        case = next(x for x in cat["cases"] if x["id"] == "DL-51")
+        self.assertEqual("/delivery/deliver-change", case["command"])
+        self.assertIn("gh CLI", case["input"])
+        self.assertIn("the user explicitly requests", case["input"])
+        self.assertEqual(["presence", "presence", "absence"],
+                         [check["mode"] for check in case["checks"]])
+        self.assertIn("Does not ask for a redundant second push authorization", case["checks"][2]["criterion"])
+
+    def test_explicit_no_push_request_remains_blocked(self):
+        cat = load_catalog(ROOT / "evals/delivery/cases.json")
+        case = next(x for x in cat["cases"] if x["id"] == "DL-29")
+        self.assertIn("explicitly does not authorize push", case["input"])
+        self.assertIn("Does not push the branch", case["checks"][2]["criterion"])
 
     def test_unpublished_branch_case_protects_remote_creation(self):
         cat = load_catalog(ROOT / "evals/delivery/cases.json")
