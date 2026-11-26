@@ -30,11 +30,13 @@ class GateError(Exception):
     """A required pre-creation decision could not be verified."""
 
 
-def invoke(argv: list[str], repo: Path, timeout: int = 300) -> str:
+def invoke(
+    argv: list[str], repo: Path, timeout: int = 300, *, env: dict[str, str] | None = None,
+) -> str:
     try:
         result = subprocess.run(
             argv, cwd=repo, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, timeout=timeout, check=False,
+            stderr=subprocess.PIPE, timeout=timeout, check=False, env=env,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise GateError(f"{argv[0]} unavailable or timed out: {type(exc).__name__}") from exc
@@ -298,10 +300,17 @@ def recheck_checkout(
 
 
 def run_checks(state: dict[str, Any], timeout: int) -> list[str]:
-    completed = []
-    for name, argv in state["checks"].items():
-        invoke(argv, state["repo"], timeout)
-        completed.append(name)
+    """Execute trusted check commands without inheriting credential-bearing host env."""
+    safe_names = ("PATH", "LANG", "LC_ALL", "LC_CTYPE", "TZ", "CI", "SYSTEMROOT", "SystemRoot", "WINDIR")
+    with tempfile.TemporaryDirectory(prefix="agent-toolkit-check-home-") as home:
+        env = {name: os.environ[name] for name in safe_names if name in os.environ}
+        env["HOME"] = home
+        env["XDG_CONFIG_HOME"] = home
+        env["XDG_CACHE_HOME"] = home
+        completed = []
+        for name, argv in state["checks"].items():
+            invoke(argv, state["repo"], timeout, env=env)
+            completed.append(name)
     return completed
 
 

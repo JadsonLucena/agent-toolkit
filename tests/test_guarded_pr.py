@@ -215,6 +215,29 @@ class GuardedPRTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.GateError, "outside the target"):
             gate.guard(self.repo, "main", "feature", self.evidence, self.signature, local)
 
+    def test_trusted_checks_do_not_inherit_host_credentials(self):
+        script = (
+            "import os; "
+            "assert 'GH_TOKEN' not in os.environ; "
+            "assert 'AWS_SECRET_ACCESS_KEY' not in os.environ; "
+            "assert 'GITHUB_TOKEN' not in os.environ; "
+            "assert 'PATH' in os.environ; "
+            "assert os.path.isdir(os.environ['HOME']); "
+            "assert os.environ['HOME'] != os.environ.get('ORIGINAL_HOME')"
+        )
+        self.write_policy(checks={
+            "lint": [sys.executable, "-c", script],
+            "tests": [sys.executable, "-c", script],
+        })
+        with patch.dict(os.environ, {
+            "GH_TOKEN": "private-test-value",
+            "GITHUB_TOKEN": "another-private-test-value",
+            "AWS_SECRET_ACCESS_KEY": "test-secret",
+            "ORIGINAL_HOME": os.environ.get("HOME", ""),
+        }):
+            outcome = self.preflight()
+        self.assertEqual({"lint", "tests"}, set(outcome["checks_passed"]))
+
     def test_failed_lint_blocks(self):
         self.write_policy(fail="lint")
         with self.assertRaisesRegex(gate.GateError, "failed"):
@@ -323,7 +346,7 @@ class GuardedPRTests(unittest.TestCase):
         seen = []
         original = gate.invoke
 
-        def intercepted(argv, cwd, timeout=300):
+        def intercepted(argv, cwd, timeout=300, *, env=None):
             if argv[:3] == ["gh", "pr", "create"]:
                 seen.append("create")
                 if commands is not None:
@@ -339,7 +362,7 @@ class GuardedPRTests(unittest.TestCase):
                     "head": {"sha": self.base if wrong_head else self.head,
                              "ref": "feature", "repo": {"full_name": "org/repo"}},
                 })
-            return original(argv, cwd, timeout)
+            return original(argv, cwd, timeout, env=env)
         return seen, intercepted
 
     def cli(self, *extra):
