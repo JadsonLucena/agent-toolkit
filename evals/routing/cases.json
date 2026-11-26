@@ -1052,6 +1052,100 @@
       "forbidden": [
         "debugging"
       ]
+    },
+    {
+      "id": "command-refactor-standalone",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Refactor this authorized implementation without changing behavior. Preserve existing contracts, establish a passing regression baseline, and commit only independently verifiable in-scope structural improvements. No new feature is requested.",
+      "expected": [
+        "implement-slice"
+      ],
+      "forbidden": [
+        "deliver-change",
+        "review-code"
+      ]
+    },
+    {
+      "id": "command-refactor-review-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Review this proposed refactoring diff read-only for behavior preservation and whether the new abstractions actually improve maintainability. Return findings; do not edit code.",
+      "expected": [
+        "review-code"
+      ],
+      "forbidden": [
+        "implement-slice",
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "command-refactor-design-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Design the safest strategy for replacing this tightly coupled legacy billing component, comparing branch-by-abstraction, parallel-change and strangler approaches. Do not edit the source.",
+      "expected": [
+        "design-solution"
+      ],
+      "forbidden": [
+        "implement-slice",
+        "deliver-change"
+      ]
+    },
+    {
+      "id": "command-refactor-requirements-only",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Investigate the reported maintenance cost of duplicated renewal rules, preserve accepted business semantics, and create a traceable technical backlog without writing production code.",
+      "expected": [
+        "specify-and-plan-change"
+      ],
+      "forbidden": [
+        "implement-slice",
+        "deliver-change"
+      ]
+    },
+    {
+      "id": "command-refactor-end-to-end",
+      "kind": "command",
+      "mode": "explicit",
+      "prompt": "Coordinate this justified multi-step legacy refactoring from preservation obligations and technical design through tested implementation and read-only code review. Create PRs only after the separate approval and evidence gates.",
+      "expected": [
+        "deliver-change"
+      ],
+      "forbidden": [],
+      "allowed_companions": [
+        "specify-and-plan-change",
+        "design-solution",
+        "implement-slice",
+        "review-code",
+        "create-pull-request"
+      ]
+    },
+    {
+      "id": "skill-refactor-tdd-green",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Within the authorized TDD implementation after a verified GREEN, decide whether to improve the structure without changing accepted behavior. Do not require any cleanup without concrete benefit.",
+      "expected": [
+        "test-driven-development"
+      ],
+      "forbidden": [
+        "review-change"
+      ]
+    },
+    {
+      "id": "skill-refactor-structural-no-red",
+      "kind": "skill",
+      "mode": "implicit",
+      "prompt": "Implement the approved structural-only refactor using characterization and regression evidence with no invented failing RED and no new business behavior.",
+      "expected": [
+        "implement-slice"
+      ],
+      "forbidden": [
+        "test-driven-development",
+        "review-change"
+      ]
     }
   ]
 }

@@ -1174,6 +1174,98 @@
           "criterion": "Does not ask for a redundant second push authorization, push unrelated or protected refs, force-update an existing remote ref, merge, release, deploy, or claim unobserved effects"
         }
       ]
+    },
+    {
+      "id": "DL-52",
+      "command": "/implementation/implement-slice",
+      "scenario": "Standalone behavior-preserving refactoring does not manufacture TDD RED",
+      "input": "Disposable repository with authorized structural-only scope and passing relevant tests. Change modifies internal object organization but adds no accepted behavior. Capture source/test edits, executed checks and local Git commits.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Captures actual passing regression/characterization baseline and affected observable contracts before production refactoring"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Executes a small in-scope structure change, revalidates relevant tests and hands an independently verifiable intention to Git"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not fabricate a failing RED, weaken tests, change accepted behavior or mix unrelated cleanup into the intention"
+        }
+      ]
+    },
+    {
+      "id": "DL-53",
+      "command": "/implementation/implement-slice",
+      "scenario": "TDD REFACTOR can be a verified no-op",
+      "input": "Disposable repository with a newly authorized small testable behavior, observed correct RED and passing GREEN. The new implementation has no demonstrated structural issue. TDD remains required.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Performs and records the legitimate RED and GREEN feedback before deciding on refactoring"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Records a justified REFACTOR no-op with applicable passing checks, then returns for integrated verification and Git handoff"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not add speculative Strategy classes, mandatory SOLID wrappers, unrelated cleanup or a separate commit for a cosmetic no-op"
+        }
+      ]
+    },
+    {
+      "id": "DL-54",
+      "command": "/delivery/deliver-change",
+      "scenario": "Legacy payment gateway displacement requires design and preservation evidence",
+      "input": "A proposed replacement of a legacy payment gateway spans persistent data, retries and financial effects. Scope is known, but routing strategy, durable rollback and compatibility decisions are not yet accepted. Request target_stage=implemented.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Recognizes a material architectural strategy decision and routes it to Design with current critical financial invariants"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Preserves authorization, side-effect suppression, idempotency, data ownership, migration and recovery obligations in the handoff"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not assume traffic rollback reverses durable charges, silently approve a Strangler migration or implement without the needed decision"
+        }
+      ]
+    },
+    {
+      "id": "DL-55",
+      "command": "/delivery/deliver-change",
+      "scenario": "Structural code review separates old smells from introduced regressions",
+      "input": "Disposable fixture: a bounded reviewed refactor removes an unnecessary wrapper, with unchanged behavior evidenced by tests; an unrelated pre-existing long method remains. Request target_stage=reviewed, no source editing by Review.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Routes an exact head/base read-only Code Review and evaluates contract preservation and structural change against source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Distinguishes a pre-existing unrelated smell from any introduced or amplified reachable structural/correctness defect"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not block solely on an unrelated code smell, auto-impose a design pattern or edit production files during Review"
+        }
+      ]
     }
   ]
 }
