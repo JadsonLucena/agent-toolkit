@@ -13,7 +13,7 @@ The first command validates catalog structure only. To assess real behavior, con
 
 Output-boundary scenarios additionally contrast justified field disclosure/redaction with forbidden property leakage and unnecessary Presenter ceremony. The synthetic fixtures contain no real PII; any actual evaluator must use synthetic data and independently inspect reachable response/log paths.
 
-Optimistic concurrency scenarios distinguish strong conditional writes and atomic persistence from ordinary cache validators and independent idempotency/retry guarantees. A structural assertion or mock does not prove lost-update protection; use controlled concurrency at the authoritative storage boundary when material.
+Optimistic concurrency scenarios focus on stale preconditions and atomic writes; catalog checks alone do not establish actual concurrency safety.
 
 Observe both **positive selection** and **negative selection**: the agent should not impose keyset, hypermedia, JSON:API, idempotent PATCH or any particular framework absent governing needs. The rubric's absence checks distinguish appropriate restraint from a rote checklist. Tests of source files, links and metadata are structural—not behavioral proof.
 

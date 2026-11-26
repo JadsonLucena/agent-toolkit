@@ -16,9 +16,7 @@ Use only when the frozen diff actually affects an HTTP API, its contract, or rea
 | Unsafe GET | GET, link prefetch or cache invokes requested cancellation/refund/state change | Actual handler and side effects |
 | Method/idempotency mismatch | Retry or concurrency of a PATCH/POST produces undesired duplicate effects; PUT is implemented as arbitrary patch | Method intent, retry path, storage/provider boundary |
 | Incorrect status/representation | Async 202 claims completion; 200 masks failure; 401/403 are inverted; 201 creation omits contractually required Location | Response paths and accepted API contract |
-| ETag/concurrency | Two writers pass a non-atomic `SELECT` version check; stale or weak `If-Match` allows lost update; `If-Match: *` is mistaken for freshness | Selected representation validator, authoritative transactional write/compare-and-swap, race fixture |
-| ETag/HTTP semantics | `If-None-Match` cache revalidation confused with `If-Match` updates; `412`, `428`, `409` misclassified; ETag emitted after transforming a successful PUT representation | RFC 9110/6585, HTTP handler, selected variant, observed responses |
-| ETag versus idempotency | A timeout followed by stale `If-Match` is treated as proof the payment failed or that replay is deduplicated | Operation identity, transaction/outbox/provider evidence, retry trace |
+| ETag/concurrency | Stale or weak `If-Match` bypasses a freshness check, or two writers race between a version read and an unguarded update | Selected representation validator, atomic persistence update, competing-write evidence |
 | Cache and Vary | Shared cache serves another tenant's private data or wrong negotiated representation | Headers, intermediaries, auth and cache config |
 | Pagination drift | Offset yields duplicates/omissions when changed data violates an explicit traversal guarantee | Ordered pages plus insert/delete trace |
 | Invalid keyset | Equal timestamps are skipped; mixed sort or NULL changes predicate; mutable sort key crosses cursor | Order, tie-breaker, predicate, database plan |
