@@ -24,6 +24,14 @@ class OptimisticConcurrencyTests(unittest.TestCase):
         for out_of_scope in ("outbox", "financial deduplication", "PUT response"):
             self.assertNotIn(out_of_scope, section)
 
+    def test_if_none_match_allows_atomic_create_if_absent(self):
+        guide = read("contexts/design/skills/design-solution/references/http-api-design.md")
+        section = guide.split("## Conditional Requests and Optimistic Concurrency", 1)[1].split("\n## ", 1)[0]
+        for expected in ("If-None-Match: *", "create-if-absent", "client-selected URI", "412", "atomically", "cache revalidation"):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, section)
+        self.assertNotIn("not lost-update prevention", section)
+
     def test_lifecycle_preserves_atomicity(self):
         impl = read("contexts/implementation/skills/implement-slice/SKILL.md")
         testing = read("contexts/testing/rules/testing.md")

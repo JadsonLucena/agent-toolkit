@@ -44,7 +44,7 @@ When a supported API contract needs to prevent **lost updates**, a client can se
 
 The validator must reflect the selected **HTTP representation**, not automatically a database/aggregate version. Enforce the check **atomically** with the authoritative state change; reading a version and then running an unconditional update leaves a race. Verify competing writes against the real persistence boundary, not just headers or mocks.
 
-**Scope:** `If-None-Match` is used for cache revalidation, not lost-update prevention; `If-Match` does not provide idempotency or duplicate-effect control. Neither ETag nor conditional writes are universally required. See RFC 9110 and RFC 6585 for the applicable protocol semantics.
+**Scope:** `If-None-Match` supports cache revalidation (`304` for matching GET/HEAD) and, with `If-None-Match: *`, **create-if-absent** writes such as PUT to a client-selected URI (`412` if a current representation exists). Enforce that absence check atomically; unlike `If-Match`, it does not assert freshness of an existing version. Neither precondition supplies idempotency or duplicate-effect control, and neither is universally required. See RFC 9110 §13.1.2 and RFC 6585.
 
 ## Architectural and Contract Design Heuristics
 
