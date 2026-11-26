@@ -38,6 +38,14 @@ Use these as **protocol-grounded questions**, not a catalog of mandatory feature
 | Conditional requests | Validators and preconditions such as ETag, If-Match and If-None-Match have protocol-defined interpretation when used; ETag is **not universally mandatory**. | Could stale updates bypass the expected precondition or a validator misrepresent the chosen representation? |
 | Caching / negotiation | Cache-Control, Vary, Accept and representation metadata have defined semantics when relevant, including authenticated/shared-cache boundaries. | Could an intermediary reuse a private or incompatible representation? |
 
+## Conditional Requests and Optimistic Concurrency
+
+When a supported API contract needs to prevent **lost updates**, a client can send a **strong ETag** obtained from the selected representation in `If-Match` on a write. Apply HTTP strong comparison: weak tags and `If-Match: *` do **not** establish freshness. A failed precondition normally returns `412 Precondition Failed` without applying the change; `428 Precondition Required` is an option when the contract requires a precondition, while `409 Conflict` addresses a distinct domain conflict.
+
+The validator must reflect the selected **HTTP representation**, not automatically a database/aggregate version. Enforce the check **atomically** with the authoritative state change; reading a version and then running an unconditional update leaves a race. Verify competing writes against the real persistence boundary, not just headers or mocks.
+
+**Scope:** `If-None-Match` is used for cache revalidation, not lost-update prevention; `If-Match` does not provide idempotency or duplicate-effect control. Neither ETag nor conditional writes are universally required. See RFC 9110 and RFC 6585 for the applicable protocol semantics.
+
 ## Architectural and Contract Design Heuristics
 
 These concerns are **contextual choices**, not universal RFC obligations or evidence that an API has reached a particular Richardson level.
@@ -65,7 +73,7 @@ Within the existing `contracts/design-evidence.md` semantics, keep only conseque
 
 ## Normative and Interpretive Sources
 
-* [RFC 9110 — HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.html); [RFC 9111 — HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111.html); [RFC 5789 — PATCH](https://www.rfc-editor.org/rfc/rfc5789.html).
+* [RFC 9110 — HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.html) (ETag §8.8.3; If-Match §13.1.1); [RFC 9111 — HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111.html); [RFC 5789 — PATCH](https://www.rfc-editor.org/rfc/rfc5789.html); [RFC 6585 — 428 Precondition Required](https://www.rfc-editor.org/rfc/rfc6585.html#section-3).
 * [RFC 9457 — Problem Details](https://www.rfc-editor.org/rfc/rfc9457.html); [RFC 8288 — Web Linking](https://www.rfc-editor.org/rfc/rfc8288.html); [RFC 9700 — OAuth 2.0 Security BCP](https://www.rfc-editor.org/rfc/rfc9700.html).
 * [Roy Fielding's REST dissertation, chapter 5](https://roy.gbiv.com/pubs/dissertation/rest_arch_style.htm); [Fielding on hypertext](https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven); [Richardson Maturity Model — Martin Fowler](https://martinfowler.com/articles/richardsonMaturityModel.html).
 * [OpenAPI Specification](https://spec.openapis.org/oas/latest.html); [JSON:API](https://jsonapi.org/format/); [OData 4.01](https://docs.oasis-open.org/odata/odata/v4.01/); [Google API Improvement Proposals](https://google.aip.dev/).

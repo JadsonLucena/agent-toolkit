@@ -369,6 +369,52 @@
           "criterion": "Does not edit production behavior or require a particular Presenter implementation"
         }
       ]
+    },
+    {
+      "id": "API-17",
+      "command": "/design/design-solution",
+      "scenario": "ETag precondition protects a mutable API resource",
+      "input": "An accepted PATCH contract uses If-Match to prevent lost updates on a mutable subscription. The underlying entity has version 7. Design the validator and atomic update without mandating a framework.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Selects a strong validator for the HTTP representation rather than assuming an aggregate version is always sufficient"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Specifies stale If-Match handling and a testable atomic write at the authoritative state boundary"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not accept weak validators or If-Match wildcard as freshness proof or impose ETag universally"
+        }
+      ]
+    },
+    {
+      "id": "API-18",
+      "command": "/review/review-code",
+      "scenario": "Non-atomic optimistic concurrency check in persistence",
+      "input": "Frozen diff: PATCH reads entity version 7, compares If-Match, then executes unconditional UPDATE in a later transaction. Two writers can both pass the check. Review this exact change.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies a reachable time-of-check/time-of-use race and concrete lost-update outcome"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Requests authoritative atomic conditional write and an integration counterexample"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not accept ETag header presence or a unit mock as proof of concurrency safety"
+        }
+      ]
     }
   ]
 }

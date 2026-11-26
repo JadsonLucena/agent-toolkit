@@ -78,6 +78,8 @@ Apply the named sections of `contexts/implementation/rules/implementation.md`. W
 
 For a slice that implements or changes an HTTP API, inspect accepted interface/behavior decisions in `contracts/design-evidence.md` and the actual published API/client behavior before the first edit. Preserve selected method and status semantics, representations, error contract, authorization, cache and preconditions, concurrency, retry/idempotency and compatibility **when applicable**. When implementing collection queries, follow the approved filtering, ordering, pagination, projection and cursor guarantees; test observable edge cases such as equal sort keys, replay, changed filters and cross-tenant access as relevant.
 
+When an approved API contract uses `If-Match` to prevent lost updates, enforce its precondition with an **atomic** write at the authoritative state boundary. A separate version read followed by an unconditional update is insufficient; verify the behavior against actual concurrency. Do not equate ETag with idempotency or require it without a supported need.
+
 Do not treat a Design reference as an implementation command or a new acceptance source. If a guarantee is not justified, return a behavioral ambiguity to Requirements or a technical choice to Design. Use the existing TDD and verification flow for supported behaviors, including a production database integration test when index plans or isolation semantics materially determine correctness. A unit mock cannot prove query performance or concurrency guarantees.
 
 ## Protected Output Contract Realization (Conditional)

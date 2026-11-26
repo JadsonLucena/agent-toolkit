@@ -109,6 +109,8 @@ When outward disclosure or transformation is affected, test permitted and forbid
 
 When the changed behavior concerns an HTTP API, select tests from applicable accepted contracts and risks: method safety/idempotency, status and Problem Details semantics, resource/object/property authorization, cache headers and response selection, conditional requests and lost updates, asynchronous transitions, retries/duplicate effects, compatibility and documented media types. Test actual wire-level semantics at an integration/contract boundary when framework behavior matters; do not assert that a header's presence proves the promised effect.
 
+For approved `If-Match` concurrency contracts, check current, stale and weak validators plus competing writes at the authoritative storage boundary. Assert no lost update; a header or unit mock alone does not establish atomicity. Cache revalidation remains a separate concern.
+
 For collection queries, challenge deterministic sorting under equal keys, correct filter/authorization scope **before** pagination, stable continuation semantics under insertion/deletion/update, token tampering or changed criteria, allowed field projection, expansion depth, empty/end pages and page-size limits. An in-memory test cannot establish production index cost, consistent snapshot isolation or access control at a real database boundary. Apply only tests justified by the selected contract and concrete risks; absence of HATEOAS, keyset or a particular JSON format is not itself a failed test.
 
 ## Regression and Characterization

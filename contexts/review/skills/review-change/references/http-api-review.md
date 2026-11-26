@@ -16,7 +16,7 @@ Use only when the frozen diff actually affects an HTTP API, its contract, or rea
 | Unsafe GET | GET, link prefetch or cache invokes requested cancellation/refund/state change | Actual handler and side effects |
 | Method/idempotency mismatch | Retry or concurrency of a PATCH/POST produces undesired duplicate effects; PUT is implemented as arbitrary patch | Method intent, retry path, storage/provider boundary |
 | Incorrect status/representation | Async 202 claims completion; 200 masks failure; 401/403 are inverted; 201 creation omits contractually required Location | Response paths and accepted API contract |
-| ETag/concurrency | Stale If-Match overwrites newer state; a non-atomic version check races | Entity version, transaction atomicity, integration scenario |
+| ETag/concurrency | Stale or weak `If-Match` bypasses a freshness check, or two writers race between a version read and an unguarded update | Selected representation validator, atomic persistence update, competing-write evidence |
 | Cache and Vary | Shared cache serves another tenant's private data or wrong negotiated representation | Headers, intermediaries, auth and cache config |
 | Pagination drift | Offset yields duplicates/omissions when changed data violates an explicit traversal guarantee | Ordered pages plus insert/delete trace |
 | Invalid keyset | Equal timestamps are skipped; mixed sort or NULL changes predicate; mutable sort key crosses cursor | Order, tie-breaker, predicate, database plan |
@@ -26,7 +26,7 @@ Use only when the frozen diff actually affects an HTTP API, its contract, or rea
 | Contract evolution | Removed field, changed sort default, cursor format or error semantics break supported clients | Approved baseline, documented versions, consumers |
 | Cache/conditional performance | Revalidation or ETag claims do not reflect representation semantics | Actual validator and cache/config traces |
 
-The correct investigation may conclude **no finding**: offset can be fit for a bounded static collection; keyset is not automatically necessary; `PATCH` may be intentionally idempotent; not every cacheable response needs ETag; HATEOAS is relevant only when adopted; JSON:API's `filter` family does not specify one universal filter expression language.
+The correct investigation may conclude **no finding**: offset can be fit for a bounded static collection; keyset is not automatically necessary; `PATCH` may be intentionally idempotent; not every cacheable response needs ETag; not every mutation requires `If-Match`; HATEOAS is relevant only when adopted; JSON:API's `filter` family does not specify one universal filter expression language.
 
 ## Review Handoff
 
