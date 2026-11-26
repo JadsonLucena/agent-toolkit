@@ -12,9 +12,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
+import stat
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -27,11 +30,13 @@ class GateError(Exception):
     """A required pre-creation decision could not be verified."""
 
 
-def invoke(argv: list[str], repo: Path, timeout: int = 300) -> str:
+def invoke(
+    argv: list[str], repo: Path, timeout: int = 300, *, env: dict[str, str] | None = None,
+) -> str:
     try:
         result = subprocess.run(
             argv, cwd=repo, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, timeout=timeout, check=False,
+            stderr=subprocess.PIPE, timeout=timeout, check=False, env=env,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise GateError(f"{argv[0]} unavailable or timed out: {type(exc).__name__}") from exc
@@ -54,23 +59,42 @@ def commit(repo: Path, ref: str) -> str:
 
 
 def read_bytes(path: Path) -> bytes:
+    """Read bounded regular files without following symlinks or blocking on FIFOs."""
+    if not hasattr(os, "O_NOFOLLOW") or not hasattr(os, "O_NONBLOCK"):
+        raise GateError("secure evidence file access unavailable on this platform")
     try:
-        if path.stat().st_size > MAX_EVIDENCE_BYTES:
-            raise GateError("evidence or policy file exceeds size limit")
-        return path.read_bytes()
+        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        try:
+            info = os.fstat(fd)
+            if not stat.S_ISREG(info.st_mode):
+                raise GateError("evidence or policy must be a regular file")
+            if info.st_size > MAX_EVIDENCE_BYTES:
+                raise GateError("evidence or policy file exceeds size limit")
+            with os.fdopen(fd, "rb") as stream:
+                fd = -1
+                payload = stream.read(MAX_EVIDENCE_BYTES + 1)
+            if len(payload) > MAX_EVIDENCE_BYTES:
+                raise GateError("evidence or policy file exceeds size limit")
+            return payload
+        finally:
+            if fd >= 0:
+                os.close(fd)
     except OSError as exc:
         raise GateError(f"file unavailable: {type(exc).__name__}") from exc
 
 
-def load_json(path: Path) -> dict[str, Any]:
+def parse_json(payload: bytes) -> dict[str, Any]:
     try:
-        doc = json.loads(read_bytes(path))
+        doc = json.loads(payload)
     except (UnicodeDecodeError, ValueError) as exc:
         raise GateError("invalid JSON evidence or trust policy") from exc
     if not isinstance(doc, dict):
         raise GateError("expected JSON object")
     return doc
 
+
+def load_json(path: Path) -> dict[str, Any]:
+    return parse_json(read_bytes(path))
 
 def changed_paths(repo: Path, base: str, head: str) -> set[str]:
     merge_base = git(repo, "merge-base", base, head)
@@ -160,27 +184,28 @@ def load_trust_policy(path: Path, repo: Path, remote: str) -> tuple[dict[str, An
 
 
 def verify_signature(
-    evidence_path: Path, signature_path: Path, reviewer: str, allowed_signers_file: str,
+    evidence: bytes, signature: bytes, reviewer: str, allowed_signers_file: str,
     repo: Path,
 ) -> None:
-    evidence = read_bytes(evidence_path)
-    signature = read_bytes(signature_path)
+    """Verify the exact evidence and signature buffers used by this decision."""
     if not signature.startswith(b"-----BEGIN SSH SIGNATURE-----"):
         raise GateError("missing valid SSH-signature envelope")
-    # ssh-keygen verifies a detached Ed25519/RSA SSHSIG signature over the
-    # exact JSON bytes. Authorized keys live in the protected allowed-signers file.
+    # ssh-keygen requires a signature filename; use a private snapshot rather
+    # than reopening the untrusted signature path.
     try:
-        result = subprocess.run(
-            ["ssh-keygen", "-Y", "verify", "-f", allowed_signers_file, "-I", reviewer,
-             "-n", SIGNATURE_NAMESPACE, "-s", str(signature_path.resolve())],
-            cwd=repo, input=evidence, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            check=False, timeout=20,
-        )
+        with tempfile.NamedTemporaryFile(prefix="agent-toolkit-sshsig-") as frozen:
+            frozen.write(signature)
+            frozen.flush()
+            result = subprocess.run(
+                ["ssh-keygen", "-Y", "verify", "-f", allowed_signers_file, "-I", reviewer,
+                 "-n", SIGNATURE_NAMESPACE, "-s", frozen.name],
+                cwd=repo, input=evidence, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                check=False, timeout=20,
+            )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise GateError(f"SSH signature verification unavailable: {type(exc).__name__}") from exc
     if result.returncode:
         raise GateError("review evidence signature is invalid or signer is unauthorized")
-
 
 def verify_evidence(
     evidence: dict[str, Any], *, base: str, head: str, actual: set[str],
@@ -226,10 +251,15 @@ def verify_evidence(
 
 
 def remote_head(repo: Path, remote: str, branch: str, expected: str, what: str) -> None:
-    refs = git(repo, "ls-remote", "--heads", remote, branch)
-    if not any(row.split()[0] == expected for row in refs.splitlines() if row.split()):
+    """Match the exact remote branch ref rather than a tail-pattern collision."""
+    if not branch or branch.startswith("-") or branch.startswith("refs/"):
+        raise GateError("invalid branch name for remote verification")
+    full_ref = f"refs/heads/{branch}"
+    git(repo, "check-ref-format", full_ref)
+    refs = git(repo, "ls-remote", remote, full_ref)
+    matches = [row.split("\t", 1) for row in refs.splitlines() if "\t" in row]
+    if matches != [[expected, full_ref]]:
         raise GateError(f"remote {what} does not match reviewed {what}")
-
 
 def require_checkout(
     repo: Path, base_ref: str, head_ref: str, trust_policy_path: Path, remote: str,
@@ -270,10 +300,17 @@ def recheck_checkout(
 
 
 def run_checks(state: dict[str, Any], timeout: int) -> list[str]:
-    completed = []
-    for name, argv in state["checks"].items():
-        invoke(argv, state["repo"], timeout)
-        completed.append(name)
+    """Execute trusted check commands without inheriting credential-bearing host env."""
+    safe_names = ("PATH", "LANG", "LC_ALL", "LC_CTYPE", "TZ", "CI", "SYSTEMROOT", "SystemRoot", "WINDIR")
+    with tempfile.TemporaryDirectory(prefix="agent-toolkit-check-home-") as home:
+        env = {name: os.environ[name] for name in safe_names if name in os.environ}
+        env["HOME"] = home
+        env["XDG_CONFIG_HOME"] = home
+        env["XDG_CACHE_HOME"] = home
+        completed = []
+        for name, argv in state["checks"].items():
+            invoke(argv, state["repo"], timeout, env=env)
+            completed.append(name)
     return completed
 
 
@@ -285,25 +322,29 @@ def guard(
     state = require_checkout(repo, base_ref, head_ref, trust_policy_path, remote)
     repo, policy, base, head = state["repo"], state["policy"], state["base"], state["head"]
     actual = changed_paths(repo, base, head)
-    evidence = load_json(evidence_path)
+    evidence_bytes = read_bytes(evidence_path)
+    signature_bytes = read_bytes(signature_path)
+    evidence = parse_json(evidence_bytes)
     reviewer = verify_evidence(
         evidence, base=base, head=head, actual=actual,
         repository=policy["github_repository"], reviewers=policy["reviewers"], repo=repo,
     )
-    verify_signature(evidence_path, signature_path, reviewer, policy["allowed_signers_file"], repo)
+    verify_signature(evidence_bytes, signature_bytes, reviewer, policy["allowed_signers_file"], repo)
     completed = run_checks(state, timeout)
     recheck_checkout(state, base_ref, head_ref, remote, trust_policy_path)
-    # Reverify signature if evidence or signer file could have changed during
-    # long checks. The signed content and trusted keys must remain current.
-    if evidence != load_json(evidence_path):
-        raise GateError("review evidence changed during verification")
-    verify_signature(evidence_path, signature_path, reviewer, policy["allowed_signers_file"], repo)
+    # Recheck exact bytes, not parsed JSON equality; an equivalent rewrite or
+    # swapped signature after trusted verification still invalidates the inputs.
+    if evidence_bytes != read_bytes(evidence_path) or signature_bytes != read_bytes(signature_path):
+        raise GateError("review evidence or signature changed during verification")
+    # Signer authorization has a time boundary: even with unchanged evidence,
+    # valid-before in allowed_signers may expire while checks run. Re-verify
+    # the original frozen buffers immediately before authorizing publication.
+    verify_signature(evidence_bytes, signature_bytes, reviewer, policy["allowed_signers_file"], repo)
     return {
         "repository": policy["github_repository"], "reviewer": reviewer,
         "base_sha": base, "head_sha": head, "changed_files": sorted(actual),
         "checks_passed": completed, "signed_review_verified": True,
     }
-
 
 def verify_created_pr(
     created_url: str, expected: dict[str, Any], base_ref: str, head_ref: str,

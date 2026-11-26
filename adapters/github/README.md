@@ -90,6 +90,14 @@ It refuses unsigned/tampered evidence, unknown signers, missing complete file
 coverage, unresolved review blockers, self-review by matching Git author
 email, stale base/head, dirty worktrees, unpublished branches, mismatched
 check commands and any failed mandatory check.
+Evidence and signatures are captured as bounded regular-file byte snapshots,
+checked again after repository checks, and tied to the **exact** remote branch
+reference rather than a suffix match.
+The remote ref query uses `git ls-remote <remote> refs/heads/<branch>` without
+version-dependent branch-filter options; exact returned ref and SHA are checked
+separately. The original frozen signature is verified **again after checks**
+so an OpenSSH allowed-signer validity window expiring during checks blocks
+publication, without reopening a substituted signature.
 
 **The SSH signature authenticates the signing key, not human independence by
 itself.** Trusted reviewer provisioning, private-key custody, author-to-signer
@@ -142,6 +150,10 @@ It will fail closed if any required trust anchor or verification is unavailable.
   permission model and repository/organization policy.
 * The wrapper cannot prove that repository tests truly cover every relevant
   behavior; the protected policy must represent effective project checks.
+* Check subprocesses receive an allowlisted environment and an isolated temporary
+  HOME, not the parent process's GitHub/cloud tokens. This **is not a sandbox**:
+  trusted callers must still isolate filesystem, network, credentials and PATH
+  when executing repository-controlled test commands.
   CI triggered only by PR creation is not a substitute for preflight checks.
 * The actual code review belongs to the separate Review context. Neither
   the SSH signature nor the output of the adapter performs a review.

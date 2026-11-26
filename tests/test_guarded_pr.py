@@ -4,6 +4,7 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -214,6 +215,29 @@ class GuardedPRTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.GateError, "outside the target"):
             gate.guard(self.repo, "main", "feature", self.evidence, self.signature, local)
 
+    def test_trusted_checks_do_not_inherit_host_credentials(self):
+        script = (
+            "import os; "
+            "assert 'GH_TOKEN' not in os.environ; "
+            "assert 'AWS_SECRET_ACCESS_KEY' not in os.environ; "
+            "assert 'GITHUB_TOKEN' not in os.environ; "
+            "assert 'PATH' in os.environ; "
+            "assert os.path.isdir(os.environ['HOME']); "
+            "assert os.environ['HOME'] != os.environ.get('ORIGINAL_HOME')"
+        )
+        self.write_policy(checks={
+            "lint": [sys.executable, "-c", script],
+            "tests": [sys.executable, "-c", script],
+        })
+        with patch.dict(os.environ, {
+            "GH_TOKEN": "private-test-value",
+            "GITHUB_TOKEN": "another-private-test-value",
+            "AWS_SECRET_ACCESS_KEY": "test-secret",
+            "ORIGINAL_HOME": os.environ.get("HOME", ""),
+        }):
+            outcome = self.preflight()
+        self.assertEqual({"lint", "tests"}, set(outcome["checks_passed"]))
+
     def test_failed_lint_blocks(self):
         self.write_policy(fail="lint")
         with self.assertRaisesRegex(gate.GateError, "failed"):
@@ -241,11 +265,88 @@ class GuardedPRTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.GateError, "remote head"):
             self.preflight()
 
+    def test_remote_ref_suffix_collision_is_rejected(self):
+        git(self.remote, "update-ref", "refs/heads/x/feature", self.head)
+        git(self.remote, "update-ref", "refs/heads/feature", self.base)
+        with self.assertRaisesRegex(gate.GateError, "remote head"):
+            self.preflight()
+
+    def test_remote_head_uses_portable_ls_remote_args(self):
+        original = gate.git
+        calls = []
+
+        def observed(repo, *args):
+            if "ls-remote" in args:
+                calls.append(args)
+                self.assertNotIn("--branches", args)
+                self.assertNotIn("--heads", args)
+            return original(repo, *args)
+
+        with patch.object(gate, "git", side_effect=observed):
+            gate.remote_head(self.repo, "origin", "feature", self.head, "head")
+        self.assertTrue(calls)
+        self.assertEqual(
+            ("ls-remote", "origin", "refs/heads/feature"), calls[0],
+        )
+
+    def test_expired_signer_at_end_of_checks_blocks_even_with_unchanged_bytes(self):
+        original = gate.verify_signature
+        verified = []
+
+        def simulated_expiry(evidence, signature, reviewer, signers, repo):
+            verified.append((evidence, signature))
+            if len(verified) == 2:
+                raise gate.GateError("review evidence signature is invalid or signer is unauthorized")
+            return original(evidence, signature, reviewer, signers, repo)
+
+        with patch.object(gate, "verify_signature", side_effect=simulated_expiry):
+            with self.assertRaisesRegex(gate.GateError, "signature"):
+                self.preflight()
+        self.assertEqual(2, len(verified))
+        self.assertEqual(verified[0], verified[1])
+
+    def test_nested_remote_branch_matches_only_exact_ref(self):
+        git(self.remote, "update-ref", "refs/heads/x/feature", self.head)
+        gate.remote_head(self.repo, "origin", "x/feature", self.head, "head")
+
+    def test_fifo_evidence_is_rejected_without_waiting_for_writer(self):
+        if not hasattr(os, "mkfifo"):
+            self.skipTest("FIFO unavailable")
+        fifo = self.root / "review.fifo"
+        os.mkfifo(fifo)
+        with self.assertRaisesRegex(gate.GateError, "regular file"):
+            gate.guard(self.repo, "main", "feature", fifo, self.signature, self.check_policy)
+
+    def test_symlinked_review_evidence_is_rejected(self):
+        alias = self.root / "review-alias.json"
+        alias.symlink_to(self.evidence)
+        with self.assertRaisesRegex(gate.GateError, "file unavailable"):
+            gate.guard(self.repo, "main", "feature", alias, self.signature, self.check_policy)
+
+    def test_byte_changes_during_checks_invalidate_signed_evidence(self):
+        def mutate(_state, _timeout):
+            # Same semantic JSON, different signed bytes.
+            self.evidence.write_bytes(self.evidence.read_bytes() + b" ")
+            return ["lint", "tests"]
+
+        with patch.object(gate, "run_checks", side_effect=mutate):
+            with self.assertRaisesRegex(gate.GateError, "changed during verification"):
+                self.preflight()
+
+    def test_signature_swap_during_checks_blocks(self):
+        def mutate(_state, _timeout):
+            self.signature.write_bytes(self.signature.read_bytes() + b" ")
+            return ["lint", "tests"]
+
+        with patch.object(gate, "run_checks", side_effect=mutate):
+            with self.assertRaisesRegex(gate.GateError, "changed during verification"):
+                self.preflight()
+
     def gh_mock(self, *, wrong_head=False, wrong_draft=False, commands=None):
         seen = []
         original = gate.invoke
 
-        def intercepted(argv, cwd, timeout=300):
+        def intercepted(argv, cwd, timeout=300, *, env=None):
             if argv[:3] == ["gh", "pr", "create"]:
                 seen.append("create")
                 if commands is not None:
@@ -261,7 +362,7 @@ class GuardedPRTests(unittest.TestCase):
                     "head": {"sha": self.base if wrong_head else self.head,
                              "ref": "feature", "repo": {"full_name": "org/repo"}},
                 })
-            return original(argv, cwd, timeout)
+            return original(argv, cwd, timeout, env=env)
         return seen, intercepted
 
     def cli(self, *extra):
