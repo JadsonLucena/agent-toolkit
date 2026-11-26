@@ -121,6 +121,13 @@ def _verify_recorded_sources(snapshot: dict) -> dict:
         "repository": str(root), "head_sha": snapshot["head_sha"],
         "sources": snapshot.get("source_versions", []),
         "missing_critical": [],
+    }, expected_selection={
+        # Checkpoint scope is only the recorded source-version boundary; it
+        # does not attest to completeness of the original stakeholder request.
+        "sources": [s["ref"] for s in snapshot.get("source_versions", [])],
+        "critical": [
+            s["ref"] for s in snapshot.get("source_versions", []) if s["critical"]
+        ],
     }, require_content=False)
     if result["status"] != "unchanged":
         raise CheckpointError("checkpoint contains stale or unverified source versions")
@@ -349,7 +356,14 @@ class CheckpointStore:
             "repository": str(root), "head_sha": snapshot["head_sha"],
             "sources": snapshot.get("source_versions", []),
             "missing_critical": [],
-        }, require_content=False)
+        }, expected_selection={
+        # Checkpoint scope is only the recorded source-version boundary; it
+        # does not attest to completeness of the original stakeholder request.
+        "sources": [s["ref"] for s in snapshot.get("source_versions", [])],
+        "critical": [
+            s["ref"] for s in snapshot.get("source_versions", []) if s["critical"]
+        ],
+    }, require_content=False)
         effects = [
             dict(row) for row in self.db.execute(
                 "SELECT effect_id,operation,status,evidence_ref FROM effects "

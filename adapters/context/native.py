@@ -190,7 +190,26 @@ def prepare_context(
     }
 
 
-def verify_context(repo: Path, pack: dict, *, require_content: bool = True) -> dict:
+def _expected_selection(selection: dict) -> tuple[list[str], set[str]]:
+    """Only an independently retained caller request defines source obligations."""
+    if not isinstance(selection, dict):
+        raise ContextError("trusted original source selection is required")
+    sources, critical = selection.get("sources"), selection.get("critical")
+    if (not isinstance(sources, list) or not isinstance(critical, list)
+            or any(not isinstance(ref, str) for ref in sources + critical)
+            or not (sources or critical)):
+        raise ContextError("trusted selection requires original sources and critical arrays")
+    for ref in sources + critical:
+        _parse_ref(ref)
+    return list(dict.fromkeys([*critical, *sources])), set(critical)
+
+
+def verify_context(
+    repo: Path, pack: dict, *, expected_selection: dict | None = None,
+    require_content: bool = True,
+) -> dict:
+    """Validate the full originally requested set, never a pack's claim of coverage."""
+    expected, critical = _expected_selection(expected_selection)
     root, head = _repository(Path(repo))
     if not isinstance(pack, dict):
         raise ContextError("context pack must be an object")
@@ -201,37 +220,71 @@ def verify_context(repo: Path, pack: dict, *, require_content: bool = True) -> d
     records = pack.get("sources")
     if not isinstance(records, list):
         raise ContextError("context pack sources must be an array")
+    unavailable = pack.get("unavailable", [] if not require_content else None)
+    if not isinstance(unavailable, list):
+        raise ContextError("context pack unavailable sources must be an array")
+    wanted = set(expected)
+    accounted: set[str] = set()
+    invalid: list[str] = []
     results = []
     for source in records:
         if (not isinstance(source, dict)
                 or not isinstance(source.get("ref"), str)
                 or not isinstance(source.get("sha256"), str)):
             raise ContextError("invalid context source record")
+        ref = source["ref"]
+        if ref not in wanted or ref in accounted or source.get("critical") is not (ref in critical):
+            invalid.append(ref)
+        accounted.add(ref)
         try:
-            ref = source["ref"]
             latest = _read(root, ref)
             matches = latest["sha256"] == source["sha256"]
             if require_content:
-                # File freshness alone does not authenticate a persisted
-                # excerpt. Check the text and its physical-line provenance.
                 matches = matches and all(
                     key in source and source[key] == latest[key]
                     for key in ("path", "line_start", "line_end", "content")
                 )
             results.append({"ref": ref, "status": "unchanged" if matches else "stale"})
         except (KeyError, TypeError, ContextError, OSError):
-            results.append({"ref": source["ref"], "status": "unavailable"})
+            results.append({"ref": ref, "status": "unavailable"})
+    unavailable_refs: set[str] = set()
+    for item in unavailable:
+        if (not isinstance(item, dict) or not isinstance(item.get("ref"), str)
+                or item["ref"] not in wanted or item["ref"] in accounted
+                or item["ref"] in unavailable_refs
+                or item.get("critical") is not (item["ref"] in critical)
+                or not isinstance(item.get("reason"), str) or not item["reason"]):
+            raise ContextError("invalid or duplicate unavailable context source")
+        unavailable_refs.add(item["ref"])
+    omitted = sorted(wanted - accounted - unavailable_refs)
+    actual_missing_critical = sorted(unavailable_refs & critical)
+    declared_missing = pack.get("missing_critical")
+    if (not isinstance(declared_missing, list)
+            or any(not isinstance(ref, str) for ref in declared_missing)
+            or sorted(declared_missing) != actual_missing_critical):
+        invalid.append("missing_critical")
+    stated = pack.get("status")
+    expected_status = "blocked" if actual_missing_critical else "partial" if unavailable_refs else "ready"
+    if stated is not None and stated != expected_status:
+        invalid.append("status")
     drift = pack.get("head_sha") != head
+    failures = bool(omitted or invalid or (unavailable_refs & critical) or any(
+        result["status"] != "unchanged" for result in results
+    ))
     return {
-        "head_sha": head,
-        "head_changed": drift,
-        "sources": results,
+        "head_sha": head, "head_changed": drift,
+        "sources": results, "omitted_refs": omitted,
+        "invalid_refs": sorted(invalid),
+        "missing_critical": actual_missing_critical,
         "status": (
-            "blocked" if pack.get("missing_critical") or
-            any(s["status"] != "unchanged" for s in results)
+            "blocked" if failures
+            else "partial" if unavailable_refs
             else "revalidate" if drift else "unchanged"
         ),
-        "note": "Unchanged content does not prove unchanged dependencies or authorization.",
+        "note": (
+            "Completeness is relative to the independently supplied original selection. "
+            "Unchanged content does not prove unchanged dependencies or authorization."
+        ),
     }
 
 
@@ -312,7 +365,11 @@ def main() -> int:
     try:
         if args.verify:
             pack = json.loads(args.verify.read_text(encoding="utf-8"))
-            outcome = verify_context(args.repo, pack)
+            outcome = verify_context(
+                args.repo, pack, expected_selection={
+                    "sources": args.source, "critical": args.critical,
+                },
+            )
         elif args.search is not None:
             outcome = search_sources(args.repo, args.search, args.scope)
         else:
