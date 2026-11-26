@@ -78,7 +78,13 @@ Apply the named sections of `contexts/implementation/rules/implementation.md`. W
 
 For a slice that implements or changes an HTTP API, inspect accepted interface/behavior decisions in `contracts/design-evidence.md` and the actual published API/client behavior before the first edit. Preserve selected method and status semantics, representations, error contract, authorization, cache and preconditions, concurrency, retry/idempotency and compatibility **when applicable**. When implementing collection queries, follow the approved filtering, ordering, pagination, projection and cursor guarantees; test observable edge cases such as equal sort keys, replay, changed filters and cross-tenant access as relevant.
 
+When an approved API contract uses `If-Match` to prevent lost updates, enforce its precondition with an **atomic** write at the authoritative state boundary. A separate version read followed by an unconditional update is insufficient; verify the behavior against actual concurrency. Do not equate ETag with idempotency or require it without a supported need.
+
 Do not treat a Design reference as an implementation command or a new acceptance source. If a guarantee is not justified, return a behavioral ambiguity to Requirements or a technical choice to Design. Use the existing TDD and verification flow for supported behaviors, including a production database integration test when index plans or isolation semantics materially determine correctness. A unit mock cannot prove query performance or concurrency guarantees.
+
+## Protected Output Contract Realization (Conditional)
+
+When an accepted change affects outward data, trace the authorized audience, purpose, field-level policy and published representation before coding. Construct only approved response properties and transformations; do not serialize domain/ORM objects, stack traces or internal metadata merely because a framework makes it easy. Reuse a suitable existing Presenter, DTO or serializer rather than creating mandatory Clean Architecture ceremony. Verify sensitive information stays protected across errors, logs, traces, event payloads, caches and exports **where those paths are reachable**. Treat masking as a representation decision, not an authorization check. Return missing policy or legal authority to Requirements instead of inventing it.
 
 ## Pre-Edit Atomic Intention Plan
 

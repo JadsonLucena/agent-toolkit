@@ -250,6 +250,8 @@ When security is material, reason beyond a generic "secure" requirement. Preserv
 * organizational obligations such as separation or binding of duties, non-repudiation, need-to-know, least privilege, redundancy, non-delegation, or purpose limitation;
 * misuse, malicious threats, accidental violations, and ordinary negative business scenarios as distinct concepts.
 
+For information disclosed to consumers, elicit only material, source-supported needs: intended recipient and purpose, data classification under the applicable jurisdiction/policy, required fields, field-level access conditions, minimum necessary precision, retention and downstream disclosure restrictions. Distinguish PII, context-sensitive *sensitive PII* (SPII), and legally defined categories such as Brazil's LGPD `dado pessoal sensível`; these labels are **not interchangeable** and do not determine a universal masking rule. Ask whether a field can be omitted rather than assuming masking is sufficient; do not invent consent, legal basis, regulatory classification or business entitlement. Record unknown authority and observable forbidden disclosures as requirements/acceptance questions, not as a mandated Presenter or DTO design.
+
 Check security requirements for conflicts with each other and with required business goals or operations.
 
 ## Requirement Patterns

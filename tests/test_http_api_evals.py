@@ -12,7 +12,7 @@ from requirements_evals import evaluate, load_catalog  # noqa: E402
 class HttpApiEvaluationCatalogTests(unittest.TestCase):
     def test_valid_catalog_has_complementary_scenarios(self):
         catalog = load_catalog(ROOT / "evals/api/cases.json")
-        self.assertEqual(12, len(catalog["cases"]))
+        self.assertEqual(18, len(catalog["cases"]))
         ids = [case["id"] for case in catalog["cases"]]
         self.assertEqual(len(ids), len(set(ids)))
         self.assertTrue(all(len(case["checks"]) >= 3 for case in catalog["cases"]))

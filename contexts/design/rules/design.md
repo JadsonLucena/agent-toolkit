@@ -21,6 +21,11 @@ alwaysApply: false
 * Relate decisions to requirement, scenario, risk or existing constraint identifiers when present. Preserve authoritative versions and record decisions that still require approval.
 * A design can guide Implementation only when the material decisions governing that slice are sufficiently stable. Unresolved issues that can change an API, data contract, safety guarantee or acceptance behavior block the affected handoff, not all unrelated work.
 
+## Output Contracts and Protected Data
+
+* When a slice exposes or changes information across a trust or consumer boundary, derive public response fields, authorized audiences, purpose and necessary transformations from accepted behavior and applicable protection constraints. Omit unnecessary properties before considering masking; masking or a Presenter does not confer authorization.
+* Separate outward representation/formatting from domain behavior and authorization policy. Consider Presenter/Output Port, explicit response DTO, serializer or mapper according to the existing architecture and actual risk; no particular class or layer is universally required. Consult `skills/design-solution/references/output-contracts-and-data-protection.md` selectively.
+
 ## HTTP API Contract Decisions
 
 * When a slice creates or changes an HTTP API, identify the declared architectural style and applicable published protocol, local contract, and consumer constraints before selecting resource operations or conventions. An HTTP API, a Richardson level, and Fielding's REST constraints are different assessments.

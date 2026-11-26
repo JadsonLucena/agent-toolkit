@@ -277,6 +277,144 @@
           "criterion": "Does not silently modify requirements, publish PR or reuse stale passing evidence"
         }
       ]
+    },
+    {
+      "id": "API-13",
+      "command": "/design/design-solution",
+      "scenario": "Safe output adapter without mandatory Presenter",
+      "input": "Accepted HTTP response DTO explicitly exposes only allowed fields to an authenticated public consumer. Internal ORM has extra properties but cannot be serialized; no Clean Architecture Presenter class. Evaluate a small response change.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Preserves explicit response field selection and the established consumer contract"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not demand Presenter, Output Port, CQRS or framework replacement without a concrete need"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not equate DTO shape with a domain Aggregate boundary"
+        }
+      ]
+    },
+    {
+      "id": "API-14",
+      "command": "/requirements/specify-requirements",
+      "scenario": "Unknown sensitive-data disclosure authority",
+      "input": "A stakeholder requests returning full customer CPF and risk score to a partner API; recipient purpose and authorization policy are unknown. Define supported requirement scope.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies missing field-level disclosure purpose and authority as blocking unknowns"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Separates PII risk classification from the LGPD-specific category of sensitive personal data"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not invent legal basis, consent, masking sufficiency or a Presenter design"
+        }
+      ]
+    },
+    {
+      "id": "API-15",
+      "command": "/review/review-code",
+      "scenario": "PII is hidden in UI but leaked through API logs",
+      "input": "Frozen authorized code diff masks an email in the frontend while API response includes full customer email and a reachable debug log records it for another tenant. Field-level permission forbids that disclosure. Review the exact change.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies reachable unpermitted property disclosure and log exposure with evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Separates the backend authorization defect from cosmetic UI masking"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim privacy compliance certification or treat missing Presenter as the flaw"
+        }
+      ]
+    },
+    {
+      "id": "API-16",
+      "command": "/testing/generate-tests",
+      "scenario": "Output field authorization under nested projections",
+      "input": "Approved contract permits a support role to see masked contact, forbids customer identity numbers, and provides include/fields projection. Generate tests only, with synthetic data.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Tests positive authorized fields and negative nested/projection disclosure for restricted data"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Checks actual serialized output and relevant error or log paths when reachable"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not edit production behavior or require a particular Presenter implementation"
+        }
+      ]
+    },
+    {
+      "id": "API-17",
+      "command": "/design/design-solution",
+      "scenario": "ETag precondition protects a mutable API resource",
+      "input": "An accepted PATCH contract uses If-Match to prevent lost updates on a mutable subscription. The underlying entity has version 7. Design the validator and atomic update without mandating a framework.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Selects a strong validator for the HTTP representation rather than assuming an aggregate version is always sufficient"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Specifies stale If-Match handling and a testable atomic write at the authoritative state boundary"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not accept weak validators or If-Match wildcard as freshness proof or impose ETag universally"
+        }
+      ]
+    },
+    {
+      "id": "API-18",
+      "command": "/review/review-code",
+      "scenario": "Non-atomic optimistic concurrency check in persistence",
+      "input": "Frozen diff: PATCH reads entity version 7, compares If-Match, then executes unconditional UPDATE in a later transaction. Two writers can both pass the check. Review this exact change.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies a reachable time-of-check/time-of-use race and concrete lost-update outcome"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Requests authoritative atomic conditional write and an integration counterexample"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not accept ETag header presence or a unit mock as proof of concurrency safety"
+        }
+      ]
     }
   ]
 }
