@@ -1,10 +1,14 @@
 # Agent Toolkit
 
-**From change requests to reviewable software increments—with traceable evidence and clear engineering responsibilities.**
+**Engineering discipline for AI-assisted software development.**
 
-Agent Toolkit provides vendor-neutral, reusable guidance for AI coding agents across requirements, design, implementation, testing, review, delivery, and Git. Its Rules, Skills, Commands, specialist Agents, and shared Contracts clarify ownership, preserve evidence across handoffs, and support verification proportionate to risk.
+AI coding agents can generate code, but reviewable software changes also require coherent requirements, explicit design decisions, meaningful verification, and controlled delivery. Agent Toolkit brings established software engineering practices to AI-assisted work, helping developers and teams move from change requests to reviewable increments.
 
-The toolkit is a collection of portable, version-controlled Markdown artifacts, **not a standalone executable agent or an automatically installed CLI**. Agent runtimes can discover or integrate the relevant artifacts; optional adapters support specific environments.
+It provides vendor-neutral, reusable guidance spanning requirements, design, implementation, testing, review, delivery preparation, and Git. Its Rules, Skills, Commands, specialist Agents, and shared Contracts clarify responsibilities, preserve decisions and evidence across handoffs, and support verification proportionate to risk.
+
+**The goal is not simply to generate more code, but to make AI-assisted engineering more disciplined, transparent, and reviewable.**
+
+The toolkit is a collection of portable, version-controlled Markdown artifacts, **not a standalone executable agent or an automatically installed CLI**. Agent runtimes can discover or integrate the relevant artifacts; optional adapters support specific environments. Guidance alone does not prove agent behavior or enforce permissions; execution and safeguards depend on the host runtime.
 
 ## What it covers
 
