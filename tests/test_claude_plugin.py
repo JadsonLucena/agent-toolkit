@@ -129,6 +129,19 @@ class ClaudePluginTests(unittest.TestCase):
         self.write(manifest)
         self.assert_issue("unsupported manifest fields")
 
+    def test_manifest_requires_version_for_strict_host_validation(self):
+        self.assertEqual("0.1.0", self.manifest()["version"])
+        manifest = self.manifest()
+        del manifest["version"]
+        self.write(manifest)
+        self.assert_issue("version must be explicit SemVer")
+
+    def test_invalid_version_is_rejected(self):
+        manifest = self.manifest()
+        manifest["version"] = "preview"
+        self.write(manifest)
+        self.assert_issue("version must be explicit SemVer")
+
     def test_missing_manifest_is_rejected(self):
         self.manifest_path.unlink()
         self.assert_issue("manifest is missing")

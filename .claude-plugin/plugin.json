@@ -1,6 +1,7 @@
 {
   "name": "agent-toolkit",
   "displayName": "Agent Toolkit",
+  "version": "0.1.0",
   "description": "Guide AI coding agents through disciplined software engineering, from requirements to reviewable changes, with traceable evidence and risk-aware verification.",
   "author": {
     "name": "Jadson Lucena"

@@ -38,6 +38,8 @@ The Python check validates manifest structure and exact canonical coverage; it c
 
 Do not configure VS Code as a duplicate Claude agent runtime or assert that `AGENTS.md` from the plugin root is automatically added to the consumer workspace. Add host-specific adapters **only after** a demonstrated incompatibility.
 
+The initial plugin version is `0.1.0`. Increment `version` when publishing subsequent Claude-format plugin updates; Claude Code can pin installed versions to this value.
+
 ## Regression and release conditions
 
 ```sh

@@ -13,9 +13,10 @@ from pathlib import Path, PurePosixPath
 ROOT = Path(__file__).resolve().parents[1]
 COMPONENTS = ("skills", "commands", "agents")
 ALLOWED_KEYS = {
-    "name", "displayName", "description", "author", "repository",
+    "name", "displayName", "version", "description", "author", "repository",
     "license", "keywords", *COMPONENTS,
 }
+SEMVER = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
 NAME = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
 FRONTMATTER_NAME = re.compile(r"\A---\r?\nname: ([a-z][a-z0-9]*(?:-[a-z0-9]+)*)\r?\n")
 
@@ -45,6 +46,8 @@ def lint_claude_plugin(root: Path) -> list[str]:
     errors: list[str] = []
     if manifest.get("name") != "agent-toolkit":
         errors.append(".claude-plugin/plugin.json: unexpected plugin name")
+    if not isinstance(manifest.get("version"), str) or not SEMVER.fullmatch(manifest["version"]):
+        errors.append(".claude-plugin/plugin.json: version must be explicit SemVer for strict validation")
     if set(manifest) - ALLOWED_KEYS:
         errors.append(".claude-plugin/plugin.json: unsupported manifest fields")
     if (not isinstance(manifest.get("description"), str)
