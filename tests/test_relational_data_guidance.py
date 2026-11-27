@@ -30,7 +30,7 @@ class RelationalDataGuidanceTests(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase.lower(), guide.lower())
         self.assertIn("not a mandatory normalization ceremony", guide)
-        self.assertIn("do not select BCNF universally", guide.lower())
+        self.assertIn("do not select bcnf universally", guide.lower())
         self.assertNotIn("must use CQRS", guide)
 
     def test_ownership_and_scope_preservation(self):
