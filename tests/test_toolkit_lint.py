@@ -22,8 +22,9 @@ class ToolkitLintTests(unittest.TestCase):
         if (ROOT / "adapters").is_dir():
             shutil.copytree(ROOT / "adapters", self.root / "adapters",
                             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-        if (ROOT / ".cursor-plugin").is_dir():
-            shutil.copytree(ROOT / ".cursor-plugin", self.root / ".cursor-plugin")
+        for plugin_dir in (".cursor-plugin", ".claude-plugin"):
+            if (ROOT / plugin_dir).is_dir():
+                shutil.copytree(ROOT / plugin_dir, self.root / plugin_dir)
         for name in ("ARCHITECTURE.md", "README.md", "AGENTS.md"):
             shutil.copy2(ROOT / name, self.root / name)
         # Mirror the CI workflow referenced by AGENTS.md in the test repository.
