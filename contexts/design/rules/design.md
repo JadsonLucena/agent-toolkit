@@ -21,6 +21,12 @@ alwaysApply: false
 * Relate decisions to requirement, scenario, risk or existing constraint identifiers when present. Preserve authoritative versions and record decisions that still require approval.
 * A design can guide Implementation only when the material decisions governing that slice are sufficiently stable. Unresolved issues that can change an API, data contract, safety guarantee or acceptance behavior block the affected handoff, not all unrelated work.
 
+## Relational Data and Derived Read Models
+
+* When a relational schema changes materially, derive dependencies and candidate keys from supported business semantics; assess normalization, lossless decomposition, dependency preservation and applicable database constraints rather than imposing a fixed normal form.
+* Treat materialization and denormalization as evidence-backed access and consistency trade-offs, not as default remedies for JOINs. Preserve source-of-truth ownership, freshness requirements, maintenance/recovery obligations and measured costs where material.
+* Keep persistence schemas and domain models conceptually distinct: relational tables, ORM records and materialized projections do not mechanically define domain entities, aggregate boundaries or API resources. Avoid unnecessary mapping layers for simple cases.
+
 ## Output Contracts and Protected Data
 
 * When a slice exposes or changes information across a trust or consumer boundary, derive public response fields, authorized audiences, purpose and necessary transformations from accepted behavior and applicable protection constraints. Omit unnecessary properties before considering masking; masking or a Presenter does not confer authorization.

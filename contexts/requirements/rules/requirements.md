@@ -196,6 +196,7 @@ When data semantics are material, define enough of the following to avoid implem
 * meaning, source, ownership, type, precision, units, and nullability;
 * temporal semantics, timezone, and historical behavior;
 * integrity and consistency expectations;
+* business-significant functional dependencies, candidate identities and independent facts when supported, without inferring business policy from existing keys or sampled rows and without prescribing a physical schema;
 * lifecycle, retention, archiving, and disposal;
 * lineage, reporting, acquisition, and privacy classification.
 
