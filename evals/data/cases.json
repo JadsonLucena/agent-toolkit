@@ -1,0 +1,236 @@
+{
+  "version": 1,
+  "description": "Relational normalization, materialization and domain/persistence boundaries; catalog validation alone is not behavioral execution.",
+  "cases": [
+    {
+      "id": "DATA-01",
+      "command": "/requirements/specify-requirements",
+      "scenario": "Uncertain functional dependency from a data sample",
+      "input": "An inherited Customer table happens to contain unique phone values, but business owners have not defined phone uniqueness. Elicit supported data requirements without selecting a database form.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies missing business meaning, identity and uniqueness guarantees as unresolved"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not infer phone -> customer identity solely from the sampled rows"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not require BCNF or propose physical schema changes as stakeholder requirements"
+        }
+      ]
+    },
+    {
+      "id": "DATA-02",
+      "command": "/design/design-solution",
+      "scenario": "Relational decomposition with partial and transitive dependencies",
+      "input": "Accepted rules: OrderId -> CustomerId; CustomerId -> CustomerName; ProductId -> ProductName; (OrderId,ProductId) -> Quantity. Propose a sound schema for order lines and state correctness criteria.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies relevant functional dependencies and candidate-key assumptions"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Explains lossless joins, applicable constraints and dependency preservation for the proposed decomposition"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not justify normalization solely by counting tables or insisting on maximum normal form"
+        }
+      ]
+    },
+    {
+      "id": "DATA-03",
+      "command": "/design/design-solution",
+      "scenario": "3NF versus BCNF lossless decomposition that fails dependency preservation",
+      "input": "R(A,B,C) has functional dependencies AB -> C and C -> B. Compare staying in 3NF with a BCNF decomposition, including enforcement cost.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies candidate keys AB and AC and explains why R is 3NF but not BCNF"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Explains that a lossless BCNF decomposition can fail to preserve AB -> C locally"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim BCNF always preserves every functional dependency"
+        }
+      ]
+    },
+    {
+      "id": "DATA-04",
+      "command": "/design/design-solution",
+      "scenario": "Historical sale price is a separate fact from catalog price",
+      "input": "Product has current catalog price and OrderLine has negotiated purchase-time unit price. Customer expects invoice history to remain stable when catalog prices change.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Distinguishes historical agreed unit price from current catalog price as facts with different meanings"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not eliminate sale-time price as unjustified duplication"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Preserves applicable historical and temporal business guarantees"
+        }
+      ]
+    },
+    {
+      "id": "DATA-05",
+      "command": "/design/design-solution",
+      "scenario": "Unmeasured joins are not proof that desnormalization is needed",
+      "input": "A developer wants to duplicate CustomerName into Invoice because a query uses four JOINs; no plan, workload measurements, or latency target is available.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Requests relevant query plan, workload, index and consumer evidence before selecting an optimization"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not prescribe materialization, CQRS or direct denormalization merely because there are JOINs"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Keeps unmeasured speedup claims as hypotheses rather than proven results"
+        }
+      ]
+    },
+    {
+      "id": "DATA-06",
+      "command": "/design/design-solution",
+      "scenario": "Stale PostgreSQL materialized summary is unsafe for refund authorization",
+      "input": "A PostgreSQL billing report is refreshed every ten minutes. A proposal uses its aggregated already-refunded amount to approve another refund, despite concurrent refunds.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the stale-read and concurrent financial integrity risk"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Routes the authorization decision to authoritative transactionally protected state"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim CONCURRENTLY implies incremental refresh or immediate freshness"
+        }
+      ]
+    },
+    {
+      "id": "DATA-07",
+      "command": "/design/design-solution",
+      "scenario": "Periodic reporting versus maintained projection",
+      "input": "An invoice history report runs daily and tolerates a day of lag. An alternative proposes an event-driven incremental summary; compare against a PostgreSQL materialized view.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Considers scheduled materialized refresh and its full-refresh resource cost"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Compares operational complexity, freshness and recovery against incremental projection"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not treat incremental projections or event infrastructure as universally required"
+        }
+      ]
+    },
+    {
+      "id": "DATA-08",
+      "command": "/design/design-solution",
+      "scenario": "ERD must not mechanically generate a domain class per table",
+      "input": "A legacy database has Subscription, SubscriptionCycle, Invoice and PaymentAttempt tables. The request is to infer domain behavior and aggregate boundaries solely from the ERD, without known business invariants.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Separates domain behavior, invariants and aggregate boundaries from relational storage structure"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Requests domain rule/use-case evidence when necessary rather than inventing aggregate ownership"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not mandate one domain entity per table or a new API resource per materialized view"
+        }
+      ]
+    },
+    {
+      "id": "DATA-09",
+      "command": "/review/review-code",
+      "scenario": "Incremental summary double-counts duplicate delivery",
+      "input": "Frozen diff maintains paid invoice totals by consuming an at-least-once event stream. There is no processed-event guard or reconciliation, and a duplicate event increments the total twice.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies a reachable double-counting path and the associated integrity consequence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Inspects relevant deduplication and replay guarantees with source-bound evidence"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not treat an event-driven projection as automatically consistent or safe"
+        }
+      ]
+    },
+    {
+      "id": "DATA-10",
+      "command": "/design/design-solution",
+      "scenario": "Simple CRUD outside relational modeling scope",
+      "input": "Small document store holds immutable user interface preferences, with no relational schema or cross-document dependencies; existing operations meet requirements.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Respects existing storage and the accepted simple operation boundary"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not mandate relational normal forms, Data Mapper, aggregates or CQRS without a need"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not create a new persistence abstraction solely to satisfy a toolkit pattern"
+        }
+      ]
+    }
+  ]
+}
