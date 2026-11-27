@@ -42,7 +42,8 @@ class ClaudePluginTests(unittest.TestCase):
         self.assertEqual(20, len(canonical_files(self.root, "skills")))
         self.assertEqual(18, len(canonical_files(self.root, "commands")))
         self.assertEqual(17, len(canonical_files(self.root, "agents")))
-        self.assertEqual(18, len(manifest["commands"]))
+        self.assertEqual(8, len(manifest["commands"]))
+        self.assertTrue(all(path.endswith("/commands") for path in manifest["commands"]))
         self.assertEqual(17, len(manifest["agents"]))
         self.assertNotIn("rules", manifest)
         self.assertNotIn("hooks", manifest)
@@ -71,6 +72,21 @@ class ClaudePluginTests(unittest.TestCase):
         manifest["commands"].append(manifest["commands"][0])
         self.write(manifest)
         self.assert_issue("duplicate commands artifact")
+
+    def test_command_file_paths_rejected_for_copilot_compatibility(self):
+        # Claude supports flat files too, but this adapter deliberately uses
+        # directory scanning to avoid the observed Copilot command gap.
+        manifest = self.manifest()
+        manifest["commands"][0] = "./contexts/debugging/commands/investigate-defect.md"
+        self.write(manifest)
+        self.assert_issue("invalid commands path")
+
+    def test_empty_command_directory_is_rejected(self):
+        manifest = self.manifest()
+        empty = self.root / "contexts/debugging/commands/investigate-defect.md"
+        empty.unlink()
+        self.write(manifest)
+        self.assert_issue("empty commands directory")
 
     def test_directory_in_agents_is_not_accepted(self):
         manifest = self.manifest()
@@ -130,7 +146,7 @@ class ClaudePluginTests(unittest.TestCase):
         self.assert_issue("unsupported manifest fields")
 
     def test_manifest_requires_version_for_strict_host_validation(self):
-        self.assertEqual("0.1.0", self.manifest()["version"])
+        self.assertEqual("0.1.1", self.manifest()["version"])
         manifest = self.manifest()
         del manifest["version"]
         self.write(manifest)

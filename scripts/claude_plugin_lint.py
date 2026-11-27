@@ -31,7 +31,7 @@ def canonical_files(root: Path, kind: str) -> set[str]:
 
 
 def lint_claude_plugin(root: Path) -> list[str]:
-    """Validate a single root-installable package with direct canonical references."""
+    """Validate root-installable components without copied canonical Markdown files."""
     root = root.resolve()
     path = root / ".claude-plugin/plugin.json"
     if not path.is_file():
@@ -87,7 +87,13 @@ def lint_claude_plugin(root: Path) -> list[str]:
                 paths = list(entry.glob("*/SKILL.md"))
                 if not paths:
                     errors.append(f".claude-plugin/plugin.json: empty skills directory {raw}")
-            elif kind != "skills" and entry.is_file() and entry.suffix == ".md":
+            elif kind == "commands" and entry.is_dir():
+                # The Claude manifest supports file or directory paths. Prefer
+                # directories here for legacy VS Code/Copilot discovery readers.
+                paths = list(entry.glob("*.md"))
+                if not paths:
+                    errors.append(f".claude-plugin/plugin.json: empty commands directory {raw}")
+            elif kind == "agents" and entry.is_file() and entry.suffix == ".md":
                 paths = [entry]
             else:
                 errors.append(f".claude-plugin/plugin.json: invalid {kind} path {raw}")

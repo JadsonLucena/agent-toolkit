@@ -7,7 +7,7 @@ Agent Toolkit is a portable engineering guidance repository. This **optional** C
 | Capability | Registration | What is not guaranteed |
 | --- | --- | --- |
 | Skills | All 20 canonical `SKILL.md` files under eight `contexts/*/skills/` scan roots | Selection, activation, and cross-repository references |
-| Commands | All 18 canonical `contexts/*/commands/*.md` files by explicit path | Slash-command mapping or execution in every Copilot client |
+| Commands | All 18 canonical `contexts/*/commands/*.md` files through eight existing command directories | Slash-command mapping or execution in every Copilot client |
 | Agents | All 17 canonical `contexts/*/agents/*.md` files by explicit path | Delegation support, identity isolation, allowed tools, or review-gate attestation |
 | Rules | **Not registered by this manifest** | Claude format has no equivalent top-level Rule paths field; Cursor Rule metadata does not make Claude or Copilot inject them |
 | Contracts | Remain in `contracts/` inside the same checkout | Loading just because a canonical Markdown document mentions a contract |
@@ -32,13 +32,14 @@ The Python check validates manifest structure and exact canonical coverage; it c
 
 1. Use a VS Code release that supports Agent Plugins and select the **Copilot** harness in the Agent Customizations editor. Enable `chat.plugins.enabled` if needed.
 2. Use **Install a plugin from source** to point at this full checkout, or register it for development using experimental `chat.pluginLocations`. Do not point to `.claude-plugin/` by itself; the plugin root contains the canonical sources.
-3. In the plugin details, inspect the available Skills, Agents and Commands **individually**. Do not infer component parity from the recognized manifest.
-4. In a **different disposable repository**, run a safe scenario such as reviewing a specified diff read-only. Capture host events for Skill loading, slash-command resolution, delegated Agent identity, Rule/Contract path resolution, and any missing capability.
-5. Record the exact host version, harness, plugin revision and observed events in `evals/routing/`, marking capabilities `unsupported` or `not-run` when evidence is unavailable.
+3. In the plugin details, inspect the available Skills, Agents and Commands **individually**. Do not infer component parity from the recognized manifest. Open a new **Copilot harness chat** and type `/` to find plugin commands; the Agent picker in VS Code is **not** a Command list. Look for `agent-toolkit` or `review-code` in slash completions, and try a harmless read-only review if the command is present. Report missing completions separately from a command that fails at runtime.
+4. If an Agent appears twice as `VS Code` and `Plugin: agent-toolkit`, inspect both entries in **Chat: Open Customizations → Agents** and their file locations. The first source is an editor/workspace/user customization; the second comes from the plugin. Disable or remove *only a separately maintained copy* if you intend plugin-only ownership. Do not rename canonical Agents, delete plugin cache entries, or assume the plugin generated duplicate source files. Also check workspace and user-scoped agent locations or custom file-location settings.
+5. In a **different disposable repository**, run a safe scenario such as reviewing a specified diff read-only. Capture host events for Skill loading, slash-command resolution, delegated Agent identity, Rule/Contract path resolution, and any missing capability.
+6. Record the exact host version, harness, plugin revision and observed events in `evals/routing/`, marking capabilities `unsupported` or `not-run` when evidence is unavailable. The Claude manifest now lists command **directories** instead of individual files, to accommodate directory-oriented plugin readers; Claude Code supports both, but VS Code command discovery is still awaiting a verified host execution after this change.
 
 Do not configure VS Code as a duplicate Claude agent runtime or assert that `AGENTS.md` from the plugin root is automatically added to the consumer workspace. Add host-specific adapters **only after** a demonstrated incompatibility.
 
-The initial plugin version is `0.1.0`. Increment `version` when publishing subsequent Claude-format plugin updates; Claude Code can pin installed versions to this value.
+The manifest version is `0.1.1`. Install or refresh this version before comparing results; stale plugin revisions can keep the old file-based command paths.
 
 ## Regression and release conditions
 
@@ -54,3 +55,4 @@ Primary specifications:
 - https://code.claude.com/docs/en/plugins/manifest-reference
 - https://code.visualstudio.com/docs/agents/reference/agent-plugin-reference
 - https://code.visualstudio.com/docs/agent-customization/agent-plugins
+- https://code.visualstudio.com/docs/agent-customization/custom-agents

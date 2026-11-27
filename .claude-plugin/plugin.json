@@ -1,7 +1,7 @@
 {
   "name": "agent-toolkit",
   "displayName": "Agent Toolkit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Guide AI coding agents through disciplined software engineering, from requirements to reviewable changes, with traceable evidence and risk-aware verification.",
   "author": {
     "name": "Jadson Lucena"
@@ -26,24 +26,14 @@
     "./contexts/testing/skills"
   ],
   "commands": [
-    "./contexts/debugging/commands/investigate-defect.md",
-    "./contexts/delivery/commands/deliver-change.md",
-    "./contexts/design/commands/design-solution.md",
-    "./contexts/git/commands/commit.md",
-    "./contexts/git/commands/create-pull-request.md",
-    "./contexts/git/commands/determine-semantic-version.md",
-    "./contexts/git/commands/plan-pull-requests.md",
-    "./contexts/git/commands/prepare-pull-request.md",
-    "./contexts/git/commands/resolve-conflicts.md",
-    "./contexts/implementation/commands/implement-slice.md",
-    "./contexts/requirements/commands/build-backlog.md",
-    "./contexts/requirements/commands/elicit-requirements.md",
-    "./contexts/requirements/commands/refine-backlog.md",
-    "./contexts/requirements/commands/specify-and-plan-change.md",
-    "./contexts/requirements/commands/specify-requirements.md",
-    "./contexts/requirements/commands/validate-requirements.md",
-    "./contexts/review/commands/review-code.md",
-    "./contexts/testing/commands/generate-tests.md"
+    "./contexts/debugging/commands",
+    "./contexts/delivery/commands",
+    "./contexts/design/commands",
+    "./contexts/git/commands",
+    "./contexts/implementation/commands",
+    "./contexts/requirements/commands",
+    "./contexts/review/commands",
+    "./contexts/testing/commands"
   ],
   "agents": [
     "./contexts/debugging/agents/debugging-investigator.md",
