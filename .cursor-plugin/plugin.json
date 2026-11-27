@@ -1,6 +1,6 @@
 {
   "name": "agent-toolkit",
-  "description": "Guide AI coding agents from change requests to reviewable software increments with clear ownership, traceable evidence, and risk-aware verification.",
+  "description": "Guide AI coding agents through disciplined software engineering, from requirements to reviewable changes, with traceable evidence and risk-aware verification.",
   "skills": [
     "./contexts/requirements/skills",
     "./contexts/design/skills",
