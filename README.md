@@ -38,6 +38,8 @@ Canonical Skills follow the [Agent Skills specification](https://agentskills.io/
 
 The [Cursor Plugin](.cursor-plugin/README.md) optionally exposes canonical Skills, Commands, Agents and Rules without duplicating sources; contextual Rule activation must be verified in Cursor.
 
+The [Claude-format plugin](.claude-plugin/README.md) exposes canonical Skills, Commands, and Agents to Claude Code and to VS Code clients that recognize Claude manifests. Rules are not registered; host behavior and cross-workspace source resolution require separate validation.
+
 The [adapters](adapters/) directory contains optional runtime integrations, including [portable Review execution](adapters/review/README.md), [OCR-assisted discovery](adapters/ocr/README.md), [team orchestration](adapters/teams/README.md), [GitHub PR safeguards](adapters/github/README.md), and [context retrieval](adapters/context/README.md). Canonical workflows remain usable without any particular adapter.
 
 ## Documentation
