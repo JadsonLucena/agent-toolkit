@@ -17,6 +17,7 @@ All specialists must confirm the same frozen target and head.
 Each candidate finding requires `finding_id`, `location` (file:line),
 `claim`, `trigger`, `evidence`, `consequence`, `severity`
 (critical/high/medium/low) and `confidence` (high/medium/low).
+For complex security candidates, an optional `security_context` mapping may carry `property`, `affected_asset`, `attacker_capability`, `entry_point`, `trust_boundary`, `violated_invariant`, `existing_controls`, `bypass` and `weakness_id` (e.g. an applicable CWE). Only include fields evidenced by inspected source; unset is not a failure, and unknown external controls must be recorded as uncertainty. This supplements—not replaces—`claim`, `trigger`, evidence, consequence, confidence and the normal verification lifecycle; never include credentials or real personal data.
 Cross-lens requests contain `kind`, `recipient_role`, `subject`,
 `evidence_refs` and `requested_action`.
 
