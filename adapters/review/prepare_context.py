@@ -40,6 +40,7 @@ def prepare_context(
     allow_security_audit: bool = True,
     security_audit_root: Path | None = None,
     security_concerns: list[str] | None = None,
+    security_topics: list[str] | None = None,
 ) -> dict[str, Any]:
     """Freeze Git scope independently of optional helpers and platform APIs."""
     if review_profile not in ("advisory", "gate"):
@@ -86,7 +87,8 @@ def prepare_context(
         try:
             security = security_guidance_adapter(
                 changed_files=inventory["changed_files"],
-                concerns=security_concerns, skill_root=security_audit_root,
+                concerns=security_concerns, topics=security_topics,
+                skill_root=security_audit_root,
             )
         except (ImportError, OSError, ValueError) as exc:
             security = {
@@ -139,6 +141,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-ocr", action="store_true")
     ap.add_argument("--no-security-audit", action="store_true")
     ap.add_argument("--security-audit-root", type=Path)
+    ap.add_argument("--security-topic", action="append", default=[],
+                    help="optional explicit security surface used only for guidance selection")
     ap.add_argument("--timeout", type=int, default=30)
     ap.add_argument("--output-language")
     ap.add_argument("--review-profile", choices=("advisory", "gate"), default="advisory")
@@ -151,6 +155,7 @@ def main(argv: list[str] | None = None) -> int:
             review_profile=args.review_profile,
             allow_security_audit=not args.no_security_audit,
             security_audit_root=args.security_audit_root,
+            security_topics=args.security_topic,
         )
     except (GitScopeError, ValueError, OSError) as exc:
         print(json.dumps({"kind": "review-context", "status": "blocked",
