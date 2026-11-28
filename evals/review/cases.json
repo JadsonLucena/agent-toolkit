@@ -423,6 +423,11 @@
           "id": "c3",
           "mode": "presence",
           "criterion": "Routes concurrency mechanism questions to Reliability/Correctness without inventing a mandatory locking implementation"
+        },
+        {
+          "id": "c4",
+          "mode": "absence",
+          "criterion": "Does not require a specific locking or transaction technology without a source-backed necessity"
         }
       ]
     }
