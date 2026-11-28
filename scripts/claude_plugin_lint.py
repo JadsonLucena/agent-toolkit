@@ -105,6 +105,9 @@ def lint_claude_plugin(root: Path) -> list[str]:
                 if not NAME.fullmatch(name) or not match or match.group(1) != name:
                     errors.append(f".claude-plugin/plugin.json: invalid {kind} identity {rel}")
         expected = canonical_files(root, kind)
+        if kind == "skills":
+            # Explicitly approved vendor skill is packaged, not canonical Review policy.
+            expected.add(".agents/skills/security-audit/SKILL.md")
         if found != expected:
             errors.append(f".claude-plugin/plugin.json: {kind} coverage mismatch "
                           f"(missing={sorted(expected - found)}, extra={sorted(found - expected)})")

@@ -17,6 +17,7 @@ class ClaudePluginTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         shutil.copytree(ROOT / "contexts", self.root / "contexts")
+        shutil.copytree(ROOT / ".agents", self.root / ".agents")
         for folder in (".claude-plugin", ".cursor-plugin"):
             (self.root / folder).mkdir(parents=True)
             shutil.copy2(ROOT / folder / "plugin.json",
@@ -38,7 +39,7 @@ class ClaudePluginTests(unittest.TestCase):
     def test_current_plugin_exposes_all_canonical_components_without_copy(self):
         self.assertEqual([], lint_claude_plugin(self.root))
         manifest = self.manifest()
-        self.assertEqual(8, len(manifest["skills"]))
+        self.assertEqual(9, len(manifest["skills"]))
         self.assertEqual(20, len(canonical_files(self.root, "skills")))
         self.assertEqual(18, len(canonical_files(self.root, "commands")))
         self.assertEqual(17, len(canonical_files(self.root, "agents")))
@@ -47,6 +48,16 @@ class ClaudePluginTests(unittest.TestCase):
         self.assertNotIn("rules", manifest)
         self.assertNotIn("hooks", manifest)
         self.assertNotIn("mcpServers", manifest)
+
+    def test_bundled_vendor_skill_is_required(self):
+        (self.root / ".agents/skills/security-audit/SKILL.md").unlink()
+        self.assert_issue("empty skills directory")
+
+    def test_unapproved_vendor_skill_is_rejected(self):
+        vendor = self.root / ".agents/skills/unapproved"
+        vendor.mkdir(parents=True)
+        (vendor / "SKILL.md").write_text("---\nname: unapproved\n---\n", encoding="utf-8")
+        self.assert_issue("skills coverage mismatch")
 
     def test_missing_one_agent_is_detected(self):
         manifest = self.manifest()

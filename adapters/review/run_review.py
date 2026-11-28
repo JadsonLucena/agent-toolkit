@@ -70,6 +70,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--commit")
     ap.add_argument("--base-branch", help="local or cached remote-tracking base; never fetches")
     ap.add_argument("--no-ocr", action="store_true")
+    ap.add_argument("--no-security-audit", action="store_true")
+    ap.add_argument("--security-audit-root", type=Path)
     ap.add_argument("--timeout", type=int, default=300)
     ap.add_argument("--ocr-timeout", type=int, default=30)
     ap.add_argument("--risk-profile", choices=("R0", "R1", "R2", "R3"))
@@ -125,6 +127,9 @@ def main(argv: list[str] | None = None) -> int:
                 base_branch=args.base_branch, allow_ocr=not args.no_ocr,
                 timeout=args.ocr_timeout, output_language=args.output_language,
                 review_profile=args.review_profile,
+                allow_security_audit=not args.no_security_audit,
+                security_audit_root=args.security_audit_root,
+                security_concerns=args.concern,
             )
             context["preparation_adapter"] = "python-reference"
             context["review_risk_profile"] = args.risk_profile

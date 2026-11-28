@@ -54,3 +54,7 @@ Primary specifications:
 - https://code.claude.com/docs/en/plugins/manifest-reference
 - https://code.visualstudio.com/docs/agents/reference/agent-plugin-reference
 - https://code.visualstudio.com/docs/agent-customization/agent-plugins
+
+## Bundled security guidance
+
+The root plugin manifest exposes the pinned Cloudflare `security-audit` skill through `./.agents/skills`. Its MIT-licensed files are committed once at `.agents/skills/security-audit/`, with integrity recorded in `skills-lock.json`. The Review Security Reviewer uses selected references in guidance mode only. No separate subagent or automatic full audit is introduced. See `adapters/security-audit/README.md`; static manifest checks do not replace a real host-discovery pilot.

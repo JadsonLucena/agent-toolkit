@@ -56,3 +56,7 @@ python3 -m unittest discover -s tests -v
 ```
 
 References: [Cursor Plugins](https://cursor.com/docs/plugins), [Cursor Plugin Reference](https://cursor.com/docs/reference/plugins), [Cursor Rules](https://cursor.com/docs/rules).
+
+## Bundled security guidance
+
+The root plugin manifest exposes the pinned Cloudflare `security-audit` skill through `./.agents/skills`. Its MIT-licensed files are committed once at `.agents/skills/security-audit/`, with integrity recorded in `skills-lock.json`. The Review Security Reviewer uses selected references in guidance mode only. No separate subagent or automatic full audit is introduced. See `adapters/security-audit/README.md`; static manifest checks do not replace a real host-discovery pilot.
