@@ -38,6 +38,7 @@ Use the existing catalogs for **specific behavioral falsification**, rather than
 - [Delivery](delivery/README.md): authorization, commits, review freshness, PR publication, recovery, and outcomes.
 - [Review](review/README.md): evidence-backed findings, conformance, and verdict integrity.
 - [HTTP API](api/README.md): design, implementation and review of applicable HTTP/API and collection-query behavior, including negative selection.
+- [Design critique pilot](design/README.md): evaluate whether a separate, opt-in pre-implementation critique reveals material decisions missed by the authoring Design process.
 - [Requirements](requirements/README.md): source authority, ambiguity, and preservation of accepted semantics.
 - [Context engineering](context/README.md): isolation, provenance, compaction, and untrusted retrieved content.
 - [Debugging](debugging/README.md): causal evidence, disconfirmation, safe scope, and read-only diagnosis.

@@ -31,6 +31,8 @@ jobs:
         run: python3 scripts/requirements_evals.py --catalog evals/delivery/cases.json
       - name: Context Engineering evaluation catalog
         run: python3 scripts/requirements_evals.py --catalog evals/context/cases.json
+      - name: Design critique pilot catalog (structure only)
+        run: python3 scripts/requirements_evals.py --catalog evals/design/review-cases.json
       - name: Capability routing evaluation catalog (structure only)
         run: python3 scripts/routing_evals.py --catalog evals/routing/cases.json
       - name: Claude plugin static coverage (host not tested)
