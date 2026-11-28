@@ -81,6 +81,7 @@ Each finding should include:
 * `id` and `raw_source_ids` — identity and provenance;
 * `category` — e.g., correctness, security, architecture, data, reliability, testing, performance, maintainability, operations;
 * `source_refs` — relevant contracts, requirements or scenarios when present, preserving stable upstream IDs;
+* `security_context` — optional source-backed adversarial context for security findings (property, protected asset, attacker capability, entry point, trust boundary, existing controls, bypass and weakness ID when relevant), passed through from the specialist without replacing independent finding verification;
 * `file`, `line` or bounded `scope` — actual inspected location without invented line numbers;
 * `claim`, `trigger_condition`, `evidence`, `consequence`, `recommendation`;
 * `severity` — `critical` / `high` / `medium` / `low`, based on **reachable impact**, calibrated by `contexts/review/rules/code-review.md`;
