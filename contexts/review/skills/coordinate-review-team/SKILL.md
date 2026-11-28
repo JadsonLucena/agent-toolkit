@@ -69,6 +69,13 @@ Concern mapping:
 * testing / scenario adequacy → `testing-reviewer`
 * architecture / service boundaries / operations → `architecture-reviewer`
 
+If the number of genuine concerns exceeds the profile's specialist cap,
+require a Lead-supplied evidence-based **rank and rationale per concern**.
+The list order alone is not a risk ranking; omit the lower-priority lenses
+with their rank/reason recorded in `n_justification`. Do not fabricate
+distinct concerns or automatic severity scores. The Lead still reviews the
+complete changed-file set and affected dependents.
+
 Record each omission and why it was not relevant. R3 with a runtime that has
 no isolated verifier may use the lead's documented native falsification pass,
 but must label it `native-second-pass` (never independent agent verification).

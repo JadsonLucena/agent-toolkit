@@ -77,6 +77,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--risk-profile", choices=("R0", "R1", "R2", "R3"))
     ap.add_argument("--concern", action="append", choices=sorted(CONCERN_CHOICES), default=[],
                     help="valid concerns: " + ", ".join(sorted(CONCERN_CHOICES)))
+    ap.add_argument("--concern-priority", action="append", metavar="CONCERN=RANK:REASON",
+                    default=[], help="required for over-capacity Task plans; rank 1 is highest, with evidence-based reason")
     ap.add_argument("--task-capable", action="store_true")
     ap.add_argument("--isolated-subagents", action="store_true")
     ap.add_argument("--direct-peer-supported", action="store_true")
@@ -113,6 +115,17 @@ def main(argv: list[str] | None = None) -> int:
         ap.error("--expected-context-sha256 is only valid with --validate-evidence")
     if not args.prepare_only and not args.validate_evidence and not command:
         ap.error("supply a reviewer command or use --prepare-only")
+    concern_priorities = {}
+    for entry in args.concern_priority:
+        name, sep, payload = entry.partition("=")
+        rank_str, reason_sep, reason = payload.partition(":")
+        if (not sep or not reason_sep or not reason.strip()
+                or name not in CONCERN_CHOICES or not rank_str.isdigit()):
+            ap.error("--concern-priority requires CONCERN=POSITIVE_RANK:EVIDENCE_REASON")
+        canonical = {"spec": "contract", "specification": "contract", "arch": "architecture"}.get(name, name)
+        if canonical in concern_priorities:
+            ap.error("duplicate --concern-priority for the same normalized concern")
+        concern_priorities[canonical] = {"rank": int(rank_str), "reason": reason.strip()}
     try:
         if args.validate_evidence:
             context = read_json(args.context)
@@ -142,6 +155,7 @@ def main(argv: list[str] | None = None) -> int:
                     isolated_tasks=args.isolated_subagents or args.task_capable,
                     direct_peer_supported=args.direct_peer_supported,
                     lead_implemented_change=args.lead_implemented_change,
+                    concern_priorities=concern_priorities or None,
                 )
             if args.prepare_only:
                 assert_target_fresh(context, args.repo)

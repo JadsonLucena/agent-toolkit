@@ -109,14 +109,15 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
         self.head = git(self.repo, "rev-parse", "HEAD")
         self.ctx = prepare_context(self.repo, base=self.base, head=self.head, allow_ocr=False)
 
-    def plan(self, risk="R3", concerns=None, tasks=True, direct=False, implementer=False):
+    def plan(self, risk="R3", concerns=None, tasks=True, direct=False, implementer=False,
+             priorities=None):
         if concerns is None:
             concerns = ["correctness", "reliability", "security"]
         return team.freeze(
             self.ctx, self.repo, risk_profile=risk, concerns=concerns,
             task_available=tasks, isolated_tasks=tasks,
             direct_peer_supported=direct, lead_implemented_change=implementer,
-            review_id="review-a",
+            review_id="review-a", concern_priorities=priorities,
         )
 
     def host(self, **kwargs):
@@ -136,16 +137,26 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
     async def test_r1_zero_or_one_only(self):
         solo = self.plan("R1", [], tasks=True)
         self.assertEqual([], solo["selected_roles"])
-        one = self.plan("R1", ["testing", "correctness"], tasks=True)
+        one = self.plan("R1", ["testing", "correctness"], tasks=True,
+                        priorities={
+                            "testing": {"rank": 1, "reason": "Changed assertions"},
+                            "correctness": {"rank": 2, "reason": "Localized behavior"},
+                        })
         self.assertEqual(["testing-reviewer"], one["selected_roles"])
 
     async def test_r2_uses_2_to_4_distinct_specialists(self):
-        plan = self.plan("R2", ["correctness", "reliability", "security", "testing", "architecture"])
+        keys = ["correctness", "reliability", "security", "testing", "architecture"]
+        priorities = {k: {"rank": i + 1, "reason": f"Verified {k} concern"}
+                      for i, k in enumerate(keys)}
+        plan = self.plan("R2", keys, priorities=priorities)
         self.assertEqual(4, len(plan["selected_roles"]))
         self.assertIn("architecture-reviewer", plan["omitted_roles"])
 
     async def test_r3_uses_3_to_5_and_isolated_verifier_always(self):
-        plan = self.plan("R3", ["correctness", "reliability", "security", "testing", "architecture", "contract"])
+        keys = ["correctness", "reliability", "security", "testing", "architecture", "contract"]
+        priorities = {k: {"rank": i + 1, "reason": f"Verified {k} concern"}
+                      for i, k in enumerate(keys)}
+        plan = self.plan("R3", keys, priorities=priorities)
         self.assertEqual(5, len(plan["selected_roles"]))
         self.assertIn("specification-reviewer", plan["omitted_roles"])
         host = self.host()
@@ -160,6 +171,58 @@ class TeamOrchestrationTests(unittest.IsolatedAsyncioTestCase):
     async def test_r2_single_all_purpose_agent_is_rejected(self):
         with self.assertRaisesRegex(team.TeamPlanningError, "2-4 distinct concerns"):
             self.plan("R2", ["correctness"])
+
+    async def test_over_capacity_unranked_concerns_fail_closed(self):
+        with self.assertRaisesRegex(team.TeamPlanningError, "input order is not a risk ranking"):
+            self.plan("R2", ["correctness", "testing", "architecture", "reliability", "contract"])
+
+    async def test_risk_ranking_overrides_input_order(self):
+        concerns = ["contract", "correctness", "testing", "reliability", "architecture"]
+        priorities = {
+            "architecture": {"rank": 1, "reason": "New service boundary affects all consumers"},
+            "reliability": {"rank": 2, "reason": "Persisted external effects"},
+            "contract": {"rank": 3, "reason": "Published contract changes"},
+            "testing": {"rank": 4, "reason": "Cross-boundary regression tests"},
+            "correctness": {"rank": 5, "reason": "Only a local helper changes"},
+        }
+        plan = self.plan("R2", concerns, priorities=priorities)
+        self.assertEqual(
+            ["architecture-reviewer", "reliability-reviewer", "specification-reviewer",
+             "testing-reviewer"], plan["selected_roles"])
+        self.assertIn("rank 5", plan["omitted_roles"]["correctness-reviewer"])
+        self.assertIn("service boundary", plan["role_assignments"]["architecture-reviewer"]["reason"])
+        self.assertEqual("contract", plan["n_justification"]["priority_ranking"][2]["concern"])
+        self.assertEqual(concerns, plan["n_justification"]["input_concerns"])
+
+    async def test_ranking_requires_complete_distinct_nonempty_evidence(self):
+        concerns = ["architecture", "reliability", "security", "testing", "contract"]
+        ranks = {k: {"rank": i + 1, "reason": k} for i, k in enumerate(concerns)}
+        for bad in (
+            {k: v for k, v in ranks.items() if k != "testing"},
+            {**ranks, "security": {"rank": 2, "reason": "ties must not decide omissions"}},
+            {**ranks, "architecture": {"rank": 1, "reason": " "}},
+            {**ranks, "extra": {"rank": 6, "reason": "outside scope"}},
+        ):
+            with self.assertRaises(team.TeamPlanningError):
+                self.plan("R2", concerns, priorities=bad)
+
+    async def test_ranking_accepts_aliases_without_duplicate_roles(self):
+        concerns = ["arch", "security", "correctness", "testing", "contract"]
+        priorities = {
+            "arch": {"rank": 1, "reason": "Changed boundary"},
+            "security": {"rank": 2, "reason": "New trust boundary"},
+            "correctness": {"rank": 3, "reason": "Behavior change"},
+            "testing": {"rank": 4, "reason": "Acceptance coverage"},
+            "contract": {"rank": 5, "reason": "Unchanged public contract"},
+        }
+        plan = self.plan("R2", concerns, priorities=priorities)
+        self.assertEqual("architecture-reviewer", plan["selected_roles"][0])
+
+    async def test_no_task_runtime_does_not_need_ranking(self):
+        plan = self.plan("R2", ["architecture", "reliability", "security",
+                                "testing", "contract"], tasks=False)
+        self.assertEqual([], plan["selected_roles"])
+        self.assertEqual("native-solo", plan["execution_mode"])
 
     async def test_r3_two_real_concerns_are_allowed_with_verifier(self):
         plan = self.plan("R3", ["security", "correctness"])
