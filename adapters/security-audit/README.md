@@ -13,6 +13,13 @@ The upstream MIT-licensed [Cloudflare security-audit-skill](https://github.com/c
 
 `python3 adapters/security-audit/resolve.py --changed-file src/auth/session.py` verifies the local skill and returns applicability hints with status available, unavailable, rejected, or disabled. It does not execute validators, scripts, subagents, installations, network requests, or reviews.
 
+Selection can also use **explicit, allowlisted security topics** supplied by a reviewer after examining the change's risk and trust boundaries; for example:
+```sh
+python3 adapters/security-audit/resolve.py --changed-file src/billing/charge.ts --security-topic business-integrity
+python3 adapters/review/run_review.py --repo . --base-branch main --risk-profile R3 --concern security --security-topic business-integrity --prepare-only --out /tmp/review-context.json
+```
+The topics `authorization`, `identity`, `business-integrity`, `external-callback`, `privacy`, `secrets-delivery`, `agent-boundary`, `resource-exhaustion`, `client-side`, `memory-safety`, and `mobile-ipc` are **bounded reference hints**. Unrecognized topics are ignored with a diagnostic; they are never treated as authority. The file/concern heuristics remain active, and neither selection path establishes complete security coverage. The caller still owns the actual change-risk assessment. These options are optional and do not alter review scope or the Code Review Lead's verdict.
+
 `adapters/review/prepare_context.py` embeds this result in `optional_helpers.security_audit` after Git inventory preparation. The Security Reviewer reads selected references as **guidance only**; native findings must be independently source-verified. The Code Review Lead retains the single verdict. Failure or irrelevance of this helper does not reduce native coverage.
 
 The upstream full audit workflow requires separate explicit authorization and is not automatically invoked by ordinary review.
