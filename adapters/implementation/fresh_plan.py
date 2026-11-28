@@ -45,7 +45,7 @@ def git(repo: Path, *args: str) -> str:
 def changed_paths(repo: Path, before: str) -> set[str]:
     """Detect committed, staged, unstaged, and untracked paths since a clean baseline."""
     try:
-        diff = subprocess.run(["git", "diff", "--name-only", "-z", before, "HEAD"],
+        diff = subprocess.run(["git", "diff", "--name-only", "--no-renames", "-z", before, "HEAD"],
                               cwd=repo, capture_output=True, timeout=15, check=False)
         status = subprocess.run(["git", "status", "--porcelain=v1", "-z", "--untracked-files=all"],
                                 cwd=repo, capture_output=True, timeout=15, check=False)
@@ -75,7 +75,7 @@ def valid_path(raw: object) -> str:
     if not isinstance(raw, str) or not raw or "\\" in raw or "\x00" in raw:
         raise PlanError("Invalid allowed path")
     p = PurePosixPath(raw.rstrip("/"))
-    if p.is_absolute() or not p.parts or any(s in (".", "..") for s in p.parts) or p.parts[0] == ".git":
+    if p.is_absolute() or not p.parts or any(s in (".", "..") for s in p.parts) or ".git" in p.parts:
         raise PlanError("Allowed path escapes workspace")
     return raw
 
@@ -142,9 +142,18 @@ class SessionHost(Protocol):
 
 
 class CodexCLIHost:
-    """One non-resumed \`codex exec\` process per plan; Codex sandbox is host-enforced."""
+    """One non-resumed Codex CLI process per plan; host sandbox is authoritative."""
     def available(self) -> bool:
-        return shutil.which("codex") is not None
+        binary = shutil.which("codex")
+        if binary is None:
+            return False
+        try:
+            help_result = subprocess.run([binary, "exec", "--help"], stdin=subprocess.DEVNULL,
+                                         capture_output=True, timeout=5, check=False)
+        except (OSError, subprocess.TimeoutExpired):
+            return False
+        return (help_result.returncode == 0 and b"--json" in help_result.stdout
+                and b"--sandbox" in help_result.stdout)
 
     def run(self, repo: Path, prompt: str, timeout: int) -> dict:
         try:
@@ -216,6 +225,11 @@ def run_plans(repo: Path, plans: list[dict], host: SessionHost | None = None,
             session = outcome.get("session_id")
             if git(repo, "symbolic-ref", "--quiet", "HEAD") != baseline_branch:
                 raise PlanError("Execution switched branches; reconcile Git state")
+            ancestry = subprocess.run(["git", "merge-base", "--is-ancestor", baseline, "HEAD"],
+                                      cwd=repo, stdin=subprocess.DEVNULL,
+                                      capture_output=True, timeout=15, check=False)
+            if ancestry.returncode != 0:
+                raise PlanError("Execution rewrote baseline history; reconcile Git state")
             footprint = changed_paths(repo, baseline)
         except (PlanError, OSError, ValueError) as exc:
             return {"status": "blocked", "reason": str(exc), "results": results,
