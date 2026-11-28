@@ -13,7 +13,7 @@ class ReviewSddEvalsTests(unittest.TestCase):
     def test_catalog_valid_and_targets_review(self):
         cat = load_catalog(ROOT / "evals/review/cases.json")
         ids = [x["id"] for x in cat["cases"]]
-        self.assertEqual(8, len(ids))
+        self.assertGreaterEqual(len(ids), 18)
         self.assertEqual(len(ids), len(set(ids)))
         self.assertTrue(all(x["command"] == "/review/review-code" for x in cat["cases"]))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))
@@ -25,6 +25,18 @@ class ReviewSddEvalsTests(unittest.TestCase):
                 expected = "absence" if check["criterion"].startswith("Does not") else "presence"
                 with self.subTest(case=case["id"], check=check["id"]):
                     self.assertEqual(expected, check["mode"])
+
+    def test_adversarial_polarity_and_outcome_coverage(self):
+        cat = load_catalog(ROOT / "evals/review/cases.json")
+        added = [case for case in cat["cases"] if case["id"].startswith("RV-")
+                 and int(case["id"][3:]) >= 9]
+        self.assertGreaterEqual(len(added), 10)
+        self.assertEqual({"missed-defect-control", "false-positive-control"},
+                         {case.get("polarity") for case in added})
+        for case in added:
+            with self.subTest(case=case["id"]):
+                self.assertIn("presence", {check["mode"] for check in case["checks"]})
+                self.assertIn("absence", {check["mode"] for check in case["checks"]})
 
     def test_missing_observed_agent_runs_cannot_pass(self):
         cat = load_catalog(ROOT / "evals/review/cases.json")
