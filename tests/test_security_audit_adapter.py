@@ -80,6 +80,44 @@ class SecurityAuditAdapterTests(unittest.TestCase):
                 self.skipTest("symlinks unavailable on this platform")
             self.assertEqual("rejected", adapter(skill_root=root)["status"])
 
+    def test_explicit_topic_covers_financial_operation_without_filename_hint(self):
+        without = adapter(changed_files=["src/billing/charge.ts"], concerns=["security"])
+        self.assertEqual([], without["selected_references"])
+        with_topic = adapter(
+            changed_files=["src/billing/charge.ts"], concerns=["security"],
+            topics=["business-integrity"],
+        )
+        self.assertEqual("available", with_topic["status"])
+        self.assertFalse(with_topic["review_performed"])
+        names = {item["path"] for item in with_topic["selected_references"]}
+        self.assertIn("PROTOCOLS-RPC-AND-MESSAGING.md", names)
+        self.assertIn("DATA-ISOLATION-AND-LIFECYCLE.md", names)
+        self.assertTrue(all("explicit security topic" in item["reason"]
+                            for item in with_topic["selected_references"]))
+
+    def test_topic_selection_is_bounded_deduplicated_and_non_authoritative(self):
+        result = adapter(
+            changed_files=["src/auth/session.py"],
+            topics=["authorization", "authorization", "bogus;external"],
+        )
+        names = [item["path"] for item in result["selected_references"]]
+        self.assertEqual(len(names), len(set(names)))
+        self.assertIn("WEB-PROTOCOL-AND-AUTH.md", names)
+        self.assertIn("DATA-ISOLATION-AND-LIFECYCLE.md", names)
+        self.assertTrue(any("unrecognized" in d for d in result["diagnostics"]))
+        self.assertNotIn("bogus;external", str(result["diagnostics"]))
+        self.assertIsNone(result["review_verdict"])
+
+    def test_explicit_topics_do_not_override_disabled_or_rejected_helper(self):
+        self.assertEqual("disabled", adapter(enabled=False, topics=["authorization"])["status"])
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "unapproved"
+            shutil.copytree(DEFAULT_ROOT, root)
+            (root / "SKILL.md").write_text("# changed\\n", encoding="utf-8")
+            result = adapter(skill_root=root, topics=["authorization"])
+            self.assertEqual("rejected", result["status"])
+            self.assertEqual([], result["selected_references"])
+
     def test_tampered_lock_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             lock = Path(directory) / "skills-lock.json"
