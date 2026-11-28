@@ -59,6 +59,28 @@ implied. With isolated Tasks but no host-observed direct exchange, the
 execution mode is `team-relayed`. `team-live` is permitted only when an
 approved runtime audit proves direct peer request AND response delivery.
 
+If more concerns are identified than the risk profile permits as specialists,
+the Lead must supply an explicit **evidence-grounded ordering**, rather than
+silently relying on the order of `--concern`. For example, an R2 change with
+five concerns (capacity four) can include:
+
+```bash
+  --concern architecture --concern reliability --concern contract \
+  --concern testing --concern correctness \
+  --concern-priority architecture=1:Changed-service-boundary \
+  --concern-priority reliability=2:External-side-effects \
+  --concern-priority contract=3:Published-contract \
+  --concern-priority testing=4:Cross-boundary-tests \
+  --concern-priority correctness=5:Local-helper-only
+```
+
+Every declared concern needs a positive unique rank and nonempty reason when
+ranking is provided; rank 1 is highest priority. This is **Lead-supplied
+investigation evidence**, not a deterministic severity score or a claim that
+omitted concerns are unreviewed. The Lead remains responsible for full diff
+coverage even when a specialist is omitted. Hosts calling `freeze` directly
+supply the neutral `concern_priorities={concern: {rank, reason}}` mapping.
+
 The host's authorized reviewer process imports
 `adapters/review/team_orchestration.py` and implements the `TaskRuntime`
 protocol: `task_batch(requests)`, `resume(task_id, message)`, and optional

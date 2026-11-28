@@ -53,6 +53,7 @@ def freeze(
     concerns: list[str], task_available: bool, isolated_tasks: bool,
     direct_peer_supported: bool = False, lead_implemented_change: bool = False,
     review_id: str | None = None,
+    concern_priorities: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Freeze target and assign bounded lenses BEFORE any Task call."""
     if risk_profile not in BOUNDS:
@@ -84,7 +85,35 @@ def freeze(
     if context["mode"] == "workspace" and not context["target"].get("workspace_fingerprint_sha256"):
         raise TeamPlanningError("workspace fingerprint missing")
     minimum, maximum = BOUNDS[risk_profile]
-    selected = concerns[:maximum] if risk_profile != "R0" else []
+    # A list of concerns identifies possible lenses; its order is not evidence
+    # that an omitted specialist is less relevant. Require explicit, grounded
+    # ranking only when capacity forces the Lead to omit a genuine concern.
+    ranked_evidence: dict[str, dict[str, Any]] = {}
+    if concern_priorities is not None:
+        if not isinstance(concern_priorities, dict):
+            raise TeamPlanningError("concern_priorities must map each concern to rank and reason")
+        for name, detail in concern_priorities.items():
+            canonical = CONCERN_ALIASES.get(name, name)
+            if (canonical not in CONCERN_ROLES or canonical in ranked_evidence
+                    or not isinstance(detail, dict)):
+                raise TeamPlanningError("invalid or duplicate ranked concern")
+            rank, reason = detail.get("rank"), detail.get("reason")
+            if (type(rank) is not int or rank < 1 or
+                    not isinstance(reason, str) or not reason.strip()):
+                raise TeamPlanningError("each ranked concern requires a positive integer rank and evidence-based reason")
+            ranked_evidence[canonical] = {"rank": rank, "reason": reason.strip()}
+        if set(ranked_evidence) != set(concerns):
+            raise TeamPlanningError("concern_priorities must cover exactly the declared distinct concerns")
+        if len({entry["rank"] for entry in ranked_evidence.values()}) != len(ranked_evidence):
+            raise TeamPlanningError("concern ranks must be unique to avoid arbitrary tie-breaking")
+    if (task_available and isolated_tasks and risk_profile != "R0"
+            and len(concerns) > maximum and not ranked_evidence):
+        raise TeamPlanningError("over-capacity concerns require explicit ranked priorities and evidence; input order is not a risk ranking")
+    ranked_concerns = (
+        sorted(concerns, key=lambda concern: ranked_evidence[concern]["rank"])
+        if ranked_evidence else list(concerns)
+    )
+    selected = ranked_concerns[:maximum] if risk_profile != "R0" else []
     if risk_profile == "R2" and task_available and isolated_tasks and len(selected) < minimum:
         raise TeamPlanningError(f"R2 needs {minimum}-{maximum} distinct concerns, not one all-purpose Task")
     if risk_profile == "R3" and task_available and isolated_tasks and not selected:
@@ -100,8 +129,13 @@ def freeze(
         selected = []
     omitted = {CONCERN_ROLES[k]: (
         "Task/isolated subagents unavailable" if not use_team else "outside proportional N cap"
-    ) for k in concerns[len(selected):]}
+    ) for k in ranked_concerns[len(selected):]}
     omitted.update({role: "no distinct concern in diff" for k, role in CONCERN_ROLES.items() if k not in concerns})
+    if ranked_evidence and use_team:
+        for k in ranked_concerns[len(selected):]:
+            omitted[CONCERN_ROLES[k]] += (
+                f" (rank {ranked_evidence[k]['rank']}: {ranked_evidence[k]['reason']})"
+            )
     mode = "team-relayed" if use_team else "native-solo"
     return {
         "review_id": review_id or uuid.uuid4().hex,
@@ -111,7 +145,11 @@ def freeze(
         "review_profile": context.get("review_profile", "advisory"),
         "selected_roles": [CONCERN_ROLES[c] for c in selected],
         "role_assignments": {
-            CONCERN_ROLES[c]: {"concern": c, "reason": f"diff concern: {c}"}
+            CONCERN_ROLES[c]: {
+                "concern": c,
+                "reason": (f"rank {ranked_evidence[c]['rank']}: {ranked_evidence[c]['reason']}"
+                           if ranked_evidence else f"diff concern: {c}"),
+            }
             for c in selected
         },
         "omitted_roles": omitted,
@@ -124,7 +162,10 @@ def freeze(
         "output_language": context.get("output_language"),
         "verifier_required": risk_profile == "R3",
         "n_justification": {
-            "distinct_concerns": list(concerns), "input_concerns": raw_concerns,
+            "distinct_concerns": list(ranked_concerns), "input_concerns": raw_concerns,
+            "priority_ranking": [
+                {"concern": k, **ranked_evidence[k]} for k in ranked_concerns
+            ] if ranked_evidence else [],
             "selected": len(selected), "minimum": minimum, "maximum": maximum,
             "below_ideal_range": below_ideal,
             "below_ideal_reason": (
