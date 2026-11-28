@@ -33,6 +33,8 @@ Canonical Rules, Skills, Commands, Agents and Contracts remain usable without pr
 
 The [Review](adapters/review/README.md), [OCR](adapters/ocr/README.md), [Agent Teams](adapters/teams/README.md), [GitHub](adapters/github/README.md), [Context](adapters/context/README.md), and [Delivery](adapters/delivery/README.md) guides own integration details and version-specific constraints. Host APIs must actually implement isolation, peer messaging, remote effects and protected policy checks; Markdown cannot do so. Optional hints never reduce required native review coverage. On failure, fall back only when the relevant evidence and operation remain safely verifiable.
 
+Bundled third-party security guidance under `.agents/skills/security-audit/` is an **explicitly approved external skill**, not another canonical Review agent, rule, or source of policy. Its pinned Skills CLI lock and read-only adapter are described in `adapters/security-audit/README.md`. Plugin manifests may expose this single noncanonical skill; native review, source verification, and the Code Review Lead's verdict remain authoritative.
+
 ## Responsibility Model
 
 | Artifact kind | Owns | Must not own |

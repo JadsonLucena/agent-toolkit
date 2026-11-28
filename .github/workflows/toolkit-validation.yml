@@ -35,5 +35,7 @@ jobs:
         run: python3 scripts/routing_evals.py --catalog evals/routing/cases.json
       - name: Claude plugin static coverage (host not tested)
         run: python3 scripts/claude_plugin_lint.py
+      - name: Pinned Cloudflare security guidance integrity
+        run: python3 -m unittest discover -s tests -p 'test_security_audit_adapter.py' -v
       - name: Linter regression tests
         run: python3 -m unittest discover -s tests -v

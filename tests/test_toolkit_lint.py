@@ -16,6 +16,7 @@ class ToolkitLintTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         shutil.copytree(ROOT / "contexts", self.root / "contexts")
+        shutil.copytree(ROOT / ".agents", self.root / ".agents")
         shutil.copytree(ROOT / "contracts", self.root / "contracts")
         if (ROOT / "evals").is_dir():
             shutil.copytree(ROOT / "evals", self.root / "evals")
@@ -44,6 +45,14 @@ class ToolkitLintTests(unittest.TestCase):
 
     def test_current_canonical_repository_passes(self):
         self.assertEqual([], lint_toolkit(self.root))
+
+    def test_only_approved_vendor_skill_is_exposed_by_cursor(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        vendor = self.root / ".agents/skills/unapproved"
+        vendor.mkdir(parents=True)
+        (vendor / "SKILL.md").write_text("---\nname: unapproved\n---\n", encoding="utf-8")
+        # The parent directory is manifest-listed; rogue children are rejected.
+        self.assert_error("noncanonical skills artifact")
 
     def test_debugging_is_canonical_and_covered_by_cursor(self):
         # The new context must be recognized by both matrix ownership

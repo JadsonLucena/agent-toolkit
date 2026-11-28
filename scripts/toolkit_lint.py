@@ -156,9 +156,12 @@ def lint_cursor_plugin(root: Path, discovered: dict[str, tuple[str, str]]) -> li
                 if rel in resolved:
                     errors.append(f".cursor-plugin/plugin.json: duplicate {component} artifact {rel}")
                 resolved.add(rel)
-                if discovered.get(rel, (None, None))[0] != kind:
+                if (discovered.get(rel, (None, None))[0] != kind
+                        and not (component == "skills" and rel == ".agents/skills/security-audit/SKILL.md")):
                     errors.append(f".cursor-plugin/plugin.json: noncanonical {component} artifact {rel}")
         expected = {p for p, (artifact_kind, _) in discovered.items() if artifact_kind == kind}
+        if component == "skills":
+            expected.add(".agents/skills/security-audit/SKILL.md")
         if resolved != expected:
             errors.append(f".cursor-plugin/plugin.json: {component} coverage mismatch"
                           f" (missing={sorted(expected - resolved)}, extra={sorted(resolved - expected)})")

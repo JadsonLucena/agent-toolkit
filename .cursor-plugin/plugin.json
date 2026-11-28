@@ -9,7 +9,8 @@
     "./contexts/testing/skills",
     "./contexts/review/skills",
     "./contexts/delivery/skills",
-    "./contexts/git/skills"
+    "./contexts/git/skills",
+    "./.agents/skills"
   ],
   "commands": [
     "./contexts/delivery/commands/deliver-change.md",

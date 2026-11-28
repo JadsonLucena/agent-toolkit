@@ -24,12 +24,22 @@ def ocr_adapter(**kwargs: Any) -> dict[str, Any]:
 
     return adapter(**kwargs)
 
+def security_guidance_adapter(**kwargs: Any) -> dict[str, Any]:
+    """Load only the native read-only resolver, never execute vendor scripts."""
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "security-audit"))
+    from resolve import adapter  # noqa: PLC0415
+
+    return adapter(**kwargs)
+
 
 def prepare_context(
     repo: Path, *, base: str | None = None, head: str | None = None,
     commit: str | None = None, base_branch: str | None = None,
     allow_ocr: bool = True, timeout: int = 30, output_language: str | None = None,
     review_profile: str = "advisory",
+    allow_security_audit: bool = True,
+    security_audit_root: Path | None = None,
+    security_concerns: list[str] | None = None,
 ) -> dict[str, Any]:
     """Freeze Git scope independently of optional helpers and platform APIs."""
     if review_profile not in ("advisory", "gate"):
@@ -72,6 +82,25 @@ def prepare_context(
             group["generic"] = True
             group["binding"] = False
         groups.append(group)
+    if allow_security_audit:
+        try:
+            security = security_guidance_adapter(
+                changed_files=inventory["changed_files"],
+                concerns=security_concerns, skill_root=security_audit_root,
+            )
+        except (ImportError, OSError, ValueError) as exc:
+            security = {
+                "status": "unavailable", "mode": "guidance",
+                "selected_references": [],
+                "diagnostics": [f"optional resolver unavailable: {type(exc).__name__}"],
+                "review_performed": False, "review_verdict": None,
+            }
+    else:
+        security = {
+            "status": "disabled", "mode": "guidance",
+            "selected_references": [], "diagnostics": [],
+            "review_performed": False, "review_verdict": None,
+        }
     excluded = [
         {"path": item["path"], "reason": item.get("exclude_reason", "helper-filtered")}
         for item in helper.get("ocr_excluded_files", [])
@@ -89,7 +118,7 @@ def prepare_context(
         "helper_excluded_requires_native_review": excluded,
         "warnings": inventory.get("warnings", []),
         "output_language": output_language,
-        "optional_helpers": {"ocr": {
+        "optional_helpers": {"security_audit": security, "ocr": {
             "status": helper_status,
             "reviewable_files": helper.get("ocr_reviewable_files", []),
             "excluded_files": helper.get("ocr_excluded_files", []),
@@ -108,6 +137,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--commit")
     ap.add_argument("--base-branch")
     ap.add_argument("--no-ocr", action="store_true")
+    ap.add_argument("--no-security-audit", action="store_true")
+    ap.add_argument("--security-audit-root", type=Path)
     ap.add_argument("--timeout", type=int, default=30)
     ap.add_argument("--output-language")
     ap.add_argument("--review-profile", choices=("advisory", "gate"), default="advisory")
@@ -118,6 +149,8 @@ def main(argv: list[str] | None = None) -> int:
             base_branch=args.base_branch, allow_ocr=not args.no_ocr,
             timeout=args.timeout, output_language=args.output_language,
             review_profile=args.review_profile,
+            allow_security_audit=not args.no_security_audit,
+            security_audit_root=args.security_audit_root,
         )
     except (GitScopeError, ValueError, OSError) as exc:
         print(json.dumps({"kind": "review-context", "status": "blocked",

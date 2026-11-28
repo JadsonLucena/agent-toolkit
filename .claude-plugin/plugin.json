@@ -23,7 +23,8 @@
     "./contexts/implementation/skills",
     "./contexts/requirements/skills",
     "./contexts/review/skills",
-    "./contexts/testing/skills"
+    "./contexts/testing/skills",
+    "./.agents/skills"
   ],
   "commands": [
     "./contexts/debugging/commands/investigate-defect.md",
