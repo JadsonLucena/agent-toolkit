@@ -4,7 +4,7 @@ This catalog is a **benchmark specification**, not evidence that an LLM/agent pa
 
 - [testing-cases.json](testing-cases.json): 13 source-backed cases (9 deficiencies, 3 adequate controls, 1 ambiguous source authority), each with an independent evaluation rubric.
 - [build_testing_fixtures.py](build_testing_fixtures.py): creates a new, disposable two-commit Git repository for one case; refuses to overwrite an existing directory.
-- [test_review_testing_evals.py](../../tests/test_review_testing_evals.py): runs the sample green suites on both revisions and checks independent behavioral witnesses; also validates a skipped test, order-dependent test and stale CI artifact.
+- `tests/test_review_testing_evals.py`: runs the sample green suites on both revisions and checks independent behavioral witnesses; also validates a skipped test, order-dependent test and stale CI artifact.
 
 ## Run the deterministic fixture checks
 
@@ -14,7 +14,7 @@ python3 -m unittest discover -s tests -p 'test_review_testing_evals.py' -v
 python3 evals/review/build_testing_fixtures.py --case TR-02 --out /tmp/agent-toolkit-testing-evals
 ```
 
-The builder returns the exact `base_sha`, `head_sha` and repository path. Run `/review/review-code` against that frozen diff in an authorized host. Assess the specialist's actual evidence and the Lead's output, not just the test name or terminal exit code.
+Each witness run uses Python's `-B` mode to avoid timestamp-based bytecode cache reuse when switching rapidly between similarly sized Git revisions. The builder returns the exact `base_sha`, `head_sha` and repository path. Run `/review/review-code` against that frozen diff in an authorized host. Assess the specialist's actual evidence and the Lead's output, not just the test name or terminal exit code.
 
 ## Evaluate observed model behavior
 
