@@ -116,6 +116,13 @@ class FreshPlanTests(unittest.TestCase):
         with self.assertRaisesRegex(PlanError, "External"):
             validate_plans([dict(self.plan, external_effects_allowed=True)])
 
+    def test_no_commit_policy_does_not_launch_unenforceable_host(self):
+        plan = dict(self.plan, allow_local_commits=False)
+        host = FakeHost()
+        self.assertEqual("native-required", run_plans(self.repo, [plan], host)["status"])
+        self.assertEqual("blocked", run_plans(self.repo, [plan], host, "require")["status"])
+        self.assertFalse(host.prompts)
+
     def test_codex_host_absence_never_claimed_available(self):
         with patch("adapters.implementation.fresh_plan.shutil.which", return_value=None):
             self.assertFalse(CodexCLIHost().available())
