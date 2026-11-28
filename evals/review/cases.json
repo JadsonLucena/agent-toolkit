@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Provider-neutral SDD conformance review behavior rubrics; not observed agent execution",
+  "description": "Provider-neutral SDD conformance and risk-selected reliability review behavior rubrics; not observed agent execution",
   "cases": [
     {
       "id": "RV-01",
@@ -183,6 +183,190 @@
           "id": "c3",
           "mode": "presence",
           "criterion": "Preserves separate Git PR readiness decision"
+        }
+      ]
+    },
+    {
+      "id": "RV-REL-01",
+      "command": "/review/review-code",
+      "scenario": "Lost gateway response and duplicate financial effect",
+      "input": "Pinned R3 fixture: charge() succeeds at the external gateway but the response is lost; retry creates a fresh operation identifier and no verified downstream deduplication. The payment path and tests are available.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Traces gateway success -> lost response -> new identifier -> second reachable charge using inspected source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Identifies the business invariant and practical idempotency or reconciliation verification"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim the gateway definitely double-charged in production or invent provider guarantees"
+        }
+      ]
+    },
+    {
+      "id": "RV-REL-02",
+      "command": "/review/review-code",
+      "scenario": "Shared HTTP client enforces the deadline",
+      "input": "Pinned R2 fixture: changed handler has no local timeout but its actual HTTP client has a bounded end-to-end deadline and cancellation; configured retry is bounded inside that deadline.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Inspects the client-level deadline and retry configuration before deciding if residual risk exists"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not report a missing local timeout solely because the handler has no timeout literal"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not prescribe an additional circuit breaker without a demonstrated fault path"
+        }
+      ]
+    },
+    {
+      "id": "RV-REL-03",
+      "command": "/review/review-code",
+      "scenario": "Early ACK can permanently lose queued work",
+      "input": "Pinned R3 fixture: consumer acknowledges a delivery, then performs the only durable business write; a crash after ACK and before commit does not trigger redelivery.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Constructs the ACK -> crash -> absent durable write failure timeline and explains operation loss"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Considers actual broker acknowledgment guarantees and crash boundaries"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not assert a DLQ alone restores the lost acknowledged operation"
+        }
+      ]
+    },
+    {
+      "id": "RV-REL-04",
+      "command": "/review/review-code",
+      "scenario": "Duplicate delivery with durable idempotent handling",
+      "input": "Pinned R2 fixture: queue is at-least-once but consumer atomically claims a unique operation key, stores outcome and safely handles redelivery including concurrent requests.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Verifies uniqueness and atomicity against concurrent redelivery before assessing a defect"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not report at-least-once delivery as a defect when downstream effects are protected"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not demand exactly-once broker delivery or a new queue as mandatory architecture"
+        }
+      ]
+    },
+    {
+      "id": "RV-REL-05",
+      "command": "/review/review-code",
+      "scenario": "Unbounded concurrency starves critical capacity",
+      "input": "Pinned R2/R3 fixture: added async batch fans out without concurrency limits; each slow remote call retains a connection from the same pool used by a critical request path.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Traces changed batch fan-out -> retained pool capacity -> affected critical requests with relevant configuration"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Assesses availability impact and proposes bounded admission or isolation verification"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not fabricate latency measurements, request volume or breached SLOs"
+        }
+      ]
+    },
+    {
+      "id": "RV-REL-06",
+      "command": "/review/review-code",
+      "scenario": "Circuit breaker absence is not a defect",
+      "input": "Pinned R1 fixture: added noncritical best-effort dependency has bounded timeout, negligible traffic, safely rejected failures and no shared critical-path resource exhaustion.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Examines blast radius, existing timeout and contract before deciding whether a finding is warranted"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not flag missing circuit breaker or bulkhead as a mandatory rule"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not classify lack of SLO documentation as a critical availability defect"
+        }
+      ]
+    },
+    {
+      "id": "RV-REL-07",
+      "command": "/review/review-code",
+      "scenario": "Layered retry storm across SDK and handler",
+      "input": "Pinned R2 fixture: changed handler repeats 3 times, SDK retries each call 3 times and an upstream component repeats 3 times during dependency saturation, with no shared attempt/deadline budget.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Explains the compounded worst-case attempt path without assuming that every operation is duplicated in production"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Checks retry eligibility, shared budget/backoff and risk of overload amplification"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not recommend more independent retries as the default fix"
+        }
+      ]
+    },
+    {
+      "id": "RV-REL-08",
+      "command": "/review/review-code",
+      "scenario": "Restarted worker has safe lease recovery",
+      "input": "Pinned R2 fixture: background worker uses persisted leases, fencing on every durable write, idempotent external effects and redelivery after shutdown/crash; review its restart path.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Inspects lease expiry, fencing and recovery behavior, including stale worker attempts"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not report the mere possibility of process death or duplicate delivery as an unmitigated defect"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not demand chaos execution on production infrastructure or fabricate observed recovery"
         }
       ]
     }
