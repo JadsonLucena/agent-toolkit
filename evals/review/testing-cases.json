@@ -1,0 +1,409 @@
+{
+  "version": 1,
+  "description": "Testing Review adversarial fixtures. Ground truth probes execute independently; rubric assessment of an actual agent requires observed transcripts and a separate evaluator.",
+  "cases": [
+    {
+      "id": "TR-01",
+      "command": "/review/review-code",
+      "polarity": "defect",
+      "scenario": "Test reaches changed code but only asserts return type",
+      "input": "Review the frozen base/head of the disposable TR-01 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the concrete verification weakness with the relevant test and source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a passing existing test or green CI claim as proof of this guarantee"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# Total must include shipping in the final amount.\n",
+        "base": "def total(price, shipping):\n    return price + shipping\n",
+        "head": "def total(price, shipping):\n    return price\n",
+        "tests": "import unittest\nfrom src.service import total\n\nclass TestTotal(unittest.TestCase):\n    def test_type_only(self):\n        self.assertIsInstance(total(10, 2), int)\n",
+        "witness": "import unittest\nfrom src.service import total\n\nclass Contract(unittest.TestCase):\n    def test_total_includes_shipping(self):\n        self.assertEqual(total(10, 2), 12)\n"
+      }
+    },
+    {
+      "id": "TR-02",
+      "command": "/review/review-code",
+      "polarity": "defect",
+      "scenario": "Circular expected value mirrors disputed implementation",
+      "input": "Review the frozen base/head of the disposable TR-02 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the concrete verification weakness with the relevant test and source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a passing existing test or green CI claim as proof of this guarantee"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# Discount is a percentage of the amount: 10% of 200 produces 180.\n",
+        "base": "def discount(amount, percent):\n    return amount * (100 - percent) // 100\n",
+        "head": "def discount(amount, percent):\n    return amount - percent\n",
+        "tests": "import unittest\nfrom src.service import discount\n\nclass TestDiscount(unittest.TestCase):\n    def test_self_confirming(self):\n        expected = discount(200, 10)\n        self.assertEqual(discount(200, 10), expected)\n",
+        "witness": "import unittest\nfrom src.service import discount\n\nclass Contract(unittest.TestCase):\n    def test_discount(self):\n        self.assertEqual(discount(200, 10), 180)\n"
+      }
+    },
+    {
+      "id": "TR-03",
+      "command": "/review/review-code",
+      "polarity": "defect",
+      "scenario": "Always-approved fake hides rejected provider response",
+      "input": "Review the frozen base/head of the disposable TR-03 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the concrete verification weakness with the relevant test and source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a passing existing test or green CI claim as proof of this guarantee"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# A declined provider authorization must yield False.\n",
+        "base": "def charge(provider, payment_id):\n    return provider.authorize(payment_id)[\"approved\"]\n",
+        "head": "def charge(provider, payment_id):\n    provider.authorize(payment_id)\n    return True\n",
+        "tests": "import unittest\nfrom src.service import charge\n\nclass AlwaysApproved:\n    def authorize(self, payment_id):\n        return {\"approved\": True}\n\nclass TestCharge(unittest.TestCase):\n    def test_approved(self):\n        self.assertTrue(charge(AlwaysApproved(), \"p1\"))\n",
+        "witness": "import unittest\nfrom src.service import charge\n\nclass ProviderDenies:\n    def authorize(self, payment_id):\n        return {\"approved\": False}\n\nclass Contract(unittest.TestCase):\n    def test_decline(self):\n        self.assertFalse(charge(ProviderDenies(), \"p1\"))\n"
+      }
+    },
+    {
+      "id": "TR-04",
+      "command": "/review/review-code",
+      "polarity": "defect",
+      "scenario": "Regression has positive-path coverage but lacks zero boundary",
+      "input": "Review the frozen base/head of the disposable TR-04 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the concrete verification weakness with the relevant test and source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a passing existing test or green CI claim as proof of this guarantee"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# An amount must be strictly positive to be eligible.\n",
+        "base": "def eligible(amount):\n    return amount > 0\n",
+        "head": "def eligible(amount):\n    return amount >= 0\n",
+        "tests": "import unittest\nfrom src.service import eligible\n\nclass TestEligible(unittest.TestCase):\n    def test_positive(self):\n        self.assertTrue(eligible(5))\n",
+        "witness": "import unittest\nfrom src.service import eligible\n\nclass Contract(unittest.TestCase):\n    def test_zero_is_not_eligible(self):\n        self.assertFalse(eligible(0))\n"
+      }
+    },
+    {
+      "id": "TR-05",
+      "command": "/review/review-code",
+      "polarity": "non-defect",
+      "scenario": "Behavior-preserving refactor with adequate existing tests",
+      "input": "Review the frozen base/head of the disposable TR-05 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Recognizes that the observed test evidence adequately protects the relevant behavior"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not demand unnecessary tests, reject legitimate doubles or fabricate a defect"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# Sum the square of each element, including empty input.\n",
+        "base": "def squares(values):\n    result = 0\n    for value in values:\n        result += value * value\n    return result\n",
+        "head": "def squares(values):\n    return sum(value * value for value in values)\n",
+        "tests": "import unittest\nfrom src.service import squares\n\nclass TestSquares(unittest.TestCase):\n    def test_results(self):\n        self.assertEqual(squares([2, 3]), 13)\n        self.assertEqual(squares([]), 0)\n",
+        "witness": "import unittest\nfrom src.service import squares\n\nclass Contract(unittest.TestCase):\n    def test_outcomes(self):\n        self.assertEqual(squares([2, 3]), 13)\n        self.assertEqual(squares([]), 0)\n"
+      }
+    },
+    {
+      "id": "TR-06",
+      "command": "/review/review-code",
+      "polarity": "defect",
+      "scenario": "Important negative test exists but is skipped",
+      "input": "Review the frozen base/head of the disposable TR-06 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the concrete verification weakness with the relevant test and source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a passing existing test or green CI claim as proof of this guarantee"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# Blank input must be rejected with ValueError.\n",
+        "base": "def normalize(value):\n    if not value.strip():\n        raise ValueError(\"empty\")\n    return value.strip().lower()\n",
+        "head": "def normalize(value):\n    return value.strip().lower()\n",
+        "tests": "import unittest\nfrom src.service import normalize\n\nclass TestNormalize(unittest.TestCase):\n    def test_valid(self):\n        self.assertEqual(normalize(\"  AB  \"), \"ab\")\n\n    @unittest.skip(\"temporarily disabled\")\n    def test_blank_rejected(self):\n        with self.assertRaises(ValueError):\n            normalize(\" \")\n",
+        "witness": "import unittest\nfrom src.service import normalize\n\nclass Contract(unittest.TestCase):\n    def test_rejects_blank(self):\n        with self.assertRaises(ValueError):\n            normalize(\" \")\n"
+      }
+    },
+    {
+      "id": "TR-07",
+      "command": "/review/review-code",
+      "polarity": "defect",
+      "scenario": "Green suite hides an order-dependent test",
+      "input": "Review the frozen base/head of the disposable TR-07 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied. Also attempt the isolated test case specified in the fixture. Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the concrete verification weakness with the relevant test and source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a passing existing test or green CI claim as proof of this guarantee"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# The limit behavior is unchanged. Each test must run independently.\n",
+        "base": "def within_limit(value):\n    return value < 3\n",
+        "head": "MAXIMUM = 3\n\ndef within_limit(value):\n    return value < MAXIMUM\n",
+        "tests": "import unittest\nfrom src.service import within_limit\n\nshared = []\n\nclass Order(unittest.TestCase):\n    def test_a_prepare(self):\n        shared.append(\"ready\")\n        self.assertTrue(within_limit(2))\n\n    def test_b_needs_previous_test(self):\n        self.assertEqual(shared, [\"ready\"])\n",
+        "isolation_probe": "tests.test_service.Order.test_b_needs_previous_test"
+      }
+    },
+    {
+      "id": "TR-08",
+      "command": "/review/review-code",
+      "polarity": "defect",
+      "scenario": "Boundary-changing mutation survives ordinary assertions",
+      "input": "Review the frozen base/head of the disposable TR-08 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the concrete verification weakness with the relevant test and source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a passing existing test or green CI claim as proof of this guarantee"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# The threshold is inclusive: a value of 10 must be accepted.\n",
+        "base": "def accepted(value):\n    return value >= 10\n",
+        "head": "def accepted(value):\n    return value > 10\n",
+        "tests": "import unittest\nfrom src.service import accepted\n\nclass TestAccepted(unittest.TestCase):\n    def test_above_threshold(self):\n        self.assertTrue(accepted(11))\n",
+        "witness": "import unittest\nfrom src.service import accepted\n\nclass Contract(unittest.TestCase):\n    def test_exact_boundary(self):\n        self.assertTrue(accepted(10))\n"
+      }
+    },
+    {
+      "id": "TR-09",
+      "command": "/review/review-code",
+      "polarity": "defect",
+      "scenario": "Sequential unit test misses a deterministic lost update",
+      "input": "Review the frozen base/head of the disposable TR-09 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the concrete verification weakness with the relevant test and source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a passing existing test or green CI claim as proof of this guarantee"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# Concurrent increments of the shared counter must not lose an increment.\n",
+        "base": "from threading import Lock\n\nclass Counter:\n    def __init__(self, pause=lambda: None):\n        self.value = 0\n        self._lock = Lock()\n        self._pause = pause\n\n    def increment(self):\n        with self._lock:\n            previous = self.value\n            self._pause()\n            self.value = previous + 1\n",
+        "head": "class Counter:\n    def __init__(self, pause=lambda: None):\n        self.value = 0\n        self._pause = pause\n\n    def increment(self):\n        previous = self.value\n        self._pause()\n        self.value = previous + 1\n",
+        "tests": "import unittest\nfrom src.service import Counter\n\nclass TestCounter(unittest.TestCase):\n    def test_sequential(self):\n        counter = Counter()\n        counter.increment()\n        counter.increment()\n        self.assertEqual(counter.value, 2)\n",
+        "witness": "import unittest\nfrom threading import Barrier, BrokenBarrierError, Thread\nfrom src.service import Counter\n\nclass Contract(unittest.TestCase):\n    def test_two_parallel_increments(self):\n        gate = Barrier(2)\n        def pause():\n            try:\n                gate.wait(timeout=0.08)\n            except BrokenBarrierError:\n                pass\n        counter = Counter(pause=pause)\n        threads = [Thread(target=counter.increment) for _ in range(2)]\n        for thread in threads:\n            thread.start()\n        for thread in threads:\n            thread.join(timeout=2)\n        self.assertTrue(all(not thread.is_alive() for thread in threads))\n        self.assertEqual(counter.value, 2)\n"
+      }
+    },
+    {
+      "id": "TR-10",
+      "command": "/review/review-code",
+      "polarity": "uncertain",
+      "scenario": "Conflicting accepted requirements make the test oracle ambiguous",
+      "input": "Review the frozen base/head of the disposable TR-10 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Reports the material ambiguity and missing authoritative oracle"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not invent a requirement authority or claim confirmed incorrectness"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# Source A (approved, no supersession): minimum age is 18.\n# Source B (approved, no supersession): minimum age is 21.\n# No evidence establishes which requirement prevails.\n",
+        "base": "def can_register(age):\n    return age >= 18\n",
+        "head": "def can_register(age):\n    return age >= 21\n",
+        "tests": "import unittest\nfrom src.service import can_register\n\nclass TestRegistration(unittest.TestCase):\n    def test_adult(self):\n        self.assertTrue(can_register(25))\n"
+      }
+    },
+    {
+      "id": "TR-11",
+      "command": "/review/review-code",
+      "polarity": "non-defect",
+      "scenario": "Existing SQLite integration test adequately covers persistence refactor",
+      "input": "Review the frozen base/head of the disposable TR-11 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Recognizes that the observed test evidence adequately protects the relevant behavior"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not demand unnecessary tests, reject legitimate doubles or fabricate a defect"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# Insert must persist exactly one value in the SQLite items table.\n",
+        "base": "def save(conn, value):\n    conn.execute(\"INSERT INTO items(value) VALUES (?)\", (value,))\n    conn.commit()\n",
+        "head": "def save(conn, value):\n    with conn:\n        conn.execute(\"INSERT INTO items(value) VALUES (?)\", (value,))\n",
+        "tests": "import sqlite3\nimport unittest\nfrom src.service import save\n\nclass TestSave(unittest.TestCase):\n    def test_persists_value(self):\n        with sqlite3.connect(\":memory:\") as conn:\n            conn.execute(\"CREATE TABLE items(value TEXT)\")\n            save(conn, \"alpha\")\n            self.assertEqual(conn.execute(\"SELECT value FROM items\").fetchall(), [(\"alpha\",)])\n",
+        "witness": "import sqlite3\nimport unittest\nfrom src.service import save\n\nclass Contract(unittest.TestCase):\n    def test_one_inserted_row(self):\n        with sqlite3.connect(\":memory:\") as conn:\n            conn.execute(\"CREATE TABLE items(value TEXT)\")\n            save(conn, \"alpha\")\n            self.assertEqual(conn.execute(\"SELECT value FROM items\").fetchall(), [(\"alpha\",)])\n"
+      }
+    },
+    {
+      "id": "TR-12",
+      "command": "/review/review-code",
+      "polarity": "non-defect",
+      "scenario": "Legitimate spy verifies an interaction that is the contract",
+      "input": "Review the frozen base/head of the disposable TR-12 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied.  Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Recognizes that the observed test evidence adequately protects the relevant behavior"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not demand unnecessary tests, reject legitimate doubles or fabricate a defect"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# Sending a single 'ready' notification is a required observable interaction.\n",
+        "base": "def announce(sender, user):\n    sender.send(user, \"ready\")\n    return True\n",
+        "head": "def announce(sender, user):\n    message = \"ready\"\n    sender.send(user, message)\n    return True\n",
+        "tests": "import unittest\nfrom src.service import announce\n\nclass Spy:\n    def __init__(self):\n        self.calls = []\n    def send(self, user, message):\n        self.calls.append((user, message))\n\nclass TestAnnounce(unittest.TestCase):\n    def test_notification_contract(self):\n        spy = Spy()\n        self.assertTrue(announce(spy, \"u1\"))\n        self.assertEqual(spy.calls, [(\"u1\", \"ready\")])\n",
+        "witness": "import unittest\nfrom src.service import announce\n\nclass Spy:\n    def __init__(self):\n        self.calls = []\n    def send(self, user, message):\n        self.calls.append((user, message))\n\nclass Contract(unittest.TestCase):\n    def test_notification_contract(self):\n        spy = Spy()\n        self.assertTrue(announce(spy, \"u1\"))\n        self.assertEqual(spy.calls, [(\"u1\", \"ready\")])\n"
+      }
+    },
+    {
+      "id": "TR-13",
+      "command": "/review/review-code",
+      "polarity": "defect",
+      "scenario": "Green CI evidence belongs to old revision and cannot verify changed behavior",
+      "input": "Review the frozen base/head of the disposable TR-13 fixture. Read docs/accepted-behavior.md, src/service.py, tests/test_service.py, actual relevant execution evidence, and witness/test_contract.py if supplied. The head includes ci/check.json with a successful result pinned to the old base SHA. Do not edit sources or claim independent gate approval.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the concrete verification weakness with the relevant test and source evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not treat a passing existing test or green CI claim as proof of this guarantee"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Reports an actionable, risk-proportionate assessment with grounded limits and no specialist PASS verdict"
+        }
+      ],
+      "fixture": {
+        "contract": "# A price of 100 incurs a tax of 10.\n",
+        "base": "def tax(price):\n    return round(price * 0.10, 2)\n",
+        "head": "def tax(price):\n    return round(price * 0.20, 2)\n",
+        "tests": "import unittest\nfrom src.service import tax\n\nclass TestTax(unittest.TestCase):\n    def test_numeric(self):\n        self.assertIsInstance(tax(100), float)\n",
+        "witness": "import unittest\nfrom src.service import tax\n\nclass Contract(unittest.TestCase):\n    def test_tax_rate(self):\n        self.assertEqual(tax(100), 10.0)\n",
+        "ci_stale": true
+      }
+    }
+  ]
+}

@@ -14,3 +14,5 @@ python3 scripts/requirements_evals.py --catalog evals/review/cases.json --observ
 The first command validates the rubric shape only. The second validates reviewer-attested evidence from actual transcripts; even an attested PASSED is not a machine-proven behavioral correctness claim. `presence` requires exact quoted transcript evidence for a pass; `absence` requires full independent transcript inspection. Missing evaluations remain INCOMPLETE.
 
 These cases are not a second Review gate, nor a requirement to materialize example repositories inside the toolkit. Git and Review continue to own their individual authorization and verdict semantics. Do not commit confidential project data or transcripts.
+
+For a separate, reproducible Testing Review corpus with disposable two-commit Git fixtures, independent ground-truth witnesses and false-positive controls, see [Testing Review adversarial evaluations](testing-README.md). Catalog lint and witness tests do not establish observed model accuracy.
