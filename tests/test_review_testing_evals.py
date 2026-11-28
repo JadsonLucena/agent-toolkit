@@ -70,25 +70,26 @@ class TestingReviewEvalsTests(unittest.TestCase):
                         expected_paths.add("ci/check.json")
                     self.assertEqual(expected_paths, paths)
 
+                    # Git checkout can preserve same-size source timestamps; -B prevents stale .pyc witnesses.
                     for revision in ("base_sha", "head_sha"):
                         checkout = execute("git", "checkout", "--detach", "-q",
                                            built[revision], cwd=repository)
                         self.assertEqual(0, checkout.returncode, checkout.stderr)
-                        suite = execute(sys.executable, "-m", "unittest", "discover",
+                        suite = execute(sys.executable, "-B", "-m", "unittest", "discover",
                                         "-s", "tests", cwd=repository)
                         self.assertEqual(0, suite.returncode,
                                          f"{case['id']}/{revision}: {suite.stderr}")
                         if case["id"] == "TR-06":
                             self.assertIn("skipped=1", suite.stderr)
                         if "witness" in case["fixture"]:
-                            witness = execute(sys.executable, "-m", "unittest",
+                            witness = execute(sys.executable, "-B", "-m", "unittest",
                                               "discover", "-s", "witness", cwd=repository)
                             expected_status = (0 if revision == "base_sha"
                                                or case["polarity"] == "non-defect" else 1)
                             self.assertEqual(expected_status, witness.returncode,
                                              f"{case['id']}/{revision}: {witness.stderr}")
                         if case["fixture"].get("isolation_probe"):
-                            isolated = execute(sys.executable, "-m", "unittest",
+                            isolated = execute(sys.executable, "-B", "-m", "unittest",
                                                case["fixture"]["isolation_probe"],
                                                cwd=repository)
                             self.assertNotEqual(0, isolated.returncode)
