@@ -9,7 +9,7 @@ production secrets, remote writes or external effects.
 Record the host binary/version, installed toolkit SHA, source baseline,
 authorized plan identities, exact prompt/source selection (securely stored
 when permitted), `thread.started` session IDs and terminal events. Collect
-the Git file inventory and verification evidence after every plan, without
+the Git file inventory and successful execution of each required check after every plan, without
 trusting a model's report.
 
 Required scenarios: two plans produce distinct observed sessions; the second
