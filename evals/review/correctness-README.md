@@ -4,7 +4,8 @@ This separate catalog avoids coupling correctness evaluation to the existing
 specification conformance rubric or concurrent review-specialist PRs.
 It evaluates **both** discovery of source-backed functional defects and
 rejection of unsupported bug allegations. Its fixtures are small Python
-programs with a behavior-source document, executable baseline/head witnesses,\nand a frozen two-commit diff.
+programs with a behavior-source document, executable baseline/head witnesses,
+and a frozen two-commit diff.
 
 ## Materialize and evaluate
 
