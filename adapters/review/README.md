@@ -69,7 +69,9 @@ five concerns (capacity four) can include:
   --concern testing --concern correctness \
   --concern-priority architecture=1:Changed-service-boundary \
   --concern-priority reliability=2:External-side-effects \
-  --concern-priority contract=3:Published-contract   --concern-priority testing=4:Cross-boundary-tests   --concern-priority correctness=5:Local-helper-only
+  --concern-priority contract=3:Published-contract \
+  --concern-priority testing=4:Cross-boundary-tests \
+  --concern-priority correctness=5:Local-helper-only
 ```
 
 Every declared concern needs a positive unique rank and nonempty reason when
