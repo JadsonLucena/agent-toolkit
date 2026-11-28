@@ -196,7 +196,12 @@ def run_plans(repo: Path, plans: list[dict], host: SessionHost | None = None,
                 "results": []}
     results, sessions = [], set()
     for plan in plans:
+        if not plan["allow_local_commits"]:
+            return {"status": "blocked" if policy == "require" else "native-required",
+                    "reason": "This host cannot enforce no-commit execution; route to native Implementation",
+                    "results": results}
         baseline = git(repo, "rev-parse", "HEAD")
+        baseline_branch = git(repo, "symbolic-ref", "--quiet", "HEAD")
         if git(repo, "status", "--porcelain=v1", "--untracked-files=all"):
             return {"status": "blocked", "reason": "Unreconciled workspace before next plan", "results": results}
         pack = prepare_context(repo, plan["sources"], plan["critical_sources"])
@@ -209,6 +214,8 @@ def run_plans(repo: Path, plans: list[dict], host: SessionHost | None = None,
         try:
             outcome = host.run(repo, prompt_for(plan, pack), timeout)
             session = outcome.get("session_id")
+            if git(repo, "symbolic-ref", "--quiet", "HEAD") != baseline_branch:
+                raise PlanError("Execution switched branches; reconcile Git state")
             footprint = changed_paths(repo, baseline)
         except (PlanError, OSError, ValueError) as exc:
             return {"status": "blocked", "reason": str(exc), "results": results,
