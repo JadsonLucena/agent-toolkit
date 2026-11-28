@@ -61,8 +61,8 @@ Use the smallest appropriate double:
 * **Spy**: records interactions for later verification
 * **Mock**: verifies an expected interaction or protocol
 * Prefer state or output verification when it provides equivalent confidence; verify interactions when the interaction itself is part of the contract.
-* Unit tests must not depend on real external APIs, databases, networks, filesystems, or infrastructure.
-* For unit tests, prefer a Fake persistence abstraction, such as an In-Memory Repository.
+* Keep unit tests isolated from uncontrolled external services, shared infrastructure, state and nondeterministic I/O. Controlled local resources (such as temporary files) may be appropriate when they are hermetic and necessary for the behavior under test.
+* For unit tests, a Fake persistence abstraction (such as an In-Memory Repository) may be useful, but does not establish database-specific transaction, constraint, query or concurrency semantics.
 * When persistence-specific behavior matters, use an integration test against an isolated instance of the production database engine.
 * In integration tests, use real implementations for the components whose integration is under test; dependencies outside that boundary may use doubles, simulators, emulators, or test servers.
 * Tests that mutate persistent or shared resources must define an isolation and cleanup strategy.
@@ -135,7 +135,8 @@ Test-only authorization permits reporting these signals, not refactoring product
 
 ## Quality Guardrails
 
-* Assertions must be strong enough to prove intended behavior.
+* Assertions must provide meaningful evidence that relevant expected behavior, observable effects, and invariants hold under the tested conditions; they do not prove universal correctness.
+* Ground expected outcomes in accepted rules, contracts, justified examples or independent properties when available. Avoid circular oracles that calculate expected values with the same disputed implementation or self-confirming test doubles.
 * Keep tests free of unrelated scenarios, complex test logic, over-mocking, brittle implementation assertions, hidden environmental dependencies, and irrelevant data.
 * Use snapshots or golden files only when they provide meaningful behavioral value.
 * Do not add tests that fail to reduce a meaningful, identifiable risk.
