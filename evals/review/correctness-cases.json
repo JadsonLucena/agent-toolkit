@@ -1,0 +1,441 @@
+{
+  "version": 1,
+  "description": "Correctness Review adversarial host-observation rubrics with reproducible Git fixtures; catalog validation is not model-performance evidence",
+  "cases": [
+    {
+      "id": "CR-01",
+      "command": "/review/review-code",
+      "scenario": "Boundary count permits a third refund",
+      "polarity": "defect",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-01; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Approved BR-REFUND\nA user with exactly two completed refunds during the last 365 days must not receive another refund. The function receives the already-completed refund count.\n",
+        "base": "def may_refund(completed_refunds):\n    return completed_refunds < 2\n",
+        "changed": "def may_refund(completed_refunds):\n    return completed_refunds <= 2\n",
+        "function": "may_refund",
+        "witnesses": [
+          {
+            "args": [
+              2
+            ],
+            "baseline": false,
+            "head": true,
+            "expected": false
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies completed_refunds=2 as the reachable boundary violation, citing BR-REFUND and the modified guard"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "States expected rejection versus actual acceptance and the concrete third-refund consequence"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim the presence of tests or a successful run without inspected execution evidence"
+        }
+      ]
+    },
+    {
+      "id": "CR-02",
+      "command": "/review/review-code",
+      "scenario": "Inclusive upper bound is a valid correction",
+      "polarity": "non-defect",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-02; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Approved BR-LIMIT\nAmounts in the closed interval [0, 100] are accepted. Validation of negative amounts is performed by the caller.\n",
+        "base": "def at_most_limit(amount):\n    return amount < 100\n",
+        "changed": "def at_most_limit(amount):\n    return amount <= 100\n",
+        "function": "at_most_limit",
+        "witnesses": [
+          {
+            "args": [
+              100
+            ],
+            "baseline": false,
+            "head": true,
+            "expected": true
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Recognizes the changed equality at 100 as required by the approved inclusive contract"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not report the inclusive comparison as a defect merely because the operator changed"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not treat a pre-existing incorrect exclusion at 100 as an obligation to preserve"
+        }
+      ]
+    },
+    {
+      "id": "CR-03",
+      "command": "/review/review-code",
+      "scenario": "Boolean precedence bypasses a required activity guard",
+      "polarity": "defect",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-03; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Approved BR-ACCESS\nA command is allowed only when the account is active AND the actor is either an administrator or the resource owner.\n",
+        "base": "def allowed(active, admin, owner):\n    return active and (admin or owner)\n",
+        "changed": "def allowed(active, admin, owner):\n    return active and admin or owner\n",
+        "function": "allowed",
+        "witnesses": [
+          {
+            "args": [
+              false,
+              false,
+              true
+            ],
+            "baseline": false,
+            "head": true,
+            "expected": false
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies active=False and owner=True as a concrete reachable bypass due to operator precedence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Explains the approved active-account precondition and how the new expression violates it"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not treat the mere use of an or expression as a finding without a concrete branch witness"
+        }
+      ]
+    },
+    {
+      "id": "CR-04",
+      "command": "/review/review-code",
+      "scenario": "Truthiness conflates an accepted empty string with absence",
+      "polarity": "defect",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-04; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Approved BR-NAME\nA missing or None name is displayed as Anonymous. A provided empty string is an intentional and valid display value and must be preserved.\n",
+        "base": "def display_name(profile):\n    value = profile.get('name')\n    return 'Anonymous' if value is None else value\n",
+        "changed": "def display_name(profile):\n    return profile.get('name') or 'Anonymous'\n",
+        "function": "display_name",
+        "witnesses": [
+          {
+            "args": [
+              {
+                "name": ""
+              }
+            ],
+            "baseline": "",
+            "head": "Anonymous",
+            "expected": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the provided empty string as a concrete input changing from empty output to Anonymous"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Anchors the expected result in BR-NAME rather than assuming empty strings are invalid"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim every use of truthiness is incorrect without the applicable contract"
+        }
+      ]
+    },
+    {
+      "id": "CR-05",
+      "command": "/review/review-code",
+      "scenario": "Invalid state transition introduced by broadening a guard",
+      "polarity": "defect",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-05; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Approved BR-STATE\nThe settle event may transition an AUTHORIZED payment to SETTLED. A PENDING payment must remain PENDING when settle is received. CANCELED remains terminal.\n",
+        "base": "def next_state(current, event):\n    if current == 'AUTHORIZED' and event == 'settle':\n        return 'SETTLED'\n    return current\n",
+        "changed": "def next_state(current, event):\n    if current != 'CANCELED' and event == 'settle':\n        return 'SETTLED'\n    return current\n",
+        "function": "next_state",
+        "witnesses": [
+          {
+            "args": [
+              "PENDING",
+              "settle"
+            ],
+            "baseline": "PENDING",
+            "head": "SETTLED",
+            "expected": "PENDING"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Traces the PENDING plus settle sequence to the prohibited SETTLED state"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Contrasts actual and allowed transition under BR-STATE with code evidence"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not infer unrelated distributed retries or durability defects absent source evidence"
+        }
+      ]
+    },
+    {
+      "id": "CR-06",
+      "command": "/review/review-code",
+      "scenario": "Semi-open time interval endpoints are reversed",
+      "polarity": "defect",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-06; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Approved BR-WINDOW\nAn event belongs to the window exactly when start <= event_time < end. The caller supplies timestamps on one comparable time basis.\n",
+        "base": "def in_window(event_time, start, end):\n    return start <= event_time < end\n",
+        "changed": "def in_window(event_time, start, end):\n    return start < event_time <= end\n",
+        "function": "in_window",
+        "witnesses": [
+          {
+            "args": [
+              10,
+              10,
+              20
+            ],
+            "baseline": true,
+            "head": false,
+            "expected": true
+          },
+          {
+            "args": [
+              20,
+              10,
+              20
+            ],
+            "baseline": false,
+            "head": true,
+            "expected": false
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies both exact endpoints as changed from the approved semi-open interval"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Provides a concrete counterexample for event_time=start or event_time=end"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not invent timezone or daylight-saving errors when this fixture fixes a common time basis"
+        }
+      ]
+    },
+    {
+      "id": "CR-07",
+      "command": "/review/review-code",
+      "scenario": "Integer truncation violates specified financial rounding",
+      "polarity": "defect",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-07; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Approved BR-DISCOUNT\nFor nonnegative prices in integer cents, apply a 15 percent discount and round the resulting integer cents to the nearest cent, with half up.\n",
+        "base": "def discounted_cents(price_cents):\n    return (price_cents * 85 + 50) // 100\n",
+        "changed": "def discounted_cents(price_cents):\n    return price_cents * 85 // 100\n",
+        "function": "discounted_cents",
+        "witnesses": [
+          {
+            "args": [
+              101
+            ],
+            "baseline": 86,
+            "head": 85,
+            "expected": 86
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Shows price_cents=101 as a witness where required rounded value 86 differs from actual 85"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Identifies the precise rounding-order change and approved nonnegative domain"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not demand Decimal or floating-point conversion when integer arithmetic meets the requirement"
+        }
+      ]
+    },
+    {
+      "id": "CR-08",
+      "command": "/review/review-code",
+      "scenario": "Equivalent simplification should not be treated as regression",
+      "polarity": "non-defect",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-08; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Approved BR-SHIPPING\nShipping costs 10 units for weights <= 5 and 20 units for weights > 5. The caller validates weight.\n",
+        "base": "def shipping_cost(weight):\n    if weight <= 5:\n        return 10\n    return 20\n",
+        "changed": "def shipping_cost(weight):\n    return 10 if weight <= 5 else 20\n",
+        "function": "shipping_cost",
+        "witnesses": [
+          {
+            "args": [
+              5
+            ],
+            "baseline": 10,
+            "head": 10,
+            "expected": 10
+          },
+          {
+            "args": [
+              6
+            ],
+            "baseline": 20,
+            "head": 20,
+            "expected": 20
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Recognizes equivalent outcomes for both sides of the boundary and the equality case"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not emit a defect based on a changed syntax or a preference for if statements"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not demand a new architecture, gate or provider-specific adapter for this local change"
+        }
+      ]
+    },
+    {
+      "id": "CR-09",
+      "command": "/review/review-code",
+      "scenario": "Unspecified empty-string semantics should remain uncertain",
+      "polarity": "uncertain",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-09; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Accepted BR-ANON\nA None value displays as Anonymous. There is NO accepted rule about whether an empty string should remain empty or be replaced. The PR description claims empty should also become Anonymous, but is not approved business policy.\n",
+        "base": "def normalize_name(name):\n    return 'Anonymous' if name is None else name\n",
+        "changed": "def normalize_name(name):\n    return name or 'Anonymous'\n",
+        "function": "normalize_name",
+        "witnesses": [
+          {
+            "args": [
+              ""
+            ],
+            "baseline": "",
+            "head": "Anonymous"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies name='' as an observable difference requiring contract-authority investigation"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not claim a confirmed bug for empty strings without a governing requirement"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not invent an approved supersession merely from the PR description"
+        }
+      ]
+    },
+    {
+      "id": "CR-10",
+      "command": "/review/review-code",
+      "scenario": "Green tests can encode the same mistaken discount oracle",
+      "polarity": "defect",
+      "input": "Prepare this fixture as a disposable Git repository using evals/review/build_correctness_fixtures.py --case CR-10; review only its frozen base/head with docs/accepted-behavior.md as the stated source. Preserve exact file:line evidence, inspect both versions and distinguish confirmed defect from ambiguity or a correct change.",
+      "fixture": {
+        "path": "src/logic.py",
+        "contract": "# Approved BR-SALE\nFor prices in whole currency units, an eligible purchase receives exactly 15 percent discount. For price 100 the result must be 85.\n",
+        "base": "def sale_price(price):\n    return price * 85 // 100\n",
+        "changed": "def sale_price(price):\n    return price * 90 // 100\n",
+        "head_tests": "import unittest\nfrom src.logic import sale_price\n\nclass DiscountTests(unittest.TestCase):\n    def test_expected_by_implementation(self):\n        self.assertEqual(90, sale_price(100))\n",
+        "function": "sale_price",
+        "witnesses": [
+          {
+            "args": [
+              100
+            ],
+            "baseline": 85,
+            "head": 90,
+            "expected": 85
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies price=100 as a violation of the accepted 15 percent discount despite a green test"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Distinguishes the expected contract oracle 85 from the implementation and test expectation 90"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim green CI or the current test proves the change is correct"
+        }
+      ]
+    }
+  ]
+}
