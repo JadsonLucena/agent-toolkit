@@ -51,12 +51,7 @@ class ToolkitLintTests(unittest.TestCase):
         vendor = self.root / ".agents/skills/unapproved"
         vendor.mkdir(parents=True)
         (vendor / "SKILL.md").write_text("---\nname: unapproved\n---\n", encoding="utf-8")
-        self.assertEqual([], lint_toolkit(self.root))  # Not in the manifest.
-        import json
-        manifest_path = self.root / ".cursor-plugin/plugin.json"
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        manifest["skills"].append("./.agents/skills/unapproved")
-        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        # The parent directory is manifest-listed; rogue children are rejected.
         self.assert_error("noncanonical skills artifact")
 
     def test_debugging_is_canonical_and_covered_by_cursor(self):
