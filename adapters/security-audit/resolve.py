@@ -30,6 +30,23 @@ REFERENCE_HINTS = (
 )
 
 
+# Explicit, provider-neutral investigation topics from a reviewed change.
+# These select guidance only; they never certify coverage, vulnerability or risk.
+TOPIC_REFERENCES = {
+    "authorization": ("WEB-PROTOCOL-AND-AUTH.md", "DATA-ISOLATION-AND-LIFECYCLE.md"),
+    "identity": ("WEB-PROTOCOL-AND-AUTH.md",),
+    "business-integrity": ("PROTOCOLS-RPC-AND-MESSAGING.md", "DATA-ISOLATION-AND-LIFECYCLE.md"),
+    "external-callback": ("PROTOCOLS-RPC-AND-MESSAGING.md", "WEB-PROTOCOL-AND-AUTH.md"),
+    "privacy": ("DATA-ISOLATION-AND-LIFECYCLE.md",),
+    "secrets-delivery": ("SUPPLY-CHAIN-AND-RELEASE.md", "CLOUD-AND-DEPLOYMENT.md"),
+    "agent-boundary": ("AI-AND-LLM.md",),
+    "resource-exhaustion": ("RESOURCE-EXHAUSTION-AND-AVAILABILITY.md",),
+    "client-side": ("CLIENT-SIDE.md",),
+    "memory-safety": ("MEMORY-SAFETY-AND-BINARY.md",),
+    "mobile-ipc": ("DESKTOP-MOBILE-AND-LOCAL-IPC.md",),
+}
+
+
 class UnapprovedSkill(ValueError):
     """Installed files do not match approved upstream content."""
 
@@ -80,6 +97,7 @@ def content_hash(root: Path) -> str:
 
 def adapter(
     *, changed_files: list[Any] | None = None, concerns: list[str] | None = None,
+    topics: list[str] | None = None,
     skill_root: Path | None = None, enabled: bool = True,
     lock_path: Path = LOCK_PATH,
 ) -> dict[str, Any]:
@@ -112,11 +130,23 @@ def adapter(
                   for item in (changed_files or [])]
         values.extend(str(item) for item in (concerns or []))
         haystack = "\n".join(values).lower()
-        result["selected_references"] = [
-            {"path": name, "reason": "matched bounded security concern"}
-            for name, pattern in REFERENCE_HINTS
-            if re.search(pattern, haystack) and (root / name).is_file()
-        ]
+        requested_topics = [str(value).strip().lower() for value in (topics or [])]
+        accepted_topics = sorted(set(requested_topics).intersection(TOPIC_REFERENCES))
+        if len(accepted_topics) != len(set(requested_topics)):
+            # Do not echo untrusted topic content in diagnostics or invent matches.
+            result["diagnostics"].append("ignored unrecognized security topic(s)")
+        result["selected_references"] = []
+        for name, pattern in REFERENCE_HINTS:
+            matching_topics = [
+                topic for topic in accepted_topics if name in TOPIC_REFERENCES[topic]
+            ]
+            if not (matching_topics or re.search(pattern, haystack)):
+                continue
+            if not (root / name).is_file():
+                continue
+            reason = ("explicit security topic: " + ", ".join(matching_topics)
+                      if matching_topics else "matched bounded security concern")
+            result["selected_references"].append({"path": name, "reason": reason})
     except (OSError, ValueError, KeyError, TypeError) as exc:
         result["status"] = "rejected"
         result["diagnostics"].append(f"approved skill verification failed: {type(exc).__name__}: {exc}")
@@ -129,10 +159,14 @@ def main() -> int:
     parser.add_argument("--no-security-audit", action="store_true")
     parser.add_argument("--changed-file", action="append", default=[])
     parser.add_argument("--concern", action="append", default=[])
+    parser.add_argument("--security-topic", action="append", default=[],
+                        help="optional domain-specific guidance topic: "
+                             + ", ".join(sorted(TOPIC_REFERENCES)))
     args = parser.parse_args()
     result = adapter(
         changed_files=args.changed_file, concerns=args.concern,
-        skill_root=args.security_audit_root, enabled=not args.no_security_audit,
+        topics=args.security_topic, skill_root=args.security_audit_root,
+        enabled=not args.no_security_audit,
     )
     print(json.dumps(result, sort_keys=True, ensure_ascii=False))
     return 1 if result["status"] == "rejected" else 0
