@@ -35,7 +35,8 @@ class FakeHost:
             git(repo, "add", self.path)
             git(repo, "commit", "-m", f"test: {session}")
         return {"session_id": session, "process_exit": 0,
-                "turn_completed": self.completed, "host": "fake"}
+                "turn_completed": self.completed, "host": "fake",
+                "successful_check_commands": ["python3 -m unittest"]}
 
 
 class FreshPlanTests(unittest.TestCase):
@@ -52,7 +53,7 @@ class FreshPlanTests(unittest.TestCase):
         self.plan = {"plan_id": "A", "objective": "Implement a bounded change",
                      "authorization_ref": "approved-work-item", "sources": ["README.md"],
                      "critical_sources": ["README.md"], "allowed_paths": ["README.md"],
-                     "allow_local_commits": True}
+                     "allow_local_commits": True, "required_checks": ["python3 -m unittest"]}
 
     def test_two_distinct_sessions_serial_and_fresh_evidence(self):
         host = FakeHost()
@@ -129,7 +130,7 @@ class FreshPlanTests(unittest.TestCase):
             def run(self, repo, prompt, timeout):
                 git(repo, "mv", "README.md", "README-copy.md")
                 git(repo, "commit", "-m", "test: rename")
-                return {"session_id": "rename-1", "process_exit": 0, "turn_completed": True}
+                return {"session_id": "rename-1", "process_exit": 0, "turn_completed": True, "successful_check_commands": ["python3 -m unittest"]}
         plan = dict(self.plan, allowed_paths=["README-copy.md"])
         result = run_plans(self.repo, [plan], RenameHost())
         self.assertEqual("blocked", result["status"])
@@ -142,7 +143,7 @@ class FreshPlanTests(unittest.TestCase):
                 (repo / "README.md").write_text("rewritten baseline", encoding="utf-8")
                 git(repo, "add", "README.md")
                 git(repo, "commit", "--amend", "--no-edit")
-                return {"session_id": "rewrite-1", "process_exit": 0, "turn_completed": True}
+                return {"session_id": "rewrite-1", "process_exit": 0, "turn_completed": True, "successful_check_commands": ["python3 -m unittest"]}
         result = run_plans(self.repo, [self.plan], RewriteHost())
         self.assertEqual("blocked", result["status"])
         self.assertTrue(result["reconciliation_required"])
@@ -157,6 +158,18 @@ class FreshPlanTests(unittest.TestCase):
              patch("adapters.implementation.fresh_plan.subprocess.run",
                    return_value=SimpleNamespace(stdout=b"legacy cli", stderr=b"", returncode=0)):
             self.assertFalse(CodexCLIHost().available())
+
+    def test_missing_required_check_stops_sequence(self):
+        class NoCheckHost(FakeHost):
+            def run(self, repo, prompt, timeout):
+                outcome = super().run(repo, prompt, timeout)
+                outcome["successful_check_commands"] = []
+                return outcome
+        host = NoCheckHost()
+        result = run_plans(self.repo, [self.plan, dict(self.plan, plan_id="B")], host)
+        self.assertEqual("blocked", result["status"])
+        self.assertEqual(1, len(host.prompts))
+        self.assertTrue(result["reconciliation_required"])
 
     def test_codex_host_absence_never_claimed_available(self):
         with patch("adapters.implementation.fresh_plan.shutil.which", return_value=None):
