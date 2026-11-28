@@ -31,6 +31,8 @@ evals/<area>/                       # provider-neutral evaluation fixtures
 
 Canonical Rules, Skills, Commands, Agents and Contracts remain usable without provider-specific adapters. The optional [Cursor plugin](.cursor-plugin/README.md) and [runtime adapters](adapters/) consume canonical sources; neither defines new authority nor proves host discovery or enforcement.
 
+The [Fresh Plan Executor](adapters/implementation/README.md) is an optional sequential Implementation runtime bridge. It can launch a genuinely new Codex CLI thread for each explicitly authorized plan when that host is installed; its observed process completion is not test or review evidence. Neither the canonical Implementation agent nor Delivery depends on Codex, and no execution waves are introduced.
+
 The [Review](adapters/review/README.md), [OCR](adapters/ocr/README.md), [Agent Teams](adapters/teams/README.md), [GitHub](adapters/github/README.md), [Context](adapters/context/README.md), and [Delivery](adapters/delivery/README.md) guides own integration details and version-specific constraints. Host APIs must actually implement isolation, peer messaging, remote effects and protected policy checks; Markdown cannot do so. Optional hints never reduce required native review coverage. On failure, fall back only when the relevant evidence and operation remain safely verifiable.
 
 ## Responsibility Model
