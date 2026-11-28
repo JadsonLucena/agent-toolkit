@@ -32,6 +32,7 @@ Example input (a template, not a claim that the example has been run):
     "sources": ["docs/accepted-change.md"],
     "critical_sources": ["docs/accepted-change.md"],
     "allowed_paths": ["src/", "tests/"],
+    "required_checks": ["python3 -m unittest discover -s tests -v"],
     "allow_local_commits": true
   }
 ]
@@ -65,7 +66,7 @@ conversation.
 - `blocked`: stop on invalid/stale sources, unsafe workspace, missing
   events, duplicate session IDs, out-of-scope paths, uncommitted changes,
   failed process, or uncertain effects. Never auto-retry.
-- `executed-unverified`: the CLI process was observed to finish and changes
+- `executed-unverified`: the CLI process and explicitly named checks were observed to finish successfully and changes
   were committed within its declared path scope. **It is not Implementation
   acceptance, passing checks, independent Review, or a PR-ready verdict.**
 
