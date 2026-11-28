@@ -13,7 +13,8 @@ class ReviewSddEvalsTests(unittest.TestCase):
     def test_catalog_valid_and_targets_review(self):
         cat = load_catalog(ROOT / "evals/review/cases.json")
         ids = [x["id"] for x in cat["cases"]]
-        self.assertEqual(8, len(ids))
+        self.assertGreaterEqual(len(ids), 16)
+        self.assertEqual(8, sum(id.startswith("RV-REL-") for id in ids))
         self.assertEqual(len(ids), len(set(ids)))
         self.assertTrue(all(x["command"] == "/review/review-code" for x in cat["cases"]))
         self.assertTrue(all(len(x["checks"]) >= 3 for x in cat["cases"]))

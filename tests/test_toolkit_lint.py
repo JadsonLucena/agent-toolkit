@@ -101,6 +101,17 @@ class ToolkitLintTests(unittest.TestCase):
         target.unlink()
         self.assert_error("broken Markdown link references/causal-tracing.md")
 
+    def test_reliability_reference_is_lazily_linked(self):
+        self.assertEqual([], lint_toolkit(self.root))
+        path = "contexts/review/skills/review-change/references/reliability-review.md"
+        self.assertTrue((self.root / path).is_file())
+        self.change(
+            "contexts/review/skills/review-change/SKILL.md",
+            "(references/reliability-review.md)",
+            "(references/missing-reliability-review.md)",
+        )
+        self.assert_error("broken Markdown link references/missing-reliability-review.md")
+
     def test_unowned_debugging_markdown_is_rejected(self):
         target = self.root / "contexts/debugging/undocumented.md"
         target.write_text("# Unexpected", encoding="utf-8")

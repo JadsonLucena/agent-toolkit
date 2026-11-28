@@ -567,6 +567,30 @@
       ]
     },
     {
+      "id": "agent-reliability-operational-overload",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "As Code Review Lead, delegate the changed queue consumer's unbounded concurrency, dependency saturation, and crash-recovery risks to a read-only operational reliability specialist; no database migration exists.",
+      "expected": [
+        "reliability-reviewer"
+      ],
+      "forbidden": [
+        "security-reviewer"
+      ]
+    },
+    {
+      "id": "agent-architecture-not-reliability-by-default",
+      "kind": "agent",
+      "mode": "implicit",
+      "prompt": "As Code Review Lead, delegate review of a harmless internal package dependency-direction cleanup. There are no changes to data, critical operations, messaging, availability or recovery paths.",
+      "expected": [
+        "architecture-reviewer"
+      ],
+      "forbidden": [
+        "reliability-reviewer"
+      ]
+    },
+    {
       "id": "agent-finding-verifier",
       "kind": "agent",
       "mode": "contextual",
