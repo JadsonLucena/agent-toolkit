@@ -24,6 +24,10 @@ Implement one supported, independently verifiable code slice without silently mo
 
 Keep the current authorized slice, source baseline, Change Boundary, and pre-edit intention partition (purposes, independent revert test, verification, safe intermediate states and dependency order). Track PR-plan status when material, repository state, commit authority and its source, Git handoff SHA, tests/checks, unresolved risks and external effects. Preserve external-effect identifiers when material to safe resumption.
 
+## Optional Fresh Plan Execution
+
+When the caller selects a fresh model context for a bounded plan, follow [Fresh Plan Execution](references/fresh-plan-execution.md) conditionally. A host must actually spawn a new, non-resumed session with a distinct observed identity; trimming the current prompt does not qualify. Preserve existing TDD, pre-edit atomic-intention planning, Git handoffs and scope authorization inside each plan. If no capable host exists, use native Implementation and report that no new session was created, unless isolation was required; then block. Reconcile actual effects and evidence before the next plan; no parallel plans or waves are introduced.
+
 ## Workflow
 
 ```mermaid
