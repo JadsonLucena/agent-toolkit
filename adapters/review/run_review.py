@@ -72,6 +72,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-ocr", action="store_true")
     ap.add_argument("--no-security-audit", action="store_true")
     ap.add_argument("--security-audit-root", type=Path)
+    ap.add_argument("--security-topic", action="append", default=[],
+                    help="optional security guidance topic; never changes risk or review scope")
     ap.add_argument("--timeout", type=int, default=300)
     ap.add_argument("--ocr-timeout", type=int, default=30)
     ap.add_argument("--risk-profile", choices=("R0", "R1", "R2", "R3"))
@@ -130,6 +132,7 @@ def main(argv: list[str] | None = None) -> int:
                 allow_security_audit=not args.no_security_audit,
                 security_audit_root=args.security_audit_root,
                 security_concerns=args.concern,
+                security_topics=args.security_topic,
             )
             context["preparation_adapter"] = "python-reference"
             context["review_risk_profile"] = args.risk_profile
