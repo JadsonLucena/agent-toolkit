@@ -51,6 +51,10 @@ further mutation. Do not replay an unknown external effect. If unavailable,
 report that durable resumption is unavailable and continue the native
 procedural workflow only where safe.
 
+## Optional Sequential Fresh-Session Handoff
+
+For an explicitly bounded set of Implementation plans, Delivery may route one plan at a time to a host-provided **new, non-resumed Implementation Engineer session**. Select and authorize each plan from current evidence; load only applicable verified sources, critical guarantees, and restrictions. After the host reports its actual session identity and outcome, reconcile the changed repository revision, commits, tests, side effects and remaining scope before starting another plan. Do not propagate a previous agent transcript as accepted specification or claim session isolation from a reworded prompt. Host absence means use native Implementation with the limitation reported, or stop if fresh sessions were required. This option is sequential only; it does not schedule waves or grant new source/remote permissions.
+
 ## Workflow
 
 The five Delivery decisions below form the **coordination loop**, not replacement procedures for specialist capabilities. Select only the next necessary authorized stage; the selected owner applies its canonical rules, checks and operation-specific gates.
