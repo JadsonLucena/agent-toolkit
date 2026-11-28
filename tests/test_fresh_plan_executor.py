@@ -132,6 +132,9 @@ class FreshPlanTests(unittest.TestCase):
         args = mocked.call_args.args[0]
         self.assertEqual(["codex", "exec", "--json", "--sandbox", "workspace-write"], args[:5])
         self.assertNotIn("resume", args)
+        self.assertEqual("-", args[-1])
+        self.assertEqual(b"approved prompt", mocked.call_args.kwargs["input"])
+        self.assertNotIn("approved prompt", " ".join(args))
 
     def test_codex_missing_thread_rejected(self):
         from types import SimpleNamespace
