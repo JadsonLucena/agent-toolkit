@@ -46,6 +46,29 @@ class CorrectnessReviewEvalsTests(unittest.TestCase):
                                 else "presence")
                     self.assertEqual(expected, check["mode"])
 
+    def test_ground_truth_witnesses_execute_and_match_contract(self):
+        cat = load_catalog(CATALOG)
+        for case in cat["cases"]:
+            fixture = case["fixture"]
+            function = fixture["function"]
+            self.assertGreaterEqual(len(fixture["witnesses"]), 1)
+            baseline = {}
+            head = {}
+            exec(compile(fixture["base"], "baseline", "exec"), baseline)
+            exec(compile(fixture["changed"], "head", "exec"), head)
+            for witness in fixture["witnesses"]:
+                with self.subTest(case=case["id"], args=witness["args"]):
+                    args = witness["args"]
+                    self.assertEqual(witness["baseline"], baseline[function](*args))
+                    self.assertEqual(witness["head"], head[function](*args))
+                    if case["polarity"] == "defect":
+                        self.assertEqual(witness["expected"], witness["baseline"])
+                        self.assertNotEqual(witness["expected"], witness["head"])
+                    elif case["polarity"] == "non-defect":
+                        self.assertEqual(witness["expected"], witness["head"])
+                    else:
+                        self.assertNotIn("expected", witness)
+
     def test_unobserved_cases_are_incomplete_not_success(self):
         cat = load_catalog(CATALOG)
         result = evaluate(cat, {"version": 1, "assessments": []}, CATALOG.parent)

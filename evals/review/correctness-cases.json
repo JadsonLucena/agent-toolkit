@@ -12,7 +12,18 @@
         "path": "src/logic.py",
         "contract": "# Approved BR-REFUND\nA user with exactly two completed refunds during the last 365 days must not receive another refund. The function receives the already-completed refund count.\n",
         "base": "def may_refund(completed_refunds):\n    return completed_refunds < 2\n",
-        "changed": "def may_refund(completed_refunds):\n    return completed_refunds <= 2\n"
+        "changed": "def may_refund(completed_refunds):\n    return completed_refunds <= 2\n",
+        "function": "may_refund",
+        "witnesses": [
+          {
+            "args": [
+              2
+            ],
+            "baseline": false,
+            "head": true,
+            "expected": false
+          }
+        ]
       },
       "checks": [
         {
@@ -42,7 +53,18 @@
         "path": "src/logic.py",
         "contract": "# Approved BR-LIMIT\nAmounts in the closed interval [0, 100] are accepted. Validation of negative amounts is performed by the caller.\n",
         "base": "def at_most_limit(amount):\n    return amount < 100\n",
-        "changed": "def at_most_limit(amount):\n    return amount <= 100\n"
+        "changed": "def at_most_limit(amount):\n    return amount <= 100\n",
+        "function": "at_most_limit",
+        "witnesses": [
+          {
+            "args": [
+              100
+            ],
+            "baseline": false,
+            "head": true,
+            "expected": true
+          }
+        ]
       },
       "checks": [
         {
@@ -72,7 +94,20 @@
         "path": "src/logic.py",
         "contract": "# Approved BR-ACCESS\nA command is allowed only when the account is active AND the actor is either an administrator or the resource owner.\n",
         "base": "def allowed(active, admin, owner):\n    return active and (admin or owner)\n",
-        "changed": "def allowed(active, admin, owner):\n    return active and admin or owner\n"
+        "changed": "def allowed(active, admin, owner):\n    return active and admin or owner\n",
+        "function": "allowed",
+        "witnesses": [
+          {
+            "args": [
+              false,
+              false,
+              true
+            ],
+            "baseline": false,
+            "head": true,
+            "expected": false
+          }
+        ]
       },
       "checks": [
         {
@@ -102,7 +137,20 @@
         "path": "src/logic.py",
         "contract": "# Approved BR-NAME\nA missing or None name is displayed as Anonymous. A provided empty string is an intentional and valid display value and must be preserved.\n",
         "base": "def display_name(profile):\n    value = profile.get('name')\n    return 'Anonymous' if value is None else value\n",
-        "changed": "def display_name(profile):\n    return profile.get('name') or 'Anonymous'\n"
+        "changed": "def display_name(profile):\n    return profile.get('name') or 'Anonymous'\n",
+        "function": "display_name",
+        "witnesses": [
+          {
+            "args": [
+              {
+                "name": ""
+              }
+            ],
+            "baseline": "",
+            "head": "Anonymous",
+            "expected": ""
+          }
+        ]
       },
       "checks": [
         {
@@ -132,7 +180,19 @@
         "path": "src/logic.py",
         "contract": "# Approved BR-STATE\nThe settle event may transition an AUTHORIZED payment to SETTLED. A PENDING payment must remain PENDING when settle is received. CANCELED remains terminal.\n",
         "base": "def next_state(current, event):\n    if current == 'AUTHORIZED' and event == 'settle':\n        return 'SETTLED'\n    return current\n",
-        "changed": "def next_state(current, event):\n    if current != 'CANCELED' and event == 'settle':\n        return 'SETTLED'\n    return current\n"
+        "changed": "def next_state(current, event):\n    if current != 'CANCELED' and event == 'settle':\n        return 'SETTLED'\n    return current\n",
+        "function": "next_state",
+        "witnesses": [
+          {
+            "args": [
+              "PENDING",
+              "settle"
+            ],
+            "baseline": "PENDING",
+            "head": "SETTLED",
+            "expected": "PENDING"
+          }
+        ]
       },
       "checks": [
         {
@@ -162,7 +222,30 @@
         "path": "src/logic.py",
         "contract": "# Approved BR-WINDOW\nAn event belongs to the window exactly when start <= event_time < end. The caller supplies timestamps on one comparable time basis.\n",
         "base": "def in_window(event_time, start, end):\n    return start <= event_time < end\n",
-        "changed": "def in_window(event_time, start, end):\n    return start < event_time <= end\n"
+        "changed": "def in_window(event_time, start, end):\n    return start < event_time <= end\n",
+        "function": "in_window",
+        "witnesses": [
+          {
+            "args": [
+              10,
+              10,
+              20
+            ],
+            "baseline": true,
+            "head": false,
+            "expected": true
+          },
+          {
+            "args": [
+              20,
+              10,
+              20
+            ],
+            "baseline": false,
+            "head": true,
+            "expected": false
+          }
+        ]
       },
       "checks": [
         {
@@ -192,7 +275,18 @@
         "path": "src/logic.py",
         "contract": "# Approved BR-DISCOUNT\nFor nonnegative prices in integer cents, apply a 15 percent discount and round the resulting integer cents to the nearest cent, with half up.\n",
         "base": "def discounted_cents(price_cents):\n    return (price_cents * 85 + 50) // 100\n",
-        "changed": "def discounted_cents(price_cents):\n    return price_cents * 85 // 100\n"
+        "changed": "def discounted_cents(price_cents):\n    return price_cents * 85 // 100\n",
+        "function": "discounted_cents",
+        "witnesses": [
+          {
+            "args": [
+              101
+            ],
+            "baseline": 86,
+            "head": 85,
+            "expected": 86
+          }
+        ]
       },
       "checks": [
         {
@@ -222,7 +316,26 @@
         "path": "src/logic.py",
         "contract": "# Approved BR-SHIPPING\nShipping costs 10 units for weights <= 5 and 20 units for weights > 5. The caller validates weight.\n",
         "base": "def shipping_cost(weight):\n    if weight <= 5:\n        return 10\n    return 20\n",
-        "changed": "def shipping_cost(weight):\n    return 10 if weight <= 5 else 20\n"
+        "changed": "def shipping_cost(weight):\n    return 10 if weight <= 5 else 20\n",
+        "function": "shipping_cost",
+        "witnesses": [
+          {
+            "args": [
+              5
+            ],
+            "baseline": 10,
+            "head": 10,
+            "expected": 10
+          },
+          {
+            "args": [
+              6
+            ],
+            "baseline": 20,
+            "head": 20,
+            "expected": 20
+          }
+        ]
       },
       "checks": [
         {
@@ -252,7 +365,17 @@
         "path": "src/logic.py",
         "contract": "# Accepted BR-ANON\nA None value displays as Anonymous. There is NO accepted rule about whether an empty string should remain empty or be replaced. The PR description claims empty should also become Anonymous, but is not approved business policy.\n",
         "base": "def normalize_name(name):\n    return 'Anonymous' if name is None else name\n",
-        "changed": "def normalize_name(name):\n    return name or 'Anonymous'\n"
+        "changed": "def normalize_name(name):\n    return name or 'Anonymous'\n",
+        "function": "normalize_name",
+        "witnesses": [
+          {
+            "args": [
+              ""
+            ],
+            "baseline": "",
+            "head": "Anonymous"
+          }
+        ]
       },
       "checks": [
         {
@@ -283,7 +406,18 @@
         "contract": "# Approved BR-SALE\nFor prices in whole currency units, an eligible purchase receives exactly 15 percent discount. For price 100 the result must be 85.\n",
         "base": "def sale_price(price):\n    return price * 85 // 100\n",
         "changed": "def sale_price(price):\n    return price * 90 // 100\n",
-        "head_tests": "import unittest\nfrom src.logic import sale_price\n\nclass DiscountTests(unittest.TestCase):\n    def test_expected_by_implementation(self):\n        self.assertEqual(90, sale_price(100))\n"
+        "head_tests": "import unittest\nfrom src.logic import sale_price\n\nclass DiscountTests(unittest.TestCase):\n    def test_expected_by_implementation(self):\n        self.assertEqual(90, sale_price(100))\n",
+        "function": "sale_price",
+        "witnesses": [
+          {
+            "args": [
+              100
+            ],
+            "baseline": 85,
+            "head": 90,
+            "expected": 85
+          }
+        ]
       },
       "checks": [
         {
