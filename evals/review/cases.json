@@ -185,6 +185,251 @@
           "criterion": "Preserves separate Git PR readiness decision"
         }
       ]
+    },
+    {
+      "id": "RV-09",
+      "command": "/review/review-code",
+      "scenario": "Material ambiguity without authorized interpretation",
+      "input": "Fixture contains approved requirement 'retry a failed payment', but no allowed failure classes, timing or attempt limits. Patch chooses three immediate retries. A stakeholder decision could change a high-impact finding.",
+      "polarity": "false-positive-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies two materially different plausible interpretations and names the missing decision"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not invent an exact retry count or treat the chosen strategy as a proven violation"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Preserves material uncertainty and routes decision-needed without an independent specialist verdict"
+        }
+      ]
+    },
+    {
+      "id": "RV-10",
+      "command": "/review/review-code",
+      "scenario": "Correct implementation uses an unfamiliar algorithm",
+      "input": "Approved R2 requires refund eligibility from a sliding 365-day window. The implementation uses an equivalent indexed interval query rather than the reviewer's preferred application-side loop. Pinned fixtures show same boundary outcomes.",
+      "polarity": "false-positive-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Checks actual source-backed behavior against the 365-day window rather than imposing implementation style"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not file a finding solely because an equivalent query differs from the expected algorithm"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Records applicable satisfying evidence or limitations without treating preference as contract"
+        }
+      ]
+    },
+    {
+      "id": "RV-11",
+      "command": "/review/review-code",
+      "scenario": "Rolling eligibility boundary uses calendar year",
+      "input": "Approved BR-3 permits at most two approved refunds in the previous 365 days. Implementation counts only records after January 1, and tests assert success only within one year.",
+      "polarity": "missed-defect-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Constructs a counterexample across December to January where three refunds fall within 365 days"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Connects the violation to the governing BR-3 and reachable counting path"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim the existing success-path tests establish conformance"
+        }
+      ]
+    },
+    {
+      "id": "RV-12",
+      "command": "/review/review-code",
+      "scenario": "Structurally valid API breaks semantic compatibility",
+      "input": "Approved API contract states status CANCELLED means permanently ended; patch preserves response schema but repurposes CANCELLED for temporary pause while old consumers still interpret it as terminal.",
+      "polarity": "missed-defect-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies semantic contract change despite unchanged field names and schema"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Traces actual downstream consumer meaning or states evidence limitations"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not treat OpenAPI/schema validation alone as proof of behavioral compatibility"
+        }
+      ]
+    },
+    {
+      "id": "RV-13",
+      "command": "/review/review-code",
+      "scenario": "Prohibited state transition on new event",
+      "input": "Approved state contract forbids a COMPLETED operation from returning to PENDING. Patch introduces a new event handler that resets COMPLETED to PENDING; a separate test only checks successful event acknowledgement.",
+      "polarity": "missed-defect-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Derives forbidden transition from the approved state contract"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Constructs a reachable event sequence with changed state as counterexample"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not substitute a green acknowledgement test for transition verification"
+        }
+      ]
+    },
+    {
+      "id": "RV-14",
+      "command": "/review/review-code",
+      "scenario": "Benign unspecified behavior without contract violation",
+      "input": "Change adds a harmless internal metric tag. Approved Change Boundary explicitly permits operational instrumentation; no external behavior, data contract or declared convention changes.",
+      "polarity": "false-positive-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Distinguishes permitted observability from material unauthorized scope expansion"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not invent a prohibition on optional internal metrics"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not demand a new specification or formal Scenario Set before native review"
+        }
+      ]
+    },
+    {
+      "id": "RV-15",
+      "command": "/review/review-code",
+      "scenario": "Missing formal Requirements document in low-risk patch",
+      "input": "A small reversible internal bug fix has a concrete reproducer and regression test but no formal Requirements artifact; affected interfaces and consumers remain unchanged.",
+      "polarity": "false-positive-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Inspects the actual bug and regression behavior using available evidence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not classify absence of a formal Requirements artifact as a defect or automatic INCOMPLETE"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim a non-existent authoritative baseline was inspected"
+        }
+      ]
+    },
+    {
+      "id": "RV-16",
+      "command": "/review/review-code",
+      "scenario": "Governing rule exists only in repository",
+      "input": "PR description omits refund eligibility, but versioned repository business rule BR-7 controls the changed endpoint. Patch newly counts requested-but-not-approved refunds; approved BR-7 permits only completed refunds.",
+      "polarity": "missed-defect-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Discovers relevant versioned BR-7 within the bounded affected repository context"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Uses BR-7 rather than the PR description to demonstrate the counterexample"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not require the author to paste all repository rules into the PR description"
+        }
+      ]
+    },
+    {
+      "id": "RV-17",
+      "command": "/review/review-code",
+      "scenario": "Liveness requirement with absent runtime measurements",
+      "input": "Approved quality rule requires terminal processing within 30 seconds under stated queue load; patch changes scheduling but no bounded-load run was executed. The code path alone cannot establish the real p99 latency.",
+      "polarity": "false-positive-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Preserves the required time bound, load condition and relevant measurement assumptions"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Distinguishes unverified timing from a proven measured breach"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not fabricate a benchmark result or require model checking for this ordinary change"
+        }
+      ]
+    },
+    {
+      "id": "RV-18",
+      "command": "/review/review-code",
+      "scenario": "Accepted financial invariant exposed through concurrency",
+      "input": "Approved rule forbids aggregate approved refunds exceeding original payment. Two concurrent refund requests can each pass the same unlocked balance check and independently commit, exceeding the bound.",
+      "polarity": "missed-defect-control",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Derives the aggregate-value invariant and constructs the concurrent counterexample"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Identifies the concrete reachable interleaving and evidence needed to confirm it"
+        },
+        {
+          "id": "c3",
+          "mode": "presence",
+          "criterion": "Routes concurrency mechanism questions to Reliability/Correctness without inventing a mandatory locking implementation"
+        },
+        {
+          "id": "c4",
+          "mode": "absence",
+          "criterion": "Does not require a specific locking or transaction technology without a source-backed necessity"
+        }
+      ]
     }
   ]
 }
