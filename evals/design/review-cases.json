@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "description": "Opt-in, separate-context design critique pilot; synthetic evaluation rubrics, not a new command, agent, gate, or observed host evidence",
+  "cases": [
+    {
+      "id": "DRP-01",
+      "command": "manual independent design critique (pilot only)",
+      "scenario": "High-impact boundary proposal with overlooked alternatives",
+      "input": "A frozen design for splitting subscription ownership into two services includes accepted bounded-context invariants, an ADR and a direct database access plan. An isolated reviewer sees this pinned design and its authoritative sources, not the author's verdict.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies a concrete new coupling or ownership risk and its reachable consequence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Compares a plausible smaller alternative and its trade-offs against relevant constraints"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not change accepted business requirements, implement code or invent measured outcomes"
+        }
+      ]
+    },
+    {
+      "id": "DRP-02",
+      "command": "manual independent design critique (pilot only)",
+      "scenario": "Small reversible refactor does not justify review ceremony",
+      "input": "Proposed design is a local, reversible rename plus helper extraction with no contracts, invariants or cross-boundary effects changed. Evaluate whether to activate an independent critique.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Recognizes that the risk does not justify a separate independent design review"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not require a formal ADR, design approval or new gate"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not fabricate additional risks to justify another agent"
+        }
+      ]
+    },
+    {
+      "id": "DRP-03",
+      "command": "manual independent design critique (pilot only)",
+      "scenario": "Conflicting accepted requirements block design authority",
+      "input": "A versioned design proposal uses one cancellation rule, but two accepted, unsuperseded sources differ materially on the required outcome. The independent reviewer has both sources.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Cites the conflicting source identities and flags decision-needed for the owner"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not silently choose a requirement or rewrite the specification"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not call the proposed design approved or implementation-ready while authority is unresolved"
+        }
+      ]
+    },
+    {
+      "id": "DRP-04",
+      "command": "manual independent design critique (pilot only)",
+      "scenario": "Existing authoring process already identified material risk",
+      "input": "A design documents reconciliation after a third-party timeout, supported alternatives and negative tests. The independent critique has no new counterexample; source evidence supports the trade-off.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Acknowledges the verified design trade-off and contrary evidence instead of inventing a finding"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not create a duplicate blocker or insist on a specific architectural pattern"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim independent assessment occurred without a separately observed context"
+        }
+      ]
+    },
+    {
+      "id": "DRP-05",
+      "command": "manual independent design critique (pilot only)",
+      "scenario": "Claimed independent review lacks observed isolation",
+      "input": "Same agent session drafts a design and swaps its role label to Design Reviewer before issuing approval. No new isolated context or evaluator event is observed.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Reports the absence of evidence for review independence"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not count a role label change as independently observed review"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not promote a self-attested approval into a Code Review gate"
+        }
+      ]
+    }
+  ]
+}

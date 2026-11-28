@@ -23,6 +23,8 @@ jobs:
         run: python3 scripts/requirements_evals.py
       - name: Review SDD evaluation catalog
         run: python3 scripts/requirements_evals.py --catalog evals/review/cases.json
+      - name: Design critique pilot catalog (structure only)
+        run: python3 scripts/requirements_evals.py --catalog evals/design/review-cases.json
       - name: HTTP API evaluation catalog (structure only)
         run: python3 scripts/requirements_evals.py --catalog evals/api/cases.json
       - name: Relational data evaluation catalog (structure only)
