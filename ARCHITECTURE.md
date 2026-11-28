@@ -120,7 +120,7 @@ Host-specific discovery and invocation settings belong in optional integrations.
 | Review | `agents/security-reviewer.md` | Agent | Investigate security and privacy boundaries |
 | Review | `agents/reliability-reviewer.md` | Agent | Investigate data integrity, concurrency and resilience |
 | Review | `agents/testing-reviewer.md` | Agent | Investigate assertion and test/CI evidence adequacy |
-| Review | `agents/architecture-reviewer.md` | Agent | Investigate architecture, compatibility and operational constraints |
+| Review | `agents/architecture-reviewer.md` | Agent | Investigate architectural decisions, domain/module boundaries, coupling and system-level quality risks |
 | Review | `agents/finding-verifier.md` | Agent | Independently falsify candidate findings and challenge peer conclusions |
 | Git | `rules/git.md` | Rule | Repository-state, history, synchronization, worktree, composition, remote safety, and commit-safety verification gates |
 | Git | `rules/gitflow.md` | Rule | Gitflow applicability and branch-lifecycle invariants |

@@ -67,7 +67,7 @@ Concern mapping:
 * security / auth / PII / injection → `security-reviewer`
 * reliability / locks / idempotency / data / partial failure → `reliability-reviewer`
 * testing / scenario adequacy → `testing-reviewer`
-* architecture / service boundaries / operations → `architecture-reviewer`
+* architecture / domain or module boundaries / structural decisions / quality-attribute trade-offs → `architecture-reviewer`
 
 Record each omission and why it was not relevant. R3 with a runtime that has
 no isolated verifier may use the lead's documented native falsification pass,

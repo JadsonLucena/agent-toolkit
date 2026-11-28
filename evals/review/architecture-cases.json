@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "description": "Architecture Code Review: falsification, quality-attribute trade-offs and negative-selection rubrics; not actual host execution",
+  "cases": [
+    {
+      "id": "ARCH-01",
+      "command": "/review/review-code",
+      "scenario": "Unjustified cross-context coupling introduced",
+      "input": "Pinned PR diff causes enrollment domain to import internal payment gateway schemas; accepted boundary says payments evolve independently; concrete consumer call path is present. Review the frozen change.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies the newly introduced cross-context knowledge and a concrete change-propagation consequence"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Tests the repository boundary against actual callers, declarations and contrary evidence"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not require a specific hexagonal layering pattern or generic interface merely for style"
+        }
+      ]
+    },
+    {
+      "id": "ARCH-02",
+      "command": "/review/review-code",
+      "scenario": "Relational schema mistaken for aggregate model",
+      "input": "Pinned diff mirrors ORM tables and join entities into domain aggregates and exposes persistence details to application callers; business invariants and actual consumers are provided. Review architectural consequences.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Separates relational persistence representation from domain concepts and demonstrated invariants"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Explains any concrete coupling or inconsistency caused by the new modeling choice"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not automatically require separate domain entities or a mapping layer for simple CRUD"
+        }
+      ]
+    },
+    {
+      "id": "ARCH-03",
+      "command": "/review/review-code",
+      "scenario": "Existing architectural decision may be outdated",
+      "input": "Pinned diff replaces an old synchronous dependency with an asynchronous port, contrary to an old ADR; new approved latency and availability constraints motivate change. Both source revisions are visible.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Distinguishes architecture intent from potentially obsolete documentation with cited sources"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Discusses material compatibility and operational trade-offs of the proposed evolution"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not automatically fail because implementation differs from the old ADR"
+        }
+      ]
+    },
+    {
+      "id": "ARCH-04",
+      "command": "/review/review-code",
+      "scenario": "Speculative abstraction with no real harm",
+      "input": "Pinned small reversible diff adds a single internal helper and local interface. No new cross-boundary coupling, consumers or measurable quality regressions are visible; code style differs from reviewer preference.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Examines change propagation and acknowledges absence of evidence for a meaningful architectural defect"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not issue a blocking finding based on SOLID, DRY or pattern preference alone"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not demand a formal ADR or an architectural redesign for the local change"
+        }
+      ]
+    },
+    {
+      "id": "ARCH-05",
+      "command": "/review/review-code",
+      "scenario": "Operational failure belongs to reliability lens",
+      "input": "Pinned diff adds a new synchronous service boundary. A network timeout may repeat an external payment; reviewers for architecture and reliability are both selected; inspect caller and retry path.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Evaluates structural dependency and systemic quality trade-off separately from retry mechanics"
+        },
+        {
+          "id": "c2",
+          "mode": "presence",
+          "criterion": "Requests or reconciles reliability evidence without duplicating the same root-cause finding"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not claim a charge was actually duplicated without execution or source evidence"
+        }
+      ]
+    },
+    {
+      "id": "ARCH-06",
+      "command": "/review/review-code",
+      "scenario": "Performance conjecture versus measurable requirement",
+      "input": "Pinned diff introduces a read projection on a hot path. The accepted SLO names p99 but no load measurements are provided; structural read/write consistency and callers are visible.",
+      "checks": [
+        {
+          "id": "c1",
+          "mode": "presence",
+          "criterion": "Identifies any source-grounded quality scenario and verification still needed"
+        },
+        {
+          "id": "c2",
+          "mode": "absence",
+          "criterion": "Does not report a measured p99 breach or fabricated performance numbers"
+        },
+        {
+          "id": "c3",
+          "mode": "absence",
+          "criterion": "Does not automatically ban denormalization, materialized views or eventual consistency"
+        }
+      ]
+    }
+  ]
+}
