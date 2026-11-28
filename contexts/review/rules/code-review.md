@@ -184,16 +184,21 @@ gate profiles, and retain the existing independence and signature boundaries.
 
 | Severity | Reachable consequence |
 | --- | --- |
-| `critical` | Financial or data loss at scale, or broadly exploitable security/privacy compromise without rare preconditions |
-| `high` | Financial/data loss, unauthorized action, or critical invariant violation reachable under realistic conditions |
-| `medium` | Manually recoverable inconsistency, fresh-environment operational failure, or violated specification without direct critical loss |
-| `low` | Bounded observability, documentation or maintainability issue without critical behavior loss |
+| `critical` | Financial or data loss at scale; broadly exploitable security/privacy compromise without rare preconditions; or widespread, sustained unavailability of an essential service with demonstrated severe impact |
+| `high` | Financial/data loss, unauthorized action or critical invariant violation under realistic conditions; or significant critical-workflow outage, cascading overload or impaired recovery with material impact |
+| `medium` | Manually recoverable inconsistency, bounded service degradation/backlog, fresh-environment operational failure or violated specification without direct critical loss |
+| `low` | Minor, bounded observability, operational diagnosability, documentation or maintainability issue without critical behavior loss |
 
 `likelihood=high` means a routinely reachable trigger; `medium` means
 credible but conditional; `low` means exceptional yet realistic. Separately,
 `confidence=high|medium|low` records how strongly inspected evidence supports
 the claim. Set `priority` from severity **and** likelihood **and** exposure
 (blast radius, affected users/data, exploitability); explain exceptions.
+Availability and recovery consequences require the same source-grounded impact,
+likelihood and exposure analysis as integrity findings. Consider duration, user/
+workflow criticality, blast radius, existing isolation and recovery controls;
+never invent SLO breaches or outage measurements. An absent circuit breaker,
+retry, fallback or SLO is not by itself a finding.
 Do not automatically block based on a checklist match, severity label alone
 or a numerical matrix.
 

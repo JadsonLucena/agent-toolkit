@@ -65,7 +65,7 @@ Concern mapping:
 * contract / OpenAPI / AC → `specification-reviewer`
 * correctness / behavior / regression → `correctness-reviewer`
 * security / auth / PII / injection → `security-reviewer`
-* reliability / locks / idempotency / data / partial failure → `reliability-reviewer`
+* reliability / consistency / locks / idempotency / partial failure / messaging / overload / dependency availability / recovery → `reliability-reviewer`
 * testing / scenario adequacy → `testing-reviewer`
 * architecture / service boundaries / operations → `architecture-reviewer`
 
