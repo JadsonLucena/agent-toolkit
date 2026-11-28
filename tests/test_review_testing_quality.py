@@ -44,7 +44,7 @@ class ReviewTestingQualityTests(unittest.TestCase):
         prompt = assignment["agent_prompt"]
         self.assertIn(QUALITY_PATH.read_text(encoding="utf-8"), prompt)
         self.assertIn("Source: `contexts/testing/rules/testing.md`", prompt)
-        self.assertIn("Assertions must be strong enough to prove intended behavior.", prompt)
+        self.assertIn("Assertions must provide meaningful evidence that relevant expected behavior", prompt)
         self.assertNotIn("untrusted target rules", prompt)
         self.assertNotIn("contexts/testing/skills/generate-tests/SKILL.md", prompt)
         self.assertTrue(assignment["read_only"])
@@ -56,6 +56,29 @@ class ReviewTestingQualityTests(unittest.TestCase):
                 prompt = team._agent_prompt(role)
                 self.assertNotIn("## Canonical Testing Quality Reference", prompt)
                 self.assertNotIn("# Automated Testing Rules", prompt)
+
+    def test_specialist_has_one_output_contract_and_test_basis_is_optional(self):
+        specialist = (ROOT / "contexts/review/agents/testing-reviewer.md").read_text()
+        self.assertIn("Output contract: `contracts/review-specialist-evidence.md`", specialist)
+        self.assertIn("Lead-owned verdict contract (reference only)", specialist)
+        self.assertIn("Optional behavioral basis: `contracts/test-basis.md`", specialist)
+        self.assertIn("Optional execution evidence: `contracts/test-evidence.md`", specialist)
+        self.assertNotIn("Output contract: `contracts/review-evidence.md`", specialist)
+
+    def test_investigation_is_falsifiable_and_does_not_create_gate(self):
+        specialist = (ROOT / "contexts/review/agents/testing-reviewer.md").read_text()
+        rules = QUALITY_PATH.read_text(encoding="utf-8")
+        for phrase in (
+            "Risk-Scoped Investigation Method", "falsifiable regression hypothesis",
+            "Challenge the test oracle", "test existence, reachability",
+            "existing integration/contract tests", "do **not** create a second",
+            "unexecuted/stale verification", "contrary evidence",
+        ):
+            self.assertIn(phrase, specialist)
+        self.assertIn("Avoid circular oracles", rules)
+        self.assertIn("do not prove universal correctness", rules)
+        self.assertIn("Controlled local resources", rules)
+        self.assertIn("does not establish database-specific", rules)
 
     def test_missing_canonical_quality_source_is_explicit_failure(self):
         with patch.object(team, "TESTING_QUALITY_RULE", ROOT / "missing-testing-rule.md"):
