@@ -23,6 +23,7 @@ class CorrectnessReviewPolicyTests(unittest.TestCase):
         self.assertTrue((ROOT / path).is_file())
         self.assertIn(path, read("contexts/review/agents/code-reviewer.md"))
         self.assertIn(path, read("contexts/review/agents/correctness-reviewer.md"))
+        self.assertIn("references/correctness-review.md", read("contexts/review/skills/review-change/SKILL.md"))
         self.assertIn("native-solo", read("contexts/review/agents/code-reviewer.md"))
 
     def test_reference_selects_probes_without_automatic_findings(self):

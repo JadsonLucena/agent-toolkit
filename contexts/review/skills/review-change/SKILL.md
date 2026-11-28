@@ -15,6 +15,7 @@ Perform a complete read-only review in `advisory` or `gate` profile with portabl
 * Skill: `contexts/review/skills/verify-findings/SKILL.md`
 * Skill: `contexts/review/skills/coordinate-review-team/SKILL.md`
 * Output contract: `contracts/review-evidence.md`
+* Conditional functional correctness reference: `references/correctness-review.md` (risk-selected in native or specialist investigation)
 * Optional input contract: `contracts/test-basis.md`
 * Optional input contract: `contracts/test-evidence.md`
 * Optional input contract: `contracts/requirements.md`
