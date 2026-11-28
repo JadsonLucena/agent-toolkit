@@ -35,7 +35,7 @@ class CorrectnessReviewPolicyTests(unittest.TestCase):
                 self.assertIn(phrase, ref)
         self.assertIn("Not a defect", ref)
         self.assertIn("not an invented business rule", ref)
-        self.assertIn("not a second gate", ref)
+        self.assertIn("Neither is a second gate", ref)
 
     def test_specialist_does_not_claim_lead_verdict_or_mutating_authority(self):
         agent = read("contexts/review/agents/correctness-reviewer.md")
