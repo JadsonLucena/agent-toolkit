@@ -149,8 +149,8 @@ class CodexCLIHost:
     def run(self, repo: Path, prompt: str, timeout: int) -> dict:
         try:
             proc = subprocess.run(
-                ["codex", "exec", "--json", "--sandbox", "workspace-write", prompt],
-                cwd=repo, stdin=subprocess.DEVNULL, capture_output=True,
+                ["codex", "exec", "--json", "--sandbox", "workspace-write", "-"],
+                cwd=repo, input=prompt.encode("utf-8"), capture_output=True,
                 timeout=timeout, check=False,
             )
         except (OSError, subprocess.TimeoutExpired) as exc:
