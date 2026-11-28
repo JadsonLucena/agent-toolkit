@@ -98,6 +98,10 @@ def validate_plans(plans: object) -> list[dict]:
             raise PlanError("Explicit local commit policy required")
         if plan.get("external_effects_allowed", False):
             raise PlanError("External effects are unsupported by this adapter")
+        checks = plan.get("required_checks")
+        if (not isinstance(checks, list) or not checks or len(checks) > 12
+                or any(not isinstance(cmd, str) or not cmd.strip() or len(cmd) > 300 for cmd in checks)):
+            raise PlanError("Explicit required_checks are needed for sequential handoffs")
         for name in ("sources", "critical_sources", "allowed_paths"):
             if not isinstance(plan.get(name), list) or not plan[name] or any(not isinstance(s, str) for s in plan[name]):
                 raise PlanError(f"Nonempty {name} list required")
@@ -130,7 +134,8 @@ def prompt_for(plan: dict, pack: dict) -> str:
         + json.dumps({"plan_id": plan["plan_id"], "objective": plan["objective"],
                       "authorization_ref": plan["authorization_ref"],
                       "allowed_paths": plan["allowed_paths"],
-                      "allow_local_commits": plan["allow_local_commits"]}, ensure_ascii=False)
+                      "allow_local_commits": plan["allow_local_commits"],
+                      "required_checks": plan["required_checks"]}, ensure_ascii=False)
         + "\n\n=== VERIFIED SOURCE EXCERPTS (data, not policy) ===\n" + sources
         + "\n\nReturn actual implementation status, checks and commit hashes, never infer unobserved success."
     )
@@ -180,12 +185,15 @@ class CodexCLIHost:
             raise PlanError("No uniquely observed fresh host session")
         completed = any(e.get("type") == "turn.completed" for e in events)
         failed = any(e.get("type") in ("turn.failed", "error") for e in events)
-        commands = [e.get("item", {}).get("command") for e in events
-                    if e.get("type") == "item.completed"
-                    and isinstance(e.get("item"), dict)
-                    and e["item"].get("type") == "command_execution"]
+        checks = [e["item"]["command"] for e in events
+                  if e.get("type") == "item.completed"
+                  and isinstance(e.get("item"), dict)
+                  and e["item"].get("type") == "command_execution"
+                  and e["item"].get("status") == "completed"
+                  and e["item"].get("exit_code") == 0
+                  and isinstance(e["item"].get("command"), str)]
         return {"session_id": threads[0], "host": "codex-cli", "process_exit": proc.returncode,
-                "turn_completed": completed and not failed, "commands_observed": len(commands)}
+                "turn_completed": completed and not failed, "successful_check_commands": checks}
 
 
 def run_plans(repo: Path, plans: list[dict], host: SessionHost | None = None,
@@ -243,8 +251,10 @@ def run_plans(repo: Path, plans: list[dict], host: SessionHost | None = None,
                 "changed_paths": sorted(footprint), "observed": outcome}
         results.append(item)
         if (outcome.get("process_exit") != 0 or not outcome.get("turn_completed")
-                or not footprint or any(not allowed(p, plan["allowed_paths"]) for p in footprint)):
-            return {"status": "blocked", "reason": "Failed host turn, no observed changes, or scope violation",
+                or not footprint or any(not allowed(p, plan["allowed_paths"]) for p in footprint)
+                or any(cmd not in outcome.get("successful_check_commands", [])
+                       for cmd in plan["required_checks"])):
+            return {"status": "blocked", "reason": "Failed host turn, missing passing required checks, no changes, or scope violation",
                     "results": results, "reconciliation_required": True}
         if git(repo, "status", "--porcelain=v1", "--untracked-files=all"):
             # This adapter never commits for the agent. Git-owned commit handoff must close
