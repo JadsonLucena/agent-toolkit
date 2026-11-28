@@ -123,6 +123,41 @@ class FreshPlanTests(unittest.TestCase):
         self.assertEqual("blocked", run_plans(self.repo, [plan], host, "require")["status"])
         self.assertFalse(host.prompts)
 
+    def test_committed_rename_accounts_for_deleted_source(self):
+        class RenameHost:
+            def available(self): return True
+            def run(self, repo, prompt, timeout):
+                git(repo, "mv", "README.md", "README-copy.md")
+                git(repo, "commit", "-m", "test: rename")
+                return {"session_id": "rename-1", "process_exit": 0, "turn_completed": True}
+        plan = dict(self.plan, allowed_paths=["README-copy.md"])
+        result = run_plans(self.repo, [plan], RenameHost())
+        self.assertEqual("blocked", result["status"])
+        self.assertIn("README.md", result["results"][0]["changed_paths"])
+
+    def test_rewritten_base_history_stops_next_plan(self):
+        class RewriteHost:
+            def available(self): return True
+            def run(self, repo, prompt, timeout):
+                (repo / "README.md").write_text("rewritten baseline", encoding="utf-8")
+                git(repo, "add", "README.md")
+                git(repo, "commit", "--amend", "--no-edit")
+                return {"session_id": "rewrite-1", "process_exit": 0, "turn_completed": True}
+        result = run_plans(self.repo, [self.plan], RewriteHost())
+        self.assertEqual("blocked", result["status"])
+        self.assertTrue(result["reconciliation_required"])
+
+    def test_codex_capability_probe_requires_supported_cli_flags(self):
+        from types import SimpleNamespace
+        with patch("adapters.implementation.fresh_plan.shutil.which", return_value="/usr/bin/codex"), \
+             patch("adapters.implementation.fresh_plan.subprocess.run",
+                   return_value=SimpleNamespace(stdout=b"exec --json --sandbox", stderr=b"", returncode=0)):
+            self.assertTrue(CodexCLIHost().available())
+        with patch("adapters.implementation.fresh_plan.shutil.which", return_value="/usr/bin/codex"), \
+             patch("adapters.implementation.fresh_plan.subprocess.run",
+                   return_value=SimpleNamespace(stdout=b"legacy cli", stderr=b"", returncode=0)):
+            self.assertFalse(CodexCLIHost().available())
+
     def test_codex_host_absence_never_claimed_available(self):
         with patch("adapters.implementation.fresh_plan.shutil.which", return_value=None):
             self.assertFalse(CodexCLIHost().available())
