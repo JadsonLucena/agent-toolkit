@@ -21,7 +21,7 @@ Command, policy owner, or a requirement to use a particular model.
 - Select sources using the original accepted Change Boundary and source
   identifiers. Re-read and verify critical sources before launch. A reference
   is not itself a loaded or verified source. Do not copy complete conversations.
-- At handoff, verify the actual repository revision, file scope, tests,
+- At handoff, require observed successful mandatory plan-check commands, and verify the actual repository revision, file scope, tests,
   completed atomic commits, and known external effects. Do not trust a
   success-shaped message as passing verification or independent Review.
 - If a host is unavailable, default to the existing native Implementation
