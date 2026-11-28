@@ -284,6 +284,33 @@ def _validate_verified_finding(item: Any, candidates: set[str]) -> None:
         raise TeamPlanningError("verifier result must be self-contained")
 
 
+def _validate_specification_obligations(obligations: Any) -> None:
+    """Validate optional source-grounded specialist assertions without implying PASS."""
+    if not isinstance(obligations, list):
+        raise TeamPlanningError("assessed_obligations must be a list")
+    for obligation in obligations:
+        if not isinstance(obligation, dict):
+            raise TeamPlanningError("specification obligation must be an object")
+        for key in ("source_ref", "expected_behavior"):
+            if not isinstance(obligation.get(key), str) or not obligation[key].strip():
+                raise TeamPlanningError(f"specification obligation missing {key}")
+        assessment = obligation.get("assessment")
+        if assessment not in {"satisfied", "violated", "unverified"}:
+            raise TeamPlanningError("specification obligation assessment invalid")
+        for key in ("implementation_refs", "evidence_refs", "counterevidence_refs", "limitations"):
+            values = obligation.get(key, [])
+            if (not isinstance(values, list)
+                    or any(not isinstance(value, str) or not value.strip() for value in values)):
+                raise TeamPlanningError(f"specification obligation {key} invalid")
+        baseline = obligation.get("source_baseline_ref")
+        if baseline is not None and (not isinstance(baseline, str) or not baseline.strip()):
+            raise TeamPlanningError("specification source baseline invalid")
+        if assessment in {"satisfied", "violated"} and not obligation.get("evidence_refs"):
+            raise TeamPlanningError("specification conformance claim lacks source evidence")
+        if assessment == "unverified" and not obligation.get("limitations"):
+            raise TeamPlanningError("unverified specification obligation lacks limitations")
+
+
 def _validate_first_pass(replies: list[dict[str, Any]], plan: dict[str, Any]) -> dict[str, dict[str, Any]]:
     roles = plan["selected_roles"]
     if not isinstance(replies, list) or len(replies) != len(roles):
@@ -315,6 +342,10 @@ def _validate_first_pass(replies: list[dict[str, Any]], plan: dict[str, Any]) ->
         for item in reply["uncertainties"]:
             if not isinstance(item, str) or not item.strip():
                 raise TeamPlanningError("specialist uncertainties must be self-contained text")
+        if "assessed_obligations" in reply:
+            if role != "specification-reviewer":
+                raise TeamPlanningError("only specification reviewer may provide assessed_obligations")
+            _validate_specification_obligations(reply["assessed_obligations"])
         grouped[role] = reply
         seen_ids.add(task_id)
     return grouped
@@ -614,6 +645,10 @@ async def execute(
         "specialist_coverage": sorted({p for reply in grouped.values() for p in reply["reviewed_files"]}),
         "raw_findings": [f for reply in grouped.values() for f in reply["candidate_findings"]],
         "specialist_uncertainties": [u for reply in grouped.values() for u in reply["uncertainties"]],
+        "specialist_obligations": [
+            {"role": role, "obligations": reply["assessed_obligations"]}
+            for role, reply in grouped.items() if "assessed_obligations" in reply
+        ],
         "verifier": verifier,
         "lead_implemented_change": plan["lead_implemented_change"],
         "review_status": None,  # Lead only; consensus cannot approve.

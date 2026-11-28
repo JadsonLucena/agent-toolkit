@@ -68,6 +68,8 @@ When authoritative specification or other source behavior is applicable, `specif
 * `out_of_scope_behavior` — observed behavior outside authorized scope and its concrete effect or unresolved authority;
 * `findings_refs`, `limitations` — related reviewed findings, material unknowns, inaccessible consumers and unresolved contradictions.
 
+A team runtime may preserve `assessed_obligations` from the Specification specialist under `specialist_obligations`, with the actual role and source evidence. The Lead reconciles these into the existing `specification_conformance.obligations` where relevant; specialist assertions alone do not prove satisfaction or replace Lead inspection.
+
 This record supplements the usual Review findings and coverage; it does not redefine test evidence, source requirements, the review profiles, or Git preflight. Do not automatically reject a change because a formal Scenario Set is absent. A `checked` label does not imply every business outcome was observed, and a `PASS` still depends on the one existing Review verdict policy.
 
 ## Optional Debugging Handoff

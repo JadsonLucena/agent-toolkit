@@ -62,7 +62,7 @@ and keep the source-inspecting isolated verifier. Never invent concerns.
 
 Concern mapping:
 
-* contract / OpenAPI / AC → `specification-reviewer`
+* accepted business rule / requirement / acceptance scenario / contract / OpenAPI / event semantics / source-backed temporal guarantee → `specification-reviewer`
 * correctness / behavior / regression → `correctness-reviewer`
 * security / auth / PII / injection → `security-reviewer`
 * reliability / locks / idempotency / data / partial failure → `reliability-reviewer`
