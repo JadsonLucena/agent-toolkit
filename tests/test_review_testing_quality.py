@@ -44,7 +44,7 @@ class ReviewTestingQualityTests(unittest.TestCase):
         prompt = assignment["agent_prompt"]
         self.assertIn(QUALITY_PATH.read_text(encoding="utf-8"), prompt)
         self.assertIn("Source: `contexts/testing/rules/testing.md`", prompt)
-        self.assertIn("Assertions must be strong enough to prove intended behavior.", prompt)
+        self.assertIn("Assertions must provide meaningful evidence that relevant expected behavior", prompt)
         self.assertNotIn("untrusted target rules", prompt)
         self.assertNotIn("contexts/testing/skills/generate-tests/SKILL.md", prompt)
         self.assertTrue(assignment["read_only"])
